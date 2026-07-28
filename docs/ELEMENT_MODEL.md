@@ -1,29 +1,22 @@
 # Element- og prosjektmodell
 
-Dette dokumentet beskriver grunnmodellen som ble utviklet i `feature/element-model` og senere merget til `main`.
+Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editoren.
 
 ## 1. Status
 
-Prosjekt- og elementmodellen er ferdig, lokalt kontrollert, visuelt godkjent og merget til `main` 28. juli 2026.
+Grunnmodellen ble utviklet i `feature/element-model` og er senere utvidet kontrollert av feature-branchene som eier nye varige elementdata.
 
-Bekreftet ved godkjenning:
+Gjeldende skjemaversjon:
 
-- `npm run check` bestod
-- ESLint bestod
-- TypeScript-kontroll bestod
-- Dependency Cruiser fant ingen regelbrudd
-- produksjonsbuild bestod
-- arkitekturrapportene ble regenerert
-- editoren åpnet automatisk med `npm run dev`
-- blank side og eksisterende editorfunksjoner fungerte visuelt
+```ts
+EDITOR_PROJECT_SCHEMA_VERSION = 2
+```
 
-## 2. Omfang
+Versjon 2 ble innført i `feature/text-box-editing` fordi tekstobjekter fikk varig tekstinnhold.
 
-Modellen definerer prosjektdata og grunnlaget for sentral editor-state.
+Det finnes foreløpig ingen prosjektlagring eller import. Migrering mellom skjemaversjoner bygges sammen med `feature/project-open-import`.
 
-Den oppretter ikke automatisk synlige elementer. Et nytt prosjekt starter blankt, og faktiske elementer skal først opprettes etter en eksplisitt brukerhandling.
-
-## 3. Prosjektstruktur
+## 2. Prosjektstruktur
 
 Et `EditorProject` inneholder:
 
@@ -35,9 +28,9 @@ Et `EditorProject` inneholder:
 
 Et nytt prosjekt starter med én blank side kalt `Forside`.
 
-`EditorProject` er den autoritative kilden for prosjektdata og skal være grunnlaget for lagring, import, forhåndsvisning, eksport og publisering.
+`EditorProject` er autoritativ kilde for lagring, import, forhåndsvisning, eksport og publisering når disse funksjonene bygges.
 
-## 4. Sider
+## 3. Sider
 
 Hver side inneholder:
 
@@ -46,29 +39,50 @@ Hver side inneholder:
 - slug
 - liste over elementer
 
-Aktiv side lagres i editorens sentrale state og er ikke hardkodet i toppmenyen.
+Aktiv side ligger i editorens sentrale state.
 
-## 5. Elementer
+## 4. Elementunion
 
-Første modell støtter:
+`EditorElement` er en diskriminert union basert på `kind`.
 
-- seksjon
-- bilde
-- tekst
-- knapp
-
-Hvert element har:
+Felles felter:
 
 - stabil ID
-- elementtype
 - responsiv posisjon
 - responsiv størrelse
 - responsiv synlighet
 - låsestatus
 
-Elementinnhold og konkrete stilfelt legges til i feature-branchen som eier funksjonaliteten.
+Elementtyper:
 
-## 6. Responsive verdier
+```ts
+type EditorElement =
+  | SectionEditorElement
+  | ImageEditorElement
+  | TextEditorElement
+  | ButtonEditorElement
+```
+
+Bare tekstobjektet har tekstinnhold:
+
+```ts
+type TextEditorElement = BaseEditorElement & {
+  kind: 'text'
+  content: string
+}
+```
+
+Dette hindrer at kode leser eller skriver tekstinnhold på Seksjon, Bilde eller Knapp uten først å snevre typen til `kind: 'text'`.
+
+Nye tekstbokser starter med:
+
+```ts
+content: ''
+```
+
+Tom tekst er gyldig. Editor-placeholder er ikke prosjektdata.
+
+## 5. Responsive verdier
 
 ```ts
 type ResponsiveValue<T> = {
@@ -77,21 +91,32 @@ type ResponsiveValue<T> = {
 }
 ```
 
-Når mobilverdien mangler, kan mobilvisningen arve desktopverdien.
+Når mobilverdien mangler, arver Telefon-visningen desktopverdien.
 
-`feature/element-selection` bruker denne regelen ved lerretsrendering. Kontroller for å opprette og administrere mobile overstyringer bygges senere i `feature/mobile-design-controls`.
+Følgende er responsive:
 
-## 7. Stabile ID-er
+- posisjon
+- størrelse
+- synlighet
+
+Følgende er foreløpig felles for PC og Telefon:
+
+- låsestatus
+- tekstinnhold
+
+Kontroller for eksplisitte mobiloverstyringer bygges i `feature/mobile-design-controls`.
+
+## 6. Stabile ID-er
 
 ID-er opprettes med nettleserens kryptografiske UUID-funksjon.
 
 - `crypto.randomUUID()` brukes når tilgjengelig.
-- En `crypto.getRandomValues()`-basert UUID brukes som sikker reserve.
+- `crypto.getRandomValues()` brukes som sikker reserve.
 - `Math.random()` brukes ikke til prosjektidentitet.
 
-ID-er skal beholdes ved lagring, gjenåpning, import, forhåndsvisning, eksport og publisering.
+ID-er beholdes ved framtidig lagring, gjenåpning, import, eksport og publisering.
 
-## 8. Sentral state
+## 7. Sentral state
 
 `EditorProjectProvider` eier:
 
@@ -99,48 +124,69 @@ ID-er skal beholdes ved lagring, gjenåpning, import, forhåndsvisning, eksport 
 - aktiv side
 - transient editor-state som markering
 
-`App.tsx` monterer provideren rundt editorshellet.
+Varige mutasjoner går gjennom uttømmende reducer-actions, blant annet:
 
-Reducerens opprinnelige prosjekt-actions:
-
-- erstatte hele prosjektet etter framtidig åpning eller import
+- erstatte prosjekt
 - bytte aktiv side
+- opprette element
+- endre desktopgeometri
+- endre låsestatus
+- endre tekstinnhold
 
-Markeringsbranchen har senere lagt til valgt element-ID og markeringshandlinger.
+State-avhengige resultater beregnes fra reducerens nyeste state.
 
-## 9. Grense mellom prosjektdata og editor-state
+## 8. Prosjektdata og transient editor-state
 
-`EditorProject` inneholder varige prosjektdata.
+Varig prosjektdata:
 
-`EditorProjectState` kan i tillegg inneholde transient editor-state, for eksempel:
+- sider og elementer
+- geometri
+- synlighet
+- låsestatus
+- tekstinnhold
+- tidsstempler
 
-```ts
-selectedElementId: string | null
-```
+Transient editor-state:
 
-Transient editor-state skal ikke:
+- `selectedElementId`
+- aktiv pekerinteraksjon
+- layout-preview
+- aktiv tekstredigeringsøkt
+- lokal tekstdraft
+- åpne paneler og fokus
+
+Transient state skal ikke:
 
 - serialiseres som prosjektdata
-- utløse autolagring
-- inngå i prosjektets angre-/gjør om-historikk
+- utløse autolagring direkte
+- inngå direkte i historikk
 - eksporteres eller publiseres
 
-Denne grensen må bevares når lagring og historikk bygges.
+## 9. Tekstcommit
 
-## 10. Gjeldende og neste fase
+Tekstinnhold endres gjennom en egen reducer-overgang.
 
-Gjeldende branch:
+Den:
 
-```text
-feature/element-selection
-```
+- krever aktiv side og eksisterende element
+- krever `kind: 'text'`
+- avviser låst element
+- normaliserer linjeskift til `\n`
+- avviser uendret tekst
+- oppdaterer `updatedAt` ved reell endring
 
-Den bygger markering av eksisterende elementer uten elementoppretting.
+Se `docs/TEXT_BOX_EDITING.md`.
 
-Neste branch etter kontrollert merge:
+## 10. Videre modellutvidelser
 
-```text
-feature/element-creation
-```
+Nye varige egenskaper legges til i branchen som eier funksjonen.
 
-Den skal opprette faktiske elementer gjennom prosjekt-state/reduceren og legge dem til aktiv side. Den skal ikke opprette tilfeldige DOM-objekter eller blande inn draing, størrelsesendring og innholdsredigering.
+Planlagte eksempler:
+
+- teksttypografi i `feature/text-properties`
+- knappinnhold og handling i `feature/button-element`
+- bildeinnhold i `feature/image-import-and-placement`
+- prosjektfarger i `feature/project-colors`
+- mobiloverstyringer i `feature/mobile-design-controls`
+
+Høyremenyen skal ikke eie en separat elementmodell. Den skal lese valgt element fra autoritativ state og sende typed brukerintensjoner tilbake til state-laget.
