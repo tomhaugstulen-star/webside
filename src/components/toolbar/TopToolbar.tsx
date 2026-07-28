@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ViewportMode } from '../../types/editor'
 
 type TopToolbarProps = {
+  pageName: string
   viewport: ViewportMode
   onViewportChange: (viewport: ViewportMode) => void
 }
@@ -60,7 +61,7 @@ function Icon({ name }: { name: IconName }) {
   }
 }
 
-export function TopToolbar({ viewport, onViewportChange }: TopToolbarProps) {
+export function TopToolbar({ pageName, viewport, onViewportChange }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -98,7 +99,7 @@ export function TopToolbar({ viewport, onViewportChange }: TopToolbarProps) {
       </div>
 
       <button className="page-selector" type="button">
-        <span>Forside</span>
+        <span>{pageName}</span>
         <Icon name="chevron" />
       </button>
 
