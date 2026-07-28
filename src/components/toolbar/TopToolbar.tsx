@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ViewportMode } from '../../types/editor'
 
 type TopToolbarProps = {
@@ -5,57 +6,123 @@ type TopToolbarProps = {
   onViewportChange: (viewport: ViewportMode) => void
 }
 
-const viewportButtons: Array<{
-  id: ViewportMode
-  label: string
-  icon: string
-}> = [
-  { id: 'desktop', label: 'Skrivebord', icon: '▭' },
-  { id: 'tablet', label: 'Nettbrett', icon: '▯' },
-  { id: 'mobile', label: 'Mobil', icon: '▯' },
-]
+type IconName =
+  | 'sun'
+  | 'chevron'
+  | 'desktop'
+  | 'mobile'
+  | 'undo'
+  | 'redo'
+  | 'eye'
+  | 'save'
+  | 'publish'
+  | 'menu'
+
+function Icon({ name }: { name: IconName }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+  }
+
+  switch (name) {
+    case 'sun':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="3.5" />
+          <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" />
+        </svg>
+      )
+    case 'chevron':
+      return <svg {...common}><path d="m8 10 4 4 4-4" /></svg>
+    case 'desktop':
+      return <svg {...common}><rect x="3" y="4" width="18" height="13" rx="1.5" /><path d="M8 21h8M12 17v4" /></svg>
+    case 'mobile':
+      return <svg {...common}><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" /></svg>
+    case 'undo':
+      return <svg {...common}><path d="M9 7 4 12l5 5" /><path d="M5 12h8a6 6 0 0 1 6 6" /></svg>
+    case 'redo':
+      return <svg {...common}><path d="m15 7 5 5-5 5" /><path d="M19 12h-8a6 6 0 0 0-6 6" /></svg>
+    case 'eye':
+      return <svg {...common}><path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
+    case 'save':
+      return <svg {...common}><path d="M4 3h13l3 3v15H4Z" /><path d="M8 3v6h8V3M8 21v-7h8v7" /></svg>
+    case 'publish':
+      return <svg {...common}><path d="M12 16V3M7 8l5-5 5 5" /><path d="M5 14v6h14v-6" /></svg>
+    case 'menu':
+      return <svg {...common}><path d="M5 7h14M5 12h14M5 17h14" /></svg>
+  }
+}
 
 export function TopToolbar({ viewport, onViewportChange }: TopToolbarProps) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <header className="top-toolbar">
-      <div className="top-toolbar__project">
-        <button className="icon-button icon-button--dark" type="button" aria-label="Åpne hovedmeny">
-          <span aria-hidden="true">☰</span>
+      <div className="top-toolbar__brand">
+        <div className="brand-mark"><Icon name="sun" /></div>
+        <span className="brand-name">Website</span>
+      </div>
+
+      <button className="page-selector" type="button">
+        <span>Forside</span>
+        <Icon name="chevron" />
+      </button>
+
+      <div className="top-toolbar__viewport" aria-label="Velg visning">
+        <button
+          className="viewport-button"
+          type="button"
+          aria-label="Skrivebord"
+          aria-pressed={viewport === 'desktop'}
+          onClick={() => onViewportChange('desktop')}
+        >
+          <Icon name="desktop" />
         </button>
-        <div className="project-name">
-          <span className="project-name__title">webside</span>
-          <span className="project-name__page">Forside</span>
-        </div>
+        <button
+          className="viewport-button"
+          type="button"
+          aria-label="Mobil"
+          aria-pressed={viewport === 'mobile'}
+          onClick={() => onViewportChange('mobile')}
+        >
+          <Icon name="mobile" />
+        </button>
       </div>
 
       <div className="top-toolbar__history" aria-label="Historikk">
-        <button className="icon-button icon-button--dark" type="button" aria-label="Angre" disabled>
-          ↶
-        </button>
-        <button className="icon-button icon-button--dark" type="button" aria-label="Gjør om" disabled>
-          ↷
-        </button>
-      </div>
-
-      <div className="viewport-switcher" aria-label="Velg visningsbredde">
-        {viewportButtons.map((button) => (
-          <button
-            className="viewport-button"
-            type="button"
-            key={button.id}
-            aria-label={button.label}
-            aria-pressed={viewport === button.id}
-            onClick={() => onViewportChange(button.id)}
-          >
-            <span aria-hidden="true">{button.icon}</span>
-          </button>
-        ))}
+        <button className="toolbar-icon-button" type="button" aria-label="Angre"><Icon name="undo" /></button>
+        <button className="toolbar-icon-button" type="button" aria-label="Gjør om" disabled><Icon name="redo" /></button>
       </div>
 
       <div className="top-toolbar__actions">
-        <button className="toolbar-action" type="button">Forhåndsvis</button>
-        <button className="toolbar-action" type="button">Del</button>
-        <button className="publish-button" type="button">Publiser</button>
+        <button className="toolbar-action" type="button"><Icon name="eye" /><span>Forhåndsvisning</span></button>
+        <button className="toolbar-action" type="button"><Icon name="save" /><span>Lagre</span></button>
+        <button className="publish-button" type="button"><Icon name="publish" /><span>Publiser</span></button>
+        <div className="main-menu-wrap">
+          <button
+            className="main-menu-button"
+            type="button"
+            aria-label="Åpne hovedmeny"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((current) => !current)}
+          >
+            <Icon name="menu" />
+          </button>
+          {menuOpen && (
+            <div className="main-menu-popover">
+              <button type="button">Prosjektinnstillinger</button>
+              <button type="button">Dupliser prosjekt</button>
+              <button type="button">Hjelp</button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )
