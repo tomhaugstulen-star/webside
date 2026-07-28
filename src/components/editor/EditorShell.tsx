@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
+import type { ElementKind } from '../../model/editorProject'
+import { useElementCreation } from '../../state/useElementCreation'
+import { useEditorProject } from '../../state/useEditorProject'
+import type { EditorTool, ViewportMode } from '../../types/editor'
 import { EditorCanvas } from '../canvas/EditorCanvas'
 import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
-import { useEditorProject } from '../../state/useEditorProject'
-import type { EditorTool, ViewportMode } from '../../types/editor'
 
 export function EditorShell() {
   const [activeTool, setActiveTool] = useState<EditorTool | null>(null)
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const { activePage } = useEditorProject()
+  const { createElement } = useElementCreation()
 
   const toggleToolPanel = (tool: EditorTool) => {
     setActiveTool((currentTool) => (currentTool === tool ? null : tool))
@@ -16,6 +19,11 @@ export function EditorShell() {
 
   const closeToolPanel = () => {
     setActiveTool(null)
+  }
+
+  const createElementAndClosePanel = (kind: ElementKind) => {
+    createElement(kind)
+    closeToolPanel()
   }
 
   useEffect(() => {
@@ -41,6 +49,7 @@ export function EditorShell() {
           activeTool={activeTool}
           onToolChange={toggleToolPanel}
           onPanelAction={closeToolPanel}
+          onCreateElement={createElementAndClosePanel}
         />
         <EditorCanvas viewport={viewport} />
       </div>
