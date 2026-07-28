@@ -111,7 +111,7 @@ En mobilendring skal ikke utilsiktet endre desktopverdien.
 Responsiv funksjonalitet skal deles i egne ansvarsområder:
 
 - responsive typer og datamodell
-- arving og overstyring av verdier
+- arv og overstyring av verdier
 - mobilkontroller i brukergrensesnittet
 - CSS-generator
 - forhåndsvisning
@@ -129,7 +129,15 @@ feature/mobile-design-controls
 
 CSS-generatoren kan få en egen branch dersom arbeidet blir stort nok til å være en selvstendig funksjonsdel.
 
-## 10. Åpne beslutninger
+## 10. Nåværende implementeringsstatus
+
+- Desktop- og mobilknappen i editorgrunnlaget endrer foreløpig bare bredden på det blanke lerretet.
+- Det finnes ennå ingen responsive prosjektverdier eller mobiloverstyringer i prosjektdata.
+- Dagens `ViewportMode` er kun skalltilstand for visning.
+- Responsiv objektlogikk skal først bygges etter at prosjekt- og objektmodellen er definert.
+- Ingen midlertidig DOM- eller CSS-generering skal legges inn før denne modellen finnes.
+
+## 11. Åpne beslutninger
 
 - Endelig brytepunkt for mobil.
 - Hvilke egenskaper som kan overstyres på mobil i første versjon.
