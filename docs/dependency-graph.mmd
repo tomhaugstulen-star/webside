@@ -1,0 +1,38 @@
+flowchart LR
+
+subgraph src["src"]
+  src_App_tsx["App.tsx"]
+  src_App_css["App.css"]
+  subgraph src_components["components"]
+    subgraph src_components_editor["editor"]
+      src_components_editor_EditorShell_tsx["EditorShell.tsx"]
+    end
+    subgraph src_components_canvas["canvas"]
+      src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
+    end
+    subgraph src_components_sidebar["sidebar"]
+      src_components_sidebar_LeftSidebar_tsx["LeftSidebar.tsx"]
+      src_components_sidebar_InspectorRail_tsx["InspectorRail.tsx"]
+    end
+    subgraph src_components_toolbar["toolbar"]
+      src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
+    end
+  end
+  subgraph src_types["types"]
+    src_types_editor_ts["editor.ts"]
+  end
+  src_main_tsx["main.tsx"]
+  src_index_css["index.css"]
+end
+src_App_tsx-->src_App_css
+src_App_tsx-->src_components_editor_EditorShell_tsx
+src_components_editor_EditorShell_tsx-->src_types_editor_ts
+src_components_editor_EditorShell_tsx-->src_components_canvas_EditorCanvas_tsx
+src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
+src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
+src_components_canvas_EditorCanvas_tsx-->src_types_editor_ts
+src_components_sidebar_LeftSidebar_tsx-->src_types_editor_ts
+src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
+src_components_sidebar_InspectorRail_tsx-->src_types_editor_ts
+src_main_tsx-->src_App_tsx
+src_main_tsx-->src_index_css
