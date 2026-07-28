@@ -23,14 +23,15 @@ Eksempler:
 
 ## 2. Filstørrelser og moduldeling
 
-- Maksimal anbefalt størrelse for en kildefil er 300 linjer.
-- 300 linjer er en øvre kontrollgrense, ikke et mål.
-- Filer vurderes for deling fra omtrent 200–250 linjer.
-- En fil deles tidligere dersom den får flere tydelige ansvarsområder.
-- Store komponenter deles etter ansvar, ikke tilfeldig etter linjetall.
+- 250 linjer er den aktive terskelen for å begynne å trekke ut ansvar fra en kildefil.
+- En kildefil skal normalt ikke vokse videre forbi 250 linjer uten at ansvar først er trukket ut, eller at en konkret teknisk begrunnelse er dokumentert.
+- En fil deles tidligere enn 250 linjer dersom den får flere tydelige ansvarsområder.
+- 300 linjer er en absolutt kontrollgrense som krever eksplisitt gjennomgang og dokumentert begrunnelse; det er ikke et akseptabelt normalmål.
+- Uttrekking skal skje etter ansvar, ikke ved tilfeldig oppdeling for å redusere linjetallet.
+- Store komponenter deles i visning, state, hendelseslogikk og hjelpefunksjoner der dette gir naturlige modulgrenser.
 - `App.tsx` skal bare sette sammen hovedstrukturen og ikke inneholde editorlogikk.
 - Visuell komponent, transient state, prosjektmodell, hjelpefunksjoner og hendelseslogikk holdes separat når det er naturlig.
-- Store CSS-filer deles etter editorområde.
+- Store CSS-filer deles etter editorområde før de blir generelle samlefiler.
 - Ingen fil skal bli en generell samlefil for all funksjonalitet.
 
 ## 3. Datagrenser
@@ -68,8 +69,9 @@ Før implementering av hver ny del skal dette avklares:
 6. Hvordan funksjonen virker på mobil.
 7. Hvordan funksjonen påvirker angre/gjør om og lagring.
 8. Hvilke filer og komponenter som opprettes eller endres.
-9. Hvordan funksjonen testes.
-10. Hvordan midlertidige test-fixtures fjernes før godkjenning.
+9. Hvordan funksjonen skal fordeles før noen berørt fil nærmer seg 250 linjer.
+10. Hvordan funksjonen testes.
+11. Hvordan midlertidige test-fixtures fjernes før godkjenning.
 
 ## 5. Endringskontroll
 
