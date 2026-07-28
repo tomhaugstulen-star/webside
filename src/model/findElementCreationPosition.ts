@@ -6,69 +6,51 @@ import type {
 
 const CREATION_ORIGIN: CanvasPosition = { x: 24, y: 24 }
 const CREATION_GAP = 16
-const CREATION_ROW_STEP = 24
-const CREATION_X_OFFSETS = [0, 12, 24] as const
-const MINIMUM_CANDIDATE_COUNT = 64
-const CANDIDATES_PER_EXISTING_ELEMENT = 16
 
-function overlapsExistingElement(
-  position: CanvasPosition,
-  size: ElementSize,
-  element: EditorElement,
-) {
-  const existingPosition = element.position.desktop
-  const existingSize = element.size.desktop
+type VerticalSpan = {
+  top: number
+  bottom: number
+}
+
+function overlapsCreationColumn(element: EditorElement, size: ElementSize) {
+  const position = element.position.desktop
+  const elementSize = element.size.desktop
 
   return (
-    position.x < existingPosition.x + existingSize.width + CREATION_GAP &&
-    position.x + size.width + CREATION_GAP > existingPosition.x &&
-    position.y < existingPosition.y + existingSize.height + CREATION_GAP &&
-    position.y + size.height + CREATION_GAP > existingPosition.y
+    CREATION_ORIGIN.x < position.x + elementSize.width + CREATION_GAP &&
+    CREATION_ORIGIN.x + size.width + CREATION_GAP > position.x
   )
 }
 
-function createCandidatePosition(candidateIndex: number): CanvasPosition {
-  const columnIndex = candidateIndex % CREATION_X_OFFSETS.length
-  const rowIndex = Math.floor(candidateIndex / CREATION_X_OFFSETS.length)
-
-  return {
-    x: CREATION_ORIGIN.x + CREATION_X_OFFSETS[columnIndex],
-    y: CREATION_ORIGIN.y + rowIndex * CREATION_ROW_STEP,
-  }
-}
-
-function createFallbackPosition(existingElements: EditorElement[]): CanvasPosition {
-  const lowestElementEdge = existingElements.reduce((lowestEdge, element) => {
-    const position = element.position.desktop
-    const size = element.size.desktop
-    return Math.max(lowestEdge, position.y + size.height)
-  }, CREATION_ORIGIN.y)
-
-  return {
-    x: CREATION_ORIGIN.x,
-    y: lowestElementEdge + CREATION_GAP,
-  }
+function getOccupiedVerticalSpans(
+  size: ElementSize,
+  existingElements: EditorElement[],
+): VerticalSpan[] {
+  return existingElements
+    .filter((element) => overlapsCreationColumn(element, size))
+    .map((element) => ({
+      top: element.position.desktop.y,
+      bottom: element.position.desktop.y + element.size.desktop.height,
+    }))
+    .sort((first, second) => first.top - second.top)
 }
 
 export function findElementCreationPosition(
   size: ElementSize,
   existingElements: EditorElement[],
 ): CanvasPosition {
-  const candidateCount = Math.max(
-    MINIMUM_CANDIDATE_COUNT,
-    existingElements.length * CANDIDATES_PER_EXISTING_ELEMENT,
-  )
+  const occupiedSpans = getOccupiedVerticalSpans(size, existingElements)
+  let y = CREATION_ORIGIN.y
 
-  for (let candidateIndex = 0; candidateIndex < candidateCount; candidateIndex += 1) {
-    const candidate = createCandidatePosition(candidateIndex)
-    const overlaps = existingElements.some((element) =>
-      overlapsExistingElement(candidate, size, element),
-    )
+  for (const span of occupiedSpans) {
+    const candidateBottomWithGap = y + size.height + CREATION_GAP
 
-    if (!overlaps) {
-      return candidate
+    if (candidateBottomWithGap <= span.top) {
+      break
     }
+
+    y = Math.max(y, span.bottom + CREATION_GAP)
   }
 
-  return createFallbackPosition(existingElements)
+  return { x: CREATION_ORIGIN.x, y }
 }
