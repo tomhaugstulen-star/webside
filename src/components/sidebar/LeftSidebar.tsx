@@ -1,8 +1,13 @@
 import type { EditorTool } from '../../types/editor'
 
 type LeftSidebarProps = {
-  activeTool: EditorTool
+  activeTool: EditorTool | null
   onToolChange: (tool: EditorTool) => void
+  onPanelAction: () => void
+}
+
+type PanelProps = {
+  onSelect: () => void
 }
 
 type IconName = 'design' | 'media' | 'boxes' | 'files' | 'settings' | 'upload' | 'image' | 'section' | 'text' | 'button'
@@ -51,16 +56,16 @@ const tools: Array<{ id: EditorTool; label: string; icon: IconName }> = [
   { id: 'files', label: 'Filer', icon: 'files' },
 ]
 
-function DesignPanel() {
+function DesignPanel({ onSelect }: PanelProps) {
   return (
     <>
       <h2>Design</h2>
       <p className="panel-intro">Velg en del av siden for å endre utseende og oppsett.</p>
       <div className="setting-group">
         <h3>Sidestil</h3>
-        <button className="setting-row" type="button"><span>Bakgrunn</span><span>›</span></button>
-        <button className="setting-row" type="button"><span>Typografi</span><span>›</span></button>
-        <button className="setting-row" type="button"><span>Avstander</span><span>›</span></button>
+        <button className="setting-row" type="button" onClick={onSelect}><span>Bakgrunn</span><span>›</span></button>
+        <button className="setting-row" type="button" onClick={onSelect}><span>Typografi</span><span>›</span></button>
+        <button className="setting-row" type="button" onClick={onSelect}><span>Avstander</span><span>›</span></button>
       </div>
       <div className="panel-tip">
         <span className="panel-tip__icon">✦</span>
@@ -70,17 +75,17 @@ function DesignPanel() {
   )
 }
 
-function MediaPanel() {
+function MediaPanel({ onSelect }: PanelProps) {
   return (
     <>
       <h2>Bilder og logo</h2>
-      <button className="primary-panel-button" type="button"><Icon name="upload" />Last opp fil</button>
+      <button className="primary-panel-button" type="button" onClick={onSelect}><Icon name="upload" />Last opp fil</button>
       <div className="empty-library"><Icon name="image" /><strong>Ingen bilder ennå</strong><span>Last opp bilder eller logoer til prosjektet.</span></div>
     </>
   )
 }
 
-function BoxesPanel() {
+function BoxesPanel({ onSelect }: PanelProps) {
   const items: Array<{ label: string; icon: IconName }> = [
     { label: 'Seksjon', icon: 'section' },
     { label: 'Bilde', icon: 'image' },
@@ -91,10 +96,10 @@ function BoxesPanel() {
   return (
     <>
       <h2>Bokser</h2>
-      <p className="panel-intro">Dra en boks inn på siden for å begynne.</p>
+      <p className="panel-intro">Velg en boks for å legge den til på siden.</p>
       <div className="box-grid">
         {items.map((item) => (
-          <button key={item.label} className="box-card" type="button">
+          <button key={item.label} className="box-card" type="button" onClick={onSelect}>
             <Icon name={item.icon} />
             <span>{item.label}</span>
           </button>
@@ -104,30 +109,30 @@ function BoxesPanel() {
   )
 }
 
-function FilesPanel() {
+function FilesPanel({ onSelect }: PanelProps) {
   return (
     <>
       <h2>Filer</h2>
-      <button className="primary-panel-button" type="button"><Icon name="upload" />Last opp fil</button>
+      <button className="primary-panel-button" type="button" onClick={onSelect}><Icon name="upload" />Last opp fil</button>
       <div className="empty-library"><Icon name="files" /><strong>Ingen filer</strong><span>Dokumenter og vedlegg vises her.</span></div>
     </>
   )
 }
 
-function SettingsPanel() {
+function SettingsPanel({ onSelect }: PanelProps) {
   return (
     <>
       <h2>Innstillinger</h2>
       <div className="setting-group">
-        <button className="setting-row" type="button"><span>Prosjektnavn</span><span>›</span></button>
-        <button className="setting-row" type="button"><span>Domene</span><span>›</span></button>
-        <button className="setting-row" type="button"><span>SEO</span><span>›</span></button>
+        <button className="setting-row" type="button" onClick={onSelect}><span>Prosjektnavn</span><span>›</span></button>
+        <button className="setting-row" type="button" onClick={onSelect}><span>Domene</span><span>›</span></button>
+        <button className="setting-row" type="button" onClick={onSelect}><span>SEO</span><span>›</span></button>
       </div>
     </>
   )
 }
 
-export function LeftSidebar({ activeTool, onToolChange }: LeftSidebarProps) {
+export function LeftSidebar({ activeTool, onToolChange, onPanelAction }: LeftSidebarProps) {
   return (
     <aside className="left-sidebar">
       <nav className="left-rail" aria-label="Editorverktøy">
@@ -137,6 +142,7 @@ export function LeftSidebar({ activeTool, onToolChange }: LeftSidebarProps) {
               key={tool.id}
               className="rail-button"
               type="button"
+              aria-expanded={activeTool === tool.id}
               aria-pressed={activeTool === tool.id}
               onClick={() => onToolChange(tool.id)}
             >
@@ -148,6 +154,7 @@ export function LeftSidebar({ activeTool, onToolChange }: LeftSidebarProps) {
         <button
           className="rail-button rail-button--settings"
           type="button"
+          aria-expanded={activeTool === 'settings'}
           aria-pressed={activeTool === 'settings'}
           onClick={() => onToolChange('settings')}
         >
@@ -156,12 +163,16 @@ export function LeftSidebar({ activeTool, onToolChange }: LeftSidebarProps) {
         </button>
       </nav>
 
-      <section className="left-panel">
-        {activeTool === 'design' && <DesignPanel />}
-        {activeTool === 'media' && <MediaPanel />}
-        {activeTool === 'boxes' && <BoxesPanel />}
-        {activeTool === 'files' && <FilesPanel />}
-        {activeTool === 'settings' && <SettingsPanel />}
+      <section className={`left-panel ${activeTool ? 'left-panel--open' : ''}`} aria-hidden={!activeTool}>
+        {activeTool && (
+          <div className="left-panel__content">
+            {activeTool === 'design' && <DesignPanel onSelect={onPanelAction} />}
+            {activeTool === 'media' && <MediaPanel onSelect={onPanelAction} />}
+            {activeTool === 'boxes' && <BoxesPanel onSelect={onPanelAction} />}
+            {activeTool === 'files' && <FilesPanel onSelect={onPanelAction} />}
+            {activeTool === 'settings' && <SettingsPanel onSelect={onPanelAction} />}
+          </div>
+        )}
       </section>
     </aside>
   )
