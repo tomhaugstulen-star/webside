@@ -7,12 +7,13 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 - Hver funksjon eller avgrenset del bygges i egen branch.
 - `main` skal alltid være stabil.
 - Ingen ny funksjon skal utvikles direkte på `main`.
-- Feilretting gjøres i egen branch når rettingen kan påvirke mer enn én isolert linje eller komponent.
+- Feilretting og teknisk opprydding gjøres i egne branches.
 - Branch-navn skal beskrive arbeidet tydelig, for eksempel:
   - `feature/mobile-design-controls`
   - `feature/alignment-guides`
-  - `feature/box-layout-system`
   - `fix/sidebar-panel-behavior`
+  - `chore/editor-foundation-audit`
+  - `tooling/dependency-cruiser`
   - `docs/project-planning`
 - En branch skal bare inneholde arbeidet den er opprettet for.
 - Funksjoner skal testes før de vurderes for sammenslåing.
@@ -20,17 +21,13 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 ## 2. Filstørrelser og moduldeling
 
 - Maksimal anbefalt størrelse for en kildefil er 300 linjer.
-- 300 linjer er en øvre grense, ikke et mål.
-- Filer skal deles tidligere dersom de får for mange ansvarsområder.
+- 300 linjer er en øvre kontrollgrense, ikke et mål.
+- Filer skal vurderes for deling fra omtrent 200–250 linjer.
+- En fil skal deles tidligere dersom den får flere tydelige ansvarsområder.
 - Store komponenter skal deles etter ansvar, ikke tilfeldig etter linjetall.
 - `App.tsx` skal bare sette sammen hovedstrukturen og skal ikke inneholde editorlogikk.
 - Visuell komponent, tilstand, datamodell, hjelpefunksjoner og hendelseslogikk skal holdes separat når det er naturlig.
-- Store CSS-filer skal deles etter område, for eksempel:
-  - toppmeny
-  - venstremeny
-  - lerret
-  - mobilredigering
-  - markerings- og hjelpelinjer
+- Store CSS-filer skal deles etter område, blant annet toppmeny, venstremeny, lerret, mobilredigering og hjelpelinjer.
 - Ingen fil skal bli en generell samlefil for all funksjonalitet.
 - En feil eller endring i én del skal i minst mulig grad stoppe arbeid i andre deler.
 
@@ -50,10 +47,11 @@ For hver ny del skal følgende avklares før implementering:
 ## 4. Endringskontroll
 
 - Ikke bygg videre på en funksjon før oppførselen er definert.
-- Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige uten at de er merket som plassholdere.
+- Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige uten at de er dokumentert som plassholdere.
 - Ikke bland designendringer, datamodell og interaksjonslogikk i samme steg uten at det er nødvendig.
 - Små, kontrollerbare leveranser foretrekkes fremfor store samleendringer.
 - Før større endringer skal berørte filer og forventet effekt beskrives.
+- Rapportfiler fra arkitektursjekken skal regenereres etter strukturendringer.
 
 ## 5. Kvalitetskrav
 
@@ -65,10 +63,19 @@ For hver ny del skal følgende avklares før implementering:
 - Layoutsystemet skal unngå skjulte avhengigheter mellom komponenter.
 - Ingen automatisk generert design skal overskrive brukerens eksplisitte valg uten tydelig varsel.
 - Automatisk lagring skal være en grunnfunksjon i editoren.
+- Ingen kildekodemodul skal ligge ubrukt uten å bli oppdaget av arkitektursjekken.
+
+Før en branch kan godkjennes skal dette normalt kjøres:
+
+```powershell
+npm run check
+npm run architecture:json
+npm run architecture:diagram
+```
 
 ## 6. Gjeldende status
 
-- Editorgrunnlaget ligger på `feature/editor-foundation`.
-- Videre funksjoner skal bygges i nye branches.
-- Denne dokumentasjonen ligger på `docs/project-planning`.
-- Ingen ny editorfunksjon er implementert som del av denne dokumentasjonsendringen.
+- Editorgrunnlaget er gjennomgått i `chore/editor-foundation-audit`.
+- Dependency Cruiser er konfigurert gjennom `tooling/dependency-cruiser`.
+- Dokumentasjonen ligger på `docs/project-planning`.
+- Ingen av disse branchene skal merges til `main` før lokal kontroll og visuell godkjenning er gjennomført.
