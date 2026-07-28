@@ -1,10 +1,15 @@
 import { createInitialEditorProjectState } from '../model/createEditorProject'
-import type { EditorProject, EditorProjectState } from '../model/editorProject'
+import type {
+  EditorElement,
+  EditorProject,
+  EditorProjectState,
+} from '../model/editorProject'
 
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
   | { type: 'set-active-page'; pageId: string }
   | { type: 'set-selected-element'; elementId: string | null }
+  | { type: 'add-element-to-active-page'; element: EditorElement; updatedAt: string }
 
 export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
@@ -13,6 +18,12 @@ export function getInitialEditorProjectState() {
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   return activePage?.elements.some((element) => element.id === elementId) ?? false
+}
+
+function projectContainsElement(state: EditorProjectState, elementId: string) {
+  return state.project.pages.some((page) =>
+    page.elements.some((element) => element.id === elementId),
+  )
 }
 
 function selectedElementExists(state: EditorProjectState) {
@@ -85,6 +96,28 @@ function reduceEditorProjectState(
       return {
         ...state,
         selectedElementId: action.elementId,
+      }
+    }
+
+    case 'add-element-to-active-page': {
+      if (projectContainsElement(state, action.element.id)) {
+        return state
+      }
+
+      const pages = state.project.pages.map((page) =>
+        page.id === state.activePageId
+          ? { ...page, elements: [...page.elements, action.element] }
+          : page,
+      )
+
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          pages,
+          updatedAt: action.updatedAt,
+        },
+        selectedElementId: action.element.id,
       }
     }
   }
