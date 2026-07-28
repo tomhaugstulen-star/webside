@@ -1,7 +1,9 @@
 import type { EditorProjectState } from '../model/editorProject'
 import {
+  isValidTextElementStyle,
   isValidTextElementStylePatch,
   textElementStylesEqual,
+  type TextElementStyle,
   type TextElementStylePatch,
 } from '../model/textElementStyle'
 
@@ -24,12 +26,15 @@ export function setTextElementStyle(
     return state
   }
 
-  const nextTextStyle = {
+  const nextTextStyle: TextElementStyle = {
     ...element.textStyle,
     ...patch,
   }
 
-  if (textElementStylesEqual(element.textStyle, nextTextStyle)) {
+  if (
+    !isValidTextElementStyle(nextTextStyle) ||
+    textElementStylesEqual(element.textStyle, nextTextStyle)
+  ) {
     return state
   }
 
