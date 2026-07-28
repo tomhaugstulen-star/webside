@@ -1,24 +1,15 @@
 import { useMemo, useReducer, type PropsWithChildren } from 'react'
-import { withElementSelectionFixture } from '../dev/elementSelectionFixture'
 import { EditorProjectContext } from './editorProjectContext'
 import {
   editorProjectReducer,
   getInitialEditorProjectState,
 } from './editorProjectReducer'
 
-function initializeEditorProjectState() {
-  const initialState = getInitialEditorProjectState()
-
-  return import.meta.env.DEV
-    ? withElementSelectionFixture(initialState)
-    : initialState
-}
-
 export function EditorProjectProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(
     editorProjectReducer,
     undefined,
-    initializeEditorProjectState,
+    getInitialEditorProjectState,
   )
 
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
