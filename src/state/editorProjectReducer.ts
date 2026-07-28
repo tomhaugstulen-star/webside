@@ -4,12 +4,33 @@ import type { EditorProject, EditorProjectState } from '../model/editorProject'
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
   | { type: 'set-active-page'; pageId: string }
+  | { type: 'set-selected-element'; elementId: string | null }
 
 export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
 }
 
-export function editorProjectReducer(
+function selectedElementExists(state: EditorProjectState) {
+  if (state.selectedElementId === null) {
+    return true
+  }
+
+  const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+  return activePage?.elements.some((element) => element.id === state.selectedElementId) ?? false
+}
+
+function ensureValidSelection(state: EditorProjectState): EditorProjectState {
+  if (selectedElementExists(state)) {
+    return state
+  }
+
+  return {
+    ...state,
+    selectedElementId: null,
+  }
+}
+
+function reduceEditorProjectState(
   state: EditorProjectState,
   action: EditorProjectAction,
 ): EditorProjectState {
@@ -24,6 +45,7 @@ export function editorProjectReducer(
       return {
         project: action.project,
         activePageId,
+        selectedElementId: null,
       }
     }
 
@@ -37,7 +59,22 @@ export function editorProjectReducer(
       return {
         ...state,
         activePageId: action.pageId,
+        selectedElementId:
+          action.pageId === state.activePageId ? state.selectedElementId : null,
       }
     }
+
+    case 'set-selected-element':
+      return {
+        ...state,
+        selectedElementId: action.elementId,
+      }
   }
+}
+
+export function editorProjectReducer(
+  state: EditorProjectState,
+  action: EditorProjectAction,
+): EditorProjectState {
+  return ensureValidSelection(reduceEditorProjectState(state, action))
 }
