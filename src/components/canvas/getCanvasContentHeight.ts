@@ -1,13 +1,8 @@
-import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement, ResponsiveViewport } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
+import type { ElementLayoutPreview } from './canvasLayoutPreview'
 
 const CANVAS_BOTTOM_PADDING = 48
-
-type ElementLayoutPreview = {
-  elementId: string
-  layout: ElementLayout
-}
 
 export function getCanvasContentHeight(
   elements: EditorElement[],
