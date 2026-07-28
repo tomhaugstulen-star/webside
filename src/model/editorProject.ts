@@ -1,4 +1,4 @@
-export const EDITOR_PROJECT_SCHEMA_VERSION = 1 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 2 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -19,14 +19,36 @@ export type ElementSize = {
 
 export type ElementKind = 'section' | 'image' | 'text' | 'button'
 
-export type EditorElement = {
+type BaseEditorElement = {
   id: string
-  kind: ElementKind
   position: ResponsiveValue<CanvasPosition>
   size: ResponsiveValue<ElementSize>
   visibility: ResponsiveValue<boolean>
   locked: boolean
 }
+
+export type SectionEditorElement = BaseEditorElement & {
+  kind: 'section'
+}
+
+export type ImageEditorElement = BaseEditorElement & {
+  kind: 'image'
+}
+
+export type TextEditorElement = BaseEditorElement & {
+  kind: 'text'
+  content: string
+}
+
+export type ButtonEditorElement = BaseEditorElement & {
+  kind: 'button'
+}
+
+export type EditorElement =
+  | SectionEditorElement
+  | ImageEditorElement
+  | TextEditorElement
+  | ButtonEditorElement
 
 export type EditorPage = {
   id: string
