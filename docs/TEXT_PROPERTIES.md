@@ -1,14 +1,12 @@
 # Tekstegenskaper for vanlige tekstbokser
 
-Dette dokumentet er autoritativ spesifikasjon for fase 8.
-
-Branch:
+Dette dokumentet er autoritativ spesifikasjon og implementasjonsstatus for fase 8.
 
 ```text
-feature/text-properties
+branch: feature/text-properties
+base main: 8de5f2e
+GitHub-sak: #10
 ```
-
-Sporet i GitHub-sak #10.
 
 ## Fast UX-regel
 
@@ -18,13 +16,11 @@ Høyremeny  = egenskaper for markert element
 Lerretet   = redigere selve teksten
 ```
 
-Venstremenyens `Elementer -> Tekst` oppretter en vanlig fri tekstboks og markerer den automatisk. Selve tekstinnholdet redigeres fortsatt bare direkte på lerretet.
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks og markerer den automatisk. Selve tekstinnholdet redigeres bare direkte på lerretet. Høyremenyen har ikke et ekstra tekstfelt.
 
-Høyremenyen skal aldri få et ekstra stort tekstfelt som redigerer samme innhold.
+## Implementert høyremeny
 
-## Første leveranse
-
-Når et vanlig tekstelement er markert, viser høyremenyen:
+Når et vanlig tekstelement er markert, vises:
 
 ```text
 Egenskaper
@@ -42,15 +38,11 @@ Element
 Status: Ulåst
 ```
 
-Formateringen gjelder hele tekstboksen. Markerte enkeltord eller tegn får ikke egne stiler.
-
-Ikke-tekstelementer viser ikke seksjonen `Tekstutseende`.
+Formateringen gjelder hele tekstboksen. Det finnes ikke riktekst eller tegnbasert formatering. Andre elementtyper åpner fortsatt høyremenyen, men viser ikke `Tekstutseende`.
 
 ## Kontrollerte verdier
 
 ### Font
-
-Første leveranse bruker åtte nettsikre valg:
 
 ```text
 System
@@ -63,47 +55,24 @@ Times New Roman
 Courier New
 ```
 
-Prosjektdata lagrer stabile fonttokens. Rå CSS-fontstacker skal ikke lagres i prosjektmodellen. Visningslaget avleder korrekt fontstack fra tokenet.
+Prosjektdata lagrer stabile fonttokens. CSS-fontstacker avledes i visningslaget.
 
 ### Størrelse
-
-Tillatte størrelser:
 
 ```text
 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96 px
 ```
 
-Kontrollen er en avgrenset liste, ikke et fritt tallfelt.
+### Stil og justering
 
-### Fet og kursiv
-
-- to uavhengige toggle-knapper
-- `aria-pressed` beskriver tilstanden
-- kontrollene endrer hele tekstboksen
-
-### Justering
-
-Tillatte verdier:
-
-```text
-venstre
-midtstilt
-høyre
-```
-
-Justering vises som en kompakt, tastaturtilgjengelig kontrollgruppe.
+- fet og kursiv er uavhengige toggle-knapper med `aria-pressed`
+- justering er venstre, midtstilt eller høyre
+- kontrollene gjelder hele tekstboksen
 
 ### Linjehøyde
 
-Tillatte verdier:
-
 ```text
-1.0
-1.2
-1.45
-1.6
-1.8
-2.0
+1.0, 1.2, 1.45, 1.6, 1.8, 2.0
 ```
 
 Linjehøyde lagres som en kontrollert enhetsløs verdi.
@@ -119,15 +88,11 @@ justering: venstre
 linjehøyde: 1.45
 ```
 
-Dette bevarer dagens standardutseende.
-
 ## Prosjektmodell
 
-Prosjektskjemaet økes fra versjon 2 til versjon 3 fordi en obligatorisk varig egenskap legges til tekstelementet.
+Prosjektskjemaet er økt fra versjon 2 til versjon 3.
 
-Bare `kind: 'text'` får obligatorisk `textStyle`.
-
-Tekststilen skal minst inneholde:
+Bare `kind: 'text'` har obligatorisk `textStyle`:
 
 ```text
 fontFamily
@@ -138,102 +103,118 @@ textAlign
 lineHeight
 ```
 
-Verdiene skal være eksplisitte unioner eller kontrollerte tallsett. Modellen skal ikke godta vilkårlige CSS-strenger.
+Tekststil er varig prosjektdata og er foreløpig felles for PC og Telefon. Nye tekstbokser får en egen kopi av standardstilen.
 
-Tekststil er foreløpig felles for PC og Telefon. Mobile tekststiloverstyringer er ikke del av denne fasen.
+## Reducer og validering
 
-## Reducer og state
-
-Hver kontroll sender en liten stilpatch. Reduceren slår patchen sammen med den nyeste autoritative state.
-
-Reducergrensen skal avvise:
+Hver brukerhandling sender én avgrenset stilpatch. Reduceren bruker nyeste autoritative state og avviser:
 
 - manglende element
 - element på feil side
-- annet element enn `kind: 'text'`
+- andre elementtyper enn `text`
 - låst tekstelement
-- ukjente eller ugyldige stilverdier
+- ugyldige eller ukjente stilverdier
+- patch med null, array, ukjent nøkkel eller flere egenskaper
 - patch som ikke gir en reell endring
 
 `project.updatedAt` endres bare ved en gyldig, faktisk stilendring.
 
-Panelet eier ingen separat kopi av tekststilen. Eventuell hover, fokus og lokal trykkfeedback er transient UI-state.
+Runtime-validatoren er trygg mot utypede data og bruker et uttømmende validatorregister. TypeScript krever derfor at framtidige felt i `TextElementStyle` også får validering.
 
 ## Låste elementer
 
-Et låst tekstelement kan markeres og inspiseres.
+Et låst tekstelement kan markeres og inspiseres. Tekstkontrollene viser gjeldende verdier, men er deaktivert. Reduceren håndhever låsen uavhengig av UI-et.
 
-Tekstkontrollene:
+Opplåsing skjer fortsatt gjennom det eksisterende objektverktøyet.
 
-- viser gjeldende verdier
-- er deaktivert når elementet er låst
-- muterer ikke prosjektet
+## Tekstredigering og rendering
 
-Opplåsing fortsetter gjennom det eksisterende objektverktøyet. Denne branchen legger ikke til en ny låsekontroll i høyremenyen.
+Klikk på en kontroll under aktiv tekstredigering bruker eksisterende blur/commit før stilendringen. Høyremenyen har ingen separat tekstdraft eller tekststilkopi.
 
-## Samspill med tekstredigering
-
-Klikk på en høyremeny-kontroll under aktiv tekstredigering skal følge eksisterende grense:
-
-1. `textarea` mister fokus
-2. eksisterende blur-mekanisme committer tekstinnholdet
-3. markeringen beholdes
-4. stilkontrollen gjennomfører sin egen reducerhandling
-5. både visning og neste redigeringsøkt bruker den nye stilen
-
-Høyremenyen skal ikke duplisere eller omgå tekstens commitmekanisme.
-
-## Rendering
-
-Samme avledede tekststil skal brukes av:
+Samme avledede stil legges på tekstelementets overordnede DOM-element og arves av:
 
 - vanlig tekstvisning
 - aktivt `textarea`
 
-Det skal ikke finnes separate hardkodede fontstørrelser eller linjehøyder som gjør at teksten hopper når redigering starter eller avsluttes.
+Det finnes ikke separate hardkodede fontstørrelser eller linjehøyder som gir hopp mellom visning og redigering. Placeholder er editor-UI og lagres ikke.
 
-Tom placeholder er bare editor-UI. Den lagres ikke og skal ikke endre prosjektmodellen.
+## Godkjent fokusoppførsel
+
+Når fokus flyttes fra lerretet til høyremenyen:
+
+- elementet forblir valgt i autoritativ editor-state
+- høyremenyen fortsetter å vise og endre samme element
+- den blå markeringsrammen på lerretet kan forsvinne visuelt
+
+Denne oppførselen er eksplisitt godkjent og skal ikke rettes i denne branchen.
 
 ## Arkitektur
 
-Forventet ansvarsdeling:
+Ansvarsdelingen er implementert slik:
 
-- `model` — tekststiltyper, standardverdier, kontrollerte valg og validering
-- `state` — reducerhjelper og dispatch-hook for tekststilpatcher
-- `properties` — liten presentasjonsseksjon for tekstkontrollene
-- `canvas` — avledning fra fonttoken til CSS og felles rendering for visning/redigering
+- `src/model/textElementStyle.ts` — tokens, typer, standardverdier og runtime-validering
+- `src/state/setTextElementStyle.ts` — validert prosjektmutasjon
+- `src/state/useTextElementStyle.ts` — liten dispatch-hook
+- `src/state/editorProjectAction.ts` — uttømmende action-union uten å blåse opp reducerfilen
+- `src/components/properties/TextPropertiesSection.tsx` — presentasjonskontroller
+- `src/components/canvas/getTextElementCssStyle.ts` — fonttoken og stil til CSS
 - `RightPropertiesPanel` — komposisjon, ikke egen tekststate
 
-Alle nye kildefiler følger aktiv 250-linjersgrense. Uttrekking skjer etter ansvar.
+Alle nye kildefiler er under 250 linjer. `EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder; senere canvaslogikk må trekkes ut.
 
-## Ikke del av denne branchen
+## Framtidsrettet kodeaudit
 
-- tekstfarge eller fargevelger
-- prosjektfargemodell
+Auditen kontrollerte:
+
+- delt eller muterbar standardstil
+- stale state og parallell stilstate
+- ugyldige, uendrede og låste reduceroverganger
+- utypede eller ødelagte framtidige importdata
+- uttømmende validering ved senere modellutvidelser
+- identisk rendering i visning og `textarea`
+- fonttoken kontra rå CSS i prosjektdata
+- samspill med blur/commit
+- tilgjengelige labels, toggles, disabled-state og fokusstil
+- filstørrelser, modulgrenser og CSS-importrekkefølge
+
+Rettede auditfunn:
+
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
+
+## Sluttkontroll
+
+Brukeren kjørte sluttkontroll etter siste produksjonskodeendring:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 54 moduler transformert, bygget på 164 ms
+```
+
+Arkitekturrapportene ble regenerert og committet i:
+
+```text
+a267ca3  chore: refresh architecture reports for text properties
+```
+
+`git diff --check` viste bare LF/CRLF-varsler, ikke whitespace-feil. Lokal branch er synkronisert med `origin/feature/text-properties`, og working tree er clean.
+
+## Ikke del av branchen
+
+- tekstfarge eller prosjektfargemodell
 - bredde, høyde eller plassering i høyremenyen
 - headerens hovedtekst eller undertittel
 - riktekst eller tegnbaserte tekstspenn
-- opplasting av fonter eller eksterne webfonter
+- egendefinerte fontfiler eller eksterne webfonter
 - sletting eller duplisering
 - historikk eller lagring
 - mobile tekststiloverstyringer
 
-Falske, tomme eller deaktiverte fremtidsseksjoner skal ikke legges inn.
+## Status før PR
 
-## Akseptansekriterier
-
-- ny tekstboks får alle standardverdier
-- alle kontroller viser prosjektets faktiske verdi
-- hver kontroll oppdaterer hele tekstboksen
-- visning og `textarea` ser likt ut
-- fonttoken avledes til korrekt CSS-fontstack
-- låst tekst kan inspiseres, men ikke endres
-- andre elementtyper viser ingen tekstkontroller
-- tekstinnhold redigeres fortsatt bare på lerretet
-- ugyldige og uendrede reduceroverganger avvises
-- `updatedAt` endres bare ved reell stilendring
-- alle kildefiler følger ansvars- og størrelsesreglene
-- `npm run check` består
-- arkitekturrapportene regenereres
-- PC, Telefon, peker og tastatur kontrolleres
-- arbeidsområdet er rent før PR
+Implementasjon, audit, sluttkontroll, arkitekturrapporter og visuell godkjenning er ferdig. Dokumentasjonen oppdateres nå. PR skal først opprettes etter at dokumentasjonscommitene er hentet lokalt og clean tree er bekreftet på nytt.
