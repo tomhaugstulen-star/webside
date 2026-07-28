@@ -1,5 +1,5 @@
-import type { EditorElement } from '../../model/editorProject'
-import { resolveResponsiveValue, type ResponsiveViewport } from '../../model/resolveResponsiveValue'
+import type { EditorElement, ResponsiveViewport } from '../../model/editorProject'
+import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 
 const CANVAS_BOTTOM_PADDING = 48
 
