@@ -45,9 +45,47 @@
 .canvas-element {
   position: absolute;
   box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #d8cec8;
+  color: #625c58;
+  background: #fffdfb;
   cursor: pointer;
   outline: 1px solid transparent;
   outline-offset: 1px;
+  user-select: none;
+}
+
+.canvas-element__placeholder {
+  pointer-events: none;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.canvas-element--section {
+  background: #fffdfb;
+}
+
+.canvas-element--image {
+  border-style: dashed;
+  background: linear-gradient(135deg, #f8f5f2 0%, #eee8e4 100%);
+}
+
+.canvas-element--text {
+  place-items: start;
+  padding: 14px;
+  border-style: dashed;
+  background: #ffffff;
+  text-align: left;
+}
+
+.canvas-element--button {
+  border-color: #7c3c2f;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #7d4032;
 }
 
 .canvas-element:hover {
