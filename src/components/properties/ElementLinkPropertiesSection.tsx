@@ -58,6 +58,13 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
   const helpId = `${idPrefix}-help`
   const errorId = `${idPrefix}-error`
   const disabled = element.locked
+  const hasPendingChanges =
+    draftType !== element.link.type ||
+    (draftType === 'external-url' &&
+      element.link.type === 'external-url' &&
+      (urlDraft.trim() !== element.link.url ||
+        openInNewTab !== element.link.openInNewTab))
+  const linkSaved = element.link.type === 'external-url' && !hasPendingChanges
 
   const submitLabel =
     draftType === 'none'
@@ -66,7 +73,9 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
         : 'Fjern lenke'
       : element.link.type === 'none'
         ? 'Lag lenke'
-        : 'Lagre lenke'
+        : linkSaved
+          ? 'Lenke lagret'
+          : 'Lagre lenke'
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -173,12 +182,18 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
         )}
 
         <button
-          className="element-link-properties__submit"
+          className={`element-link-properties__submit ${linkSaved ? 'element-link-properties__submit--saved' : ''}`}
           type="submit"
           disabled={disabled}
         >
           {submitLabel}
         </button>
+
+        {linkSaved && (
+          <p className="element-link-properties__saved" role="status">
+            Lenken er lagret på tekstboksen.
+          </p>
+        )}
       </form>
 
       {disabled && (
