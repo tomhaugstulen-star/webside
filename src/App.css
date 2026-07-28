@@ -5,6 +5,7 @@
 @import './styles/canvas.css';
 @import './styles/right-properties-panel.css';
 @import './styles/text-properties.css';
+@import './styles/element-link-properties.css';
 
 #root {
   min-height: 100vh;

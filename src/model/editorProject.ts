@@ -1,6 +1,7 @@
+import type { ElementLink } from './elementLink'
 import type { TextElementStyle } from './textElementStyle'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 3 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 4 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -41,6 +42,7 @@ export type TextEditorElement = BaseEditorElement & {
   kind: 'text'
   content: string
   textStyle: TextElementStyle
+  link: ElementLink
 }
 
 export type ButtonEditorElement = BaseEditorElement & {

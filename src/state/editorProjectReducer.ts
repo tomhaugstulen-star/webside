@@ -8,6 +8,7 @@ import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import type { EditorProjectAction } from './editorProjectAction'
 import { setTextElementContent } from './setTextElementContent'
+import { setTextElementLink } from './setTextElementLink'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
 
@@ -191,6 +192,14 @@ function reduceEditorProjectState(
         state,
         action.elementId,
         action.patch,
+        action.updatedAt,
+      )
+
+    case 'set-text-element-link':
+      return setTextElementLink(
+        state,
+        action.elementId,
+        action.link,
         action.updatedAt,
       )
   }
