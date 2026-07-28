@@ -64,6 +64,20 @@
   outline-offset: 3px;
 }
 
+.canvas-element--dev-fixture {
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(143, 67, 47, 0.42);
+  background: rgba(143, 67, 47, 0.06);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.canvas-element--dev-fixture::before {
+  content: attr(data-dev-label);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .canvas-page {
     transition: none;
