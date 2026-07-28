@@ -8,19 +8,22 @@ For hver avgrensede del:
 
 1. Kontroller rent arbeidsområde.
 2. Oppdater og kontroller `main`.
-3. Opprett egen branch fra oppdatert `main`.
+3. Opprett eller fast-forward riktig feature-branch fra oppdatert `main`.
 4. Definer omfang, brukerhandlinger, state og grenser mot senere funksjoner.
-5. Bygg bare den avgrensede funksjonen.
-6. Trekk ut ansvar før en kildefil passerer 250 linjer.
-7. Gjennomfør framtidsrettet kodeaudit.
-8. Kjør `npm run check`.
-9. Regenerer arkitekturrapporter ved strukturendringer.
-10. Test PC, Telefon, peker og tastatur der det er relevant.
-11. Fjern test-fixtures.
-12. Oppdater dokumentasjonen.
-13. Opprett PR og kontroller diff, mergebarhet og review-tråder.
-14. Merge først etter eksplisitt godkjenning.
-15. Kontroller oppdatert `main` før neste branch.
+5. Få eksplisitt godkjenning på åpne produkt- og designvalg.
+6. Bygg bare den avgrensede funksjonen.
+7. Trekk ut ansvar før en kildefil passerer 250 linjer.
+8. Gjennomfør framtidsrettet kodeaudit.
+9. Kjør `npm run check` etter siste kodeendring.
+10. Regenerer arkitekturrapporter ved strukturendringer.
+11. Test PC, Telefon, peker og tastatur der det er relevant.
+12. Fjern test-fixtures.
+13. Oppdater dokumentasjonen.
+14. Kontroller at branchen er synkronisert og arbeidsområdet er rent.
+15. Opprett draft-PR og kontroller hele diffen, mergebarhet, review-tråder og eventuell CI.
+16. Marker PR klar for review.
+17. Merge først etter brukerens eksplisitte godkjenning.
+18. Kontroller oppdatert lokal `main` før neste fase.
 
 ## 2. Ferdig og merget til `main`
 
@@ -29,7 +32,7 @@ For hver avgrensede del:
 - blankt lerret
 - toppmeny og venstremeny
 - PC- og Telefon-visning
-- kontrollert paneloppførsel
+- kontrollert venstrepanel
 - Dependency Cruiser
 - samlet `npm run check`
 - automatisk nettleseråpning
@@ -100,27 +103,18 @@ Status: merget som PR #5 med merge-commit `a3eed45`.
 
 Se `docs/OBJECT_LOCKING.md`.
 
-## 3. Gjeldende fase
-
 ### Fase 6 – Ren tekstredigering
 
-Branch:
+Branch: `feature/text-box-editing`
 
-```text
-feature/text-box-editing
-```
-
-Status: **implementert, kodeauditert, `npm run check` bestått og visuelt godkjent på PC og Telefon før dokumentoppdateringen**.
-
-Implementert:
+Status: merget som PR #7 med merge-commit `c729d33`.
 
 - prosjektskjema versjon 2
 - diskriminert elementunion
 - obligatorisk `content` bare for `kind: 'text'`
 - tomt standardinnhold
 - ett klikk markerer
-- dobbeltklikk starter redigering
-- `Enter` på markert tekstboks starter redigering
+- dobbeltklikk eller `Enter` på markert tekstboks starter redigering
 - kontrollert flerlinjet `textarea`
 - vanlig `Enter` lager ny linje
 - blur og `Ctrl`/`Cmd` + `Enter` committer
@@ -134,68 +128,113 @@ Implementert:
 - `updatedAt` endres bare ved reell tekstendring
 - tekstinnhold er felles for PC og Telefon
 
-Arkitekturgrenser:
-
-- tekstinnhold er varig prosjektdata
-- aktiv redigeringsøkt og lokal draft er transient state
-- én avsluttet økt skal senere være én historikk-/autolagringsendring
-- DOM-en og `innerHTML` brukes ikke som lagringskilde
-- alle berørte TypeScript- og TSX-filer er under 250 linjer
-
-Branchen inneholder ikke:
-
-- høyremeny
-- fontfamilie eller fontstørrelse
-- tekstfarge, fet eller kursiv
-- formatering av markert tekst
-- bildeimport
-- knapphandlinger
-- historikk eller lagring
-- responsive mobiloverstyringer
-
 Se `docs/TEXT_BOX_EDITING.md`.
 
-Før PR gjenstår:
+### Menynavn og rekkefølge
 
-- hent dokumentendringene lokalt
-- regenerer arkitekturrapportene
-- commit og push rapportene
-- bekreft rent og synkronisert arbeidsområde
+Branch: `feature/left-menu-labels`
 
-## 4. Neste fase etter merge
+Status: merget som PR #8 med merge-commit `a35f59d`.
+
+Endelig venstremeny:
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+- `Prosjekt` står øverst
+- `Innstillinger` står nederst
+- paneloverskriftene følger samme navn
+- funksjonaliteten i panelene ble ikke utvidet i PR #8
+
+## 3. Gjeldende fase
 
 ### Fase 7 – Høyremenyens grunnstruktur
 
-Planlagt branch:
+Branch:
 
 ```text
 feature/right-properties-panel
 ```
 
-Skal bygge:
+Branchstatus:
 
-- stabil høyre kolonne i editorshellet
-- følger `selectedElementId`
-- viser valgt elementtype og grunnidentitet
-- tydelig tom/skjult tilstand når ingenting er valgt
-- kontrollert oppførsel når element låses eller tekst redigeres
-- seksjonsstruktur for senere egenskaper
+- branchen er fast-forwardet til `main` etter PR #8
+- base-commit er `a35f59d`
+- dokumentasjonen oppdateres før implementering
+- ingen produksjonskode for høyremenyen er lagt inn ennå
+
+Sporet i:
+
+```text
+docs/RIGHT_PROPERTIES_PANEL.md
+GitHub-sak #6
+```
+
+### Låste produktbeslutninger
+
+- ingen markering gir ingen synlig eller reservert høyremeny
+- markering av et element åpner høyremenyen
+- klikk på tomt lerret fjerner markering og lukker høyremenyen
+- bytte av markering oppdaterer panelet umiddelbart
+- låst element kan fortsatt inspiseres
+- panelet kan være åpent under tekstredigering
+- klikk i panelet bruker eksisterende blur/commit
+- markeringen beholdes etter normal tekstcommit
+- panelet oppretter ikke en separat tekstdraft
+
+En permanent synlig tom høyremeny er avvist.
+
+### Åpne beslutninger før kode
+
+Neste chat skal presentere ett konkret forslag og få godkjenning på:
+
+- panelbredde
+- oppførsel i smale nettleservinduer
+- egen scrolling
+- visuell overskrift og seksjonsstruktur
+- minimum av faktisk inspeksjonsinformasjon
+- eventuell åpne-/lukkeanimasjon
+
+### Skal bygge
+
+- høyremeny som egen komponent og eget layoutområde i `EditorShell`
+- betinget rendering basert på valgt element
+- gjenbruk eller kontrollert bruk av eksisterende `useElementSelection`
+- korrekt oppdatering ved markering, ny markering, fjernet markering og sideskifte
+- kontrollert oppførsel ved låsing og aktiv tekstredigering
 - forutsigbar fokusrekkefølge
+- egen CSS-grense
 - PC- og Telefon-kontroll
+- peker- og tastaturkontroll
 
-Skal ikke bygge:
+### Skal ikke bygge
 
 - fontkontroller
 - tekstformattering
 - bildeinnstillinger
 - knapphandlinger
-- fargevelgere
-- sletting
+- fargevelgere eller prosjektfargeregister
+- logo- eller headerbygger
+- sletting eller duplisering
 - historikk eller lagring
+- prosjektimport
+- mobiloverstyringer
 
-Menyen bygges før innholdet i den, slik at senere egenskapsfunksjoner får én stabil arkitektur.
+### Første steg i neste chat
 
-## 5. Senere faser
+1. Les `docs/NEXT_CHAT_PROMPT.md` og `docs/RIGHT_PROPERTIES_PANEL.md`.
+2. Kontroller at lokal `main` er clean.
+3. Hent og bytt til `feature/right-properties-panel`.
+4. Les faktisk shell-, selection-, canvas- og CSS-kode.
+5. Presenter konkrete forslag for de åpne designbeslutningene.
+6. Ikke skriv produksjonskode før brukeren har godkjent disse valgene.
+
+## 4. Senere faser
 
 ### Fase 8 – Tekstegenskaper
 
@@ -304,7 +343,7 @@ Branches:
 
 Bygges først etter at editor, responsiv modell og lagring er stabile.
 
-## 6. Kontrollpunkter før merge
+## 5. Kontrollpunkter før merge
 
 - branchen inneholder bare avtalt omfang
 - ingen test-fixture ligger igjen
@@ -316,20 +355,10 @@ Bygges først etter at editor, responsiv modell og lagring er stabile.
 - tastaturbruk og fokus er kontrollert
 - senere faser er dokumentert uten skjult implementering
 - `npm run check` er bestått etter siste kodeendring
-- arkitekturrapporter er regenerert
+- arkitekturrapporter er regenerert ved strukturendringer
 - PC og Telefon er testet
 - peker og tastatur er testet
 - dokumentasjonen er oppdatert
 - arbeidsområdet er rent og synkronisert
-
-## 7. Neste kontrollsteg
-
-På `feature/text-box-editing`:
-
-```powershell
-npm run architecture:json
-npm run architecture:diagram
-git status
-```
-
-Rapportene committes og pushes før PR. Produksjonskoden er allerede kontrollert etter siste kodeendring; dokumentoppdateringene krever ikke ny visuell regresjonstest.
+- hele PR-diffen er kontrollert
+- merge skjer bare etter eksplisitt godkjenning
