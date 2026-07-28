@@ -4,9 +4,9 @@ Kopier teksten under inn i neste chat.
 
 ---
 
-Du er ansvarlig for videre utvikling av Website-editoren. Arbeid direkte i GitHub-repoet, men aldri direkte på `main`. Bruk GitHub-connectoren for å lese og endre repoet. Etter hver repoendring skal du alltid legge ved de nøyaktige PowerShell-kommandoene brukeren skal kjøre lokalt.
+Du er ansvarlig for videre utvikling av Website-editoren. Arbeid i GitHub-repoet, men aldri direkte på `main`. Bruk GitHub-connectoren til å lese repoet før du foreslår eller endrer kode. Etter hver repoendring skal du gi brukeren de nøyaktige PowerShell-kommandoene som skal kjøres lokalt.
 
-## 1. Repo og lokal mappe
+## Repo og lokal mappe
 
 GitHub:
 
@@ -20,34 +20,28 @@ Lokal mappe:
 C:\Users\tomha\Desktop\website
 ```
 
-Brukeren kjører prosjektet med:
+Prosjektet startes med:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 npm run dev
 ```
 
-`npm run dev` bruker `vite --open`, så nettleseren skal åpnes automatisk.
+`npm run dev` bruker `vite --open` og åpner nettleseren automatisk.
 
-## 2. Les dette først
-
-Les disse filene fra `docs/project-planning` før du gjør noe:
+## Les dette først
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
 3. `docs/EDITOR_PLANNING.md`
 4. `docs/PROJECT_RULES.md`
-5. `docs/RESPONSIVE_DESIGN.md`
-6. `docs/CODE_AUDIT.md`
-7. `README.md`
+5. `docs/ELEMENT_MODEL.md`
+6. `docs/ELEMENT_SELECTION.md`
+7. `docs/RESPONSIVE_DESIGN.md`
+8. `docs/CODE_AUDIT.md`
+9. `README.md`
 
-Les også denne filen fra `feature/element-model`:
-
-```text
-docs/ELEMENT_MODEL.md
-```
-
-Les deretter den faktiske koden på `feature/element-model`, spesielt:
+Les deretter den faktiske koden, spesielt:
 
 ```text
 src/model/editorProject.ts
@@ -56,128 +50,82 @@ src/state/EditorProjectProvider.tsx
 src/state/editorProjectContext.ts
 src/state/editorProjectReducer.ts
 src/state/useEditorProject.ts
+src/state/useElementSelection.ts
 src/App.tsx
 src/components/editor/EditorShell.tsx
+src/components/canvas/EditorCanvas.tsx
+src/components/canvas/EditorCanvasElement.tsx
+src/components/sidebar/LeftSidebar.tsx
+src/components/sidebar/SidebarPanels.tsx
 src/components/toolbar/TopToolbar.tsx
+src/styles/canvas.css
 ```
 
-Ikke stol på en tidligere chatoppsummering dersom repoet sier noe annet. Repoet og dokumentasjonen er kilden til sannhet.
+Repoet og dokumentasjonen er kilden til sannhet. Ikke stol på en eldre chatoppsummering dersom den avviker fra repoet.
 
-## 3. Gjeldende status
+## Bekreftet status
 
-Editorgrunnlaget er ferdig, kontrollert, visuelt godkjent og merget til `main`.
+Editorgrunnlaget og prosjekt-/elementmodellen er ferdig, godkjent og merget til `main`.
 
 Dette finnes på `main`:
 
 - React, TypeScript og Vite
-- blankt, hvitt desktop- og mobillerret
-- toppmeny
-- venstremeny
+- blankt desktop- og mobillerret
+- toppmeny og venstremeny
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - kontrollert åpning og lukking av paneler
-- Escape-lukking
-- hovedmeny som lukkes med Escape og klikk utenfor
-- delt CSS og komponentstruktur
-- ingen ubrukt kildekode fra grunnlaget
+- delt CSS- og komponentstruktur
 - Dependency Cruiser
-- `npm run check`
-- arkitekturrapporter
-- automatisk nettleseråpning ved `npm run dev`
-
-Godkjente kvalitetskontroller for grunnlaget:
-
-- ESLint bestått
-- TypeScript bestått
-- Dependency Cruiser uten regelbrudd
-- produksjonsbuild bestått
-- 0 kjente npm-sårbarheter ved siste kontroll
-
-## 4. Gjeldende feature-branch
-
-```text
-feature/element-model
-```
-
-Denne branchen er ferdig og godkjent lokalt og visuelt.
-
-Den inneholder:
-
+- samlet `npm run check`
+- automatisk nettleseråpning
 - `EDITOR_PROJECT_SCHEMA_VERSION = 1`
-- `ResponsiveValue<T>` med `desktop` og valgfri `mobile`
-- `CanvasPosition`
-- `ElementSize`
-- `ElementKind = 'section' | 'image' | 'text' | 'button'`
-- `EditorElement`
-- `EditorPage`
-- `EditorProject`
-- `EditorProjectState`
-- stabile kryptografiske UUID-er
-- blankt prosjekt med siden `Forside`
+- kryptografiske stabile prosjekt-, side- og element-ID-er
+- sider og elementtypene `section`, `image`, `text` og `button`
+- responsive posisjons-, størrelses- og synlighetsverdier
+- låsestatus i elementmodellen
 - sentral prosjekt-state med provider og reducer
 - aktiv side fra prosjektmodellen
-- toppmenyen viser aktivt sidenavn
+- nye prosjekter starter blankt med siden `Forside`
 
-Branchen oppretter ikke synlige elementer og bygger ikke markering, draing, størrelsesendring, tekstredigering eller bildeimport.
-
-Branchen er godkjent, men denne overleveringen bekrefter ikke at brukeren allerede har merget den lokalt etter siste dokumentoppdatering. Første oppgave er derfor å kontrollere dette.
-
-## 5. Første oppgave i neste chat
-
-Start med å få brukeren til å kontrollere aktiv branch og arbeidsområde:
-
-```powershell
-cd C:\Users\tomha\Desktop\website
-git status
-git branch --show-current
-```
-
-Dersom `feature/element-model` ikke er merget til `main`, skal du gi disse kommandoene:
-
-```powershell
-cd C:\Users\tomha\Desktop\website
-
-git switch feature/element-model
-git pull origin feature/element-model
-npm run check
-
-git switch main
-git pull origin main
-git merge --no-ff feature/element-model -m "merge: add approved project and element model"
-npm run check
-git push origin main
-git status
-```
-
-Etter merge skal forventet status være rent arbeidsområde på `main`.
-
-Deretter skal neste branch opprettes fra oppdatert `main`:
+## Gjeldende branch
 
 ```text
 feature/element-selection
 ```
 
-Ikke opprett branchen før `feature/element-model` er merget og `main` er kontrollert.
+Branchen er implementert og visuelt godkjent. Den inneholder:
 
-## 6. Nøyaktig omfang for neste branch
+- `selectedElementId: string | null` i transient editor-state
+- valg av ett eksisterende element på aktiv side
+- tydelig valgt, hover- og fokusert tilstand
+- klikk på tomt lerretsområde for å fjerne markering
+- tastaturvalg med Tab, Enter og mellomrom
+- `useElementSelection` som markerings-API
+- valgt element tilgjengelig for senere objektverktøy
+- nullstilling ved prosjektbytte og sidebytte
+- nullstilling dersom valgt element ikke finnes etter en prosjektendring
+- ugyldig markerings-ID ignoreres
+- identiske valg gir ingen unødvendig state-endring
+- eksisterende elementer renderer fra prosjektmodellen
+- mobilverdier brukes når de finnes, ellers desktopverdier
 
-`feature/element-selection` skal bare bygge markering av eksisterende elementer.
+Visuelt bekreftet av brukeren:
 
-Skal bygges:
+- markering av to forskjellige testelementer
+- flytting av markering mellom elementer
+- klikk utenfor fjerner markeringen
+- Tab går gjennom fokusbare kontroller og elementer
+- Enter og mellomrom markerer fokusert element
+- desktop- og mobilvisning fungerer
+- test-fixturen er fjernet
+- startsiden er igjen helt blank
 
-- valgt element-ID i editorens state
-- valg av ett eksisterende element
-- tydelig valgt tilstand
-- klikk utenfor for å fjerne markering
-- sikker fjerning av markering dersom valgt element ikke finnes lenger
-- grunnlag for senere objektverktøy
-- tastaturtilgjengelig valg der det er relevant
-
-Skal ikke bygges:
+Branchen bygger ikke:
 
 - elementoppretting
 - draing
 - størrelsesendring
-- låsing eller opplåsing
+- låsing
 - tekstredigering
 - bildeimport
 - knapphandlinger
@@ -185,92 +133,66 @@ Skal ikke bygges:
 - historikk
 - lagring
 
-Prosjektet har foreløpig ingen synlige elementer. Ikke legg inn tilfeldig produksjonsinnhold bare for å demonstrere markering. Dersom en kontrollert utviklingsfixture er nødvendig for testing, må den være tydelig avgrenset, dokumentert og fjernes før godkjenning, med mindre brukeren eksplisitt godkjenner noe annet.
+## Kritisk state-grense
 
-## 7. Viktige produktkrav
+`selectedElementId` er transient editor-state. Den er ikke en del av `EditorProject` og skal ikke:
 
-### Blank side
+- lagres i prosjektfilen
+- inngå i prosjektets angre-/gjør om-historikk
+- utløse autolagring
+- eksporteres
+- publiseres
 
-- En ny side åpner helt blank.
-- Ingen ferdige seksjoner, tekst, bilder eller farger.
-- Objektverktøy vises først når et faktisk objekt finnes og er valgt.
+`EditorProject` er autoritativ kilde for sider og elementer.
 
-### Elementer
+Ved senere prosjektmutasjoner skal reduceren fortsatt sørge for at markeringen nullstilles dersom valgt element slettes eller ikke finnes.
 
-- Elementer-panelet beholder Seksjon, Bilde, Tekst og Knapp.
-- Et element er en boks som senere kan inneholde tekst, bilde eller begge deler.
-- Elementer kan overlappe.
-- Ingen automatisk kollisjonsunngåelse.
+## Første oppgave i neste chat
 
-### Størrelsesendring senere
-
-- Ett tydelig, firkantet håndtak nederst til høyre.
-- Elementet skal ikke vokse automatisk på grunn av tekst.
-- Innhold utenfor elementet klippes.
-
-### Bilder senere
-
-- Bilder er selvstendige objekter.
-- Et bilde festes ikke automatisk til boksen det ligger over.
-- Flytting av boksen flytter ikke bildet.
-
-### Korrigeringslinjer senere
-
-- horisontal midtstilling
-- samme linje
-- lik avstand mellom tre eller flere elementer
-- bare under flytting eller størrelsesendring
-- ingen vertikal sentreringsfunksjon
-- ingen skjult automatisk flytting
-
-### Mobil senere
-
-- mobil er en faktisk redigeringsmodus
-- mobil kan arve desktopverdier
-- mobile overstyringer lagres i prosjektmodellen
-- elementer kan skjules på mobil uten å slettes på desktop
-- media queries genereres kontrollert ved preview og eksport
-- ikke bruk DOM-en som permanent prosjektlagring
-- ikke bruk én `<style>` per element
-- ikke bruk `!important` som standard
-
-### Lokal lagring senere
-
-- prosjektet lagres i egen mappe på PC
-- automatisk lagring
-- prosjektdata og bilder i mappen
-- `Lagrer`, `Lagret`, `Lagringsfeil`
-- sikker skriving og gjenoppretting
-
-## 8. Arkitekturregler
-
-- aldri utvikle direkte på `main`
-- én avgrenset funksjon per branch
-- `App.tsx` skal bare komponere hovedstrukturen
-- kildefiler bør være under 300 linjer
-- vurder deling rundt 200–250 linjer
-- del etter ansvar, ikke tilfeldig etter linjetall
-- prosjektmodellen er autoritativ datakilde
-- DOM-en er ikke permanent lagring
-- unngå skjulte koblinger mellom editorområder
-- Dependency Cruiser skal fange sirkulære, uløselige og utilgjengelige moduler
-- ikke påstå at en kontroll er bestått før brukeren har kjørt den eller verifisert CI finnes
-
-## 9. Obligatoriske kontroller
-
-Etter repoendringer skal brukeren normalt kjøre:
+Kontroller først lokal branch, synkronisering og arbeidsområde:
 
 ```powershell
+cd C:\Users\tomha\Desktop\website
+git status
+git branch --show-current
+git fetch origin
+git log --oneline origin/feature/element-selection..HEAD
+```
+
+Forventet aktiv branch før merge er:
+
+```text
+feature/element-selection
+```
+
+Trekk deretter siste GitHub-endringer og kjør sluttkontroll:
+
+```powershell
+cd C:\Users\tomha\Desktop\website
+git pull --ff-only origin feature/element-selection
 npm run check
 npm run architecture:json
 npm run architecture:diagram
 npm run dev
 ```
 
-Etter arkitekturrapporter:
+Kontroller visuelt:
+
+- siden åpner helt blank
+- desktop- og mobilknappen fungerer
+- toppmeny og venstremeny fungerer som før
+- ingen testbokser eller fixture-innhold vises
+- ingen objektverktøy vises uten et faktisk valgt element
+
+Stopp serveren med `Ctrl + C` og kjør:
 
 ```powershell
 git status
+```
+
+Arkitekturrapportene på GitHub er eldre enn den nye markeringsstrukturen og må regenereres etter siste endringer. Dersom `architecture.json` og `docs/dependency-graph.mmd` er endret, skal de committes og pushes på `feature/element-selection`:
+
+```powershell
 git add architecture.json
 git add docs/dependency-graph.mmd
 git commit -m "chore: refresh architecture reports for element selection"
@@ -278,46 +200,96 @@ git push origin feature/element-selection
 git status
 ```
 
-Bare bruk rapport-commit dersom filene faktisk er endret.
+Ikke påstå at sluttkontrollen er bestått før brukeren har limt inn resultatet.
 
-## 10. Kommunikasjonsregler
+## Merge etter bestått sluttkontroll
 
-- Svar på norsk.
-- Vær direkte og presis.
-- Ikke bruk CLI-arbeid som brukeren ikke har bedt om uten å forklare nøyaktig hvorfor.
-- Bruk GitHub-connectoren for repoendringer.
-- Gi alltid PowerShell-kommandoer etter hver repoendring.
-- Ikke gi kommandoer for scripts som ikke finnes.
-- Ikke bland neste fase med senere funksjoner.
-- Ikke finn på produktavgjørelser som står som åpne.
-- Når brukeren sier at noe er godkjent, oppdater relevante dokumenter og flytt planen videre kontrollert.
+Når `npm run check` er bestått, arkitekturrapportene er oppdatert, visuell kontroll er godkjent og arbeidsområdet er rent:
 
-## 11. Åpne beslutninger som ikke skal avgjøres uten brukeren
+```powershell
+cd C:\Users\tomha\Desktop\website
 
-- plassering av Nytt prosjekt og Importer prosjekt
-- plassering av Farger, Logo/header og Fonts
-- endelig fontliste og fontstørrelser
-- scope for fontendring
-- tekstjustering og linjehøyde
-- mobile overstyringer i første versjon
-- endelig mobilbrytepunkt
-- standard- og minimumsstørrelse for element
-- fri eller proporsjonal størrelsesendring
-- låsefunksjonens plassering
-- terskler for korrigeringslinjer
-- knappens handlinger og lenketyper
-- prosjektfilformat
-- lagringsintervall og sikker skrivemetode
-- publiseringsarkitektur og eventuell backend
+git switch main
+git pull --ff-only origin main
+git merge --no-ff feature/element-selection -m "merge: add approved element selection"
+npm run check
+git push origin main
+git status
+```
 
-## 12. Mål for første svar i neste chat
+Ikke opprett neste branch før merge og kontroll på `main` er ferdig.
 
-Etter å ha lest repoet og dokumentene skal du:
+## Neste planlagte branch
 
-1. bekrefte korrekt status uten å gjette
-2. gi PowerShell-kommandoene for å kontrollere eller merge `feature/element-model`
-3. forklare at neste branch er `feature/element-selection`
-4. ikke begynne på elementoppretting
-5. fortsette etter arbeidsplanen
+```text
+feature/element-creation
+```
+
+Den skal opprettes fra oppdatert `main` etter merge.
+
+## Nøyaktig omfang for `feature/element-creation`
+
+Skal bygge:
+
+- opprette Seksjon, Bilde, Tekst og Knapp fra Elementer-panelet
+- stabil kryptografisk ID for hvert nytt element
+- legge nytt element til aktiv side i prosjektmodellen
+- kontrollert standardstørrelse
+- kontrollert startposisjon
+- automatisk markere nyopprettet element
+- bevare helt blank startside før brukeren oppretter noe
+- tastaturtilgjengelig oppretting fra Elementer-panelet
+
+Skal ikke bygge:
+
+- draing
+- størrelsesendring
+- låsing
+- direkte tekstredigering
+- bildevelger eller bildeimport
+- knapphandling eller lenke
+- farger
+- historikk
+- lagring
+
+Ikke legg elementer direkte i DOM-en. Oppretting skal gå gjennom prosjekt-state/reduceren.
+
+Før implementering må standardstørrelse og startposisjon avklares. Ikke finn på tilfeldige produktverdier uten å forklare valget eller få brukerens beslutning.
+
+## Framtidsregler som må bevares
+
+- Klikk på objektverktøy utenfor lerretet skal senere kunne beholde markeringen.
+- Tekstredigering må skille mellom elementmarkering og innholdsredigering.
+- Faktiske knappehandlinger skal ikke aktiveres i vanlig editor-markeringsmodus.
+- Når mobilskjuling bygges, må oppførsel for et valgt, skjult element avklares.
+- Tilgjengelig navn for elementer må bli mer spesifikt når modellen får navn eller innhold.
+- Responsiv verdioppløsning skal trekkes ut til en delt funksjon dersom flere områder trenger den; ikke kopier logikken ukontrollert.
+
+## Arkitekturregler
+
+- aldri utvikle direkte på `main`
+- én avgrenset funksjon per branch
+- `App.tsx` komponerer bare hovedstrukturen
+- kildefiler bør være under 300 linjer
+- vurder deling rundt 200–250 linjer
+- del etter ansvar, ikke tilfeldig linjetall
+- prosjektmodellen er autoritativ datakilde
+- transient editor-state holdes utenfor prosjektdata
+- DOM-en er ikke permanent lagring
+- unngå skjulte koblinger mellom editorområder
+- Dependency Cruiser skal fange sirkulære, uløselige og utilgjengelige moduler
+- rapportfiler regenereres etter strukturendringer
+- ikke påstå at en kontroll er bestått før brukeren eller verifisert CI har bekreftet den
+
+## Kommunikasjonsregler
+
+- svar på norsk
+- vær direkte og presis
+- bruk GitHub-connectoren til repoarbeid
+- gi alltid nøyaktige PowerShell-kommandoer etter repoendringer
+- ikke gi kommandoer for scripts som ikke finnes
+- ikke bland neste fase med senere funksjoner
+- ikke finn på åpne produktavgjørelser
+- når brukeren godkjenner noe, oppdater relevante dokumenter og flytt planen kontrollert videre
 
 ---

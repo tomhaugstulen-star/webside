@@ -52,5 +52,6 @@ export function createInitialEditorProjectState(): EditorProjectState {
   return {
     project,
     activePageId: project.pages[0].id,
+    selectedElementId: null,
   }
 }

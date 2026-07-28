@@ -1,12 +1,12 @@
 # Element- og prosjektmodell
 
-Dette dokumentet beskriver grunnmodellen i `feature/element-model`.
+Dette dokumentet beskriver grunnmodellen som ble utviklet i `feature/element-model` og senere merget til `main`.
 
 ## 1. Status
 
-Branchen er ferdig utviklet og godkjent 28. juli 2026.
+Prosjekt- og elementmodellen er ferdig, lokalt kontrollert, visuelt godkjent og merget til `main` 28. juli 2026.
 
-Bekreftet lokalt:
+Bekreftet ved godkjenning:
 
 - `npm run check` bestod
 - ESLint bestod
@@ -15,17 +15,17 @@ Bekreftet lokalt:
 - produksjonsbuild bestod
 - arkitekturrapportene ble regenerert
 - editoren åpnet automatisk med `npm run dev`
-- den blanke siden og eksisterende editorfunksjoner fungerte visuelt
-
-Branchen skal merges til `main` før neste feature-branch opprettes.
+- blank side og eksisterende editorfunksjoner fungerte visuelt
 
 ## 2. Omfang
 
-Branchen definerer prosjektdata og sentral prosjekt-state. Den oppretter ikke synlige elementer på lerretet og bygger ikke markering, draing, størrelsesendring, tekstredigering eller bildebehandling.
+Modellen definerer prosjektdata og grunnlaget for sentral editor-state.
+
+Den oppretter ikke automatisk synlige elementer. Et nytt prosjekt starter blankt, og faktiske elementer skal først opprettes etter en eksplisitt brukerhandling.
 
 ## 3. Prosjektstruktur
 
-Et prosjekt inneholder:
+Et `EditorProject` inneholder:
 
 - skjemaversjon
 - stabil prosjekt-ID
@@ -34,6 +34,8 @@ Et prosjekt inneholder:
 - opprettet- og oppdatert-tidspunkt
 
 Et nytt prosjekt starter med én blank side kalt `Forside`.
+
+`EditorProject` er den autoritative kilden for prosjektdata og skal være grunnlaget for lagring, import, forhåndsvisning, eksport og publisering.
 
 ## 4. Sider
 
@@ -48,7 +50,7 @@ Aktiv side lagres i editorens sentrale state og er ikke hardkodet i toppmenyen.
 
 ## 5. Elementer
 
-Første modell støtter disse elementtypene:
+Første modell støtter:
 
 - seksjon
 - bilde
@@ -64,7 +66,7 @@ Hvert element har:
 - responsiv synlighet
 - låsestatus
 
-Elementinnhold og konkrete stilfelt legges til i de avgrensede feature-branchene som eier funksjonaliteten.
+Elementinnhold og konkrete stilfelt legges til i feature-branchen som eier funksjonaliteten.
 
 ## 6. Responsive verdier
 
@@ -75,39 +77,70 @@ type ResponsiveValue<T> = {
 }
 ```
 
-Når mobilverdien mangler, skal mobil senere arve desktopverdien. Denne branchen lagrer bare modellen. Arv, overstyring og mobilkontroller bygges senere i `feature/mobile-design-controls`.
+Når mobilverdien mangler, kan mobilvisningen arve desktopverdien.
+
+`feature/element-selection` bruker denne regelen ved lerretsrendering. Kontroller for å opprette og administrere mobile overstyringer bygges senere i `feature/mobile-design-controls`.
 
 ## 7. Stabile ID-er
 
-ID-er opprettes med nettleserens kryptografiske UUID-funksjon. `Math.random()` brukes ikke. En sikker `getRandomValues`-basert UUID brukes som reserve dersom `randomUUID()` ikke er tilgjengelig.
+ID-er opprettes med nettleserens kryptografiske UUID-funksjon.
+
+- `crypto.randomUUID()` brukes når tilgjengelig.
+- En `crypto.getRandomValues()`-basert UUID brukes som sikker reserve.
+- `Math.random()` brukes ikke til prosjektidentitet.
+
+ID-er skal beholdes ved lagring, gjenåpning, import, forhåndsvisning, eksport og publisering.
 
 ## 8. Sentral state
 
-`EditorProjectProvider` eier den aktive prosjektmodellen og siden som redigeres. `App.tsx` monterer provideren rundt editorshellet.
+`EditorProjectProvider` eier:
 
-Første reducer støtter:
+- aktiv prosjektmodell
+- aktiv side
+- transient editor-state som markering
 
-- erstatte hele prosjektet etter fremtidig åpning eller import
+`App.tsx` monterer provideren rundt editorshellet.
+
+Reducerens opprinnelige prosjekt-actions:
+
+- erstatte hele prosjektet etter framtidig åpning eller import
 - bytte aktiv side
 
-Oppretting, endring og sletting av elementer legges ikke inn før de respektive fasene i arbeidsplanen.
+Markeringsbranchen har senere lagt til valgt element-ID og markeringshandlinger.
 
-## 9. Neste fase
+## 9. Grense mellom prosjektdata og editor-state
 
-Neste planlagte branch er:
+`EditorProject` inneholder varige prosjektdata.
+
+`EditorProjectState` kan i tillegg inneholde transient editor-state, for eksempel:
+
+```ts
+selectedElementId: string | null
+```
+
+Transient editor-state skal ikke:
+
+- serialiseres som prosjektdata
+- utløse autolagring
+- inngå i prosjektets angre-/gjør om-historikk
+- eksporteres eller publiseres
+
+Denne grensen må bevares når lagring og historikk bygges.
+
+## 10. Gjeldende og neste fase
+
+Gjeldende branch:
 
 ```text
 feature/element-selection
 ```
 
-Den skal bygges fra oppdatert `main` etter at `feature/element-model` er merget.
+Den bygger markering av eksisterende elementer uten elementoppretting.
 
-Fasen skal bare bygge:
+Neste branch etter kontrollert merge:
 
-- valgt element-ID i editor-state
-- valg av ett eksisterende element
-- tydelig valgt tilstand
-- klikk utenfor for å fjerne markering
-- grunnlag for senere objektverktøy
+```text
+feature/element-creation
+```
 
-Elementoppretting skal ikke blandes inn i denne branchen.
+Den skal opprette faktiske elementer gjennom prosjekt-state/reduceren og legge dem til aktiv side. Den skal ikke opprette tilfeldige DOM-objekter eller blande inn draing, størrelsesendring og innholdsredigering.
