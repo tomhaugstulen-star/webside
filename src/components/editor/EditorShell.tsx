@@ -19,7 +19,7 @@ export function EditorShell() {
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        closeToolPanel()
+        setActiveTool(null)
       }
     }
 
