@@ -2,13 +2,23 @@
 
 Dette dokumentet beskriver første stabile tekstredigering i Website-editoren.
 
-## Omfang
+## Status
 
 Branch:
 
 ```text
 feature/text-box-editing
 ```
+
+Merget som PR #7 med merge-commit:
+
+```text
+c729d33
+```
+
+Fasen er ferdig, kodeauditert, kontrollert på PC og Telefon og ligger på `main`.
+
+## Omfang
 
 Fasen bygger bare ren flerlinjet tekst i tekstbokser. Den bygger ikke fontvelger, fontstørrelse, farge, fet, kursiv, markert tekstformatering, høyremeny, historikk, lagring eller mobile overstyringer.
 
@@ -31,7 +41,7 @@ content: ''
 
 Tom tekst er gyldig prosjektdata. Teksten **Dobbeltklikk for å skrive** er bare en editor-placeholder og lagres aldri som innhold.
 
-Det finnes foreløpig ingen lagring eller import. Skjemamigrering bygges derfor først sammen med prosjektåpning/import.
+Det finnes foreløpig ingen lagring eller import. Skjemamigrering bygges derfor først sammen med prosjektåpning og import.
 
 ## Objektmarkering og redigeringsmodus
 
@@ -65,6 +75,8 @@ Vanlig `Enter` lager en ny linje. Linjeskift normaliseres til `\n` ved prosjektc
 - IME-komposisjon avbrytes ikke av snarveiene
 
 Etter eksplisitt commit eller avbryt går fokus tilbake til tekstobjektet. Etter blur beholdes fokuset på kontrollen brukeren klikket på.
+
+Denne blurregelen skal gjenbrukes av høyremenyen: klikk i panelet committer aktiv tekstdraft uten å opprette en separat draft eller miste markeringen.
 
 ## Prosjektcommit
 
@@ -135,16 +147,18 @@ Brukeren har bekreftet:
 - låst tekstboks kan ikke redigeres
 - PC og Telefon fungerer
 - øvrige elementtyper har ingen regresjon
-- arbeidsområdet var rent før dokumentoppdateringen
+- arbeidsområdet var rent og synkronisert før PR
 
-Arkitekturrapportene må regenereres etter de nye kildekodemodulene før PR.
+Arkitekturrapportene ble regenerert og inkludert før PR #7 ble merget.
 
 ## Neste fase
 
-Etter kontrollert merge bygges høyremenyens grunnstruktur i:
+Gjeldende fase er høyremenyens grunnstruktur:
 
 ```text
 feature/right-properties-panel
 ```
 
-Den branchen skal bare bygge et stabilt inspeksjonspanel basert på valgt element. Font- og riktekstkontroller bygges deretter i en egen branch.
+Denne branchen skal bare bygge et stabilt inspeksjonspanel basert på valgt element. Font- og riktekstkontroller bygges deretter i en egen branch.
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.

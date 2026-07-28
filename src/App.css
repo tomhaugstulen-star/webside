@@ -3,6 +3,7 @@
 @import './styles/sidebar.css';
 @import './styles/sidebar-content.css';
 @import './styles/canvas.css';
+@import './styles/right-properties-panel.css';
 
 #root {
   min-height: 100vh;

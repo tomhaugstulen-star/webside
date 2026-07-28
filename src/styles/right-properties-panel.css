@@ -1,0 +1,124 @@
+.right-properties-panel {
+  position: relative;
+  z-index: 12;
+  width: 0;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
+  pointer-events: none;
+}
+
+.right-properties-panel--open {
+  width: var(--properties-panel-width);
+  pointer-events: auto;
+}
+
+.right-properties-panel__surface {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--properties-panel-width);
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  visibility: hidden;
+  transform: translateX(100%);
+  color: var(--text);
+  background: rgba(255, 253, 251, 0.99);
+  border-left: 1px solid var(--border);
+  box-shadow: -5px 0 18px rgba(85, 60, 45, 0.05);
+  transition:
+    transform 180ms ease-out,
+    visibility 0s linear 180ms;
+}
+
+.right-properties-panel--open .right-properties-panel__surface {
+  visibility: visible;
+  transform: translateX(0);
+  transition: transform 180ms ease-out;
+}
+
+.right-properties-panel__content {
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.right-properties-panel h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.right-properties-panel__element-type {
+  margin: 6px 0 28px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.right-properties-panel h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.right-properties-panel__details {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.right-properties-panel__detail-row {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 18px;
+}
+
+.right-properties-panel__detail-row dt,
+.right-properties-panel__detail-row dd {
+  margin: 0;
+  font-size: 14px;
+}
+
+.right-properties-panel__detail-row dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.right-properties-panel__detail-row dd {
+  color: var(--text);
+  font-weight: 650;
+}
+
+@media (max-width: 1679px) {
+  .right-properties-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--properties-panel-width);
+  }
+}
+
+@media (min-width: 1680px) {
+  .editor-shell--properties-open {
+    --properties-panel-reserved-width: var(--properties-panel-width);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .right-properties-panel__surface,
+  .right-properties-panel--open .right-properties-panel__surface {
+    transition: none;
+  }
+}

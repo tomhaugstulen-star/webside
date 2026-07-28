@@ -91,7 +91,12 @@
 }
 
 .editor-shell:not(.editor-shell--panel-open) .canvas-page--desktop {
-  width: min(1320px, calc(100vw - var(--rail-width) - 112px));
+  width: min(
+    1320px,
+    calc(
+      100vw - var(--rail-width) - var(--properties-panel-reserved-width) - 112px
+    )
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -35,7 +35,12 @@
 }
 
 .canvas-page--desktop {
-  width: min(1080px, calc(100vw - var(--rail-width) - var(--panel-width) - 112px));
+  width: min(
+    1080px,
+    calc(
+      100vw - var(--rail-width) - var(--panel-width) - var(--properties-panel-reserved-width) - 112px
+    )
+  );
 }
 
 .canvas-page--mobile {

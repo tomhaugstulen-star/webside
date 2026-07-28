@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { ElementKind } from '../../model/editorProject'
 import { useElementCreation } from '../../state/useElementCreation'
+import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
 import type { EditorTool, ViewportMode } from '../../types/editor'
 import { EditorCanvas } from '../canvas/EditorCanvas'
+import { RightPropertiesPanel } from '../properties/RightPropertiesPanel'
 import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
 
@@ -12,6 +14,7 @@ export function EditorShell() {
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const { activePage } = useEditorProject()
   const { createElement } = useElementCreation()
+  const { selectedElement } = useElementSelection()
 
   const toggleToolPanel = (tool: EditorTool) => {
     setActiveTool((currentTool) => (currentTool === tool ? null : tool))
@@ -38,7 +41,9 @@ export function EditorShell() {
   }, [])
 
   return (
-    <div className={`editor-shell ${activeTool ? 'editor-shell--panel-open' : ''}`}>
+    <div
+      className={`editor-shell${activeTool ? ' editor-shell--panel-open' : ''}${selectedElement ? ' editor-shell--properties-open' : ''}`}
+    >
       <TopToolbar
         pageName={activePage.name}
         viewport={viewport}
@@ -52,6 +57,7 @@ export function EditorShell() {
           onCreateElement={createElementAndClosePanel}
         />
         <EditorCanvas viewport={viewport} />
+        <RightPropertiesPanel element={selectedElement} />
       </div>
     </div>
   )

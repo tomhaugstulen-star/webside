@@ -1,51 +1,58 @@
 # Plan for Website-editoren
 
-Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne beslutninger.
+Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlagte utvidelser.
 
 ## 1. Implementeringsstatus
 
 ### Ferdig og merget til `main`
 
 - blankt PC- og Telefon-lerret
-- toppmeny og venstremeny
+- toppmeny og kontrollert venstremeny
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - prosjekt- og elementmodell
 - stabile kryptografiske ID-er
 - responsive posisjons-, størrelses- og synlighetsverdier
 - sentral prosjekt-state og aktiv side
 - transient elementmarkering
-- oppretting av alle fire elementtypene
+- oppretting av alle fire elementtyper
 - kontrollerte startstørrelser og startplassering
 - flytting og resizing med peker og tastatur
 - minimumsmål, clamping, edge-scroll og transient preview
 - objektlåsing og opplåsing
+- kontrollert flerlinjet tekstredigering
 - Dependency Cruiser og samlet `npm run check`
 
-### Implementert i `feature/text-box-editing`
+Viktige merges:
 
-- prosjektskjema versjon 2
-- diskriminert elementunion
-- tekstobjekter har obligatorisk `content`
-- nye tekstbokser starter med tom tekst
-- tydelig skille mellom objektmarkering og tekstredigering
-- kontrollert flerlinjet `textarea`
-- blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster aktiv draft
-- vanlig `Enter` lager ny linje
-- tom tekst er gyldig
-- låst tekstboks kan ikke redigeres
-- transform og objektverktøy er deaktivert under redigering
-- reduceren validerer tekstcommit og oppdaterer `updatedAt` bare ved reell endring
+```text
+PR #4  drag og resize
+PR #5  objektlåsing                 a3eed45
+PR #7  ren tekstredigering          c729d33
+PR #8  navn og rekkefølge i meny    a35f59d
+```
 
-Brukeren har bekreftet at `npm run check` bestod, at all oppførsel fungerer på PC og Telefon, og at arbeidsområdet var rent før dokumentoppdateringen.
+Endelig venstremeny:
 
-### Neste fase etter merge
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+### Gjeldende branch
 
 ```text
 feature/right-properties-panel
 ```
 
-Denne fasen skal bygge høyremenyens stabile grunnstruktur uten å legge inn font-, bilde-, knapp- eller fargekontroller.
+```text
+base main: a35f59d
+kode og arkitekturrapporter: 2d25a542
+```
+
+Høyremenyens grunnstruktur er implementert, auditert, kontrollert og godkjent. Dokumentasjonen ferdigstilles før PR.
 
 ## 2. Bekreftede hovedkrav
 
@@ -73,7 +80,8 @@ Følgende skal ikke serialiseres, publiseres eller lagres:
 - layout-preview
 - aktiv tekstredigeringsøkt
 - lokal tekstdraft
-- fokus, hover og synlighet for objektverktøy og paneler
+- aktive verktøy og paneler
+- fokus, hover og lokal UI-feedback
 
 Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én eksplisitt prosjektendring.
 
@@ -82,7 +90,7 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - Mobil arver desktopgeometri når mobiloverstyring mangler.
 - Dagens UI redigerer den delte desktopgeometrien.
 - Egne mobiloverstyringer bygges i `feature/mobile-design-controls`.
-- Tekstinnhold og låsestatus er felles elementdata og er ikke responsive verdier.
+- Tekstinnhold og låsestatus er felles elementdata.
 
 ## 3. Elementer
 
@@ -137,65 +145,108 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - tom tekst er gyldig
 - editor-placeholder lagres ikke
 - ett klikk markerer
-- dobbeltklikk starter redigering
-- `Enter` på markert tekstboks starter redigering
+- dobbeltklikk eller `Enter` starter redigering
 - vanlig `Enter` lager ny linje
 - blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster
+- `Escape` forkaster lokal draft
 - linjeskift normaliseres til `\n`
 - `contentEditable` og `innerHTML` brukes ikke
 - tekst klippes ved elementgrensen
 - boksen vokser ikke automatisk med innholdet
 
-Se `docs/TEXT_BOX_EDITING.md`.
-
-### Bilder
+### Bilder og knapper
 
 - Bilde er foreløpig en plassholder.
-- Ekte bildeinnhold og bildevelger er ikke implementert.
-
-### Knapper
-
 - Knapp er foreløpig uten handling.
-- Faktisk handling eller lenke skal ikke aktiveres i vanlig editormodus.
+- Faktiske handlinger aktiveres ikke i vanlig editormodus.
 
 ## 4. Høyremeny
 
-Neste kontrollerte fase bygger bare inspeksjonspanelets arkitektur:
+### Implementert produktoppførsel
 
-- høyre kolonne i editorshellet
-- følger valgt element
-- viser elementtype og grunnidentitet
-- tydelig tom/skjult tilstand
-- stabil seksjonsstruktur for senere egenskaper
-- ingen midlertidige egenskapskontroller
+```text
+Ingenting valgt -> ingen høyremeny
+Element valgt   -> høyremeny åpnes
+Tomt lerret     -> høyremeny lukkes
+```
 
-Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges først etter at panelet er stabilt.
+- bredde 320 px
+- dokket fra 1680 px
+- overlay under 1680 px
+- overlay reduserer ikke lerretet
+- skjult panel reserverer ingen plass
+- ny markering oppdaterer panelet umiddelbart
+- låst element kan inspiseres
+- panelet kan være åpent under tekstredigering
+- panelklikk bruker eksisterende blur/commit
+- markeringen beholdes etter commit
+- egen vertikal scrolling
+- 180 ms transform-animasjon
+- ingen animasjon ved `prefers-reduced-motion`
 
-## 5. Farger, logo/header og fonts
+Visuell struktur:
+
+```text
+Egenskaper
+Tekst
+
+Element
+Status: Ulåst
+```
+
+### Implementert arkitektur
+
+- `RightPropertiesPanel.tsx` presenterer valgt elementtype og status
+- eksisterende `useElementSelection` er autoritativ avledning
+- `EditorShell` komponerer panelområdet uten å eie egenskapslogikk
+- ingen DOM-søk, separat elementkopi eller ny reducer-action
+- innhold rendres bare når et element finnes
+- `--properties-panel-width` er 320 px
+- `--properties-panel-reserved-width` er den eneste koblingen til lerretsbredden
+- panel-CSS styrer ikke canvas-klasser direkte
+- ingen falske egenskapskontroller
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
+## 5. Farger, logo/header og fonter
 
 ### Farger
 
-- panelet skal vise faktiske prosjektfarger
+- venstremenyens navn er `Farger`
+- området skal senere vise faktiske prosjektfarger
 - ingen ferdig fargepalett
 - global endring skal oppdatere alle brukere av fargen
 
-### Logo/header
+### Logo og header
 
+- venstremenyens navn er `Logo og header`
 - laste opp logo
 - opprette header
 - hovedtekst og undertittel
 - redigerbar struktur
 
-### Fonts
+### Fonter
 
 - omtrent 7–8 nettsikre fonter
 - fontstørrelse fra kontrollert liste
 - tekstfarge kobles til fargesystemet
 - fet og kursiv
-- formatering av hele boksen kontra markert tekst må avklares før kode
+- hele boksen kontra markert tekst må avklares før kode
 
-## 6. Arkitektur og arbeidsmåte
+## 6. Prosjektområdet
+
+Venstremenyens første valg heter `Prosjekt`.
+
+Det skal senere eie:
+
+- nytt prosjekt
+- åpne prosjekt
+- importere prosjekt
+- eventuell eksport og duplisering etter egen beslutning
+
+Disse funksjonene er ikke implementert.
+
+## 7. Arkitektur og arbeidsmåte
 
 - én avgrenset funksjon per branch
 - `main` holdes stabil
@@ -205,11 +256,12 @@ Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges f�
 - ugyldige og uendrede state-overganger avvises
 - Dependency Cruiser kontrollerer modulgrensene
 - arkitekturrapporter regenereres etter strukturendringer
+- repo og dokumentasjon leses før kode endres
+- PR opprettes først etter kontroll og rent arbeidsområde
+- merge krever eksplisitt godkjenning
 
-## 7. Planlagte branches
+## 8. Planlagte branches
 
-- `feature/text-box-editing` — gjeldende, klar for arkitekturrapporter og PR
-- `feature/right-properties-panel`
 - `feature/text-properties`
 - `feature/button-element`
 - `feature/image-import-and-placement`
@@ -223,9 +275,10 @@ Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges f�
 - `feature/preview-mode`
 - `feature/publishing`
 
-## 8. Åpne beslutninger
+## 9. Åpne beslutninger
 
-- høyremenyens eksakte bredde og oppførsel i smale vinduer
+Høyremenyens grunnstruktur er låst. Senere åpne beslutninger er:
+
 - om tekstformatering gjelder hele boksen eller markert tekst
 - endelig fontliste og fontstørrelser
 - tekstjustering og linjehøyde

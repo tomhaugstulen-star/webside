@@ -149,6 +149,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../state/useElementSelection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useElementSelection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../types/editor",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -175,6 +192,23 @@
             "import"
           ],
           "resolved": "src/components/canvas/EditorCanvas.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../properties/RightPropertiesPanel",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/properties/RightPropertiesPanel.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -250,6 +284,7 @@
         "src/components/canvas/canvasElementAccessibility.ts",
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/canvas/getCanvasContentHeight.ts",
+        "src/components/properties/RightPropertiesPanel.tsx",
         "src/components/sidebar/LeftSidebar.tsx",
         "src/components/sidebar/SidebarPanels.tsx"
       ],
@@ -287,8 +322,8 @@
       "dependents": [
         "src/components/editor/EditorShell.tsx",
         "src/state/useElementCreation.ts",
-        "src/components/canvas/EditorCanvas.tsx",
         "src/state/useElementSelection.ts",
+        "src/components/canvas/EditorCanvas.tsx",
         "src/state/useElementLayout.ts",
         "src/state/useTextElementContent.ts",
         "src/state/useElementLocking.ts"
@@ -813,6 +848,41 @@
       "valid": true
     },
     {
+      "source": "src/state/useElementSelection.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx",
+        "src/components/canvas/EditorCanvas.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/types/editor.ts",
       "dependencies": [
         {
@@ -962,40 +1032,6 @@
       ],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/state/useElementSelection.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./useEditorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/state/useEditorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/components/canvas/EditorCanvas.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -1685,6 +1721,41 @@
       "valid": true
     },
     {
+      "source": "src/components/properties/RightPropertiesPanel.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/components/sidebar/LeftSidebar.tsx",
       "dependencies": [
         {
@@ -2017,8 +2088,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 37,
-    "totalDependenciesCruised": 77,
+    "totalCruised": 38,
+    "totalDependenciesCruised": 80,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
