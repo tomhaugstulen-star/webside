@@ -19,60 +19,56 @@ Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige Power
 
 Det utvikles aldri direkte på `main`. Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer for å hente endringen lokalt.
 
+Ikke merge uten eksplisitt brukergodkjenning. Ikke påstå at tester består uten verifisert output fra brukeren eller CI.
+
 ## Autoritativ leserekkefølge
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/TEXT_PROPERTIES.md`
-4. `docs/RIGHT_PROPERTIES_PANEL.md`
-5. `docs/EDITOR_PLANNING.md`
-6. `docs/PROJECT_RULES.md`
-7. `README.md`
-8. `docs/ELEMENT_MODEL.md`
-9. `docs/TEXT_BOX_EDITING.md`
-10. `docs/OBJECT_LOCKING.md`
-11. `docs/DRAG_RESIZE.md`
-12. `docs/ELEMENT_SELECTION.md`
-13. `docs/ELEMENT_CREATION.md`
-14. `docs/MOBILE_DESIGN_CONTROLS.md`
-15. `docs/CODE_AUDIT.md`
+3. `docs/ELEMENT_LINKS.md`
+4. `docs/TEXT_PROPERTIES.md`
+5. `docs/RIGHT_PROPERTIES_PANEL.md`
+6. `docs/EDITOR_PLANNING.md`
+7. `docs/PROJECT_RULES.md`
+8. `README.md`
+9. `docs/ELEMENT_MODEL.md`
+10. `docs/TEXT_BOX_EDITING.md`
+11. `docs/OBJECT_LOCKING.md`
+12. `docs/DRAG_RESIZE.md`
+13. `docs/ELEMENT_SELECTION.md`
+14. `docs/ELEMENT_CREATION.md`
+15. `docs/MOBILE_DESIGN_CONTROLS.md`
+16. `docs/CODE_AUDIT.md`
 
 ## Git-status
 
 Siste bekreftede `main`:
 
 ```text
-8de5f2e
+452b491
 ```
 
-Dette er merge-commit fra PR #9, som la inn høyremenyens grunnstruktur.
+Dette er merge-commit fra PR #11, som la inn tekstegenskaper.
 
 Gjeldende branch:
 
 ```text
-feature/text-properties
+feature/element-links
 ```
 
-Branch-head før dokumentasjonscommitene:
+Åpen PR:
 
 ```text
-a267ca3  chore: refresh architecture reports for text properties
-```
-
-Direkte under ligger de siste auditrettelsene:
-
-```text
-3d01336  refactor: make text style validation exhaustive
-95dae75  fix: harden text style runtime validation
+PR #14 Add standalone links for text elements
 ```
 
 GitHub-sak:
 
 ```text
-#10 Plan: text properties for selected text boxes
+#13 Plan: standalone links for text boxes and button assets
 ```
 
-PR er ikke opprettet ennå.
+PR #14 er åpen, ikke draft og mergebar. Den er ikke merget. Sak #13 lukkes automatisk ved merge.
 
 ## Ferdig og merget til `main`
 
@@ -86,18 +82,20 @@ PR er ikke opprettet ennå.
 - flytting og resizing med peker og tastatur
 - minimumsmål, clamping, edge-scroll og automatisk lerretsvekst
 - objektlåsing og opplåsing
-- kontrollert ren flerlinjet tekstredigering
+- kontrollert flerlinjet tekstredigering
 - høyremenyens grunnstruktur
+- tekstegenskaper for hele tekstboksen
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
 
 ```text
-PR #4  drag og resize
-PR #5  objektlåsing                 a3eed45
-PR #7  ren tekstredigering          c729d33
-PR #8  navn og rekkefølge i meny    a35f59d
-PR #9  høyremenyens grunnstruktur    8de5f2e
+PR #4   drag og resize
+PR #5   objektlåsing                 a3eed45
+PR #7   ren tekstredigering          c729d33
+PR #8   navn og rekkefølge i meny    a35f59d
+PR #9   høyremenyens grunnstruktur   8de5f2e
+PR #11  tekstegenskaper              452b491
 ```
 
 ## Fast UX-regel
@@ -112,38 +110,17 @@ Konsekvenser:
 
 - `Elementer -> Tekst` oppretter en vanlig fri tekstboks.
 - Selve tekstinnholdet redigeres bare på lerretet.
-- Høyremenyen har ikke et ekstra tekstfelt.
-- Font, størrelse og andre egenskaper skal ikke ligge i venstremenyen.
+- Font, størrelse, lenke og andre egenskaper ligger i høyremenyen.
 - `Logo og header` skal senere eie strukturelle headerdeler.
+- Lenker aktiveres ikke i vanlig editormodus.
 
-## Implementert høyremenygrunnlag
+## Implementert tekstgrunnlag
 
-```text
-Ingenting valgt -> ingen høyremeny
-Element valgt   -> høyremeny åpnes
-Tomt lerret     -> høyremeny lukkes
-```
+Tekstegenskaper er merget til `main` i PR #11.
 
-- bredde 320 px
-- dokket fra 1680 px
-- overlay under 1680 px uten å redusere lerretet
-- skjult panel reserverer ingen plass
-- egen vertikal scrolling
-- 180 ms transform-animasjon
-- `prefers-reduced-motion` respekteres
-- eksisterende `useElementSelection` er autoritativ avledning
-- ingen parallell elementstate eller direkte prosjektmutasjon
-
-## Gjeldende fase: tekstegenskaper
-
-Fasen er implementert, auditert, kontrollert og visuelt godkjent.
-
-Når en vanlig tekstboks er markert, viser høyremenyen:
+For en markert tekstboks viser høyremenyen:
 
 ```text
-Egenskaper
-Tekst
-
 Tekstutseende
 Font
 Størrelse
@@ -151,157 +128,197 @@ Fet
 Kursiv
 Justering
 Linjehøyde
-
-Element
-Status: Ulåst
 ```
 
 Formateringen gjelder hele tekstboksen. Det bygges ikke riktekst eller formatering av markerte ord og tegn.
 
-Kontrollerte verdier:
+`EditorCanvasElement.tsx` er nær aktiv filgrense og skal ikke få flere nye ansvarsområder. Senere canvaslogikk må trekkes ut.
+
+## Gjeldende fase – frittstående elementlenker
+
+Fasen er isolert fra knappbibliotek, knappdesign, riktekst, forhåndsvisning og publisering.
+
+Første leveranse gjelder hele vanlige tekstbokser:
 
 ```text
-fonter: System, Arial, Verdana, Tahoma, Trebuchet MS,
-        Georgia, Times New Roman, Courier New
-
-størrelser: 12, 14, 16, 18, 20, 24, 28, 32, 36,
-            40, 48, 56, 64, 72, 96 px
-
-justering: venstre, midtstilt, høyre
-linjehøyde: 1.0, 1.2, 1.45, 1.6, 1.8, 2.0
+Marker tekstboksen
+-> Høyremeny
+-> Lenke
+-> Ekstern lenke
+-> skriv http:// eller https://
+-> velg eventuelt Åpne i ny fane
+-> Lag lenke / Lagre lenke
 ```
 
-Standard:
+Høyremenyen viser:
 
 ```text
-System, 16 px, normal, venstre, 1.45
+Lenke
+Type: Ingen / Ekstern lenke
+Nettadresse
+Åpne i ny fane
+Lag lenke / Lagre lenke / Fjern lenke
 ```
 
-## Modell og reducer
+Fast funksjonsregel:
 
-- prosjektskjema versjon 3
-- bare `kind: 'text'` har obligatorisk `textStyle`
-- tekststil er varig prosjektdata og foreløpig felles for PC og Telefon
-- stabile fonttokens lagres i prosjektet
-- rå CSS-fontstacker avledes i visningslaget
-- hver handling endrer én validert stilegenskap
-- reduceren bruker nyeste autoritative state
-- låste, ugyldige og uendrede overganger avvises
-- `updatedAt` endres bare ved reell endring
-- panelet eier ingen lokal stilkopi
-- vanlig visning og `textarea` arver samme stil
+- hele tekstboksen får lenken
+- bare absolutte `http://`- og `https://`-adresser godtas
+- ugyldig URL muterer ikke prosjektet
+- `openInNewTab` lagres eksplisitt
+- låste tekstbokser kan inspiseres, men kontrollene er deaktivert
+- lagring gir grønn knapp og teksten `Lenke lagret`
+- panelet viser også `Lenken er lagret på tekstboksen.`
+- lenken åpnes aldri i editormodus
+- enkeltord eller tegn får ikke egne lenker
 
-Runtime-validatoren avviser null, arrays, ukjente nøkler og utypede data. Validatorregisteret er uttømmende, slik at TypeScript krever validering ved framtidige modellfelt.
+## Lenkemodell
 
-## Låste tekstbokser
+Prosjektskjemaet er versjon 4 på `feature/element-links`.
 
-- kan markeres og inspiseres
-- viser gjeldende tekststil
-- alle tekstkontroller er deaktivert
-- reduceren håndhever låsen
-- opplåsing skjer gjennom eksisterende objektverktøy
+Modell:
 
-## Godkjent fokusoppførsel
+```text
+none
+external-url { url, openInNewTab }
+```
 
-Når fokus flyttes til høyremenyen:
+Regler:
 
-- elementet forblir valgt i autoritativ state
-- høyremenyen fortsetter å vise og endre samme element
-- den blå markeringsrammen kan forsvinne visuelt
+- bare `kind: 'text'` får obligatorisk `link` i første leveranse
+- nye tekstbokser starter med `link: none`
+- semantiske data lagres, ikke rå DOM- eller ankerattributter
+- runtime-validatoren tåler `unknown`, `null`, arrays og ukjente nøkler
+- validatorregisteret er uttømmende ved framtidige lenketyper
+- reduceren avviser manglende, feiltypede, låste, ugyldige og uendrede overganger
+- `updatedAt` endres bare ved reell prosjektendring
+- inputdraft, feil- og lagringsmelding er transient UI-state
 
-Dette er eksplisitt godkjent. Ikke rett det i denne branchen.
+Editorens DOM inneholder ikke `href` på tekstboksen. URL-en kan derfor ikke bekreftes i vanlig Elements-visning. Den autoritative kontrollen er at adressen vises igjen i høyremenyen når tekstboksen velges på nytt.
 
 ## Arkitektur
 
-Viktige nye filer:
+Nye filer:
 
 ```text
-src/model/textElementStyle.ts
+src/model/elementLink.ts
+src/state/setTextElementLink.ts
+src/state/useTextElementLink.ts
+src/components/properties/ElementLinkPropertiesSection.tsx
+src/styles/element-link-properties.css
+```
+
+Eksisterende integrasjon:
+
+```text
+src/model/editorProject.ts
+src/model/createEditorElement.ts
 src/state/editorProjectAction.ts
-src/state/setTextElementStyle.ts
-src/state/useTextElementStyle.ts
-src/components/canvas/getTextElementCssStyle.ts
-src/components/properties/TextPropertiesSection.tsx
-src/styles/text-properties.css
+src/state/editorProjectReducer.ts
+src/components/properties/RightPropertiesPanel.tsx
+src/App.css
 ```
 
-`EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder. Senere canvaslogikk må trekkes ut.
+`EditorCanvasElement.tsx` er urørt av lenkeimplementasjonen.
 
-## Audit og kontrollstatus
+Alle nye kildefiler er under aktiv 250-linjersgrense.
 
-Rettede auditfunn:
+## Audit og verifisert kontroll
+
+Brukeren har manuelt bekreftet:
 
 ```text
-95dae75  fix: harden text style runtime validation
-3d01336  refactor: make text style validation exhaustive
+gyldig lenke lagres
+URL-en vises igjen etter at elementet velges på nytt
+lagreknappen blir grønn og viser bekreftelse
+ugyldig adresse avvises
+lenken åpnes ikke i editoren
+låste lenkekontroller er deaktivert
 ```
 
-Brukeren kjørte sluttkontroll etter siste produksjonskodeendring:
+Siste verifiserte `npm run check` etter siste produksjonskodeendring:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
 produksjonsbuild: bestått
-Vite: 54 moduler transformert, bygget på 164 ms
-arkitekturrapporter: regenerert og committet i a267ca3
-working tree: clean
-branch: synkronisert med origin
+Vite: 58 moduler transformert
 ```
 
-`git diff --check` viste bare LF/CRLF-varsler, ikke whitespace-feil.
+Arkitekturrapportene er regenerert:
 
-Det finnes foreløpig ikke automatiserte enhetstester. `npm run check` dekker lint, TypeScript, arkitektur og produksjonsbuild. Brukeren har gjennomført funksjonell og visuell kontroll.
-
-## Ikke del av branchen
-
-- tekstfarge eller prosjektfargemodell
-- bredde, høyde eller plassering i høyremenyen
-- headerens hovedtekst eller undertittel
-- riktekst eller tegnbaserte tekstspenn
-- opplasting av fonter eller eksterne webfonter
-- sletting eller duplisering
-- historikk eller lagring
-- mobile tekststiloverstyringer
-
-## Neste steg
-
-Dokumentasjonen er oppdatert gjennom GitHub-connectoren etter den rene lokale sluttkontrollen.
-
-Be brukeren hente dokumentasjonen:
-
-```powershell
-cd C:\Users\tomha\Desktop\website
-
-git pull --ff-only origin feature/text-properties
-git status
-git log -5 --oneline --decorate
+```text
+architecture.json
+docs/dependency-graph.mmd
 ```
 
-Når brukeren bekrefter clean tree:
+Arbeidstreet var clean før den avsluttende dokumentasjonsrevisjonen. Dokumentasjonscommitene må hentes lokalt og clean tree må bekreftes igjen før merge.
 
-1. Sammenlign hele `feature/text-properties` mot `main`.
-2. Kontroller at diffen bare inneholder tekstegenskaper, arkitekturrapporter og relevant dokumentasjon.
-3. Kontroller at branchen er foran `main` og ikke bak.
-4. Opprett draft-PR mot `main` med `Closes #10`.
-5. Dokumenter omfang, state-grenser, auditfunn, testresultater og visuell godkjenning.
-6. Kontroller mergebarhet, review-tråder og eventuell CI.
-7. Marker PR klar for review når alt er kontrollert.
-8. Ikke merge før brukeren gir eksplisitt godkjenning.
-9. Bruk forventet head-SHA ved merge.
-10. Etter merge: oppdater lokal `main` og kontroller clean tree.
+## Dokumentasjonsstatus
 
-## Kommunikasjonsregler
+Oppdatert på `feature/element-links`:
 
-- svar på norsk
-- vær direkte og presis
-- ikke gjett
-- bruk GitHub-connectoren til repoarbeid
-- gi nøyaktige PowerShell-kommandoer etter repoendringer
-- ikke be brukeren bruke GitHub CLI
-- ikke bland senere funksjoner inn i gjeldende branch
-- ikke påstå at tester er bestått uten brukerens output eller verifisert CI
-- ikke opprett PR før lokal branch er clean etter dokumentasjonspull
-- ikke merge uten eksplisitt godkjenning
+```text
+docs/ELEMENT_LINKS.md
+architecture.json
+docs/dependency-graph.mmd
+README.md
+docs/WORK_PLAN.md
+docs/EDITOR_PLANNING.md
+docs/NEXT_CHAT_PROMPT.md
+```
+
+`docs/ELEMENT_LINKS.md` er autoritativ spesifikasjon for PR #14.
+
+## Ikke del av PR #14
+
+- knappbibliotek eller lokal `buttons`-mappe
+- Canva/Figma-import
+- knappdesign, farger, rammer eller typografi
+- riktekst eller lenker på markerte enkeltord
+- forhåndsvisning eller publisering
+- aktive ankere i editormodus
+- interne sidelenker
+- e-post-, telefon- eller nedlastingslenker
+- sletting, duplisering, historikk eller autolagring
+
+## Senere knappbibliotek
+
+Bekreftet produktretning:
+
+```text
+Canva eller Figma
+-> eksporter knapp som SVG eller PNG
+-> lagre i separat knappbibliotek
+-> Elementer -> Knapp åpner biblioteket
+-> velg knapp og sett den inn på lerretet
+-> koble knappen til den samme lenkemodellen
+```
+
+Foreløpig branch:
+
+```text
+feature/button-library
+```
+
+Den gamle `feature/button-element`-branchen er parkert og skal ikke merges. Den inneholder bare tidligere planmateriale. GitHub-sak #12 er lukket som `not_planned`.
+
+Før knappbiblioteket implementeres må følgende avklares:
+
+- statisk lesing eller skrivbar lokal mappe
+- lagringsplass i prosjektet
+- SVG kontra PNG
+- metadata og tilgjengelig navn
+
+## Neste handling
+
+1. Hent siste dokumentasjonscommits på `feature/element-links`.
+2. Kontroller at working tree er clean.
+3. Kontroller PR #14 etter dokumentasjonsoppdateringene.
+4. Ikke kjør en ny full `npm run check` bare på grunn av Markdown-endringer med mindre kode eller konfigurasjon er endret.
+5. Merge PR #14 bare etter eksplisitt brukergodkjenning.
+6. Etter merge: bytt til `main`, pull, kontroller merge-commit og clean tree.
+7. Ikke start knappbiblioteket før brukeren eksplisitt ber om det og omfanget er låst.
 
 ---
