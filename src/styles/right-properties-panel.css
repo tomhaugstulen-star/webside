@@ -1,0 +1,115 @@
+.right-properties-panel {
+  position: relative;
+  z-index: 12;
+  width: 0;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-left: 1px solid transparent;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(10px);
+  color: var(--text);
+  background: rgba(255, 253, 251, 0.99);
+  box-shadow: none;
+  transition:
+    width 180ms ease-out,
+    border-color 180ms ease-out,
+    opacity 140ms ease-out,
+    transform 180ms ease-out,
+    box-shadow 180ms ease-out;
+}
+
+.right-properties-panel--open {
+  width: var(--properties-panel-width);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  border-left-color: var(--border);
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  box-shadow: -5px 0 18px rgba(85, 60, 45, 0.05);
+}
+
+.right-properties-panel__content {
+  width: calc(var(--properties-panel-width) - 1px);
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.right-properties-panel h2 {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.right-properties-panel__details {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.right-properties-panel__detail-row {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 18px;
+}
+
+.right-properties-panel__detail-row dt,
+.right-properties-panel__detail-row dd {
+  margin: 0;
+  font-size: 14px;
+}
+
+.right-properties-panel__detail-row dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.right-properties-panel__detail-row dd {
+  color: var(--text);
+  font-weight: 650;
+}
+
+@media (max-width: 1679px) {
+  .right-properties-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+@media (min-width: 1680px) {
+  .editor-shell--properties-open .canvas-page--desktop {
+    width: min(
+      1080px,
+      calc(
+        100vw - var(--rail-width) - var(--panel-width) - var(--properties-panel-width) - 112px
+      )
+    );
+  }
+
+  .editor-shell--properties-open:not(.editor-shell--panel-open) .canvas-page--desktop {
+    width: min(
+      1320px,
+      calc(100vw - var(--rail-width) - var(--properties-panel-width) - 112px)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .right-properties-panel {
+    transition: none;
+  }
+}
