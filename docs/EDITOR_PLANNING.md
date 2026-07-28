@@ -6,9 +6,8 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 
 ### Ferdig og merget til `main`
 
-- blankt, hvitt desktop- og mobillerret
+- blankt PC- og Telefon-lerret
 - toppmeny og venstremeny
-- kontrollert paneloppførsel
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - prosjekt- og elementmodell
 - stabile kryptografiske ID-er
@@ -16,53 +15,53 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 - sentral prosjekt-state og aktiv side
 - transient elementmarkering
 - oppretting av alle fire elementtypene
-- kontrollerte startstørrelser og første ledige startplass
-- automatisk markering av nytt element
-- avledet lerretshøyde
+- kontrollerte startstørrelser og startplassering
 - flytting og resizing med peker og tastatur
 - minimumsmål, clamping, edge-scroll og transient preview
+- objektlåsing og opplåsing
 - Dependency Cruiser og samlet `npm run check`
 
-### Implementert i `feature/object-locking`
+### Implementert i `feature/text-box-editing`
 
-- egen objektverktøylinje over valgt element
-- åpen og lukket hengelås
-- varig `locked`-mutasjon gjennom reduceren
-- låseverdi beregnes fra reducerens nyeste state
-- låst element beholder markeringen
-- stiplet markering for låst element
-- resize-håndtak skjules når låst
-- peker- og tastaturtransform blokkeres
-- låseknappen er tastaturtilgjengelig
-- pointer-propagation fra verktøylinjen stoppes
-- låsestatus er felles for PC og Telefon
+- prosjektskjema versjon 2
+- diskriminert elementunion
+- tekstobjekter har obligatorisk `content`
+- nye tekstbokser starter med tom tekst
+- tydelig skille mellom objektmarkering og tekstredigering
+- kontrollert flerlinjet `textarea`
+- blur og `Ctrl`/`Cmd` + `Enter` committer
+- `Escape` forkaster aktiv draft
+- vanlig `Enter` lager ny linje
+- tom tekst er gyldig
+- låst tekstboks kan ikke redigeres
+- transform og objektverktøy er deaktivert under redigering
+- reduceren validerer tekstcommit og oppdaterer `updatedAt` bare ved reell endring
 
-Visuelt godkjent på PC og Telefon før siste kodeaudit. Siste tastaturretting må gjennom ny lokal sluttkontroll før PR.
+Brukeren har bekreftet at `npm run check` bestod, at all oppførsel fungerer på PC og Telefon, og at arbeidsområdet var rent før dokumentoppdateringen.
 
 ### Neste fase etter merge
 
 ```text
-feature/text-box-editing
+feature/right-properties-panel
 ```
 
-Denne fasen skal bygge direkte tekstredigering og et tydelig skille mellom objektmarkering og innholdsredigering. Bilder, knappehandlinger, historikk, lagring og mobiloverstyringer skal ikke blandes inn.
+Denne fasen skal bygge høyremenyens stabile grunnstruktur uten å legge inn font-, bilde-, knapp- eller fargekontroller.
 
 ## 2. Bekreftede hovedkrav
 
 ### Blank startside
 
 - En ny side åpner helt blank.
-- Ingen ferdige seksjoner, tekst, bilder eller farger opprettes automatisk.
-- Elementoppretting skjer bare etter en eksplisitt brukerhandling.
+- Ingen synlige elementer opprettes automatisk.
+- Elementoppretting skjer bare etter eksplisitt brukerhandling.
 - Omlasting gir foreløpig blank side fordi lagring ikke er implementert.
 
 ### Autoritativ prosjektmodell
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
-- DOM-en er bare rendering, ikke permanent lagring.
-- Elementer, geometri, innhold og låsestatus endres gjennom prosjekt-state/reduceren.
-- State-avhengige prosjektberegninger bruker reducerens nyeste state.
-- ID og klokkeslett genereres før dispatch slik at reduceren er deterministisk.
+- DOM-en er rendering, ikke permanent lagring.
+- Geometri, låsestatus og tekstinnhold endres gjennom reduceren.
+- State-avhengige beregninger bruker reducerens nyeste state.
 - `updatedAt` endres bare ved gyldig prosjektmutasjon.
 
 ### Transient state
@@ -71,21 +70,19 @@ Følgende skal ikke serialiseres, publiseres eller lagres:
 
 - `selectedElementId`
 - aktiv pointer-interaksjon
-- layout-preview under draing eller resizing
-- fokus, hover og synlighet for objektverktøylinjen
-- framtidig redigeringsmodus dersom den bare er UI-state
+- layout-preview
+- aktiv tekstredigeringsøkt
+- lokal tekstdraft
+- fokus, hover og synlighet for objektverktøy og paneler
 
-Når historikk og autolagring bygges, skal én ferdig brukerhandling behandles som én eksplisitt prosjektendring.
+Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én eksplisitt prosjektendring.
 
-### Desktop og mobil
+### PC og Telefon
 
-- Prosjektmodellen bruker desktopverdi med valgfri mobilverdi.
-- Mobilvisning bruker mobilverdi når den finnes og ellers desktopverdi.
-- Nye elementer har foreløpig bare desktopgeometri.
-- I dagens UI redigerer PC og Telefon den delte desktopgeometrien.
-- Egne mobiloverstyringer bygges eksplisitt i `feature/mobile-design-controls`.
-- En mobilendring skal senere aldri endre desktopverdien utilsiktet.
-- Låsestatus er felles for PC og Telefon.
+- Mobil arver desktopgeometri når mobiloverstyring mangler.
+- Dagens UI redigerer den delte desktopgeometrien.
+- Egne mobiloverstyringer bygges i `feature/mobile-design-controls`.
+- Tekstinnhold og låsestatus er felles elementdata og er ikke responsive verdier.
 
 ## 3. Elementer
 
@@ -103,7 +100,7 @@ Når historikk og autolagring bygges, skal én ferdig brukerhandling behandles s
 - Tekst: 120 × 48 px
 - Knapp: 80 × 36 px
 
-### Opprettingsplassering
+### Oppretting
 
 - start ved x 24 px
 - første ledige vertikale gap
@@ -111,104 +108,69 @@ Når historikk og autolagring bygges, skal én ferdig brukerhandling behandles s
 - eksisterende elementer flyttes aldri automatisk
 - regelen gjelder bare elementets fødested
 
-Se `docs/ELEMENT_CREATION.md`.
-
 ### Flytting og resizing
 
 - elementer kan overlappe
 - ingen automatisk kollisjonsunngåelse
-- elementet holdes innenfor venstre, høyre og øvre lerretskant
-- det finnes ingen fast nedre grense
-- lerretet forlenges automatisk nedover
-- ett resize-håndtak vises på valgt og ulåst element
-- synlig håndtak er 16 × 16 px
-- treffflaten er 32 × 32 px
-- innhold utenfor elementgrensen klippes
-
-Pekerregler:
-
-- pointer capture brukes under interaksjonen
-- scrollforskyvning inngår i deltaet
-- preview er transient
-- normalt slipp committer én gang
+- venstre, høyre og øvre grense håndheves
+- ingen fast nedre grense
+- lerretet forlenges nedover
+- transient preview under pekerbevegelse
+- én commit ved normalt slipp
 - cancel eller tapt capture committer ikke
-
-Tastaturregler:
-
-- piltaster flytter 1 px
-- `Shift` + piltast flytter 10 px
-- `Ctrl`/`Cmd` + piltast endrer størrelse 1 px
-- `Ctrl`/`Cmd` + `Shift` + piltast endrer størrelse 10 px
-
-Se `docs/DRAG_RESIZE.md`.
+- piltaster flytter
+- `Ctrl`/`Cmd` + piltaster endrer størrelse
+- `Shift` bruker 10 px steg
 
 ### Låsing
 
-Implementert:
-
-- valgt element får en separat objektverktøylinje
-- åpen hengelås låser elementet
-- lukket hengelås låser opp elementet
-- låst element beholder markeringen
-- låst element får stiplet markeringsramme
+- valgt element får separat objektverktøylinje
+- låst element kan markeres og fokuseres
+- låst element kan ikke transformeres
 - resize-håndtaket skjules
-- peker- og tastaturtransform blokkeres
-- låseknappen starter ikke flytting eller fjerner markering
-- piltaster på låst element utløser ikke utilsiktet scrolling
+- reduceren håndhever låsen
+- låsestatus er felles for PC og Telefon
 
-Arkitekturregler:
+### Ren tekstredigering
 
-- `locked` er varig elementdata
-- neste låseverdi beregnes i reduceren fra nyeste state
-- ukjent element-ID ignoreres
-- gyldig endring oppdaterer `updatedAt`
-- reduceren forblir autoritativ for transformblokkering
-- objektverktøylinjens fokus og synlighet er transient UI-state
+- bare `kind: 'text'` har `content`
+- tom tekst er gyldig
+- editor-placeholder lagres ikke
+- ett klikk markerer
+- dobbeltklikk starter redigering
+- `Enter` på markert tekstboks starter redigering
+- vanlig `Enter` lager ny linje
+- blur og `Ctrl`/`Cmd` + `Enter` committer
+- `Escape` forkaster
+- linjeskift normaliseres til `\n`
+- `contentEditable` og `innerHTML` brukes ikke
+- tekst klippes ved elementgrensen
+- boksen vokser ikke automatisk med innholdet
 
-Se `docs/OBJECT_LOCKING.md`.
-
-### Tekst
-
-- `Tekst` er foreløpig en nøytral plassholder.
-- Direkte tekstredigering bygges i egen modus.
-- Objektmarkering og innholdsredigering må skilles tydelig.
-- Innhold utenfor elementboksen klippes.
-- Låst tekstboks skal ikke gå inn i redigeringsmodus.
-- Tastaturkommandoer for objektet må deaktiveres mens tekstinnhold redigeres.
-
-Før implementering må dette fastsettes:
-
-- hvordan redigeringsmodus startes og avsluttes
-- Enter-regel
-- første fontliste og fontstørrelsesliste
-- om formatering gjelder hele boksen eller markert tekst
-- commit-grense for tekstendringer
-- hvordan tom tekst behandles
+Se `docs/TEXT_BOX_EDITING.md`.
 
 ### Bilder
 
-- `Bilde` er foreløpig en nøytral plassholder.
+- Bilde er foreløpig en plassholder.
 - Ekte bildeinnhold og bildevelger er ikke implementert.
-- Bildet skal være et selvstendig objekt med egen geometri og låsestatus.
 
 ### Knapper
 
-- `Knapp` er foreløpig en nøytral representasjon uten handling.
-- Senere skal tekst, farger, ramme og handling kunne redigeres.
-- Faktisk knapphandling skal ikke aktiveres i vanlig editormodus.
+- Knapp er foreløpig uten handling.
+- Faktisk handling eller lenke skal ikke aktiveres i vanlig editormodus.
 
-## 4. Korrigerings- og hjelpesystem
+## 4. Høyremeny
 
-Senere krav:
+Neste kontrollerte fase bygger bare inspeksjonspanelets arkitektur:
 
-- horisontal midtstilling
-- elementer på samme linje
-- lik avstand mellom tre eller flere elementer
-- vises bare under flytting eller resizing
-- ingen usynlig automatisk flytting
-- ingen generell kollisjonsunngåelse
+- høyre kolonne i editorshellet
+- følger valgt element
+- viser elementtype og grunnidentitet
+- tydelig tom/skjult tilstand
+- stabil seksjonsstruktur for senere egenskaper
+- ingen midlertidige egenskapskontroller
 
-Planlagt branch: `feature/alignment-guides`.
+Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges først etter at panelet er stabilt.
 
 ## 5. Farger, logo/header og fonts
 
@@ -216,7 +178,7 @@ Planlagt branch: `feature/alignment-guides`.
 
 - panelet skal vise faktiske prosjektfarger
 - ingen ferdig fargepalett
-- global endring skal oppdatere alle elementer som bruker fargen
+- global endring skal oppdatere alle brukere av fargen
 
 ### Logo/header
 
@@ -229,36 +191,26 @@ Planlagt branch: `feature/alignment-guides`.
 
 - omtrent 7–8 nettsikre fonter
 - fontstørrelse fra kontrollert liste
-- fontfarge registreres senere i fargesystemet
-- fet og kursiv vurderes i første tekstversjon
+- tekstfarge kobles til fargesystemet
+- fet og kursiv
+- formatering av hele boksen kontra markert tekst må avklares før kode
 
-## 6. Lokal automatisk lagring
-
-- prosjektet lagres i egen mappe på brukerens PC
-- prosjektdata og bilder lagres lokalt
-- automatisk lagring uten manuell lagreknapp per endring
-- statusene `Lagrer`, `Lagret` og `Lagringsfeil`
-- sikker skriving og gjenoppretting
-- samme prosjektendringsgrense som historikksystemet
-- transient markering, pointer-preview og verktøylinjefokus skal ikke lagres
-
-## 7. Arkitektur og arbeidsmåte
+## 6. Arkitektur og arbeidsmåte
 
 - én avgrenset funksjon per branch
 - `main` holdes stabil
 - 250 linjer er aktiv terskel for ansvarstrekk
-- `App.tsx` komponerer bare hovedstrukturen
 - prosjektmodell, transient state, hendelseslogikk og visning holdes separat
 - reducer-actions håndteres uttømmende
 - ugyldige og uendrede state-overganger avvises
-- pointer-transform, edge-scroll og objektverktøylinje er separate ansvar
 - Dependency Cruiser kontrollerer modulgrensene
 - arkitekturrapporter regenereres etter strukturendringer
 
-## 8. Planlagte branches
+## 7. Planlagte branches
 
-- `feature/object-locking` — gjeldende, auditendring må sluttkontrolleres
-- `feature/text-box-editing`
+- `feature/text-box-editing` — gjeldende, klar for arkitekturrapporter og PR
+- `feature/right-properties-panel`
+- `feature/text-properties`
 - `feature/button-element`
 - `feature/image-import-and-placement`
 - `feature/project-colors`
@@ -268,22 +220,17 @@ Planlagt branch: `feature/alignment-guides`.
 - `feature/history-system`
 - `feature/local-project-autosave`
 - `feature/project-open-import`
-- `feature/layers-panel`
 - `feature/preview-mode`
 - `feature/publishing`
 
-## 9. Åpne beslutninger
+## 8. Åpne beslutninger
 
-- start og avslutning av tekstredigeringsmodus
-- Enter-regel og tom tekst
-- formatering av hele tekstboksen kontra markert tekst
-- sletting og bekreftelsesregel
-- endelig mobilbrytepunkt
-- hvilke egenskaper som kan overstyres på mobil
-- sammenslåing av gjentatte tastatur- og tekstendringer i historikk
+- høyremenyens eksakte bredde og oppførsel i smale vinduer
+- om tekstformatering gjelder hele boksen eller markert tekst
 - endelig fontliste og fontstørrelser
 - tekstjustering og linjehøyde
+- sletting og bekreftelsesregel
+- endelig mobilbrytepunkt
 - knappens handlinger og lenketyper
-- prosjektfilformat og lagringsintervall
-- sikker skriving og gjenoppretting
+- prosjektfilformat, migrering og lagringsintervall
 - publiseringsarkitektur
