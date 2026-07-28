@@ -2,11 +2,12 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter nå kontrollert redigering av ren flerlinjet tekst.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert redigering av ren flerlinjet tekst.
 
-## Lokal mappe
+## Repo og lokal mappe
 
 ```text
+https://github.com/tomhaugstulen-star/webside.git
 C:\Users\tomha\Desktop\website
 ```
 
@@ -43,21 +44,45 @@ Det utvikles aldri direkte på `main`.
 
 ```text
 main
-  → egen avgrenset branch
-  → implementering
-  → kodeaudit
-  → npm run check
-  → arkitekturrapporter
-  → PC-, Telefon-, peker- og tastaturtest
-  → dokumentasjon
-  → kontrollert PR og merge
+  -> egen avgrenset branch
+  -> godkjent omfang og design
+  -> implementering
+  -> kodeaudit
+  -> npm run check
+  -> arkitekturrapporter
+  -> PC-, Telefon-, peker- og tastaturtest
+  -> dokumentasjon
+  -> kontrollert PR
+  -> eksplisitt mergegodkjenning
 ```
+
+## Gjeldende `main`
+
+Siste bekreftede merge-commit:
+
+```text
+a35f59d
+```
+
+Denne kom fra PR #8 og låste navn og rekkefølge i venstremenyen.
+
+Endelig venstremeny:
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+`Prosjekt` står øverst. `Innstillinger` står nederst.
 
 ## Ferdig og merget til `main`
 
 - stabilt React/TypeScript/Vite-grunnlag
 - blankt PC- og Telefon-lerret
-- toppmeny og venstremeny
+- toppmeny og kontrollert venstremeny
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - prosjekt- og elementmodell med stabile ID-er og responsive verdier
 - sentral prosjekt-state og aktiv side
@@ -67,65 +92,69 @@ main
 - flytting og størrelsesendring med peker og tastatur
 - clamping, minimumsmål, edge-scroll og automatisk lerretsvekst
 - objektlåsing med tilgjengelig lås/lås opp
+- kontrollert flerlinjet tekstredigering
 - Dependency Cruiser og samlet `npm run check`
 
-PR #5 merget objektlåsing til `main` med merge-commit:
+Viktige merges:
 
 ```text
-a3eed45
+PR #4  drag og resize
+PR #5  objektlåsing                 a3eed45
+PR #7  ren tekstredigering          c729d33
+PR #8  navn og rekkefølge i meny    a35f59d
 ```
 
-## Gjeldende branch
-
-```text
-feature/text-box-editing
-```
-
-Implementert, kodeauditert og visuelt godkjent:
-
-- prosjektskjema versjon 2
-- diskriminert elementunion
-- obligatorisk `content` bare for tekstobjekter
-- tomt standardinnhold i nye tekstbokser
-- ett klikk markerer
-- dobbeltklikk eller `Enter` på markert tekstboks starter redigering
-- kontrollert flerlinjet `textarea`
-- vanlig `Enter` lager ny linje
-- blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster aktiv draft
-- tom tekst er gyldig
-- låst tekstboks kan ikke redigeres
-- flytting, resizing og objektverktøy er deaktivert under redigering
-- tekstcommit valideres av reduceren
-- uendret eller ugyldig tekst oppdaterer ikke state eller `updatedAt`
-- PC og Telefon viser samme tekstinnhold
-
-Se `docs/TEXT_BOX_EDITING.md`.
-
-Arkitekturrapportene må regenereres før PR fordi branchen har nye kildekodemoduler.
-
-## Neste fase etter merge
+## Gjeldende branch og fase
 
 ```text
 feature/right-properties-panel
 ```
 
-Sporet i:
+Branchen er fast-forwardet fra oppdatert `main` etter PR #8. Dokumentasjonen er oppdatert før implementering. Det er foreløpig ikke lagt inn produksjonskode for høyremenyen.
+
+Fasen bygger bare høyremenyens grunnstruktur.
+
+Låst oppførsel:
 
 ```text
-docs/RIGHT_PROPERTIES_PANEL.md
-GitHub-sak #6
+Ingenting valgt -> ingen høyremeny
+Element valgt   -> høyremeny åpnes
+Tomt lerret     -> høyremeny lukkes
 ```
 
-Denne fasen skal bygge høyremenyens grunnstruktur:
+I tillegg:
 
-- følger `selectedElementId`
-- viser valgt elementtype
-- tom/skjult tilstand når ingenting er valgt
-- stabil layout for senere egenskaper
-- ingen font-, farge-, bilde- eller knappfunksjoner ennå
+- skjult panel reserverer ikke en tom høyrekolonne
+- låst element kan fortsatt inspiseres
+- panelet kan være åpent mens en tekstboks redigeres
+- klikk i panelet bruker eksisterende blur/commit
+- markeringen beholdes etter normal tekstcommit
+- panelet oppretter ikke separat tekstdraft
 
-Fontfamilie, fontstørrelse, tekstfarge, fet, kursiv og eventuell markert tekstformatering bygges senere i en egen branch.
+En permanent synlig tom høyremeny er avvist.
+
+Før kode må følgende fortsatt godkjennes:
+
+- panelbredde
+- oppførsel i smale nettleservinduer
+- egen scrolling
+- visuell overskrift og seksjonsstruktur
+- minimum av faktisk inspeksjonsinformasjon
+- eventuell åpne-/lukkeanimasjon
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md` og GitHub-sak #6.
+
+Denne branchen skal ikke bygge:
+
+- font-, tekststørrelse- eller riktekstkontroller
+- fargevelgere eller prosjektfargeregister
+- bildeinnstillinger
+- knapphandlinger
+- logo- eller headerbygger
+- sletting eller duplisering
+- historikk eller lagring
+- prosjektimport
+- mobiloverstyringer
 
 ## Responsiv redigering
 
@@ -156,15 +185,16 @@ Transient editor-state:
 - aktiv pekerinteraksjon
 - layout-preview
 - aktiv tekstredigeringsøkt og lokal draft
-- fokus, hover og synlighet for objektverktøy
+- aktive verktøy og paneler
+- fokus, hover og lokal UI-feedback
 
-Transient state skal ikke serialiseres, eksporteres, publiseres eller inngå direkte i historikk/autolagring.
+Transient state skal ikke serialiseres, eksporteres, publiseres eller inngå direkte i historikk eller autolagring.
 
 ## Filstørrelse og ansvar
 
 - 250 linjer er aktiv terskel for ansvarstrekk.
 - En fil deles tidligere når den får flere tydelige ansvar.
-- 300 linjer er en eksplisitt unntaksgrense.
+- 300 linjer er en eksplisitt unntaksgrense for kildefiler.
 - Deling skjer etter ansvar, ikke tilfeldig linjetall.
 
 ## Dokumentasjon
@@ -173,15 +203,15 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/EDITOR_PLANNING.md`
-4. `docs/PROJECT_RULES.md`
-5. `docs/ELEMENT_MODEL.md`
-6. `docs/ELEMENT_SELECTION.md`
-7. `docs/ELEMENT_CREATION.md`
-8. `docs/DRAG_RESIZE.md`
-9. `docs/OBJECT_LOCKING.md`
-10. `docs/TEXT_BOX_EDITING.md`
-11. `docs/RIGHT_PROPERTIES_PANEL.md`
+3. `docs/RIGHT_PROPERTIES_PANEL.md`
+4. `docs/EDITOR_PLANNING.md`
+5. `docs/PROJECT_RULES.md`
+6. `docs/ELEMENT_MODEL.md`
+7. `docs/ELEMENT_SELECTION.md`
+8. `docs/ELEMENT_CREATION.md`
+9. `docs/DRAG_RESIZE.md`
+10. `docs/OBJECT_LOCKING.md`
+11. `docs/TEXT_BOX_EDITING.md`
 12. `docs/RESPONSIVE_DESIGN.md`
 13. `docs/MOBILE_DESIGN_CONTROLS.md`
 14. `docs/CODE_AUDIT.md`
@@ -191,9 +221,9 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 - høyremeny/egenskapspanel
 - font- og riktekstkontroller
 - sletting
-- bildeimport
+- ekte bildeimport
 - knapphandling og lenker
-- fargesystem
+- prosjektfargesystem
 - logo/header
 - korrigeringslinjer
 - egne mobiloverstyringer
