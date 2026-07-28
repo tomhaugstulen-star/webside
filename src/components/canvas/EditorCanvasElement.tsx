@@ -8,10 +8,8 @@ import type { EditorElement } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
 import type { ViewportMode } from '../../types/editor'
-import {
-  useElementPointerTransform,
-  type ElementLayoutPreview,
-} from './useElementPointerTransform'
+import type { ElementLayoutPreview } from './canvasLayoutPreview'
+import { useElementPointerTransform } from './useElementPointerTransform'
 
 const elementKindLabels: Record<EditorElement['kind'], string> = {
   section: 'Seksjon',
@@ -53,6 +51,7 @@ export function EditorCanvasElement({
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
+    handleLostPointerCapture,
   } = useElementPointerTransform({
     element,
     initialLayout,
@@ -100,6 +99,7 @@ export function EditorCanvasElement({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
+      onLostPointerCapture={handleLostPointerCapture}
       onKeyDown={handleKeyDown}
     >
       <span className="canvas-element__placeholder" aria-hidden="true">
