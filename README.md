@@ -110,6 +110,13 @@ Arkitekturrapportene må regenereres før PR fordi branchen har nye kildekodemod
 feature/right-properties-panel
 ```
 
+Sporet i:
+
+```text
+docs/RIGHT_PROPERTIES_PANEL.md
+GitHub-sak #6
+```
+
 Denne fasen skal bygge høyremenyens grunnstruktur:
 
 - følger `selectedElementId`
@@ -174,9 +181,10 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 8. `docs/DRAG_RESIZE.md`
 9. `docs/OBJECT_LOCKING.md`
 10. `docs/TEXT_BOX_EDITING.md`
-11. `docs/RESPONSIVE_DESIGN.md`
-12. `docs/MOBILE_DESIGN_CONTROLS.md`
-13. `docs/CODE_AUDIT.md`
+11. `docs/RIGHT_PROPERTIES_PANEL.md`
+12. `docs/RESPONSIVE_DESIGN.md`
+13. `docs/MOBILE_DESIGN_CONTROLS.md`
+14. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
