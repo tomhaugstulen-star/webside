@@ -16,6 +16,7 @@ Eksempler:
 - `feature/element-creation`
 - `feature/drag-resize`
 - `feature/object-locking`
+- `feature/text-box-editing`
 - `feature/mobile-design-controls`
 - `fix/sidebar-panel-behavior`
 - `tooling/dependency-cruiser`
@@ -37,11 +38,12 @@ Eksempler:
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - DOM-en skal ikke brukes som permanent prosjektlagring.
-- Elementer og geometri endres gjennom prosjekt-state/reduceren.
+- Elementer, geometri, innhold og låsestatus endres gjennom prosjekt-state/reduceren.
 - Prosjektidentitet bruker stabile kryptografiske ID-er.
 - State-avhengige prosjektberegninger bruker reducerens nyeste state.
 - UI-hooks sender brukerintensjon og ikke-deterministisk metadata, men skal ikke beregne varig resultat fra et mulig gammelt React-snapshot.
 - Reduceren skal være deterministisk for samme state og action.
+- `updatedAt` endres bare ved en reell, gyldig prosjektmutasjon.
 
 ### Transient editor-state
 
@@ -51,6 +53,8 @@ Transient state skal holdes utenfor `EditorProject`, blant annet:
 - aktiv pekerinteraksjon
 - layout-preview under draing eller resizing
 - åpne paneler og aktivt verktøy
+- fokus, hover og synlighet for objektverktøylinjer
+- framtidig tekstredigeringsmodus dersom den bare beskriver UI-tilstand
 
 Transient state skal ikke:
 
@@ -76,7 +80,24 @@ Når historikk og lagring bygges, skal ferdige prosjektmutasjoner være den eksp
 - Reduceren skal også avvise layoutmutasjon av låste elementer.
 - Lerretshøyde er avledet visning og skal ikke lagres i prosjektfilen.
 
-## 5. Responsiv grense
+## 5. Objektlåsing
+
+- `locked` er varig elementdata og er felles for PC og Telefon.
+- Låsestatus endres gjennom en eksplisitt reducer-action.
+- Neste låseverdi beregnes fra reducerens nyeste state.
+- Ukjent element-ID gir ingen prosjektendring.
+- En gyldig låseendring oppdaterer `updatedAt`.
+- Låst element skal fortsatt kunne fokuseres og markeres.
+- Låst element skal kunne låses opp uten at markeringen fjernes.
+- Peker- og tastaturtransform blokkeres både i UI-grensen og reducer-grensen.
+- Piltaster på låst element skal ikke utløse utilsiktet scrolling.
+- Objektverktøylinjen skal være separat fra elementets `role="button"`.
+- Klikk på objektverktøy skal ikke starte flytting eller fjerne markeringen.
+- En låseendring skal senere være én historikk-/autolagringsendring.
+
+Se `docs/OBJECT_LOCKING.md`.
+
+## 6. Responsiv grense
 
 - `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen.
 - UI-typer skal være alias til modelltypen, ikke en separat union.
@@ -84,8 +105,9 @@ Når historikk og lagring bygges, skal ferdige prosjektmutasjoner være den eksp
 - Egne mobiloverstyringer bygges eksplisitt i `feature/mobile-design-controls`.
 - En mobilendring skal ikke utilsiktet skrive desktopgeometri når mobiloverstyringer senere finnes.
 - Layout-actions og transform-API må gjøres viewport-bevisste i den fasen.
+- Låsestatus er ikke responsiv med mindre en senere eksplisitt produktbeslutning endrer dette.
 
-## 6. Arbeidsrekkefølge
+## 7. Arbeidsrekkefølge
 
 Før hver ny del avklares:
 
@@ -99,7 +121,7 @@ Før hver ny del avklares:
 8. Hvordan funksjonen testes med peker og tastatur.
 9. Hvordan test-fixtures fjernes.
 
-## 7. Endringskontroll
+## 8. Endringskontroll
 
 - Ikke bygg videre før oppførselen er definert.
 - Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige uten dokumentasjon.
@@ -111,7 +133,7 @@ Før hver ny del avklares:
 - Ikke oppgi at lint, typekontroll, arkitektursjekk eller build er bestått før brukeren eller verifisert CI har bekreftet det.
 - Ikke merge uten eksplisitt godkjenning.
 
-## 8. Kvalitetskrav
+## 9. Kvalitetskrav
 
 - TypeScript brukes konsekvent.
 - Reducer-actions og union-baserte UI-switcher håndteres uttømmende.
@@ -121,7 +143,7 @@ Før hver ny del avklares:
 - Interaksjoner skal ha tastaturalternativ der draing ellers er eneste handling.
 - Fokusrekkefølgen skal være forutsigbar.
 - Brukerhandlinger skal ha tydelig tilbakemelding.
-- Desktop og mobil testes separat.
+- PC og Telefon testes separat.
 - Layoutsystemet skal unngå skjulte koblinger.
 - Ingen ubrukt kildekodemodul skal passere arkitektursjekken.
 
@@ -134,21 +156,22 @@ npm run architecture:diagram
 npm run dev
 ```
 
-## 9. Tilgjengelighet og editorinteraksjon
+## 10. Tilgjengelighet og editorinteraksjon
 
 - Enter og mellomrom markerer et fokusert element.
-- Piltaster flytter et fokusert element.
-- `Ctrl`/`Cmd` + piltaster endrer størrelse.
+- Piltaster flytter et ulåst, fokusert element.
+- `Ctrl`/`Cmd` + piltaster endrer størrelse på et ulåst element.
 - `Shift` bruker større steg.
 - Resize-håndtakets treffflate skal være større enn den synlige firkanten.
 - Tilgjengelige navn skal bli mer spesifikke når elementmodellen får navn eller innhold.
 - Tekstredigering må skille objektmarkering fra innholdsredigering.
 - Faktiske knappehandlinger eller lenker aktiveres ikke i vanlig editormodus.
 - Låste elementer skal fortsatt kunne fokuseres og markeres.
+- Låseknappen skal ha dynamisk tilgjengelig navn og synlig fokustilstand.
 
-## 10. Gjeldende status
+## 11. Gjeldende status
 
-- Editorgrunnlag, prosjektmodell, markering og elementoppretting er merget til `main`.
-- `feature/drag-resize` er implementert og visuelt godkjent på desktop og mobil før siste audit.
-- Auditendringene må sluttkontrolleres lokalt før PR.
-- Neste branch etter godkjent merge er `feature/object-locking`.
+- Editorgrunnlag, prosjektmodell, markering, elementoppretting og drag/resize er merget til `main`.
+- `feature/object-locking` er implementert og visuelt godkjent på PC og Telefon før siste auditendring.
+- Siste tastaturretting, dokumentasjon og arkitekturrapporter må sluttkontrolleres før PR.
+- Neste planlagte branch etter godkjent merge er `feature/text-box-editing`.

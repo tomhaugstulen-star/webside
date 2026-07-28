@@ -13,6 +13,7 @@ import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
 import type { ViewportMode } from '../../types/editor'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
+import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import { useElementPointerTransform } from './useElementPointerTransform'
 
 const elementKindLabels: Record<EditorElement['kind'], string> = {
@@ -87,6 +88,10 @@ export function EditorCanvasElement({
   const transformClass = transformMode
     ? ` canvas-element--transforming canvas-element--${transformMode}`
     : ''
+  const lockedClass = element.locked ? ' canvas-element--locked' : ''
+  const accessibleLabel = element.locked
+    ? `${label}, låst. Bruk objektverktøyet for å låse opp.`
+    : `${label}. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse.`
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -129,32 +134,45 @@ export function EditorCanvasElement({
   }
 
   return (
-    <div
-      className={`canvas-element canvas-element--${element.kind} ${selected ? 'canvas-element--selected' : ''}${transformClass}`}
-      style={style}
-      role="button"
-      tabIndex={0}
-      aria-label={`${label}. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse.`}
-      aria-keyshortcuts="Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight Control+ArrowUp Control+ArrowDown Control+ArrowLeft Control+ArrowRight Meta+ArrowUp Meta+ArrowDown Meta+ArrowLeft Meta+ArrowRight"
-      aria-pressed={selected}
-      data-element-id={element.id}
-      onPointerDown={handleMovePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
-      onLostPointerCapture={handleLostPointerCapture}
-      onKeyDown={handleKeyDown}
-    >
-      <span className="canvas-element__placeholder" aria-hidden="true">
-        {label}
-      </span>
-      {selected && !element.locked && (
-        <span
-          className="canvas-element__resize-handle"
-          aria-hidden="true"
-          onPointerDown={handleResizePointerDown}
+    <>
+      <div
+        className={`canvas-element canvas-element--${element.kind} ${selected ? 'canvas-element--selected' : ''}${transformClass}${lockedClass}`}
+        style={style}
+        role="button"
+        tabIndex={0}
+        aria-label={accessibleLabel}
+        aria-keyshortcuts={
+          element.locked
+            ? 'Enter Space'
+            : 'Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight Control+ArrowUp Control+ArrowDown Control+ArrowLeft Control+ArrowRight Meta+ArrowUp Meta+ArrowDown Meta+ArrowLeft Meta+ArrowRight'
+        }
+        aria-pressed={selected}
+        data-element-id={element.id}
+        onPointerDown={handleMovePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        onLostPointerCapture={handleLostPointerCapture}
+        onKeyDown={handleKeyDown}
+      >
+        <span className="canvas-element__placeholder" aria-hidden="true">
+          {label}
+        </span>
+        {selected && !element.locked && (
+          <span
+            className="canvas-element__resize-handle"
+            aria-hidden="true"
+            onPointerDown={handleResizePointerDown}
+          />
+        )}
+      </div>
+      {selected && transformMode === null && (
+        <ElementSelectionToolbar
+          elementId={element.id}
+          locked={element.locked}
+          layout={layout}
         />
       )}
-    </div>
+    </>
   )
 }

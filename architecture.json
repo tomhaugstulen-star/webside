@@ -241,6 +241,7 @@
         "src/model/findElementCreationPosition.ts",
         "src/model/createEditorProject.ts",
         "src/model/elementLayout.ts",
+        "src/state/toggleElementLock.ts",
         "src/state/useElementCreation.ts",
         "src/types/editor.ts",
         "src/components/canvas/EditorCanvasElement.tsx",
@@ -286,7 +287,8 @@
         "src/state/useElementCreation.ts",
         "src/components/canvas/EditorCanvas.tsx",
         "src/state/useElementSelection.ts",
-        "src/state/useElementLayout.ts"
+        "src/state/useElementLayout.ts",
+        "src/state/useElementLocking.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -417,6 +419,23 @@
             "import"
           ],
           "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./toggleElementLock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/toggleElementLock.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -621,7 +640,43 @@
         "src/components/canvas/canvasLayoutPreview.ts",
         "src/components/canvas/EditorCanvasElement.tsx",
         "src/state/useElementLayout.ts",
+        "src/components/canvas/ElementSelectionToolbar.tsx",
         "src/components/canvas/useElementPointerTransform.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/toggleElementLock.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/editorProjectReducer.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -1045,6 +1100,23 @@
         },
         {
           "dynamic": false,
+          "module": "./ElementSelectionToolbar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/ElementSelectionToolbar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./useElementPointerTransform",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -1151,6 +1223,92 @@
       ],
       "dependents": [
         "src/components/canvas/EditorCanvasElement.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/ElementSelectionToolbar.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../state/useElementLocking",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useElementLocking.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/EditorCanvasElement.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/useElementLocking.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/ElementSelectionToolbar.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -1668,8 +1826,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 30,
-    "totalDependenciesCruised": 64,
+    "totalCruised": 33,
+    "totalDependenciesCruised": 70,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
