@@ -7,9 +7,9 @@ import {
 import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
 import type { ViewportMode } from '../../types/editor'
+import type { ElementLayoutPreview } from './canvasLayoutPreview'
 import { EditorCanvasElement } from './EditorCanvasElement'
 import { getCanvasContentHeight } from './getCanvasContentHeight'
-import type { ElementLayoutPreview } from './useElementPointerTransform'
 
 type EditorCanvasProps = {
   viewport: ViewportMode
