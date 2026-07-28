@@ -75,6 +75,7 @@
 
 .element-link-properties__help,
 .element-link-properties__error,
+.element-link-properties__saved,
 .element-link-properties__locked-note {
   margin: 0;
   font-size: 13px;
@@ -91,6 +92,11 @@
   font-weight: 600;
 }
 
+.element-link-properties__saved {
+  color: #35634b;
+  font-weight: 700;
+}
+
 .element-link-properties__submit {
   min-height: 40px;
   padding: 0 14px;
@@ -102,6 +108,19 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  transition:
+    transform 100ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.element-link-properties__submit:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.element-link-properties__submit--saved {
+  border-color: #35634b;
+  background: #35634b;
 }
 
 .element-link-properties select:disabled,
@@ -113,4 +132,14 @@
 
 .element-link-properties__locked-note {
   margin-top: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .element-link-properties__submit {
+    transition: none;
+  }
+
+  .element-link-properties__submit:active:not(:disabled) {
+    transform: none;
+  }
 }
