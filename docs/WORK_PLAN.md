@@ -1,34 +1,27 @@
 # Arbeidsplan for Website-editoren
 
-Dette dokumentet fastsetter rekkefølgen for videre utvikling uten å skrive direkte på `main`.
+Dette dokumentet fastsetter rekkefølgen for videre utvikling. Det utvikles aldri direkte på `main`.
 
-## 1. Rolle for `main`
+## 1. Fast arbeidsflyt
 
-- `main` er den stabile integrasjonsbranchen.
-- Ingen funksjon utvikles direkte på `main`.
-- Godkjent og testet arbeid merges kontrollert til `main`.
-- Neste feature-branch opprettes fra oppdatert `main`.
-- Dokumentasjon utvikles i `docs/project-planning`.
-
-## 2. Fast arbeidsflyt
-
-For hver del:
+For hver avgrensede del:
 
 1. Kontroller at arbeidsområdet er rent.
 2. Oppdater lokal `main`.
-3. Merge forrige godkjente branch dersom den ikke allerede er merget.
+3. Merge forrige godkjente branch dersom det gjenstår.
 4. Kjør `npm run check` på oppdatert `main`.
-5. Opprett ny branch fra `main`.
-6. Beskriv nøyaktig ansvar og berørte filer.
+5. Opprett neste branch fra oppdatert `main`.
+6. Definer nøyaktig omfang, brukerhandlinger, state og berørte filer.
 7. Bygg bare den avgrensede funksjonen.
-8. Kontroller filstørrelse og ansvarsdeling.
+8. Kontroller filstørrelser og ansvarsdeling.
 9. Kjør `npm run check`.
 10. Regenerer arkitekturrapporter ved strukturendringer.
-11. Test visuelt på desktop og mobil der det er relevant.
-12. Oppdater dokumentasjonen.
-13. Merge først etter godkjenning.
+11. Test desktop og mobil der det er relevant.
+12. Fjern alle midlertidige test-fixtures.
+13. Oppdater dokumentasjonen.
+14. Merge først etter eksplisitt godkjenning.
 
-## 3. Gjeldende status
+## 2. Ferdige faser
 
 ### Fase 0 – Stabilt editorgrunnlag
 
@@ -37,24 +30,20 @@ Status: **ferdig, godkjent og merget til `main`**.
 Inneholder:
 
 - blankt lerret
-- toppmeny
-- venstremeny
+- toppmeny og venstremeny
 - desktop- og mobilvisning
 - kontrollert paneloppførsel
-- ryddige interne navn for Elementer
-- delt CSS og komponentstruktur
+- Elementer-panel
+- delt CSS- og komponentstruktur
 - Dependency Cruiser
-- automatisk åpning av nettleseren med `npm run dev`
+- samlet `npm run check`
+- automatisk åpning av nettleseren
 
 ### Fase 1 – Prosjekt- og elementmodell
 
-Branch:
+Branch: `feature/element-model`
 
-```text
-feature/element-model
-```
-
-Status: **ferdig og godkjent lokalt og visuelt**.
+Status: **ferdig, godkjent og merget til `main`**.
 
 Inneholder:
 
@@ -68,54 +57,96 @@ Inneholder:
 - aktiv side fra prosjektmodellen
 - blankt prosjekt med siden `Forside`
 
-Branchen skal merges til `main` før neste fase starter.
-
-## 4. Neste fase
+## 3. Gjeldende fase
 
 ### Fase 2 – Markering av elementer
 
-Planlagt branch:
+Branch:
 
 ```text
 feature/element-selection
 ```
 
-Branchen opprettes først etter at `feature/element-model` er merget til oppdatert `main`.
+Status: **implementert og visuelt godkjent; siste kode- og dokumentendringer må kontrolleres før merge**.
 
-Omfang:
+Implementert:
 
-- lagre valgt element-ID i editor-state
-- velge ett eksisterende element
-- vise tydelig valgt tilstand
-- fjerne markering ved klikk utenfor
-- fjerne markering når valgt element ikke lenger finnes
-- legge grunnlag for senere objektverktøy
-- tastaturtilgjengelig markering der det er relevant
+- `selectedElementId` i transient editor-state
+- valg av ett eksisterende element på aktiv side
+- tydelig valgt, hover- og fokusert tilstand
+- klikk på tomt lerretsområde fjerner markeringen
+- Enter og mellomrom markerer fokusert element
+- eget `useElementSelection`-API
+- automatisk nullstilling når valgt element ikke finnes
+- nullstilling ved prosjektbytte og sidebytte
+- ugyldige markeringsforespørsler ignoreres
+- identiske valg gir ingen unødvendig state-endring
+- eksisterende elementer renderer fra prosjektmodellen
+- responsive posisjons-, størrelses- og synlighetsverdier brukes
 
-Skal ikke bygges i denne branchen:
+Visuelt godkjent:
+
+- valg av første og andre testelement
+- flytting av markering mellom elementer
+- klikk utenfor for å fjerne markering
+- tastaturvalg med Tab, Enter og mellomrom
+- desktop- og mobilvisning
+- blank side etter at test-fixturen ble fjernet
+
+Branchen inneholder ikke:
 
 - elementoppretting
 - draing
 - størrelsesendring
-- låsing og opplåsing
+- låsing eller opplåsing
 - tekstredigering
 - bildeimport
 - knapphandlinger
 - historikk
 - lagring
 
-Siden prosjektet foreløpig ikke har synlige elementer, skal markeringens state, API og visuelle komponentgrense bygges uten å legge inn tilfeldig produksjonsinnhold. Et kontrollert utviklingselement kan bare brukes dersom det er tydelig avgrenset og fjernes eller dokumenteres før godkjenning.
+Varig state-regel:
 
-## 5. Senere faser
+- `selectedElementId` er transient editor-state og skal ikke lagres i prosjektfil, historikk, autolagring, eksport eller publisering.
+
+Se `docs/ELEMENT_SELECTION.md` for arkitektur- og framtidsregler.
+
+## 4. Neste fase etter merge
 
 ### Fase 3 – Opprette elementer
 
-Branch: `feature/element-creation`
+Planlagt branch:
 
-- opprette element fra Elementer-panelet
-- standardstørrelse og startposisjon
-- koble elementet til prosjektmodellen
-- beholde Seksjon, Bilde, Tekst og Knapp i menyen
+```text
+feature/element-creation
+```
+
+Skal bygge:
+
+- opprette Seksjon, Bilde, Tekst og Knapp fra Elementer-panelet
+- generere stabil kryptografisk element-ID
+- legge elementet til aktiv side i prosjektmodellen
+- definere kontrollert standardstørrelse og startposisjon
+- markere det nyopprettede elementet
+- bevare blank startside før brukeren oppretter noe
+- støtte desktop og mobil uten å bygge full responsiv redigering
+- tastaturtilgjengelig oppretting fra menyen
+
+Skal ikke bygge:
+
+- draing
+- størrelsesendring
+- låsing
+- direkte tekstredigering
+- bildevelger
+- knapphandlinger
+- farger
+- historikk
+- lagring
+
+Før implementering må standardstørrelse og startposisjon fastsettes kontrollert. Det skal ikke opprettes tilfeldige DOM-elementer; reduceren og prosjektmodellen er autoritative.
+
+## 5. Senere faser
 
 ### Fase 4 – Flytting og størrelsesendring
 
@@ -137,20 +168,19 @@ Branch: `feature/object-locking`
 
 Branch: `feature/text-box-editing`
 
-- tekstobjekt og direkte redigering
-- markering og sletting
-- 7–8 nettsikre fonter
-- fontstørrelser fra liste
-- fontfarge, fet og kursiv
+- direkte tekstredigering
+- klart skille mellom elementmarkering og innholdsredigering
+- nettsikre fonter
+- fontstørrelse, farge, fet og kursiv
 
 ### Fase 7 – Knapper
 
 Branch: `feature/button-element`
 
-- knappobjekt
-- redigerbar tekst
+- redigerbar knappetekst
 - størrelse, plassering, farger og ramme
 - handling eller lenketype avklares før implementering
+- knapphandling skal ikke aktiveres i vanlig editor-markeringsmodus
 
 ### Fase 8 – Bilder
 
@@ -185,7 +215,7 @@ Branch: `feature/alignment-guides`
 - horisontal midtstilling
 - samme linje
 - lik avstand mellom tre eller flere elementer
-- bare visuell veiledning under flytting og størrelsesendring
+- bare under flytting eller størrelsesendring
 - ingen vertikal sentreringsfunksjon
 - ingen automatisk kollisjonsunngåelse
 
@@ -196,15 +226,16 @@ Branch: `feature/mobile-design-controls`
 - desktop-arv
 - mobiloverstyringer
 - skjul på mobil
+- avklare markering av element som er skjult i aktiv visning
 - media queries fra prosjektmodellen
 
 ### Fase 13 – Angre og gjør om
 
 Branch: `feature/history-system`
 
-- definert endringsmodell
+- definert prosjektendringsmodell
 - angre og gjør om
-- støtte for alle prosjektendringer
+- markeringsstate skal ikke inngå i prosjektets historikk
 
 ### Fase 14 – Lokal automatisk lagring
 
@@ -213,8 +244,9 @@ Branch: `feature/local-project-autosave`
 - velge prosjektmappe
 - automatisk sikker lagring
 - lokale bilder
-- statusene `Lagrer`, `Lagret` og `Lagringsfeil`
+- `Lagrer`, `Lagret` og `Lagringsfeil`
 - gjenoppretting
+- transient markeringsstate skal ikke lagres
 
 ### Fase 15 – Åpne og importere prosjekt
 
@@ -232,25 +264,32 @@ Branches:
 - `feature/preview-mode`
 - `feature/publishing`
 
-Disse bygges først etter at editor, responsiv modell og lagring er stabile.
+Bygges først etter at editor, responsiv modell og lagring er stabile.
 
 ## 6. Kontrollpunkter før merge
 
 - branchen inneholder bare avtalt omfang
+- ingen midlertidig fixture eller testinnhold ligger igjen
 - ingen fil har for mange ansvarsområder
 - filer over 250 linjer er vurdert for deling
 - filer ved eller over 300 linjer er eksplisitt gjennomgått
-- `npm run check` er bestått
-- arkitekturrapporter er oppdatert ved strukturendringer
+- `npm run check` er bestått etter siste kodeendring
+- arkitekturrapportene er regenerert etter siste strukturendring
 - desktop og mobil er testet der relevant
 - dokumentasjonen er oppdatert
-- PowerShell-kommandoer er gitt til brukeren
+- lokalt arbeidsområde er rent
+- lokal branch er synkronisert med GitHub
 
-## 7. Første oppgave i neste chat
+## 7. Neste kontrollsteg
 
-1. Les `docs/NEXT_CHAT_PROMPT.md`.
-2. Kontroller om `feature/element-model` allerede er merget.
-3. Merge den godkjente branchen til `main` dersom det gjenstår.
-4. Kjør kontroll på `main`.
-5. Opprett `feature/element-selection` fra oppdatert `main`.
-6. Ikke bygg elementoppretting i samme branch.
+På `feature/element-selection`:
+
+```powershell
+npm run check
+npm run architecture:json
+npm run architecture:diagram
+npm run dev
+git status
+```
+
+Etter bestått kontroll og rent arbeidsområde kan branchen merges kontrollert til `main`. Deretter opprettes `feature/element-creation` fra oppdatert `main`.
