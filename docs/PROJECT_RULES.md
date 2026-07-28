@@ -7,7 +7,8 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 - Hver funksjon bygges i egen avgrenset branch.
 - `main` skal alltid være stabil.
 - Ingen ny funksjon utvikles direkte på `main`.
-- En godkjent branch merges før neste feature-branch opprettes fra oppdatert `main`.
+- En godkjent branch merges før neste feature-branch starter fra oppdatert `main`.
+- En branch som allerede finnes, men ligger bak `main`, skal fast-forwardes kontrollert før nytt arbeid.
 - En branch skal ikke inneholde skjult arbeid for senere faser.
 
 Eksempler:
@@ -22,10 +23,11 @@ Eksempler:
 
 - 250 linjer er aktiv terskel for å trekke ut ansvar.
 - En fil deles tidligere dersom den får flere tydelige ansvarsområder.
-- 300 linjer er en eksplisitt unntaksgrense.
+- 300 linjer er en eksplisitt unntaksgrense for kildefiler.
 - Uttrekking skjer etter ansvar, ikke ved tilfeldig oppdeling.
 - Visning, varig state, transient state, hendelseslogikk og rene hjelpefunksjoner skilles når det gir naturlige grenser.
 - `App.tsx` skal bare sette sammen hovedstrukturen.
+- `EditorShell` skal bare komponere editorens hovedområder.
 - Store CSS-filer deles etter editorområde.
 - Ingen fil skal bli en generell samlefil.
 
@@ -35,7 +37,7 @@ Eksempler:
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - DOM-en skal ikke brukes som permanent prosjektlagring.
-- Geometri, låsestatus, tekstinnhold og senere egenskaper endres gjennom prosjekt-state/reduceren.
+- Geometri, låsestatus, tekstinnhold og senere egenskaper endres gjennom prosjekt-state og reduceren.
 - Prosjektidentitet bruker stabile kryptografiske ID-er.
 - State-avhengige beregninger bruker reducerens nyeste state.
 - UI-hooks sender brukerintensjon og ikke-deterministisk metadata, men beregner ikke varig resultat fra et mulig gammelt React-snapshot.
@@ -52,7 +54,7 @@ Transient state holdes utenfor `EditorProject`, blant annet:
 - åpne paneler og aktivt verktøy
 - aktiv tekstredigeringsøkt
 - lokal tekstdraft
-- fokus, hover og synlighet for objektverktøy og egenskapspanel
+- fokus, hover, animasjon og lokal UI-feedback
 
 Transient state skal ikke:
 
@@ -116,20 +118,65 @@ Se `docs/OBJECT_LOCKING.md`.
 - En avsluttet redigeringsøkt skal senere være én historikk-/autolagringsendring.
 - En tekstboks vokser ikke automatisk med innholdet i denne fasen.
 
+Status: merget som PR #7 med merge-commit `c729d33`.
+
 Se `docs/TEXT_BOX_EDITING.md`.
 
-## 7. Høyremeny og egenskaper
+## 7. Venstremeny
 
-- Høyremenyens grunnstruktur bygges før egenskapskontrollene.
-- Panelet skal følge `selectedElementId`, ikke lete i DOM-en.
-- Ingen valgt element gir en eksplisitt tom eller skjult tilstand.
-- Panelet skal aldri eie en separat kopi av autoritative elementdata.
-- Egenskapsendringer skal senere gå gjennom typed state-API og reducer-actions.
-- Den første panelbranchen bygger ikke font-, farge-, bilde- eller knappfunksjoner.
-- Panelstate som åpne seksjoner, fokus og hover er transient.
-- Panelkontroller må fungere uten å stjele eller ødelegge aktiv tekstredigering utilsiktet.
+Endelig navn og rekkefølge:
 
-## 8. Responsiv grense
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+- `Prosjekt` står øverst.
+- `Innstillinger` står nederst.
+- Paneloverskriftene følger samme navn.
+- Interne tool-ID-er kan foreløpig beholde eksisterende verdier dersom det ikke gir arkitekturfeil.
+- Menynavn skal ikke blandes sammen med senere funksjonsimplementering.
+
+Status: merget som PR #8 med merge-commit `a35f59d`.
+
+## 8. Høyremeny og egenskaper
+
+Høyremenyens grunnstruktur bygges før egenskapskontrollene.
+
+Låst oppførsel:
+
+- ingen valgt element gir ingen synlig eller reservert høyremeny
+- valgt element åpner høyremenyen
+- nytt valgt element oppdaterer panelet
+- klikk på tomt lerret fjerner markeringen og lukker panelet
+- låst element kan fortsatt inspiseres
+- panelet kan være åpent under tekstredigering
+- klikk i panelet bruker eksisterende blur/commit
+- markeringen beholdes etter normal tekstcommit
+- panelet oppretter ikke separat tekstdraft
+
+En permanent synlig tom høyremeny er avvist.
+
+Arkitekturregler:
+
+- panelet følger `selectedElementId`, ikke DOM-søk
+- aktiv side inneholder autoritative elementdata
+- eksisterende `useElementSelection` skal vurderes og normalt gjenbrukes
+- panelet eier aldri en separat kopi av elementdata
+- panelstate som fokus, hover og animasjon er transient
+- egenskapsendringer skal senere gå gjennom typed state-API og reducer-actions
+- den første panelbranchen bygger ikke font-, farge-, bilde-, knapp-, slettings-, historikk- eller lagringsfunksjoner
+- panelet får egen komponent og egen CSS-grense
+- høyremenyens breddevariabel skal være entydig og ikke gjenbruke venstrepanelets `--panel-width`
+
+Før kode må bredde, smalvinduoppførsel, scrolling, visuell struktur, minimumsinnhold og eventuell animasjon godkjennes.
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
+## 9. Responsiv grense
 
 - `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen.
 - Mobil arver desktopverdier når mobiloverstyring mangler.
@@ -138,7 +185,7 @@ Se `docs/TEXT_BOX_EDITING.md`.
 - Layout-actions og transform-API gjøres viewport-bevisste i den fasen.
 - Låsestatus og tekstinnhold er ikke responsive verdier uten en ny eksplisitt produktbeslutning.
 
-## 9. Arbeidsrekkefølge
+## 10. Arbeidsrekkefølge
 
 Før hver ny del avklares:
 
@@ -151,8 +198,9 @@ Før hver ny del avklares:
 7. Hvilke filer og ansvarsgrenser som berøres.
 8. Hvordan funksjonen testes med peker og tastatur.
 9. Hvordan test-fixtures fjernes.
+10. Hvilke produkt- og designvalg som fortsatt krever godkjenning.
 
-## 10. Endringskontroll
+## 11. Endringskontroll
 
 - Ikke bygg videre før oppførselen er definert.
 - Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige.
@@ -161,9 +209,10 @@ Før hver ny del avklares:
 - Arkitekturrapporter regenereres etter strukturendringer.
 - Nøyaktige PowerShell-kommandoer følger hver repoendring.
 - Ikke påstå at kontrollene er bestått før brukeren eller verifisert CI har bekreftet det.
+- Ikke opprett PR før branchen er kontrollert, synkronisert og lokal tree er clean.
 - Ikke merge uten eksplisitt godkjenning.
 
-## 11. Kvalitetskrav
+## 12. Kvalitetskrav
 
 - TypeScript brukes konsekvent.
 - Reducer-actions og union-baserte switcher håndteres uttømmende.
@@ -183,7 +232,7 @@ npm run architecture:diagram
 npm run dev
 ```
 
-## 12. Tilgjengelighet og editorinteraksjon
+## 13. Tilgjengelighet og editorinteraksjon
 
 - Enter og mellomrom markerer et fokusert objekt.
 - Piltaster flytter et ulåst, fokusert objekt.
@@ -192,13 +241,16 @@ npm run dev
 - Låste elementer kan fortsatt fokuseres og markeres.
 - Tekstredigering skiller objektmarkering fra innholdsredigering.
 - Under tekstredigering brukes piltaster og Enter av tekstfeltet.
+- Panelklikk under tekstredigering skal følge normal blur/fokusrekkefølge.
 - Tilgjengelige navn skal bli mer spesifikke når elementet får innhold.
 - Faktiske knappehandlinger og lenker aktiveres ikke i vanlig editormodus.
 
-## 13. Gjeldende status
+## 14. Gjeldende status
 
-- Editorgrunnlag, modell, markering, oppretting, drag/resize og objektlåsing er merget til `main`.
-- `feature/text-box-editing` er implementert, kodeauditert, kontrollert og visuelt godkjent.
-- Dokumentasjon er oppdatert.
-- Arkitekturrapportene må regenereres og committes før PR.
-- Neste branch etter kontrollert merge er `feature/right-properties-panel`.
+- Editorgrunnlag, modell, markering, oppretting, drag/resize, objektlåsing og ren tekstredigering er merget til `main`.
+- Endelige venstremenynavn er merget som PR #8.
+- Lokal `main` er bekreftet clean på `a35f59d`.
+- `feature/right-properties-panel` er fast-forwardet fra dette utgangspunktet.
+- Dokumentasjonen oppdateres før implementering.
+- Ingen produksjonskode for høyremenyen er lagt inn ennå.
+- Neste chat skal lese dokumentasjonen og faktisk kode, presentere åpne designvalg og få godkjenning før kode.
