@@ -11,10 +11,10 @@ type LeftSidebarProps = {
 }
 
 const tools: Array<{ id: EditorTool; label: string; icon: SidebarIconName }> = [
-  { id: 'design', label: 'Design', icon: 'design' },
-  { id: 'media', label: 'Bilder og logo', icon: 'media' },
+  { id: 'files', label: 'Prosjekt', icon: 'files' },
+  { id: 'design', label: 'Farger', icon: 'design' },
+  { id: 'media', label: 'Logo og header', icon: 'media' },
   { id: 'elements', label: 'Elementer', icon: 'elements' },
-  { id: 'files', label: 'Filer', icon: 'files' },
 ]
 
 export function LeftSidebar({

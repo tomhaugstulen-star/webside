@@ -14,10 +14,10 @@ type SidebarPanelProps = PanelProps & ElementsPanelProps & {
   activeTool: EditorTool
 }
 
-function DesignPanel({ onSelect }: PanelProps) {
+function ColorsPanel({ onSelect }: PanelProps) {
   return (
     <>
-      <h2>Design</h2>
+      <h2>Farger</h2>
       <p className="panel-intro">Velg en del av siden for å endre utseende og oppsett.</p>
       <div className="setting-group">
         <h3>Sidestil</h3>
@@ -33,10 +33,10 @@ function DesignPanel({ onSelect }: PanelProps) {
   )
 }
 
-function MediaPanel({ onSelect }: PanelProps) {
+function LogoHeaderPanel({ onSelect }: PanelProps) {
   return (
     <>
-      <h2>Bilder og logo</h2>
+      <h2>Logo og header</h2>
       <button className="primary-panel-button" type="button" onClick={onSelect}><SidebarIcon name="upload" />Last opp fil</button>
       <div className="empty-library"><SidebarIcon name="image" /><strong>Ingen bilder ennå</strong><span>Last opp bilder eller logoer til prosjektet.</span></div>
     </>
@@ -76,10 +76,10 @@ function ElementsPanel({ onCreateElement }: ElementsPanelProps) {
   )
 }
 
-function FilesPanel({ onSelect }: PanelProps) {
+function ProjectPanel({ onSelect }: PanelProps) {
   return (
     <>
-      <h2>Filer</h2>
+      <h2>Prosjekt</h2>
       <button className="primary-panel-button" type="button" onClick={onSelect}><SidebarIcon name="upload" />Last opp fil</button>
       <div className="empty-library"><SidebarIcon name="files" /><strong>Ingen filer</strong><span>Dokumenter og vedlegg vises her.</span></div>
     </>
@@ -106,13 +106,13 @@ export function SidebarPanel({
 }: SidebarPanelProps) {
   switch (activeTool) {
     case 'design':
-      return <DesignPanel onSelect={onSelect} />
+      return <ColorsPanel onSelect={onSelect} />
     case 'media':
-      return <MediaPanel onSelect={onSelect} />
+      return <LogoHeaderPanel onSelect={onSelect} />
     case 'elements':
       return <ElementsPanel onCreateElement={onCreateElement} />
     case 'files':
-      return <FilesPanel onSelect={onSelect} />
+      return <ProjectPanel onSelect={onSelect} />
     case 'settings':
       return <SettingsPanel onSelect={onSelect} />
   }
