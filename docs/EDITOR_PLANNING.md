@@ -90,6 +90,7 @@ Panelet skal minst inneholde:
 - bilder
 - rammetykkelse
 - rammefarge
+- lås/lås opp valgt objekt
 
 Bekreftede regler for elementboksen:
 
@@ -99,10 +100,11 @@ Bekreftede regler for elementboksen:
 - Elementets høyde øker ikke automatisk når mer tekst legges inn.
 - Tekst som går utenfor elementets grenser skal klippes bort og ikke vises utenfor boksen.
 - Når brukeren klikker utenfor elementet, avsluttes redigeringen og størrelse/plassering blir stående.
-- Ingen egen låseknapp skal brukes.
 - Rammetykkelse skal minst ha valgene ingen, 1 px, 2 px, 3 px og 4 px.
 - Rammefarge registreres i prosjektets felles Farger-system.
 - Elementer kan ligge oppå hverandre.
+- Et valgt element eller bilde skal kunne låses slik at det ikke flyttes eller endrer størrelse ved et uhell.
+- Låsing skal kunne oppheves igjen.
 
 ### Tekstboks i element
 
@@ -124,17 +126,28 @@ Valget `Bilder` skal:
 2. La brukeren velge et bilde.
 3. Legge det valgte bildet inn på redigeringsflaten.
 4. La brukeren endre bildets størrelse.
-5. La brukeren klikke og dra bildet inn i et element.
+5. La brukeren klikke og dra bildet inn over eller inn i et element.
 
-Bildet skal være et selvstendig redigerbart objekt fram til det plasseres i et element.
+Bekreftede regler:
 
-## 3. Lagring og sikkerhet
+- Bildet skal alltid være et selvstendig redigerbart objekt.
+- Bildet skal ikke festes til elementet det visuelt ligger i.
+- Flyttes elementboksen, følger ikke bildet automatisk med.
+- Brukeren flytter bildet separat.
+- Bildet skal kunne låses for å hindre utilsiktet flytting eller størrelsesendring.
 
-- Editoren skal ha automatisk lagring.
-- Automatisk lagring regnes som en grunnfunksjon, ikke en senere ekstrafunksjon.
-- Det må finnes lokal midlertidig lagring slik at arbeid ikke forsvinner ved feil eller lukket nettleser.
-- Serverlagring, lagringsintervall, gjenoppretting og versjonshistorikk må planlegges før implementering.
-- Angre/gjør om og automatisk lagring må bruke samme tydelige endringsmodell.
+## 3. Lokal automatisk lagring
+
+- Editoren skal ha automatisk lagring som grunnfunksjon.
+- Prosjektet skal lagres direkte på brukerens PC i en egen prosjektmappe.
+- Brukeren skal velge eller opprette prosjektmappen når prosjektet opprettes eller åpnes første gang.
+- Etter at prosjektmappen er valgt, skal endringer lagres automatisk i denne mappen.
+- Prosjektmappen skal inneholde prosjektdata og nødvendige lokale filer, inkludert bilder som brukes i prosjektet.
+- Lagring skal skje uten at brukeren må trykke Lagre etter hver endring.
+- Editoren skal vise tydelig status, for eksempel `Lagrer`, `Lagret` eller `Lagringsfeil`.
+- Det må finnes gjenoppretting etter feil eller uventet lukking.
+- Automatisk lagring og angre/gjør om skal bruke samme tydelige endringsmodell.
+- Serverlagring er ikke et krav for første lokale versjon.
 
 ## 4. Arkitektur og arbeidsmåte
 
@@ -152,15 +165,16 @@ Bildet skal være et selvstendig redigerbart objekt fram til det plasseres i et 
 3. Bygge markering av elementer.
 4. Bygge innsetting av ett enkelt element.
 5. Bygge flytting og størrelsesendring med drahåndtak.
-6. Bygge tekstboks og tekstredigering.
-7. Bygge bildevelger, bildeobjekt og plassering i element.
-8. Bygge korrigeringslinjer og lik avstand.
-9. Avklare og bygge desktop- og mobilspesifikke egenskaper.
-10. Bygge angre/gjør om.
-11. Bygge automatisk lagring og gjenoppretting.
-12. Bygge lagpanel og elementhierarki.
-13. Bygge forhåndsvisning.
-14. Bygge publisering.
+6. Bygge låsing og opplåsing av objekter.
+7. Bygge tekstboks og tekstredigering.
+8. Bygge bildevelger, bildeobjekt og fri plassering.
+9. Bygge korrigeringslinjer og lik avstand.
+10. Avklare og bygge desktop- og mobilspesifikke egenskaper.
+11. Bygge angre/gjør om.
+12. Bygge lokal automatisk lagring og gjenoppretting.
+13. Bygge lagpanel og elementhierarki.
+14. Bygge forhåndsvisning.
+15. Bygge publisering.
 
 ## 6. Planlagte branches
 
@@ -169,12 +183,13 @@ Branches opprettes først når delen faktisk skal bygges:
 - `feature/element-model`
 - `feature/element-selection`
 - `feature/drag-resize`
+- `feature/object-locking`
 - `feature/text-box-editing`
 - `feature/image-import-and-placement`
 - `feature/alignment-guides`
 - `feature/mobile-design-controls`
 - `feature/history-system`
-- `feature/editor-autosave`
+- `feature/local-project-autosave`
 - `feature/layers-panel`
 - `feature/preview-mode`
 - `feature/publishing`
@@ -189,10 +204,10 @@ Branches opprettes først når delen faktisk skal bygges:
 - Om desktop og mobil kan ha forskjellige font-, bilde- og elementinnstillinger.
 - Endelig standardstørrelse og minimumsstørrelse på et nytt element.
 - Om drahåndtaket endrer bredde og høyde fritt eller proporsjonalt.
-- Hvordan bilder beskjæres eller tilpasses når de legges i et element.
-- Om et bilde blir låst til elementet etter innsetting, eller fortsatt kan flyttes inni boksen.
+- Nøyaktig plassering og utforming av låsefunksjonen.
 - Hvordan tre eller flere bokser måles for lik avstand.
 - Terskel og styrke for sentrering og lik avstand.
-- Automatisk lagringsintervall.
-- Lokal lagringsmetode, serverlagring og gjenoppretting.
-- Datamodell, lagringsformat, backend og publiseringsarkitektur.
+- Filformatet for prosjektdata i prosjektmappen.
+- Nøyaktig lagringsintervall og metode for sikker skriving uten ødelagte filer.
+- Hvordan prosjektet åpnes igjen fra en eksisterende prosjektmappe.
+- Datamodell, publiseringsarkitektur og eventuell senere backend.
