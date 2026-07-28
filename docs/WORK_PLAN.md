@@ -96,7 +96,7 @@ Branch:
 feature/drag-resize
 ```
 
-Status: **implementert og visuelt godkjent på desktop og mobil før siste audit; auditendringer må sluttkontrolleres før PR**.
+Status: **implementert, kodeauditert og visuelt godkjent på desktop og mobil; dokumentasjon er oppdatert før PR**.
 
 Implementert:
 
@@ -132,6 +132,7 @@ Audit-herding:
 - piltaster flytter 1 px
 - `Shift` + piltast flytter 10 px
 - `Ctrl`/`Cmd` + piltast endrer størrelse
+- preview-state håndteres uten synkron `setState` i effect
 
 Branchen inneholder ikke:
 
@@ -242,13 +243,56 @@ Branch: `feature/alignment-guides`
 
 ### Fase 12 – Responsiv redigering
 
-Branch: `feature/mobile-design-controls`
+Branch:
 
-- desktop-arv
-- mobiloverstyringer
-- skjul på mobil
-- viewport-bevisste layout-actions
-- media queries fra prosjektmodellen
+```text
+feature/mobile-design-controls
+```
+
+Sporing:
+
+```text
+GitHub-sak #3
+docs/MOBILE_DESIGN_CONTROLS.md
+docs/RESPONSIVE_DESIGN.md
+```
+
+Mål:
+
+- desktop er grunnlaget
+- mobil arver desktopverdier som standard
+- første mobilendring kan opprette eksplisitt mobiloverstyring
+- mobil flytting og resizing endrer ikke desktop
+- desktopendring overskriver ikke eksplisitt mobiloppsett
+- **Bruk PC-oppsett** fjerner mobiloverstyringen
+- tydelig status for **Arver fra PC**, **Eget mobiloppsett** og **Skjult på mobil**
+- skjul på mobil uten å slette elementet
+- viewport-bevisste layout-actions og reducer-overganger
+- peker og tastatur bruker samme viewport-regler
+- editor, preview, import og eksport tolker samme responsive modell
+- media queries genereres kontrollert fra prosjektmodellen
+
+Første versjon bør minst støtte:
+
+- posisjon
+- bredde og høyde
+- synlighet på mobil
+
+Må avklares før implementering:
+
+- automatisk eller eksplisitt oppretting av første mobiloverstyring
+- regel for elementoppretting mens Telefon-visning er aktiv
+- hvordan skjulte elementer finnes og vises igjen
+- støtte for bare-mobil-elementer
+- endelig mobilbrytepunkt
+
+Ikke del av første versjon uten ny beslutning:
+
+- nettbrett som egen viewport
+- flere mobilbrytepunkter
+- automatisk omplassering eller kollisjonsunngåelse
+- AI-generert mobiloppsett
+- generell CSS-editor
 
 ### Fase 13 – Angre og gjør om
 
@@ -298,6 +342,7 @@ Bygges først etter at editor, responsiv modell og lagring er stabile.
 - transient og varig state er tydelig separert
 - ugyldige og uendrede state-overganger avvises
 - tastaturalternativ finnes der draing ellers er eneste handling
+- planlagte senere faser er dokumentert uten skjult implementering i gjeldende branch
 - `npm run check` er bestått etter siste kodeendring
 - arkitekturrapporter er regenerert
 - desktop og mobil er testet
