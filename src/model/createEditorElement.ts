@@ -1,4 +1,5 @@
 import type { EditorElement, ElementKind, ElementSize } from './editorProject'
+import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
 import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
 
@@ -41,6 +42,7 @@ export function createEditorElement({
         kind,
         content: '',
         textStyle: { ...DEFAULT_TEXT_ELEMENT_STYLE },
+        link: { ...NO_ELEMENT_LINK },
       }
     case 'button':
       return { ...common, kind }
