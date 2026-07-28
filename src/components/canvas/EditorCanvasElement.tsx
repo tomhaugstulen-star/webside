@@ -22,6 +22,7 @@ import {
   getCanvasElementKeyboardShortcuts,
 } from './canvasElementAccessibility'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
+import { getTextElementCssStyle } from './getTextElementCssStyle'
 import {
   TextElementEditor,
   type TextEditFinishReason,
@@ -98,6 +99,7 @@ export function EditorCanvasElement({
     top: layout.position.y,
     width: layout.size.width,
     height: layout.size.height,
+    ...(element.kind === 'text' ? getTextElementCssStyle(element.textStyle) : {}),
   }
   const transformClass = transformMode
     ? ` canvas-element--transforming canvas-element--${transformMode}`
