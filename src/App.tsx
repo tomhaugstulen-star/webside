@@ -1,7 +1,8 @@
+import { EditorShell } from './components/editor/EditorShell'
 import './App.css'
 
 function App() {
-  return <main className="page-canvas" aria-label="Blank nettside" />
+  return <EditorShell />
 }
 
 export default App
