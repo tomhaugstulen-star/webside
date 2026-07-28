@@ -1,8 +1,5 @@
+@import './styles/editor.css';
+
 #root {
   min-height: 100vh;
-}
-
-.page-canvas {
-  min-height: 100vh;
-  background: #ffffff;
 }
