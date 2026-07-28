@@ -11,6 +11,7 @@ import {
   type ElementLayout,
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
+import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
 
 export type ElementLayoutPreview = {
   elementId: string
@@ -38,33 +39,6 @@ type ElementPointerTransformOptions = {
   onSelect: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
-}
-
-const AUTO_SCROLL_EDGE = 56
-const AUTO_SCROLL_STEP = 18
-
-function autoScrollNearEdges(
-  container: HTMLDivElement,
-  clientX: number,
-  clientY: number,
-) {
-  const bounds = container.getBoundingClientRect()
-  const left =
-    clientX < bounds.left + AUTO_SCROLL_EDGE
-      ? -AUTO_SCROLL_STEP
-      : clientX > bounds.right - AUTO_SCROLL_EDGE
-        ? AUTO_SCROLL_STEP
-        : 0
-  const top =
-    clientY < bounds.top + AUTO_SCROLL_EDGE
-      ? -AUTO_SCROLL_STEP
-      : clientY > bounds.bottom - AUTO_SCROLL_EDGE
-        ? AUTO_SCROLL_STEP
-        : 0
-
-  if (left !== 0 || top !== 0) {
-    container.scrollBy({ left, top })
-  }
 }
 
 export function useElementPointerTransform({
@@ -138,7 +112,7 @@ export function useElementPointerTransform({
       return
     }
 
-    autoScrollNearEdges(scrollContainer, event.clientX, event.clientY)
+    autoScrollCanvasNearEdges(scrollContainer, event.clientX, event.clientY)
 
     const delta = {
       x:
