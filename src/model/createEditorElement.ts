@@ -13,24 +13,28 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
   button: { width: 160, height: 48 },
 }
 
-const creationPositions: CanvasPosition[] = [
-  { x: 24, y: 24 },
-  { x: 36, y: 48 },
-  { x: 48, y: 72 },
-  { x: 60, y: 96 },
-]
+const CREATION_SLOT_COUNT = 16
+
+function getCreationPosition(existingElementCount: number): CanvasPosition {
+  const slot = existingElementCount % CREATION_SLOT_COUNT
+
+  return {
+    x: 24 + (slot % 4) * 12,
+    y: 24 + slot * 24,
+  }
+}
 
 export function createEditorElement(
   kind: ElementKind,
   existingElementCount: number,
 ): EditorElement {
-  const position = creationPositions[existingElementCount % creationPositions.length]
+  const position = getCreationPosition(existingElementCount)
   const size = defaultElementSizes[kind]
 
   return {
     id: createStableId(),
     kind,
-    position: { desktop: { ...position } },
+    position: { desktop: position },
     size: { desktop: { ...size } },
     visibility: { desktop: true },
     locked: false,
