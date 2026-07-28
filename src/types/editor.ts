@@ -1,5 +1,3 @@
-export type EditorTool = 'design' | 'media' | 'boxes' | 'files' | 'settings'
-
-export type InspectorTool = 'design' | 'layout' | 'settings'
+export type EditorTool = 'design' | 'media' | 'elements' | 'files' | 'settings'
 
 export type ViewportMode = 'desktop' | 'mobile'
