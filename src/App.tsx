@@ -1,5 +1,5 @@
 import { EditorShell } from './components/editor/EditorShell'
-import { EditorProjectProvider } from './state/EditorProjectContext'
+import { EditorProjectProvider } from './state/EditorProjectProvider'
 import './App.css'
 
 function App() {
