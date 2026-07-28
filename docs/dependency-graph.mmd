@@ -9,7 +9,10 @@ subgraph src["src"]
     end
     subgraph src_components_canvas["canvas"]
       src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
+      src_components_canvas_canvasLayoutPreview_ts["canvasLayoutPreview.ts"]
       src_components_canvas_EditorCanvasElement_tsx["EditorCanvasElement.tsx"]
+      src_components_canvas_useElementPointerTransform_ts["useElementPointerTransform.ts"]
+      src_components_canvas_autoScrollCanvas_ts["autoScrollCanvas.ts"]
       src_components_canvas_getCanvasContentHeight_ts["getCanvasContentHeight.ts"]
     end
     subgraph src_components_sidebar["sidebar"]
@@ -27,6 +30,7 @@ subgraph src["src"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
     src_model_createEditorProject_ts["createEditorProject.ts"]
     src_model_createStableId_ts["createStableId.ts"]
+    src_model_elementLayout_ts["elementLayout.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
   end
   subgraph src_state["state"]
@@ -35,6 +39,7 @@ subgraph src["src"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
     src_state_useElementCreation_ts["useElementCreation.ts"]
     src_state_useElementSelection_ts["useElementSelection.ts"]
+    src_state_useElementLayout_ts["useElementLayout.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
   end
   subgraph src_types["types"]
@@ -59,11 +64,13 @@ src_state_editorProjectContext_ts-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorElement_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
+src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
 src_model_createEditorElement_ts-->src_model_editorProject_ts
 src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
 src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_model_elementLayout_ts-->src_model_editorProject_ts
 src_state_useElementCreation_ts-->src_model_createStableId_ts
 src_state_useElementCreation_ts-->src_model_editorProject_ts
 src_state_useElementCreation_ts-->src_state_useEditorProject_ts
@@ -71,15 +78,28 @@ src_types_editor_ts-->src_model_editorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useEditorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useElementSelection_ts
 src_components_canvas_EditorCanvas_tsx-->src_types_editor_ts
+src_components_canvas_EditorCanvas_tsx-->src_components_canvas_canvasLayoutPreview_ts
 src_components_canvas_EditorCanvas_tsx-->src_components_canvas_EditorCanvasElement_tsx
 src_components_canvas_EditorCanvas_tsx-->src_components_canvas_getCanvasContentHeight_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
+src_components_canvas_canvasLayoutPreview_ts-->src_model_elementLayout_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_editorProject_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_model_elementLayout_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_resolveResponsiveValue_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_state_useElementLayout_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasLayoutPreview_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_useElementPointerTransform_ts
 src_model_resolveResponsiveValue_ts-->src_model_editorProject_ts
+src_state_useElementLayout_ts-->src_model_elementLayout_ts
+src_state_useElementLayout_ts-->src_state_useEditorProject_ts
+src_components_canvas_useElementPointerTransform_ts-->src_model_editorProject_ts
+src_components_canvas_useElementPointerTransform_ts-->src_model_elementLayout_ts
+src_components_canvas_useElementPointerTransform_ts-->src_components_canvas_autoScrollCanvas_ts
+src_components_canvas_useElementPointerTransform_ts-->src_components_canvas_canvasLayoutPreview_ts
 src_components_canvas_getCanvasContentHeight_ts-->src_model_editorProject_ts
 src_components_canvas_getCanvasContentHeight_ts-->src_model_resolveResponsiveValue_ts
+src_components_canvas_getCanvasContentHeight_ts-->src_components_canvas_canvasLayoutPreview_ts
 src_components_sidebar_LeftSidebar_tsx-->src_model_editorProject_ts
 src_components_sidebar_LeftSidebar_tsx-->src_types_editor_ts
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarIcon_tsx
