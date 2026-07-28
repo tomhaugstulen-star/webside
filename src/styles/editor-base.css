@@ -1,0 +1,53 @@
+:root {
+  --app-bg: #f6f2ef;
+  --panel: #fffdfb;
+  --border: #e5dfda;
+  --border-strong: #d7cec7;
+  --text: #171717;
+  --muted: #65615e;
+  --accent: #8f432f;
+  --outer-gap: 18px;
+  --toolbar-height: 84px;
+  --rail-width: 124px;
+  --panel-width: 380px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.editor-shell {
+  width: 100vw;
+  height: 100vh;
+  min-width: 1180px;
+  overflow: hidden;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.95), transparent 38%),
+    linear-gradient(180deg, #faf7f5 0%, var(--app-bg) 100%);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.editor-shell__body {
+  height: calc(100vh - var(--toolbar-height) - 46px);
+  margin: 0 var(--outer-gap) var(--outer-gap);
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(222, 214, 208, 0.72);
+  border-radius: 16px;
+  background: rgba(255, 252, 249, 0.56);
+  box-shadow: 0 8px 30px rgba(84, 58, 43, 0.05);
+}
+
+@media (max-width: 1320px) {
+  :root {
+    --rail-width: 108px;
+    --panel-width: 320px;
+  }
+}
