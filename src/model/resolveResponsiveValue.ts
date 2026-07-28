@@ -1,6 +1,4 @@
-import type { ResponsiveValue } from './editorProject'
-
-export type ResponsiveViewport = 'desktop' | 'mobile'
+import type { ResponsiveValue, ResponsiveViewport } from './editorProject'
 
 export function resolveResponsiveValue<T>(
   value: ResponsiveValue<T>,
