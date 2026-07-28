@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert flerlinjet tekstredigering. Høyremenyens grunnstruktur er merget og neste fase bygger tekstutseende for markerte vanlige tekstbokser.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert flerlinjet redigering og kontrollerte tekstegenskaper i høyremenyen.
 
 ## Repo og lokal mappe
 
@@ -58,13 +58,11 @@ main
 
 ## Gjeldende `main`
 
-Siste bekreftede merge-commit:
-
 ```text
 8de5f2e
 ```
 
-Denne kom fra PR #9 og la inn høyremenyens grunnstruktur.
+Dette er merge-commit fra PR #9, som la inn høyremenyens grunnstruktur.
 
 Viktige merges:
 
@@ -102,11 +100,11 @@ Høyremeny  = egenskaper for markert element
 Lerretet   = redigere selve teksten
 ```
 
-Venstremenyen skal ikke inneholde font, størrelse eller andre egenskaper for markert tekst.
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Font, størrelse og andre egenskaper skal ikke ligge i venstremenyen.
 
-`Elementer -> Tekst` oppretter en vanlig fri tekstboks. `Logo og header` skal senere eie strukturelle headerdeler som logo, hovedtekst, undertittel og header-oppsett.
+`Logo og header` skal senere eie strukturelle headerdeler som logo, hovedtekst, undertittel og header-oppsett.
 
-## Implementert høyremeny
+## Implementert høyremenygrunnlag
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -123,25 +121,27 @@ Tomt lerret     -> høyremeny lukkes
 - ingen animasjon ved `prefers-reduced-motion`
 - valgt elementtype og `Låst`/`Ulåst` vises
 - eksisterende `useElementSelection` er autoritativ kilde
-- panelinnhold rendres bare for et gyldig element
 - ingen parallell elementstate eller direkte prosjektmutasjon
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
-## Gjeldende branch og fase
+## Gjeldende branch
 
 ```text
 feature/text-properties
 ```
 
-Utgangspunkt:
-
 ```text
-main: 8de5f2e
+base main: 8de5f2e
+rapportcommit: a267ca3
 sporing: docs/TEXT_PROPERTIES.md og GitHub-sak #10
 ```
 
-Fasen bygger for en markert vanlig tekstboks:
+Branchen er implementert, auditert, kontrollert og visuelt godkjent. Dokumentasjonen ferdigstilles før PR.
+
+## Implementerte tekstegenskaper
+
+For en markert vanlig tekstboks viser høyremenyen:
 
 ```text
 Tekstutseende
@@ -153,7 +153,7 @@ Justering
 Linjehøyde
 ```
 
-Låste valg:
+Låste beslutninger:
 
 - formateringen gjelder hele tekstboksen
 - tekstinnhold redigeres fortsatt bare på lerretet
@@ -161,13 +161,50 @@ Låste valg:
 - kontrollerte størrelser fra 12 til 96 px
 - venstre, midtstilt og høyre justering
 - kontrollerte linjehøyder fra 1.0 til 2.0
-- standarden bevarer System, 16 px, venstre og 1.45
+- standarden er System, 16 px, normal, venstre og 1.45
 - låste tekstbokser kan inspiseres, men kontrollene er deaktivert
 - tekstfarge utsettes til prosjektfargesystemet
 - bredde, høyde og plassering bygges ikke i denne branchen
 - headertekst, riktekst og mobile tekststiloverstyringer bygges ikke
 
-Modellen skal oppgraderes til skjemaversjon 3 med obligatorisk `textStyle` bare for tekstelementer. Fonttokens lagres i prosjektet, mens CSS-fontstacker avledes i visningslaget.
+## Modell og validering
+
+- prosjektskjema versjon 3
+- obligatorisk `textStyle` bare for tekstelementer
+- stabile fonttokens lagres i prosjektdata
+- CSS-fontstacker avledes i visningslaget
+- én validert stilegenskap endres per reducerhandling
+- ugyldige, låste og uendrede overganger avvises
+- runtime-validatoren er trygg mot utypede data
+- validatorregisteret er uttømmende ved framtidige modellutvidelser
+- `updatedAt` endres bare ved reell stilendring
+- vanlig visning og `textarea` arver samme stil
+
+## Audit og sluttkontroll
+
+Rettede auditfunn:
+
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
+
+Bekreftet av brukeren etter siste produksjonskodeendring:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 54 moduler transformert, bygget på 164 ms
+arkitekturrapporter: regenerert og committet i a267ca3
+working tree: clean
+branch: synkronisert med origin
+```
+
+Den blå markeringsrammen kan forsvinne når fokus flyttes til høyremenyen. Elementet forblir valgt i state, og panelet fortsetter å virke. Denne oppførselen er eksplisitt godkjent.
+
+`EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder.
 
 Se `docs/TEXT_PROPERTIES.md`.
 
@@ -178,7 +215,7 @@ Varig prosjektdata:
 - elementgeometri
 - låsestatus
 - tekstinnhold
-- tekststil etter fase 8
+- tekststil
 - prosjektets `updatedAt`
 
 Transient editor-state:
@@ -194,9 +231,9 @@ Transient state skal ikke serialiseres, eksporteres, publiseres eller inngå dir
 
 ## Responsiv redigering
 
-PC og Telefon deler foreløpig desktopgeometrien. Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls`.
+PC og Telefon deler foreløpig desktopgeometrien. Tekstinnhold, låsestatus og tekststil er foreløpig felles elementdata.
 
-Tekstinnhold, låsestatus og tekststil er foreløpig felles elementdata.
+Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls`.
 
 ## Filstørrelse og ansvar
 
@@ -226,7 +263,6 @@ Les i denne rekkefølgen:
 
 ## Ikke implementert ennå
 
-- tekstegenskaper i høyremenyen
 - tekstfarge og prosjektfargesystem
 - sletting og duplisering
 - ekte bildeimport
