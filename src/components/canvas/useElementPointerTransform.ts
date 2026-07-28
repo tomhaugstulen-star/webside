@@ -12,11 +12,7 @@ import {
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
-
-export type ElementLayoutPreview = {
-  elementId: string
-  layout: ElementLayout
-}
+import type { ElementLayoutPreview } from './canvasLayoutPreview'
 
 type TransformMode = 'move' | 'resize'
 
@@ -183,6 +179,14 @@ export function useElementPointerTransform({
     finishInteraction(false)
   }
 
+  const handleLostPointerCapture = (event: PointerEvent<HTMLDivElement>) => {
+    if (interactionRef.current?.pointerId !== event.pointerId) {
+      return
+    }
+
+    finishInteraction(false)
+  }
+
   return {
     layout: draftLayout ?? initialLayout,
     transformMode,
@@ -191,5 +195,6 @@ export function useElementPointerTransform({
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
+    handleLostPointerCapture,
   }
 }
