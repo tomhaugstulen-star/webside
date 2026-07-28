@@ -38,6 +38,7 @@ export function EditorCanvasElement({
 
   const position = resolveResponsiveValue(element.position, viewport)
   const size = resolveResponsiveValue(element.size, viewport)
+  const label = elementKindLabels[element.kind]
   const style: CSSProperties = {
     left: position.x,
     top: position.y,
@@ -65,15 +66,19 @@ export function EditorCanvasElement({
 
   return (
     <div
-      className={`canvas-element ${selected ? 'canvas-element--selected' : ''}`}
+      className={`canvas-element canvas-element--${element.kind} ${selected ? 'canvas-element--selected' : ''}`}
       style={style}
       role="button"
       tabIndex={0}
-      aria-label={`Velg ${elementKindLabels[element.kind].toLowerCase()}`}
+      aria-label={`Velg ${label.toLowerCase()}`}
       aria-pressed={selected}
       data-element-id={element.id}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
-    />
+    >
+      <span className="canvas-element__placeholder" aria-hidden="true">
+        {label}
+      </span>
+    </div>
   )
 }
