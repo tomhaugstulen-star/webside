@@ -13,7 +13,7 @@ For hver avgrensede del:
 5. Opprett neste branch fra oppdatert `main`.
 6. Definer nøyaktig omfang, brukerhandlinger, state og berørte filer.
 7. Bygg bare den avgrensede funksjonen.
-8. Kontroller filstørrelser og ansvarsdeling.
+8. Kontroller ansvarsdeling fortløpende og begynn uttrekking før en fil passerer 250 linjer.
 9. Kjør `npm run check`.
 10. Regenerer arkitekturrapporter ved strukturendringer.
 11. Test desktop og mobil der det er relevant.
@@ -270,9 +270,10 @@ Bygges først etter at editor, responsiv modell og lagring er stabile.
 
 - branchen inneholder bare avtalt omfang
 - ingen midlertidig fixture eller testinnhold ligger igjen
-- ingen fil har for mange ansvarsområder
-- filer over 250 linjer er vurdert for deling
-- filer ved eller over 300 linjer er eksplisitt gjennomgått
+- ingen fil har flere uklare ansvarsområder
+- ved 250 linjer er ansvar allerede begynt trukket ut i egne moduler
+- filer over 250 linjer har en konkret, dokumentert begrunnelse og plan for videre deling
+- filer ved eller over 300 linjer krever eksplisitt teknisk gjennomgang og skal være et unntak
 - `npm run check` er bestått etter siste kodeendring
 - arkitekturrapportene er regenerert etter siste strukturendring
 - desktop og mobil er testet der relevant
