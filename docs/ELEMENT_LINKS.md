@@ -209,3 +209,32 @@ Dette skal ikke implementeres i `feature/element-links`.
 - arkitekturrapportene regenereres
 - PC, Telefon, peker og tastatur kontrolleres
 - working tree er clean før PR
+
+## Verifisert status 2026-07-28
+
+Manuell funksjonstest er godkjent:
+
+- gyldig `https://`-adresse lagres på hele tekstboksen
+- adressen vises igjen når tekstboksen velges på nytt
+- lagreknappen gir grønn bekreftelse og teksten `Lenke lagret`
+- lenken åpnes ikke i editormodus
+
+Automatisk kontroll er godkjent med:
+
+```text
+npm run check
+```
+
+Resultat:
+
+- ESLint bestått
+- TypeScript bestått
+- Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
+- Vite-produksjonsbygg bestått med 58 transformerte moduler
+
+Gjenstår før PR:
+
+- regenerere `architecture.json`
+- regenerere `docs/dependency-graph.mmd`
+- bekrefte PC, Telefon og tastaturkontroll
+- bekrefte clean working tree
