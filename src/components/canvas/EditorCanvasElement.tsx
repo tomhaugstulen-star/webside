@@ -106,6 +106,7 @@ export function EditorCanvasElement({
       return
     }
 
+    event.preventDefault()
     onSelect(element.id)
 
     const canvas = canvasRef.current
@@ -113,8 +114,6 @@ export function EditorCanvasElement({
     if (element.locked || !canvas || canvas.clientWidth <= 0) {
       return
     }
-
-    event.preventDefault()
 
     const step = event.shiftKey ? 10 : 1
     const delta = {
