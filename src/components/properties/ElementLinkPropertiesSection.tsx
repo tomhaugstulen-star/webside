@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useState,
-  type FormEvent,
-} from 'react'
+import { useId, useState, type FormEvent } from 'react'
 import type { TextEditorElement } from '../../model/editorProject'
 import {
   NO_ELEMENT_LINK,
@@ -33,6 +28,12 @@ function createDraft(link: ElementLink): LinkDraft {
       }
 }
 
+function createFormKey(element: TextEditorElement) {
+  return element.link.type === 'none'
+    ? `${element.id}:none`
+    : `${element.id}:external-url:${element.link.url}:${element.link.openInNewTab}`
+}
+
 type ElementLinkPropertiesSectionProps = {
   element: TextEditorElement
 }
@@ -40,6 +41,10 @@ type ElementLinkPropertiesSectionProps = {
 export function ElementLinkPropertiesSection({
   element,
 }: ElementLinkPropertiesSectionProps) {
+  return <ElementLinkForm key={createFormKey(element)} element={element} />
+}
+
+function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
   const { updateTextElementLink } = useTextElementLink()
   const initialDraft = createDraft(element.link)
   const [draftType, setDraftType] = useState<LinkType>(initialDraft.type)
@@ -54,15 +59,6 @@ export function ElementLinkPropertiesSection({
   const errorId = `${idPrefix}-error`
   const disabled = element.locked
 
-  useEffect(() => {
-    const nextDraft = createDraft(element.link)
-
-    setDraftType(nextDraft.type)
-    setUrlDraft(nextDraft.url)
-    setOpenInNewTab(nextDraft.openInNewTab)
-    setValidationMessage(null)
-  }, [element.id, element.link])
-
   const hasChanges =
     draftType !== element.link.type ||
     (draftType === 'external-url' &&
@@ -72,7 +68,9 @@ export function ElementLinkPropertiesSection({
 
   const submitLabel =
     draftType === 'none'
-      ? 'Fjern lenke'
+      ? element.link.type === 'none'
+        ? 'Ingen lenke'
+        : 'Fjern lenke'
       : element.link.type === 'none'
         ? 'Lag lenke'
         : 'Lagre lenke'
