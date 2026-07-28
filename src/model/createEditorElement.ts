@@ -1,10 +1,6 @@
-import type {
-  CanvasPosition,
-  EditorElement,
-  ElementKind,
-  ElementSize,
-} from './editorProject'
+import type { EditorElement, ElementKind, ElementSize } from './editorProject'
 import { createStableId } from './createStableId'
+import { findElementCreationPosition } from './findElementCreationPosition'
 
 const defaultElementSizes: Record<ElementKind, ElementSize> = {
   section: { width: 320, height: 180 },
@@ -13,24 +9,12 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
   button: { width: 160, height: 48 },
 }
 
-const CREATION_SLOT_COUNT = 16
-
-function getCreationPosition(existingElementCount: number): CanvasPosition {
-  const safeElementCount = Math.max(0, existingElementCount)
-  const slot = safeElementCount % CREATION_SLOT_COUNT
-
-  return {
-    x: 24 + (slot % 4) * 12,
-    y: 24 + slot * 24,
-  }
-}
-
 export function createEditorElement(
   kind: ElementKind,
-  existingElementCount: number,
+  existingElements: EditorElement[],
 ): EditorElement {
-  const position = getCreationPosition(existingElementCount)
   const size = defaultElementSizes[kind]
+  const position = findElementCreationPosition(size, existingElements)
 
   return {
     id: createStableId(),
