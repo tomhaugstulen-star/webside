@@ -10,6 +10,7 @@ subgraph src["src"]
     subgraph src_components_canvas["canvas"]
       src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
       src_components_canvas_EditorCanvasElement_tsx["EditorCanvasElement.tsx"]
+      src_components_canvas_getCanvasContentHeight_ts["getCanvasContentHeight.ts"]
     end
     subgraph src_components_sidebar["sidebar"]
       src_components_sidebar_LeftSidebar_tsx["LeftSidebar.tsx"]
@@ -20,16 +21,21 @@ subgraph src["src"]
       src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
     end
   end
+  subgraph src_model["model"]
+    src_model_editorProject_ts["editorProject.ts"]
+    src_model_createEditorProject_ts["createEditorProject.ts"]
+    src_model_createStableId_ts["createStableId.ts"]
+    src_model_createEditorElement_ts["createEditorElement.ts"]
+    src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
+    src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
+  end
   subgraph src_state["state"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
+    src_state_useElementCreation_ts["useElementCreation.ts"]
     src_state_useElementSelection_ts["useElementSelection.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
-  end
-  subgraph src_model["model"]
-    src_model_editorProject_ts["editorProject.ts"]
-    src_model_createEditorProject_ts["createEditorProject.ts"]
   end
   subgraph src_types["types"]
     src_types_editor_ts["editor.ts"]
@@ -40,7 +46,9 @@ end
 src_App_tsx-->src_App_css
 src_App_tsx-->src_components_editor_EditorShell_tsx
 src_App_tsx-->src_state_EditorProjectProvider_tsx
+src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
+src_components_editor_EditorShell_tsx-->src_state_useElementCreation_ts
 src_components_editor_EditorShell_tsx-->src_types_editor_ts
 src_components_editor_EditorShell_tsx-->src_components_canvas_EditorCanvas_tsx
 src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
@@ -50,17 +58,32 @@ src_state_editorProjectContext_ts-->src_model_editorProject_ts
 src_state_editorProjectContext_ts-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
+src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_state_useElementCreation_ts-->src_model_createEditorElement_ts
+src_state_useElementCreation_ts-->src_model_editorProject_ts
+src_state_useElementCreation_ts-->src_state_useEditorProject_ts
+src_model_createEditorElement_ts-->src_model_createStableId_ts
+src_model_createEditorElement_ts-->src_model_editorProject_ts
+src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
+src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useEditorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useElementSelection_ts
 src_components_canvas_EditorCanvas_tsx-->src_types_editor_ts
 src_components_canvas_EditorCanvas_tsx-->src_components_canvas_EditorCanvasElement_tsx
+src_components_canvas_EditorCanvas_tsx-->src_components_canvas_getCanvasContentHeight_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_editorProject_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_model_resolveResponsiveValue_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
+src_model_resolveResponsiveValue_ts-->src_model_editorProject_ts
+src_components_canvas_getCanvasContentHeight_ts-->src_model_editorProject_ts
+src_components_canvas_getCanvasContentHeight_ts-->src_model_resolveResponsiveValue_ts
+src_components_sidebar_LeftSidebar_tsx-->src_model_editorProject_ts
 src_components_sidebar_LeftSidebar_tsx-->src_types_editor_ts
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarPanels_tsx
+src_components_sidebar_SidebarPanels_tsx-->src_model_editorProject_ts
 src_components_sidebar_SidebarPanels_tsx-->src_types_editor_ts
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
