@@ -27,6 +27,15 @@ const alignmentLabels: Record<TextAlignment, string> = {
   right: 'Høyre',
 }
 
+const lineHeightLabels: Record<TextLineHeight, string> = {
+  1: '1,0',
+  1.2: '1,2',
+  1.45: '1,45',
+  1.6: '1,6',
+  1.8: '1,8',
+  2: '2,0',
+}
+
 const alignments = Object.keys(alignmentLabels) as TextAlignment[]
 
 type TextPropertiesSectionProps = {
@@ -88,7 +97,11 @@ export function TextPropertiesSection({ element }: TextPropertiesSectionProps) {
 
         <div className="text-properties__field">
           <span>Stil</span>
-          <div className="text-properties__button-group" role="group" aria-label="Skriftstil">
+          <div
+            className="text-properties__button-group"
+            role="group"
+            aria-label="Skriftstil"
+          >
             <button
               type="button"
               aria-pressed={textStyle.fontWeight === 'bold'}
@@ -156,7 +169,7 @@ export function TextPropertiesSection({ element }: TextPropertiesSectionProps) {
           >
             {textLineHeights.map((lineHeight) => (
               <option key={lineHeight} value={lineHeight}>
-                {String(lineHeight).replace('.', ',')}
+                {lineHeightLabels[lineHeight]}
               </option>
             ))}
           </select>
