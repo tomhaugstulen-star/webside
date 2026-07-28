@@ -11,6 +11,7 @@
   --rail-width: 124px;
   --panel-width: 380px;
   --properties-panel-width: 320px;
+  --properties-panel-reserved-width: 0px;
 }
 
 button,
