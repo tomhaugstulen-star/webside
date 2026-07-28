@@ -10,6 +10,7 @@
   --toolbar-height: 84px;
   --rail-width: 124px;
   --panel-width: 380px;
+  --properties-panel-width: 320px;
 }
 
 button,
@@ -34,6 +35,7 @@ button {
 }
 
 .editor-shell__body {
+  position: relative;
   height: calc(100vh - var(--toolbar-height) - 46px);
   margin: 0 var(--outer-gap) var(--outer-gap);
   display: flex;
