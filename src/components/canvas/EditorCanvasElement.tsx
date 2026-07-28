@@ -44,9 +44,6 @@ export function EditorCanvasElement({
     width: size.width,
     height: size.height,
   }
-  const label = elementKindLabels[element.kind]
-  const isDevelopmentFixture =
-    import.meta.env.DEV && element.id.startsWith('dev-selection-')
 
   const selectCurrentElement = () => {
     onSelect(element.id)
@@ -68,14 +65,13 @@ export function EditorCanvasElement({
 
   return (
     <div
-      className={`canvas-element ${selected ? 'canvas-element--selected' : ''} ${isDevelopmentFixture ? 'canvas-element--dev-fixture' : ''}`}
+      className={`canvas-element ${selected ? 'canvas-element--selected' : ''}`}
       style={style}
       role="button"
       tabIndex={0}
-      aria-label={`Velg ${label.toLowerCase()}`}
+      aria-label={`Velg ${elementKindLabels[element.kind].toLowerCase()}`}
       aria-pressed={selected}
       data-element-id={element.id}
-      data-dev-label={isDevelopmentFixture ? label : undefined}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
     />
