@@ -8,21 +8,27 @@ Dette dokumentet fastsetter hvordan editoren bygges steg for steg uten å utvikl
 - Ingen funksjon skal utvikles direkte på `main`.
 - Godkjent og testet arbeid merges inn i `main`.
 - Nye feature-branches skal normalt opprettes fra oppdatert `main`.
-- Dokumentasjon kan utvikles i egen docs-branch og merges når den er gjennomgått.
+- Dokumentasjon utvikles i egen docs-branch og merges når den er gjennomgått.
 
-## 2. Første grunnlag som må være på plass
+## 2. Grunnlag som må være på plass
 
 Før nye editorfunksjoner bygges må følgende være bekreftet og testet:
 
 1. Prosjektet starter lokalt med `npm run dev`.
 2. Editorens hovedskall vises korrekt.
-3. Lerretet åpnes blankt.
+3. Lerretet åpnes blankt uten midlertidige objektkontroller.
 4. Venstremenyen kan åpnes og lukkes kontrollert.
 5. Desktop- og mobilvisning finnes som redigeringsmoduser.
-6. TypeScript og prosjektstruktur fungerer uten kjente feil.
-7. Filstrukturen følger prosjektreglene og unngår samlefiler.
+6. TypeScript, lint og produksjonsbuild fungerer uten kjente feil.
+7. Dependency Cruiser finner sirkulære, uløselige og ubrukte kildekodemoduler.
+8. Filstrukturen følger prosjektreglene og unngår samlefiler.
 
-Det eksisterende editorgrunnlaget skal gjennomgås og godkjennes før det merges til `main`.
+Gjeldende grunnbranches:
+
+- `tooling/dependency-cruiser`
+- `chore/editor-foundation-audit`
+
+Editorgrunnlaget skal godkjennes før det merges til `main`.
 
 ## 3. Fast arbeidsflyt for hver funksjon
 
@@ -33,19 +39,20 @@ For hver del brukes denne rekkefølgen:
 3. Beskriv funksjonens ansvar og berørte filer.
 4. Bygg bare den avgrensede funksjonen.
 5. Kontroller filstørrelse og ansvarsdeling underveis.
-6. Kjør typekontroll, bygg og relevante tester.
-7. Test funksjonen visuelt på desktop.
-8. Test mobiloppførsel der det er relevant.
-9. Oppdater dokumentasjonen.
-10. Gjennomgå endringene før merge.
-11. Merge til `main` først når delen er godkjent.
-12. Opprett neste feature-branch fra nyeste `main`.
+6. Kjør `npm run check`.
+7. Regenerer arkitekturrapporter ved strukturendringer.
+8. Test funksjonen visuelt på desktop.
+9. Test mobiloppførsel der det er relevant.
+10. Oppdater dokumentasjonen.
+11. Gjennomgå endringene før merge.
+12. Merge til `main` først når delen er godkjent.
+13. Opprett neste feature-branch fra nyeste `main`.
 
 ## 4. Planlagt teknisk rekkefølge
 
 ### Fase 0 – Stabilt editorgrunnlag
 
-Branch: eksisterende `feature/editor-foundation`
+Branch: `chore/editor-foundation-audit`
 
 Mål:
 
@@ -55,6 +62,9 @@ Mål:
 - venstremeny
 - desktop/mobil-knapper
 - grunnleggende paneloppførsel
+- ryddige interne navn for Elementer
+- ingen ubrukt kildekode
+- CSS og komponenter delt etter ansvar
 
 Resultat: Godkjent grunnlag merges til `main`.
 
@@ -96,6 +106,8 @@ Bygg:
 - rammefarge
 - plassering på lerretet
 
+Elementer-menyen skal beholde valgene Seksjon, Bilde, Tekst og Knapp. Faktisk knappobjekt bygges separat når grunnmodellen er stabil.
+
 ### Fase 4 – Flytting og størrelsesendring
 
 Branch: `feature/drag-resize`
@@ -132,7 +144,19 @@ Bygg:
 - fontfarge
 - fet og kursiv
 
-### Fase 7 – Bilder
+### Fase 7 – Knapper
+
+Branch: `feature/button-element`
+
+Bygg:
+
+- opprette knappobjekt fra Elementer-menyen
+- redigerbar knappetekst
+- bakgrunn, tekstfarge og ramme
+- størrelse og plassering
+- kobling eller handling bestemmes før implementering
+
+### Fase 8 – Bilder
 
 Branch: `feature/image-import-and-placement`
 
@@ -144,7 +168,7 @@ Bygg:
 - flytte og endre størrelse
 - fri plassering over eller inni elementer uten fast kobling
 
-### Fase 8 – Farger
+### Fase 9 – Farger
 
 Branch: `feature/project-colors`
 
@@ -155,7 +179,7 @@ Bygg:
 - endring av global prosjektfarge
 - oppdatering av alle objekter som bruker fargen
 
-### Fase 9 – Logo og header
+### Fase 10 – Logo og header
 
 Branch: `feature/logo-header`
 
@@ -167,7 +191,7 @@ Bygg:
 - undertittel
 - redigerbar headerstruktur
 
-### Fase 10 – Korrigeringslinjer
+### Fase 11 – Korrigeringslinjer
 
 Branch: `feature/alignment-guides`
 
@@ -178,7 +202,7 @@ Bygg:
 - lik avstand mellom tre eller flere objekter
 - kun visuell veiledning under flytting og størrelsesendring
 
-### Fase 11 – Responsiv redigering
+### Fase 12 – Responsiv redigering
 
 Branch: `feature/mobile-design-controls`
 
@@ -187,10 +211,10 @@ Bygg etter `docs/RESPONSIVE_DESIGN.md`:
 - arv fra desktop til mobil
 - mobiloverstyringer
 - skjul på mobil
-- senere egne font-, størrelse- og posisjonsverdier der dette godkjennes
+- egne verdier der dette er godkjent
 - generering av media queries fra prosjektmodellen
 
-### Fase 12 – Angre og gjør om
+### Fase 13 – Angre og gjør om
 
 Branch: `feature/history-system`
 
@@ -201,7 +225,7 @@ Bygg:
 - gjør om
 - støtte for oppretting, sletting, flytting, størrelse, tekst, farge og låsing
 
-### Fase 13 – Lokal automatisk lagring
+### Fase 14 – Lokal automatisk lagring
 
 Branch: `feature/local-project-autosave`
 
@@ -214,7 +238,7 @@ Bygg:
 - sikker skriving uten ødelagte prosjektfiler
 - gjenoppretting etter uventet lukking
 
-### Fase 14 – Åpne og importere prosjekt
+### Fase 15 – Åpne og importere prosjekt
 
 Branch: `feature/project-open-import`
 
@@ -225,7 +249,7 @@ Bygg:
 - laste prosjektdata og bilder
 - håndtere manglende eller ugyldige filer
 
-### Fase 15 – Forhåndsvisning og publisering
+### Fase 16 – Forhåndsvisning og publisering
 
 Separate branches:
 
@@ -243,8 +267,8 @@ Før en branch merges til `main` skal dette være bekreftet:
 - ingen fil har fått for mange ansvarsområder
 - filer over omtrent 250 linjer er vurdert for deling
 - filer ved eller over 300 linjer er gjennomgått eksplisitt
-- TypeScript-feil er rettet
-- build og tester er kjørt
+- `npm run check` er bestått
+- `architecture.json` og diagrammet er oppdatert ved strukturendringer
 - desktop er testet
 - mobil er testet der det er relevant
 - automatisk lagring og historikk er vurdert når funksjonen endrer prosjektdata
