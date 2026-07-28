@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { EditorCanvas } from '../canvas/EditorCanvas'
 import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
-import { useEditorProject } from '../../state/EditorProjectContext'
+import { useEditorProject } from '../../state/useEditorProject'
 import type { EditorTool, ViewportMode } from '../../types/editor'
 
 export function EditorShell() {
