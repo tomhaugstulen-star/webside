@@ -67,8 +67,19 @@
 
 .canvas-element__resize-handle {
   position: absolute;
-  right: 4px;
-  bottom: 4px;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: end;
+  box-sizing: border-box;
+  padding: 4px;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.canvas-element__resize-handle::after {
   width: 16px;
   height: 16px;
   box-sizing: border-box;
@@ -76,8 +87,7 @@
   border-radius: 2px;
   background: var(--accent);
   box-shadow: 0 1px 4px rgba(61, 38, 29, 0.28);
-  cursor: nwse-resize;
-  touch-action: none;
+  content: '';
 }
 
 .canvas-element--section {
