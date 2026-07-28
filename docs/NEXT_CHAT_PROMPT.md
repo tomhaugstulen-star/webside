@@ -4,9 +4,9 @@ Kopier hele teksten under inn i neste chat.
 
 ---
 
-Du er ansvarlig for videre utvikling av Website-editoren. Du skal arbeide som prosjektleder og kodeansvarlig med fullt fokus, presis avgrensning og ingen gjetting.
+Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder og kodeansvarlig med presist omfang og ingen gjetting.
 
-Svar på norsk. Vær direkte og konkret. Les alltid repo og dokumentasjon før du foreslår eller endrer kode.
+Svar på norsk. Vær direkte og konkret. Repo og dokumentasjon er kilden til sannhet.
 
 ## Repo og lokal mappe
 
@@ -15,7 +15,7 @@ https://github.com/tomhaugstulen-star/webside.git
 C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til å lese og skrive i repoet. Ikke bruk GitHub CLI. Bruk bare vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
+Bruk GitHub-connectoren til å lese og skrive i repoet. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
 
 Det utvikles aldri direkte på `main`.
 
@@ -23,7 +23,7 @@ Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer for å
 
 ## Autoritativ leserekkefølge
 
-Les disse filene fra repoet før du gjør noe annet:
+Les før videre arbeid:
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
@@ -40,9 +40,7 @@ Les disse filene fra repoet før du gjør noe annet:
 13. `docs/MOBILE_DESIGN_CONTROLS.md`
 14. `docs/CODE_AUDIT.md`
 
-Repoet og dokumentasjonen er kilden til sannhet. Ikke baser arbeidet på gamle chatantakelser dersom repoet viser noe annet.
-
-## Nåværende Git-status
+## Git-status
 
 Siste bekreftede `main`:
 
@@ -52,47 +50,23 @@ a35f59d
 
 Dette er merge-commit fra PR #8.
 
-Brukeren har bekreftet at lokal `main` er oppdatert og har clean working tree.
-
-Gjeldende feature-branch:
+Gjeldende branch:
 
 ```text
 feature/right-properties-panel
 ```
 
-Branchen ble opprinnelig opprettet før PR #8, men er nå kontrollert fast-forwardet til `a35f59d` og inneholder oppdatert dokumentasjon for overleveringen.
+Siste commit med kontrollert produksjonskode og regenererte arkitekturrapporter:
 
-Det er **ingen produksjonskode for høyremenyen ennå**. Ikke påstå at panelet er implementert.
-
-## Første lokale steg
-
-Brukeren står sannsynligvis på clean `main`. Start med å be om disse kommandoene:
-
-```powershell
-cd C:\Users\tomha\Desktop\website
-
-git fetch origin
-git branch --show-current
-git status
-git branch --list feature/right-properties-panel
+```text
+2d25a542  chore: refresh architecture reports for right panel
 ```
 
-Dersom lokal branch ikke finnes:
+Etter denne ligger bare dokumentasjonscommits, inkludert denne overleveringsprompten. Verifiser alltid faktisk branch-head gjennom GitHub før PR.
 
-```powershell
-git switch --track origin/feature/right-properties-panel
-git status
-```
+Brukeren bekreftet clean working tree før dokumentasjonsoppdateringene. Etter at dokumentasjonen er hentet lokalt, må clean tree bekreftes på nytt.
 
-Dersom lokal branch finnes:
-
-```powershell
-git switch feature/right-properties-panel
-git pull --ff-only origin feature/right-properties-panel
-git status
-```
-
-Ikke bruk reset, force eller destruktive kommandoer når vanlig fast-forward er tilstrekkelig.
+Det er ikke opprettet PR ennå.
 
 ## Ferdig og merget til `main`
 
@@ -119,9 +93,7 @@ PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
 ```
 
-## Endelig venstremeny
-
-Navn og rekkefølge er låst og merget:
+Endelig venstremeny:
 
 ```text
 Prosjekt
@@ -131,71 +103,11 @@ Elementer
 Innstillinger
 ```
 
-- `Prosjekt` står øverst.
-- `Innstillinger` står nederst.
-- Paneloverskriftene bruker samme navn.
-- PR #8 endret bare navn, rekkefølge og interne komponentnavn.
-- Nytt prosjekt, import, fargesystem og logo/header-funksjoner er ikke implementert.
-- Ikke gjør nye menyendringer i høyremenybranchen uten eksplisitt avtale.
-
-## Implementert tekstmodell
-
-Prosjektskjemaet er versjon 2.
-
-`EditorElement` er en diskriminert union. Bare tekstobjekter har:
-
-```ts
-kind: 'text'
-content: string
-```
-
-Nye tekstbokser starter med `content: ''`. Tom tekst er gyldig. Editor-placeholder lagres ikke.
-
-Tekstredigeringen bruker kontrollert `textarea` og lokal transient draft. DOM-en, `contentEditable` og `innerHTML` brukes ikke som lagringskilde.
-
-Implementert interaksjon:
-
-- ett klikk markerer
-- dobbeltklikk starter redigering
-- `Enter` på markert tekstboks starter redigering
-- vanlig `Enter` lager ny linje
-- blur committer
-- `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster aktiv draft
-- IME-komposisjon beskyttes
-- låst tekstboks kan ikke redigeres
-- transform, resize-håndtak og objektverktøy er deaktivert under redigering
-
-Reducerens tekstovergang:
-
-- krever eksisterende tekstobjekt på aktiv side
-- avviser feil type og låst element
-- normaliserer linjeskift til `\n`
-- avviser uendret tekst
-- oppdaterer `updatedAt` bare ved reell endring
-
-En avsluttet tekstøkt skal senere være én historikk- og autolagringsendring.
-
 ## Gjeldende fase: høyremenyens grunnstruktur
 
-Branch:
+Branchen er implementert, framtidsrettet kodeauditert, visuelt kontrollert og godkjent.
 
-```text
-feature/right-properties-panel
-```
-
-Sporet i:
-
-```text
-docs/RIGHT_PROPERTIES_PANEL.md
-GitHub-sak #6
-```
-
-Fasen skal bygge arkitekturen for høyremenyen før egenskapskontroller legges inn.
-
-## Låste høyremenybeslutninger
-
-Dette er eksplisitt godkjent og skal ikke diskuteres på nytt uten at brukeren selv ber om det:
+Låst oppførsel:
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -203,55 +115,131 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-Detaljer:
+### Godkjente layoutvalg
 
-- høyremenyen er helt skjult når ingenting er markert
-- skjult panel reserverer ikke en tom høyrekolonne
-- markering av et element åpner panelet
+- bredde: 320 px
+- fra 1680 px: dokket høyremeny på høyre side
+- under 1680 px: overlay fra høyre
+- overlay ligger oppå editorområdet og reduserer ikke lerretet
+- skjult panel reserverer ingen plass
+- egen vertikal scrolling
+- 180 ms transform-animasjon
+- ingen animasjon ved `prefers-reduced-motion`
+
+### Godkjent visuell struktur
+
+```text
+Egenskaper
+Knapp
+
+Element
+Status: Ulåst
+```
+
+Elementtypen kan være `Seksjon`, `Bilde`, `Tekst` eller `Knapp`. Status er `Låst` eller `Ulåst`.
+
+Det finnes ingen falske eller deaktiverte egenskapskontroller.
+
+### Godkjent interaksjon
+
+- markering åpner panelet
 - ny markering oppdaterer samme panel umiddelbart
-- klikk på tomt lerret fjerner markeringen og lukker panelet
-- låst element kan fortsatt markeres og inspiseres
-- panelet kan være åpent mens en markert tekstboks redigeres
-- klikk i panelet bruker den eksisterende blur/commit-mekanismen
-- markeringen beholdes etter normal blur/commit
-- panelet skal ikke opprette eller eie en separat tekstdraft
+- klikk på tomt lerret lukker panelet
+- låst element kan inspiseres
+- panelet kan være åpent under tekstredigering
+- klikk i panelet bruker eksisterende blur/commit
+- markeringen beholdes etter normal tekstcommit
+- panelet oppretter ikke separat tekstdraft
 
-En permanent synlig tom høyremeny er uttrykkelig avvist fordi den tar for mye plass fra lerretet.
+## Implementert arkitektur
 
-## Åpne beslutninger før kode
+Viktige filer:
 
-Disse punktene er ikke godkjent ennå:
+```text
+src/components/editor/EditorShell.tsx
+src/components/properties/RightPropertiesPanel.tsx
+src/state/useElementSelection.ts
+src/styles/editor-base.css
+src/styles/canvas.css
+src/styles/sidebar.css
+src/styles/right-properties-panel.css
+src/App.css
+```
 
-- endelig panelbredde
-- oppførsel i smale nettleservinduer
-- om panelet får egen vertikal scrolling
-- visuell overskrift og seksjonsstruktur
-- minimum av faktisk inspeksjonsinformasjon i første leveranse
-- eventuell åpne-/lukkeanimasjon og `prefers-reduced-motion`
+Ansvarsdeling:
 
-Før produksjonskode skrives skal du:
+- `EditorShell` komponerer venstremeny, lerret og høyremeny.
+- Eksisterende `useElementSelection` leverer `selectedElement`.
+- `RightPropertiesPanel` er en presentasjonskomponent som mottar elementet som prop.
+- Panelet søker ikke i DOM-en og muterer ikke prosjektdata.
+- Det finnes ingen parallell selector, separat elementkopi eller ny reducer-action.
+- Panelinnholdet rendres bare når et gyldig element er valgt.
+- Paneloverflaten beholdes kun for transform-animasjonen.
+- `aria-labelledby` brukes bare når panelet er åpent.
 
-1. lese faktisk shell-, selection-, canvas- og CSS-kode
-2. presentere ett konkret og begrunnet forslag for alle åpne punkter
-3. vise tydelig hva som er anbefaling og hva som allerede er låst
-4. vente på brukerens eksplisitte godkjenning
+Layoutvariabler:
 
-Ikke løs designbeslutningene med tilfeldig CSS underveis.
+```text
+--properties-panel-width: 320px
+--properties-panel-reserved-width: 0px
+```
 
-## Første leveranse skal bygge
+Ved åpent og dokket panel settes reservert bredde til panelbredden. Canvas- og sidebar-CSS bruker variabelen i egne breddeberegninger. Høyremenyens CSS styrer ikke `.canvas-page--desktop` direkte.
 
-- høyremeny som egen komponent
-- eget layoutområde i `EditorShell`
-- betinget rendering basert på faktisk valgt element
-- korrekt oppdatering ved markering, ny markering, fjernet markering og sideskifte
-- kontrollert visning av låst element dersom godkjent minimumsinnhold inkluderer status
-- forutsigbar fokusrekkefølge
-- kontrollert blur/commit fra aktiv tekstredigering
-- egen CSS-grense
-- PC- og Telefon-kontroll
-- peker- og tastaturkontroll
+## Framtidsrettet kodeaudit
 
-## Første leveranse skal ikke bygge
+Auditen kontrollerte:
+
+- stale markering og stale elementdata
+- duplisert state og parallelle selectors
+- direkte DOM-søk og prosjektmutasjon
+- tekstens blur/commit
+- låste elementer
+- sideskifte og ugyldig markering
+- overlay kontra dokket layout
+- CSS-eierskap og importrekkefølge
+- skjult innhold og framtidige fokuserbare kontroller
+- `prefers-reduced-motion`
+- filstørrelser og ansvarsgrenser
+
+To funn ble rettet før sluttkontrollen:
+
+1. Selve panelinnholdet rendres bare når et element finnes.
+2. Panel-CSS styrer ikke lenger canvas-klassen direkte; en sentral variabel formidler reservert bredde.
+
+Ingen problemer ble funnet med reducer, låsing, tekstcommit, state-separasjon eller Dependency Cruiser.
+
+## Kontrollstatus
+
+Brukeren kjørte etter siste produksjonskodeendring:
+
+```text
+npm run check
+npm run architecture:json
+npm run architecture:diagram
+git diff --check
+git status
+```
+
+Bekreftet resultat:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 38 moduler, 80 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+arkitekturrapporter: oppdatert
+visuell PC-kontroll: godkjent
+working tree før dokumentasjonscommits: clean
+```
+
+LF/CRLF-varslene fra `git diff --check` var bare linjeskiftvarsler, ikke whitespace-feil.
+
+Produksjonskode ble ikke endret etter denne kontrollen. Bare dokumentasjon ble oppdatert.
+
+## Ikke del av branchen
+
+Ikke legg inn:
 
 - fontfamilie eller fontstørrelse
 - tekstfarge, fet, kursiv eller markert tekstformatering
@@ -263,144 +251,47 @@ Ikke løs designbeslutningene med tilfeldig CSS underveis.
 - lagpanel
 - historikk eller lagring
 - nytt prosjekt eller prosjektimport
-- mobile overstyringer
+- mobile geometri-overstyringer
 
-Ikke legg inn tomme seksjoner med falske eller deaktiverte kontroller.
+## Neste steg
 
-## Faktisk kode som må leses før forslag
+Start med å be brukeren hente dokumentasjonen:
 
-Les minst:
+```powershell
+cd C:\Users\tomha\Desktop\website
 
-```text
-src/components/editor/EditorShell.tsx
-src/components/sidebar/LeftSidebar.tsx
-src/components/sidebar/SidebarPanels.tsx
-src/state/useElementSelection.ts
-src/state/useEditorProject.ts
-src/state/editorProjectReducer.ts
-src/components/canvas/EditorCanvas.tsx
-src/components/canvas/EditorCanvasElement.tsx
-src/components/canvas/TextElementEditor.tsx
-src/styles/editor-base.css
-src/styles/sidebar.css
-src/styles/canvas.css
-src/App.css
+git pull --ff-only origin feature/right-properties-panel
+git status
+git log -1 --oneline
 ```
 
-Viktige eksisterende forhold:
-
-- `EditorShell` komponerer toppmeny, venstremeny og lerret.
-- `useElementSelection` finnes allerede og returnerer `selectedElementId`, `selectedElement`, `selectElement` og `clearSelection`.
-- Ikke opprett en ny parallell selector bare fordi en gammel plan nevnte en egen hook.
-- Eksisterende CSS-variabel `--panel-width` brukes av venstrepanelet.
-- Høyremenyen skal få en egen entydig variabel, for eksempel `--properties-panel-width`, dersom breddevariabel godkjennes.
-- `EditorShell` skal forbli en komposisjonskomponent og ikke eie egenskapslogikk.
-
-## State-grenser for panelet
-
-Autoritativt:
-
-- `state.selectedElementId` identifiserer markeringen
-- aktiv side inneholder elementdataene
-- `EditorProject` er eneste varige datakilde
-
-Transient:
-
-- panelvisning
-- fokus
-- hover
-- lokal UI-feedback
-- eventuell animasjonsstatus
-- senere åpne og lukkede seksjoner
-
-Panelet skal ikke:
-
-- lete etter markert element i DOM-en
-- lagre en separat kopi av elementdata
-- mutere prosjektdata direkte
-- serialiseres i prosjektfilen
-- inngå direkte i historikk eller autolagring
-
-## Arkitekturkrav
-
-Forventet ansvarsdeling:
+Forventet:
 
 ```text
-RightPropertiesPanel.tsx       panelkomposisjon
-useElementSelection.ts         eksisterende valgt element-avledning
-right-properties-panel.css     egne panelregler
-EditorShell.tsx                komposisjon av hovedområder
+On branch feature/right-properties-panel
+Your branch is up to date with 'origin/feature/right-properties-panel'.
+
+nothing to commit, working tree clean
 ```
 
-Små presentasjonskomponenter opprettes bare når faktisk godkjent innhold krever det.
+Dokumentasjonsendringene krever ikke ny `npm run check`, fordi ingen produksjonskode eller arkitekturrapport ble endret etter den beståtte sluttkontrollen.
 
-Regler:
+Når lokal branch er clean:
 
-- 250 linjer er aktiv terskel for ansvarstrekk
-- del tidligere dersom en fil får flere ansvar
-- 300 linjer er eksplisitt unntaksgrense for kildefiler
-- ingen generell samlefil
-- Dependency Cruiser skal fortsatt være uten brudd
-- reducer-actions skal håndteres uttømmende
-- ingen prosjektmutasjon uten gyldig reducergrense
-
-## Arbeidsflyt i denne fasen
-
-1. Kontroller riktig lokal branch og clean tree.
-2. Les autoritative dokumenter og faktisk kode.
-3. Presenter de åpne designvalgene.
-4. Vent på eksplisitt godkjenning.
-5. Implementer bare panelgrunnstrukturen.
-6. Auditér diffen for scope creep, fokusfeil, stale data og duplisert state.
-7. Kjør `npm run check` etter siste kodeendring.
-8. Regenerer arkitekturrapporter ved strukturendringer.
-9. Kjør appen og test PC og Telefon.
-10. Test peker og tastatur.
-11. Test tekstredigering og låst element som regresjon.
-12. Oppdater dokumentasjonen.
-13. Be brukeren bekrefte at appen fungerer og at working tree er clean.
-14. Opprett ikke PR før denne bekreftelsen.
-15. Opprett draft-PR, kontroller hele diffen, mergebarhet, review-tråder og eventuell CI.
-16. Marker PR klar for review.
-17. Merge bare etter brukerens eksplisitte godkjenning, normalt formulert som `PR #<nummer>`.
-18. Bruk forventet head-SHA ved merge.
-19. Oppdater lokal `main` og kontroller clean tree før neste fase.
-
-## Kontrollpunkter for høyremenyen
-
-- ingen valgt element gir ingen synlig eller reservert høyremeny
-- valgt element åpner panelet
-- ny markering oppdaterer panelet uten stale data
-- klikk på tomt lerret lukker panelet
-- låst element kan fortsatt inspiseres
-- aktiv tekstdraft mistes eller overskrives ikke
-- panelklikk bruker normal blur/commit
-- markeringen beholdes etter commit
-- ingen falske egenskapskontroller
-- ingen direkte DOM-søk
-- ingen separat kopi av prosjektdata
-- ingen utilsiktet endring i venstremenyen
-- PC og Telefon fungerer
-- peker og tastatur fungerer
-- `npm run check` består etter siste kodeendring
-- arkitekturrapportene er oppdatert
-- arbeidsområdet er rent og synkronisert før PR
-
-## Responsiv plan
-
-PC og Telefon deler fortsatt desktopgeometrien. Dette er kontrollert midlertidig oppførsel.
-
-Tekstinnhold og låsestatus er felles elementdata.
-
-Egne mobiloverstyringer spores i:
-
-```text
-docs/MOBILE_DESIGN_CONTROLS.md
-GitHub-sak #3
-feature/mobile-design-controls
-```
-
-Ikke bygg mobiloverstyringer i høyremenybranchen.
+1. Sammenlign hele `feature/right-properties-panel` mot `main`.
+2. Kontroller at diffen bare inneholder:
+   - høyremenyens grunnstruktur
+   - tilhørende layout-CSS
+   - arkitekturrapporter
+   - relevant dokumentasjon
+3. Kontroller at branchen er foran `main` og ikke bak.
+4. Opprett draft-PR mot `main`.
+5. Dokumenter produktvalg, state-grenser, auditfunn, teststatus og visuell godkjenning.
+6. Kontroller mergebarhet, review-tråder og eventuell CI.
+7. Marker PR klar for review når alt er kontrollert.
+8. Ikke merge før brukeren gir eksplisitt godkjenning, normalt formulert som `PR #<nummer>`.
+9. Bruk forventet head-SHA ved merge.
+10. Etter merge: oppdater lokal `main` og kontroller clean tree.
 
 ## Kommunikasjonsregler
 
@@ -411,22 +302,8 @@ Ikke bygg mobiloverstyringer i høyremenybranchen.
 - gi nøyaktige PowerShell-kommandoer etter repoendringer
 - ikke be brukeren bruke GitHub CLI
 - ikke bland senere funksjoner inn i gjeldende branch
-- ikke påstå at tester er bestått før brukeren eller verifisert CI har bekreftet det
-- ikke opprett PR før brukerens sluttkontroll og clean tree
+- ikke påstå at tester er bestått uten brukerens output eller verifisert CI
+- ikke opprett PR før lokal branch er clean etter dokumentasjonspull
 - ikke merge uten eksplisitt godkjenning
-
-## Hva den første nye chatten skal gjøre
-
-Den første responsen skal:
-
-1. bekrefte at du har lest repo og dokumentasjon
-2. oppsummere at `main` er clean på `a35f59d`
-3. fastslå at `feature/right-properties-panel` er gjeldende branch og at ingen produksjonskode er skrevet ennå
-4. hjelpe brukeren over på riktig lokal branch
-5. lese den faktiske koden
-6. presentere konkrete forslag for bredde, smalvinduoppførsel, scrolling, visuell struktur, minimumsinnhold og animasjon
-7. vente på godkjenning før implementering
-
-Ikke start med fontkontroller, farger, bilder, knapphandlinger, prosjektimport eller andre senere faser.
 
 ---
