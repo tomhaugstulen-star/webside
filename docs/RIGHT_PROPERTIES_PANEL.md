@@ -1,45 +1,33 @@
 # Høyremenyens grunnstruktur
 
-Dette dokumentet er autoritativ spesifikasjon for fase 7.
+Dette dokumentet er autoritativ spesifikasjon og implementeringsstatus for fase 7.
 
-Branch:
-
-```text
-feature/right-properties-panel
-```
-
-Utgangspunkt:
+## Branch og utgangspunkt
 
 ```text
-main: a35f59d
-PR #7: kontrollert tekstredigering
-PR #8: endelige navn og rekkefølge i venstremenyen
+branch: feature/right-properties-panel
+base main: a35f59d
+produksjonskode og arkitekturrapporter: 2d25a542
 ```
 
-Det er foreløpig ikke lagt inn produksjonskode for høyremenyen.
+PR #7 leverte kontrollert tekstredigering. PR #8 låste navn og rekkefølge i venstremenyen.
 
-## Mål
+## Status
 
-Bygg ett stabilt inspeksjons- og egenskapspanel på høyre side av editoren før konkrete egenskapskontroller legges inn.
+Høyremenyens grunnstruktur er implementert, kodeauditert, visuelt kontrollert og godkjent.
 
-Panelet skal senere være den autoritative UI-plassen for tekst-, knapp-, bilde- og layoutegenskaper. Det skal lese fra sentral editor-state og skal aldri eie en separat kopi av prosjektdata.
+Bekreftet etter siste produksjonskodeendring:
 
-## Låste produktbeslutninger
+```text
+npm run check: bestått
+Dependency Cruiser: 38 moduler, 80 avhengigheter, 0 brudd
+PC-visning: godkjent
+arbeidsområde etter arkitekturrapporter: clean
+```
 
-Følgende er eksplisitt godkjent:
+Det er ikke opprettet PR ennå.
 
-- høyremenyen er helt skjult når ingenting er markert
-- skjult panel skal ikke reservere en tom høyrekolonne
-- markering av et element åpner høyremenyen
-- markering av et annet element oppdaterer samme panel umiddelbart
-- klikk på tomt lerret fjerner markeringen og lukker høyremenyen
-- et låst element kan fortsatt markeres og inspiseres
-- høyremenyen kan være åpen mens en markert tekstboks redigeres
-- klikk i høyremenyen avslutter tekstredigeringen gjennom eksisterende blur/commit
-- markeringen skal beholdes etter normal blur/commit
-- høyremenyen skal ikke opprette eller eie en separat tekstdraft
-
-Kort regel:
+## Låst produktoppførsel
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -47,45 +35,118 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-En permanent synlig tom høyremeny er uttrykkelig avvist fordi den tar unødvendig plass fra lerretet.
+Detaljer:
 
-## Beslutninger som fortsatt er åpne
+- panelet er 320 px bredt
+- ved vindusbredde på minst 1680 px er panelet dokket på høyre side
+- under 1680 px er panelet overlay fra høyre
+- overlay ligger oppå editorområdet og reduserer ikke lerretsbredden
+- skjult panel reserverer ingen plass
+- markering av et annet element oppdaterer samme panel umiddelbart
+- låst element kan markeres og inspiseres
+- panelet kan være åpent under tekstredigering
+- klikk i panelet bruker eksisterende blur/commit
+- markeringen beholdes etter normal tekstcommit
+- panelet oppretter ikke eller eier en separat tekstdraft
+- panelet har egen vertikal scrolling
+- åpning og lukking bruker 180 ms transform-animasjon
+- animasjonen deaktiveres ved `prefers-reduced-motion`
 
-Disse må presenteres konkret og godkjennes før produksjonskode skrives:
+## Visuell struktur
 
-- endelig panelbredde
-- oppførsel i smale nettleservinduer
-- om panelet får egen vertikal scrolling
-- visuell overskrift og seksjonsstruktur
-- hvilket minimum av faktisk inspeksjonsinformasjon som skal vises i første leveranse
-- eventuell åpne-/lukkeanimasjon og hensyn til `prefers-reduced-motion`
+Første leveranse viser bare faktisk inspeksjonsinformasjon:
 
-Ikke løs disse punktene med tilfeldig CSS under implementeringen.
+```text
+Egenskaper
+Knapp
 
-## Første leveranse
+Element
+Status: Ulåst
+```
 
-Skal bygge:
+Elementtypen endres mellom:
 
-- høyremeny som egen komponent og eget layoutområde i `EditorShell`
-- betinget rendering basert på faktisk valgt element
-- lesing av valgt element gjennom sentral editor-state
-- korrekt oppdatering ved ny markering, fjernet markering og sideskifte
-- kontrollert visning av låst status dersom dette godkjennes som minimumsinnhold
-- forutsigbar fokusrekkefølge
-- egen CSS-grense
-- PC- og Telefon-kontroll
-- peker- og tastaturkontroll
+```text
+Seksjon
+Bilde
+Tekst
+Knapp
+```
 
-Panelet skal ikke bruke direkte DOM-søk for å finne valgt element og skal ikke mutere prosjektdata direkte.
+Status er enten `Låst` eller `Ulåst`.
+
+Det finnes ingen tomme seksjoner, falske kontroller eller deaktiverte plassholdere.
+
+## Implementert arkitektur
+
+Ansvarsdeling:
+
+```text
+src/components/properties/RightPropertiesPanel.tsx
+  - presenterer valgt elementtype og låsestatus
+  - mottar elementet som prop
+  - muterer ingen prosjektdata
+
+src/state/useElementSelection.ts
+  - eksisterende autoritativ avledning av selectedElementId og selectedElement
+
+src/components/editor/EditorShell.tsx
+  - komponerer venstremeny, lerret og høyremeny
+  - leser selectedElement gjennom eksisterende hook
+  - eier ingen egenskapslogikk
+
+src/styles/right-properties-panel.css
+  - paneloverflate, scrolling, breakpoint og transform-animasjon
+
+src/styles/editor-base.css
+  - --properties-panel-width: 320px
+  - --properties-panel-reserved-width: 0px
+
+src/styles/canvas.css og src/styles/sidebar.css
+  - egne lerretsberegninger bruker bare den sentrale reserverte breddevariabelen
+```
+
+Panelet:
+
+- søker ikke etter valgt element i DOM-en
+- lagrer ikke en separat kopi av elementdata
+- oppretter ingen ny selector eller reducer-action
+- muterer ikke prosjektdata direkte
+- serialiseres ikke
+- inngår ikke direkte i historikk eller autolagring
+
+## Betinget innhold og animasjon
+
+Paneloverflaten er montert for å kunne animere ut. Selve innholdet rendres bare når et gyldig element er valgt.
+
+Dette sikrer at fremtidige inputfelt og knapper ikke blir liggende skjult i DOM-en etter at markeringen fjernes. `aria-labelledby` brukes bare når panelet er åpent.
+
+## Tekstredigering
+
+Eksisterende tekstredigering bruker kontrollert `textarea` og lokal transient draft.
+
+Når brukeren klikker i høyremenyen under redigering:
+
+1. tekstfeltet mister fokus
+2. eksisterende blur-mekanisme committer draften
+3. tekstøkten avsluttes
+4. elementmarkeringen beholdes
+5. panelet fortsetter å lese elementet fra sentral state
+
+Høyremenyen omgår eller dupliserer ikke commitgrensen.
+
+## Låste elementer
+
+Et låst element kan fortsatt være valgt og vises i panelet. Grunnfasen viser bare status og introduserer ingen ny prosjektmutasjon.
+
+Reducerens eksisterende låsegrenser er fortsatt autoritative.
 
 ## Ikke del av denne branchen
 
-Følgende bygges ikke:
+Følgende er ikke implementert:
 
-- fontfamilie
-- fontstørrelse
-- tekstfarge
-- fet, kursiv eller markert tekstformatering
+- fontfamilie eller fontstørrelse
+- tekstfarge, fet, kursiv eller markert tekstformatering
 - bildevelger eller bildeegenskaper
 - knapphandlinger eller lenker
 - fargevelgere eller prosjektfargeregister
@@ -93,100 +154,53 @@ Følgende bygges ikke:
 - sletting eller duplisering
 - lagpanel
 - historikk eller lagring
-- mobiloverstyringer
 - nytt prosjekt eller prosjektimport
+- mobile geometri-overstyringer
 
-Tomme seksjoner med falske eller deaktiverte kontroller skal ikke legges inn.
+## Kodeaudit
 
-## State-grenser
+Den framtidsrettede auditen kontrollerte:
 
-Autoritativt grunnlag:
+- stale markering og stale elementdata
+- duplisert state og parallelle selectors
+- direkte DOM-søk og prosjektmutasjon
+- tekstens blur/commit
+- låste elementer
+- sideskifte og ugyldig markering
+- overlay kontra dokket layout
+- CSS-eierskap og importrekkefølge
+- skjult innhold og framtidige fokuserbare kontroller
+- `prefers-reduced-motion`
+- filstørrelser og ansvarsgrenser
 
-- `state.selectedElementId` identifiserer markeringen
-- aktiv side inneholder elementdataene
-- prosjektmodellen er eneste varige datakilde
-- `useElementSelection` finnes allerede og returnerer både `selectedElementId` og `selectedElement`
+To funn ble rettet før sluttkontrollen:
 
-Eksisterende hook skal vurderes og normalt gjenbrukes. Ikke opprett en parallell selector eller ny kopi av samme avledning uten et dokumentert behov.
+1. Panelinnholdet rendres nå bare når et element finnes.
+2. Høyremenyens CSS styrer ikke lenger `.canvas-page--desktop` direkte; en sentral variabel formidler reservert bredde.
 
-Transient panelstate kan omfatte:
-
-- fokus
-- hover
-- lokal UI-feedback
-- eventuell animasjonsstatus
-- senere åpne og lukkede seksjoner
-
-Transient panelstate skal ikke serialiseres, publiseres eller inngå direkte i historikk eller autolagring.
-
-## Tekstredigering
-
-Eksisterende tekstredigering bruker kontrollert `textarea` og lokal transient draft.
-
-Når brukeren klikker i høyremenyen under tekstredigering:
-
-1. tekstfeltet mister fokus
-2. eksisterende blur-mekanisme committer draften
-3. fokus fortsetter til kontrollen brukeren klikket på
-4. elementmarkeringen beholdes
-5. panelet leser oppdatert elementdata fra sentral state
-
-Høyremenyen skal ikke omgå eller duplisere denne commitgrensen.
-
-## Låste elementer
-
-Et låst element kan fortsatt være valgt og vises i panelet. Høyremenyen kan senere tilby egenskapskontroller, men reducerens autoritative låsegrenser skal fortsatt håndheves.
-
-Denne grunnfasen skal ikke introdusere nye prosjektmutasjoner bare for å vise låst status.
-
-## Arkitekturkrav
-
-Forventet ansvarsdeling:
-
-- `RightPropertiesPanel.tsx` — panelkomposisjon
-- eksisterende `useElementSelection` — valgt element og markering
-- små presentasjonskomponenter bare dersom faktisk godkjent innhold krever det
-- `right-properties-panel.css` — egne panelregler
-- `EditorShell.tsx` — bare komposisjon av venstremeny, lerret og høyremeny
-
-Eksisterende CSS-variabel `--panel-width` brukes av venstrepanelet. En høyremenybredde skal få et eget entydig navn, for eksempel `--properties-panel-width`. Ikke bruk samme variabel til to forskjellige paneler.
-
-Alle nye kildefiler skal følge 250-linjersregelen.
-
-## Første kodegjennomgang i neste chat
-
-Les minst:
-
-```text
-src/components/editor/EditorShell.tsx
-src/components/sidebar/LeftSidebar.tsx
-src/state/useElementSelection.ts
-src/state/useEditorProject.ts
-src/components/canvas/EditorCanvas.tsx
-src/components/canvas/EditorCanvasElement.tsx
-src/components/canvas/TextElementEditor.tsx
-src/styles/editor-base.css
-src/styles/sidebar.css
-src/styles/canvas.css
-```
-
-Før implementering skal neste chat presentere ett konkret forslag for de åpne designbeslutningene og få eksplisitt godkjenning.
+Alle nye kildefiler er under 250 linjer.
 
 ## Akseptansekriterier
+
+Bekreftet:
 
 - ingen valgt element gir ingen synlig eller reservert høyremeny
 - valgt element åpner panelet
 - ny markering oppdaterer panelet uten stale data
 - klikk på tomt lerret lukker panelet
-- låst element kan fortsatt inspiseres
+- låst element kan inspiseres
 - aktiv tekstdraft mistes eller overskrives ikke
 - panelklikk bruker normal blur/commit
 - markeringen beholdes etter commit
-- panelet inneholder ingen falske egenskapskontroller
+- ingen falske egenskapskontroller
 - ingen direkte DOM-søk eller direkte prosjektmutasjon
-- alle nye kildefiler følger 250-linjersregelen
-- `npm run check` består etter siste kodeendring
-- arkitekturrapportene er oppdatert ved strukturendringer
-- PC og Telefon er kontrollert
-- peker og tastatur er kontrollert
-- arbeidsområdet er rent og synkronisert før PR
+- overlay under 1680 px
+- dokket panel fra 1680 px
+- egen scrolling
+- redusert bevegelse respekteres
+- `npm run check` består
+- arkitekturrapportene er oppdatert
+- PC-visning er godkjent
+- arbeidsområdet er rent og synkronisert
+
+Neste steg er dokumentasjonskontroll og PR-gjennomgang mot `main`.
