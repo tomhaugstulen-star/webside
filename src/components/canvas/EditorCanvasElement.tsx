@@ -1,5 +1,6 @@
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
-import type { EditorElement, ResponsiveValue } from '../../model/editorProject'
+import type { EditorElement } from '../../model/editorProject'
+import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import type { ViewportMode } from '../../types/editor'
 
 const elementKindLabels: Record<EditorElement['kind'], string> = {
@@ -14,14 +15,6 @@ type EditorCanvasElementProps = {
   viewport: ViewportMode
   selected: boolean
   onSelect: (elementId: string) => void
-}
-
-function resolveResponsiveValue<T>(value: ResponsiveValue<T>, viewport: ViewportMode) {
-  if (viewport === 'mobile') {
-    return value.mobile ?? value.desktop
-  }
-
-  return value.desktop
 }
 
 export function EditorCanvasElement({
