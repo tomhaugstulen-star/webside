@@ -38,8 +38,9 @@ npm run dev
 7. `docs/ELEMENT_CREATION.md`
 8. `docs/DRAG_RESIZE.md`
 9. `docs/RESPONSIVE_DESIGN.md`
-10. `docs/CODE_AUDIT.md`
-11. `README.md`
+10. `docs/MOBILE_DESIGN_CONTROLS.md`
+11. `docs/CODE_AUDIT.md`
+12. `README.md`
 
 Les deretter faktisk kode, spesielt:
 
@@ -87,7 +88,7 @@ Repoet og dokumentasjonen er kilden til sannhet. Ikke stol på en eldre chatopps
 feature/drag-resize
 ```
 
-Branchen er implementert og ble visuelt godkjent på desktop og mobil før siste kodeaudit.
+Branchen er implementert, kodeauditert og visuelt godkjent på desktop og mobil.
 
 Implementert:
 
@@ -101,8 +102,9 @@ Implementert:
 - fri overlapping
 - transient preview under pekerbevegelse
 - én prosjekt-commit ved normalt pekerslipp
-- avbrudd uten commit ved `pointercancel`
+- avbrudd uten commit ved `pointercancel` eller tapt pointer capture
 - desktop og mobil med delt desktopgeometri
+- tastaturflytting og tastatur-resizing
 
 Minimumsmål:
 
@@ -113,27 +115,27 @@ Tekst:   120 × 48
 Knapp:    80 × 36
 ```
 
-## Siste kodeaudit
+## Kodeaudit
 
-Etter den visuelle godkjenningen ble disse framtidsrisikoene rettet:
+Disse framtidsrisikoene er rettet:
 
 1. **Låste elementer kunne ikke markeres med peker**
-   - Markering skjer nå før låsesjekken.
+   - Markering skjer før låsesjekken.
    - Låste elementer kan markeres, men transform starter ikke.
-   - Reduceren avviser også layoutmutasjon av låste elementer.
+   - Reduceren avviser layoutmutasjon av låste elementer.
 
 2. **Tapt pointer capture kunne etterlate aktiv preview**
    - `lostpointercapture` avslutter interaksjonen kontrollert.
    - Preview ryddes uten prosjekt-commit.
 
 3. **Preview-type var duplisert**
-   - `ElementLayoutPreview` ligger nå i `canvasLayoutPreview.ts`.
+   - `ElementLayoutPreview` ligger i `canvasLayoutPreview.ts`.
 
 4. **Minimumsmål kunne eksponeres som muterbar delt referanse**
    - `getElementMinimumSize` returnerer kopi.
 
 5. **Resize-håndtaket hadde liten treffflate**
-   - Synlig firkant er fortsatt 16 × 16 px.
+   - Synlig firkant er 16 × 16 px.
    - Faktisk treffflate er 32 × 32 px.
 
 6. **Draing manglet tastaturalternativ**
@@ -142,7 +144,9 @@ Etter den visuelle godkjenningen ble disse framtidsrisikoene rettet:
    - `Ctrl`/`Cmd` + piltast endrer størrelse
    - `Ctrl`/`Cmd` + `Shift` + piltast bruker 10 px
 
-Disse siste auditendringene er ikke lokalt sluttkontrollert ennå.
+7. **Preview ble nullstilt med synkron `setState` i en effect**
+   - Preview-state er nå bundet til aktiv side og viewport.
+   - Gamle previews ignoreres uten ekstra effect-render.
 
 ## Kritiske arkitekturgrenser
 
@@ -172,11 +176,36 @@ Følgende skal ikke lagres, eksporteres eller inngå direkte i historikk:
 - ingen fast nedre grense
 - lerretshøyde er avledet visning
 
-### Mobil
+## Responsiv design må ikke glemmes
 
-- dagens UI oppretter ikke mobiloverstyringer
-- PC og Telefon redigerer foreløpig delt desktopgeometri
-- viewport-bevisste actions bygges senere i `feature/mobile-design-controls`
+Dagens midlertidige regel:
+
+- PC og Telefon deler desktopgeometrien
+- en transform i Telefon påvirker derfor også PC
+- ingen mobiloverstyring opprettes skjult
+
+Endelig responsiv redigering er dokumentert og spores eksplisitt i:
+
+```text
+docs/MOBILE_DESIGN_CONTROLS.md
+docs/RESPONSIVE_DESIGN.md
+GitHub-sak #3
+feature/mobile-design-controls
+```
+
+Planlagt modell:
+
+- desktop er grunnlaget
+- manglende mobilverdi betyr **Arver fra PC**
+- eksplisitt mobilverdi betyr **Eget mobiloppsett**
+- første mobilendring kan opprette en mobiloverstyring
+- mobil flytting og resizing skal ikke endre desktop
+- desktopendringer skal ikke overskrive eksplisitt mobiloppsett
+- **Bruk PC-oppsett** fjerner mobiloverstyringen
+- mobilskjuling sletter ikke elementet
+- UI skal vise arv, mobiloverstyring og skjuling tydelig
+
+Ikke implementer dette skjult i en annen branch. Det bygges kontrollert i `feature/mobile-design-controls` etter grunnleggende objektredigering og låsing.
 
 ## Første oppgave i neste chat
 
@@ -197,72 +226,28 @@ Forventet branch:
 feature/drag-resize
 ```
 
-Hent siste audit- og dokumentendringer:
+Hent siste dokumentendringer:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 
 git pull --ff-only origin feature/drag-resize
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-npm run dev
-```
-
-Kjør regresjonstest:
-
-### Peker
-
-- opprett alle fire elementtypene
-- flytt hvert element
-- resize hvert element
-- kontroller minimumsmål
-- kontroller venstre, høyre og øvre grense
-- dra nedover og kontroller lerretsvekst
-- test overlapping
-- test edge-scroll
-- test PC og Telefon
-
-### Tastatur
-
-- Tab til et element
-- Enter eller mellomrom markerer
-- piltaster flytter
-- `Shift` + piltast flytter 10 px
-- `Ctrl` + piltast endrer størrelse
-- `Ctrl` + `Shift` + piltast endrer størrelse 10 px
-- clamping og minimumsmål gjelder også for tastatur
-
-Kontroller at resize-håndtaket ser likt ut som før, men er lett å treffe.
-
-Stopp serveren med `Ctrl + C` og kjør:
-
-```powershell
 git status
 ```
 
-Arkitekturrapportene vil være endret etter de nye modulene. Dersom bare rapportene er endret:
-
-```powershell
-git add architecture.json
-git add docs/dependency-graph.mmd
-git commit -m "chore: refresh architecture reports for drag and resize"
-git push origin feature/drag-resize
-git status
-```
-
-Ikke påstå at sluttkontrollen er bestått før brukeren har bekreftet resultat og rent arbeidsområde.
+Dokumentendringene etter siste kontroll påvirker ikke produksjonskode eller arkitekturrapporter.
 
 ## PR og merge
 
-Når sluttkontrollen er bestått:
+Når lokal branch er synkronisert og arbeidsområdet er rent:
 
 1. Gjennomgå hele diffen mot `main`.
-2. Opprett PR mot `main`.
-3. Dokumenter omfang, state-grenser, tilgjengelighet og kontrollstatus.
-4. Kontroller mergebarhet og åpne review-tråder.
-5. Merge bare etter eksplisitt brukergodkjenning og med forventet head-SHA.
-6. Kontroller oppdatert `main` lokalt.
+2. Kontroller at branchen bare inneholder drag/resize, audit-herding og tilhørende dokumentasjon.
+3. Opprett PR mot `main`.
+4. Dokumenter omfang, state-grenser, tilgjengelighet, responsiv framtidsplan og kontrollstatus.
+5. Kontroller mergebarhet og åpne review-tråder.
+6. Merge bare etter eksplisitt brukergodkjenning og med forventet head-SHA.
+7. Kontroller oppdatert `main` lokalt.
 
 ## Neste planlagte branch
 
@@ -280,7 +265,7 @@ Skal bygge:
 - fortsatt markering av låste elementer
 - ingen transform når låst
 
-Skal ikke bygge tekstredigering, sletting, historikk eller lagring.
+Skal ikke bygge tekstredigering, sletting, historikk, lagring eller mobiloverstyringer.
 
 ## Kommunikasjonsregler
 
