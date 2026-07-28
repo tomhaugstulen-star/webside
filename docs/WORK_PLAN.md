@@ -1,279 +1,256 @@
 # Arbeidsplan for Website-editoren
 
-Dette dokumentet fastsetter hvordan editoren bygges steg for steg uten å utvikle direkte på `main`.
+Dette dokumentet fastsetter rekkefølgen for videre utvikling uten å skrive direkte på `main`.
 
 ## 1. Rolle for `main`
 
 - `main` er den stabile integrasjonsbranchen.
-- Ingen funksjon skal utvikles direkte på `main`.
-- Godkjent og testet arbeid merges inn i `main`.
-- Nye feature-branches skal normalt opprettes fra oppdatert `main`.
-- Dokumentasjon utvikles i egen docs-branch og merges når den er gjennomgått.
+- Ingen funksjon utvikles direkte på `main`.
+- Godkjent og testet arbeid merges kontrollert til `main`.
+- Neste feature-branch opprettes fra oppdatert `main`.
+- Dokumentasjon utvikles i `docs/project-planning`.
 
-## 2. Grunnlag som må være på plass
+## 2. Fast arbeidsflyt
 
-Før nye editorfunksjoner bygges må følgende være bekreftet og testet:
+For hver del:
 
-1. Prosjektet starter lokalt med `npm run dev`.
-2. Editorens hovedskall vises korrekt.
-3. Lerretet åpnes blankt uten midlertidige objektkontroller.
-4. Venstremenyen kan åpnes og lukkes kontrollert.
-5. Desktop- og mobilvisning finnes som redigeringsmoduser.
-6. TypeScript, lint og produksjonsbuild fungerer uten kjente feil.
-7. Dependency Cruiser finner sirkulære, uløselige og ubrukte kildekodemoduler.
-8. Filstrukturen følger prosjektreglene og unngår samlefiler.
+1. Kontroller at arbeidsområdet er rent.
+2. Oppdater lokal `main`.
+3. Merge forrige godkjente branch dersom den ikke allerede er merget.
+4. Kjør `npm run check` på oppdatert `main`.
+5. Opprett ny branch fra `main`.
+6. Beskriv nøyaktig ansvar og berørte filer.
+7. Bygg bare den avgrensede funksjonen.
+8. Kontroller filstørrelse og ansvarsdeling.
+9. Kjør `npm run check`.
+10. Regenerer arkitekturrapporter ved strukturendringer.
+11. Test visuelt på desktop og mobil der det er relevant.
+12. Oppdater dokumentasjonen.
+13. Merge først etter godkjenning.
 
-Gjeldende grunnbranches:
-
-- `tooling/dependency-cruiser`
-- `chore/editor-foundation-audit`
-
-Editorgrunnlaget skal godkjennes før det merges til `main`.
-
-## 3. Fast arbeidsflyt for hver funksjon
-
-For hver del brukes denne rekkefølgen:
-
-1. Oppdater lokal `main`.
-2. Opprett en egen branch fra `main`.
-3. Beskriv funksjonens ansvar og berørte filer.
-4. Bygg bare den avgrensede funksjonen.
-5. Kontroller filstørrelse og ansvarsdeling underveis.
-6. Kjør `npm run check`.
-7. Regenerer arkitekturrapporter ved strukturendringer.
-8. Test funksjonen visuelt på desktop.
-9. Test mobiloppførsel der det er relevant.
-10. Oppdater dokumentasjonen.
-11. Gjennomgå endringene før merge.
-12. Merge til `main` først når delen er godkjent.
-13. Opprett neste feature-branch fra nyeste `main`.
-
-## 4. Planlagt teknisk rekkefølge
+## 3. Gjeldende status
 
 ### Fase 0 – Stabilt editorgrunnlag
 
-Branch: `chore/editor-foundation-audit`
+Status: **ferdig, godkjent og merget til `main`**.
 
-Mål:
+Inneholder:
 
-- ferdigstille og teste hovedlayout
 - blankt lerret
 - toppmeny
 - venstremeny
-- desktop/mobil-knapper
-- grunnleggende paneloppførsel
+- desktop- og mobilvisning
+- kontrollert paneloppførsel
 - ryddige interne navn for Elementer
-- ingen ubrukt kildekode
-- CSS og komponenter delt etter ansvar
+- delt CSS og komponentstruktur
+- Dependency Cruiser
+- automatisk åpning av nettleseren med `npm run dev`
 
-Resultat: Godkjent grunnlag merges til `main`.
+### Fase 1 – Prosjekt- og elementmodell
 
-### Fase 1 – Prosjekt- og objektmodell
+Branch:
 
-Branch: `feature/element-model`
+```text
+feature/element-model
+```
 
-Opprett først:
+Status: **ferdig og godkjent lokalt og visuelt**.
 
-- typer for prosjektet
-- typer for objekter
-- stabile objekt-ID-er
-- desktop- og mobilverdier
-- posisjon, størrelse, synlighet og låsestatus
-- sentral prosjekt-state med tydelig ansvar
+Inneholder:
 
-Ingen draing, tekstredigering eller bildelogikk bygges før modellen er definert.
+- prosjekt med skjemaversjon, ID, navn og tidsstempler
+- sider med ID, navn, slug og elementliste
+- elementtypene seksjon, bilde, tekst og knapp
+- responsive verdier for posisjon, størrelse og synlighet
+- låsestatus
+- kryptografiske stabile ID-er
+- sentral prosjekt-state med provider og reducer
+- aktiv side fra prosjektmodellen
+- blankt prosjekt med siden `Forside`
 
-### Fase 2 – Markering av objekter
+Branchen skal merges til `main` før neste fase starter.
 
-Branch: `feature/element-selection`
+## 4. Neste fase
 
-Bygg:
+### Fase 2 – Markering av elementer
 
-- valg av ett objekt
-- tydelig valgt tilstand
-- klikk utenfor for å avslutte redigering
-- grunnlag for objektverktøy
+Planlagt branch:
 
-### Fase 3 – Opprette elementbokser
+```text
+feature/element-selection
+```
+
+Branchen opprettes først etter at `feature/element-model` er merget til oppdatert `main`.
+
+Omfang:
+
+- lagre valgt element-ID i editor-state
+- velge ett eksisterende element
+- vise tydelig valgt tilstand
+- fjerne markering ved klikk utenfor
+- fjerne markering når valgt element ikke lenger finnes
+- legge grunnlag for senere objektverktøy
+- tastaturtilgjengelig markering der det er relevant
+
+Skal ikke bygges i denne branchen:
+
+- elementoppretting
+- draing
+- størrelsesendring
+- låsing og opplåsing
+- tekstredigering
+- bildeimport
+- knapphandlinger
+- historikk
+- lagring
+
+Siden prosjektet foreløpig ikke har synlige elementer, skal markeringens state, API og visuelle komponentgrense bygges uten å legge inn tilfeldig produksjonsinnhold. Et kontrollert utviklingselement kan bare brukes dersom det er tydelig avgrenset og fjernes eller dokumenteres før godkjenning.
+
+## 5. Senere faser
+
+### Fase 3 – Opprette elementer
 
 Branch: `feature/element-creation`
 
-Bygg:
-
-- `Legg til element`
-- standardstørrelse som er enkel å gripe
-- rammevalg
-- rammefarge
-- plassering på lerretet
-
-Elementer-menyen skal beholde valgene Seksjon, Bilde, Tekst og Knapp. Faktisk knappobjekt bygges separat når grunnmodellen er stabil.
+- opprette element fra Elementer-panelet
+- standardstørrelse og startposisjon
+- koble elementet til prosjektmodellen
+- beholde Seksjon, Bilde, Tekst og Knapp i menyen
 
 ### Fase 4 – Flytting og størrelsesendring
 
 Branch: `feature/drag-resize`
 
-Bygg:
-
-- flytting av elementer
-- firkantet drahåndtak nederst til høyre
-- fri reduksjon og økning av størrelse
+- flytting
+- ett firkantet håndtak nederst til høyre
 - minimumsstørrelse
-- klipping av innhold utenfor elementet
+- klipping av innhold
 
 ### Fase 5 – Låsing
 
 Branch: `feature/object-locking`
 
-Bygg:
-
-- lås valgt objekt
-- lås opp valgt objekt
-- blokkering av flytting og størrelsesendring mens objektet er låst
+- lås og lås opp valgt objekt
+- blokkere flytting og størrelsesendring når låst
 
 ### Fase 6 – Tekst og fonts
 
 Branch: `feature/text-box-editing`
 
-Bygg:
-
-- `Legg til tekst`
-- tekstboks som kan vokse med innholdet
-- markering, redigering og sletting
+- tekstobjekt og direkte redigering
+- markering og sletting
 - 7–8 nettsikre fonter
 - fontstørrelser fra liste
-- fontfarge
-- fet og kursiv
+- fontfarge, fet og kursiv
 
 ### Fase 7 – Knapper
 
 Branch: `feature/button-element`
 
-Bygg:
-
-- opprette knappobjekt fra Elementer-menyen
-- redigerbar knappetekst
-- bakgrunn, tekstfarge og ramme
-- størrelse og plassering
-- kobling eller handling bestemmes før implementering
+- knappobjekt
+- redigerbar tekst
+- størrelse, plassering, farger og ramme
+- handling eller lenketype avklares før implementering
 
 ### Fase 8 – Bilder
 
 Branch: `feature/image-import-and-placement`
 
-Bygg:
-
-- åpne bildevelger på PC
-- importere bildet til prosjektmappen
-- opprette et selvstendig bildeobjekt
-- flytte og endre størrelse
-- fri plassering over eller inni elementer uten fast kobling
+- bildevelger
+- lokal prosjektfil
+- selvstendig bildeobjekt
+- fri plassering og størrelse
 
 ### Fase 9 – Farger
 
 Branch: `feature/project-colors`
 
-Bygg:
-
-- registrering av alle farger som brukes i prosjektet
-- oversikt i Farger-panelet
-- endring av global prosjektfarge
-- oppdatering av alle objekter som bruker fargen
+- register over faktiske prosjektfarger
+- global endring
+- oppdatering av alle brukere av fargen
 
 ### Fase 10 – Logo og header
 
 Branch: `feature/logo-header`
 
-Bygg:
-
-- importere logo
-- automatisk opprette header
-- hovedtekst
-- undertittel
-- redigerbar headerstruktur
+- logo
+- automatisk header
+- hovedtekst og undertittel
+- redigerbar struktur
 
 ### Fase 11 – Korrigeringslinjer
 
 Branch: `feature/alignment-guides`
 
-Bygg:
-
 - horisontal midtstilling
 - samme linje
-- lik avstand mellom tre eller flere objekter
-- kun visuell veiledning under flytting og størrelsesendring
+- lik avstand mellom tre eller flere elementer
+- bare visuell veiledning under flytting og størrelsesendring
+- ingen vertikal sentreringsfunksjon
+- ingen automatisk kollisjonsunngåelse
 
 ### Fase 12 – Responsiv redigering
 
 Branch: `feature/mobile-design-controls`
 
-Bygg etter `docs/RESPONSIVE_DESIGN.md`:
-
-- arv fra desktop til mobil
+- desktop-arv
 - mobiloverstyringer
 - skjul på mobil
-- egne verdier der dette er godkjent
-- generering av media queries fra prosjektmodellen
+- media queries fra prosjektmodellen
 
 ### Fase 13 – Angre og gjør om
 
 Branch: `feature/history-system`
 
-Bygg:
-
-- én definert endringsmodell
-- angre
-- gjør om
-- støtte for oppretting, sletting, flytting, størrelse, tekst, farge og låsing
+- definert endringsmodell
+- angre og gjør om
+- støtte for alle prosjektendringer
 
 ### Fase 14 – Lokal automatisk lagring
 
 Branch: `feature/local-project-autosave`
 
-Bygg:
-
-- velge eller opprette prosjektmappe
-- lagre prosjektdata direkte på PC
-- kopiere nødvendige bilder til prosjektmappen
+- velge prosjektmappe
+- automatisk sikker lagring
+- lokale bilder
 - statusene `Lagrer`, `Lagret` og `Lagringsfeil`
-- sikker skriving uten ødelagte prosjektfiler
-- gjenoppretting etter uventet lukking
+- gjenoppretting
 
 ### Fase 15 – Åpne og importere prosjekt
 
 Branch: `feature/project-open-import`
 
-Bygg:
-
 - åpne eksisterende prosjektmappe
 - validere prosjektfil
 - laste prosjektdata og bilder
-- håndtere manglende eller ugyldige filer
+- håndtere feil
 
 ### Fase 16 – Forhåndsvisning og publisering
 
-Separate branches:
+Branches:
 
 - `feature/preview-mode`
 - `feature/publishing`
 
 Disse bygges først etter at editor, responsiv modell og lagring er stabile.
 
-## 5. Kontrollpunkter før hver merge
+## 6. Kontrollpunkter før merge
 
-Før en branch merges til `main` skal dette være bekreftet:
-
-- funksjonen gjør bare det branchen er laget for
-- ingen uvedkommende design- eller strukturendringer er blandet inn
-- ingen fil har fått for mange ansvarsområder
-- filer over omtrent 250 linjer er vurdert for deling
-- filer ved eller over 300 linjer er gjennomgått eksplisitt
+- branchen inneholder bare avtalt omfang
+- ingen fil har for mange ansvarsområder
+- filer over 250 linjer er vurdert for deling
+- filer ved eller over 300 linjer er eksplisitt gjennomgått
 - `npm run check` er bestått
-- `architecture.json` og diagrammet er oppdatert ved strukturendringer
-- desktop er testet
-- mobil er testet der det er relevant
-- automatisk lagring og historikk er vurdert når funksjonen endrer prosjektdata
+- arkitekturrapporter er oppdatert ved strukturendringer
+- desktop og mobil er testet der relevant
 - dokumentasjonen er oppdatert
+- PowerShell-kommandoer er gitt til brukeren
 
-## 6. Viktig avgrensning
+## 7. Første oppgave i neste chat
 
-`main` inneholder den godkjente hovedkoden, men hovedkoden skal ikke skrives direkte der. All utvikling skjer i avgrensede branches. `main` oppdateres bare gjennom kontrollerte merges av testede deler.
+1. Les `docs/NEXT_CHAT_PROMPT.md`.
+2. Kontroller om `feature/element-model` allerede er merget.
+3. Merge den godkjente branchen til `main` dersom det gjenstår.
+4. Kjør kontroll på `main`.
+5. Opprett `feature/element-selection` fra oppdatert `main`.
+6. Ikke bygg elementoppretting i samme branch.
