@@ -8,14 +8,13 @@ Dette dokumentet beskriver teknisk retning for forskjeller mellom desktop- og mo
 - Mobilvisningen skal kunne skjule elementer som fortsatt finnes på desktop.
 - Desktop og mobil skal kunne ha egne verdier for utvalgte egenskaper.
 - Nøyaktig hvilke egenskaper som kan overstyres bestemmes før mobilkontrollene implementeres.
-
-Et foreløpig brytepunkt kan være 768 px, men dette skal testes før det låses.
+- Et foreløpig brytepunkt kan være 768 px, men skal testes før det låses.
 
 ## 2. Prosjektdata er hovedkilden
 
 Editoren skal ikke bruke DOM-strukturen som permanent prosjektlagring.
 
-`feature/element-model` har implementert dette grunnprinsippet:
+Prosjektmodellen inneholder:
 
 ```ts
 type ResponsiveValue<T> = {
@@ -33,11 +32,11 @@ type EditorElement = {
 }
 ```
 
-Når en mobilverdi mangler, skal mobil senere arve desktopverdien.
+`EditorProject` er autoritativ kilde. DOM-en er bare en rendering av prosjektdataene.
 
 ## 3. Implementert nå
 
-Godkjent i `feature/element-model`:
+Merget til `main` gjennom prosjekt- og elementmodellen:
 
 - stabile prosjekt-, side- og element-ID-er
 - responsive modellfelter for posisjon, størrelse og synlighet
@@ -45,18 +44,30 @@ Godkjent i `feature/element-model`:
 - sentral prosjekt-state
 - prosjektmodellen som autoritativ datakilde
 
-Ikke implementert ennå:
+Implementert i `feature/element-selection`:
 
-- beregning av arvet verdi
-- mobiloverstyringer i brukergrensesnittet
-- skjul på mobil
-- egen mobilposisjonering
+- eksisterende elementer renderer på lerretet fra prosjektmodellen
+- desktopvisning bruker desktopverdien
+- mobilvisning bruker mobilverdien når den finnes
+- mobilvisning faller tilbake til desktopverdien når mobilverdien mangler
+- elementer med `visibility: false` for aktiv visning renderer ikke
+- markering og fokus følger den renderte elementgrensen
+
+Dette er bare renderingsgrunnlaget. Brukergrensesnitt for å opprette mobile overstyringer er ikke implementert.
+
+## 4. Ikke implementert ennå
+
+- kontroller for arv og overstyring
+- synlig indikasjon på arvet verdi
+- skjul på mobil i brukergrensesnittet
+- egen mobilposisjonering fra UI
+- valg av hvilke egenskaper som kan overstyres i første versjon
 - CSS-generator
 - eksporterte media queries
 
-Desktop- og mobilknappen i toppmenyen endrer foreløpig bare bredden på editorens blanke lerret.
+Desktop- og mobilknappen endrer fortsatt lerretsbredden. Elementrendererens verdier følger valgt visning når elementer finnes.
 
-## 4. Skjule på mobil
+## 5. Skjule på mobil
 
 Brukeren skal senere kunne velge at et objekt:
 
@@ -66,7 +77,13 @@ Brukeren skal senere kunne velge at et objekt:
 
 Prosjektdataene skal være autoritativ kilde. Preview og eksport genererer media query fra modellen.
 
-## 5. Forskjellige verdier
+Før funksjonen bygges må dette avklares:
+
+- om et element som blir skjult i aktiv visning automatisk skal miste markeringen
+- hvordan objektverktøy oppfører seg dersom valgt element ikke renderer
+- om bare-mobil-visning skal støttes i første versjon
+
+## 6. Forskjellige verdier
 
 Det er teknisk mulig å bruke ulike:
 
@@ -76,9 +93,9 @@ Det er teknisk mulig å bruke ulike:
 - posisjoner
 - bredder og høyder
 
-Før dette bygges må vi fastsette hvilke egenskaper som kan overstyres i første versjon.
+Før mobilkontrollene bygges må det fastsettes hvilke egenskaper som kan overstyres i første versjon.
 
-## 6. CSS-generering
+## 7. CSS-generering
 
 Editoren skal generere ett kontrollert prosjektstilark fremfor mange tilfeldige `<style>`-elementer.
 
@@ -92,7 +109,7 @@ Stilgeneratoren skal:
 
 `!important` skal ikke brukes som standard.
 
-## 7. Stabile ID-er
+## 8. Stabile ID-er
 
 ID-er skal beholdes ved:
 
@@ -105,7 +122,7 @@ ID-er skal beholdes ved:
 
 `Math.random()` skal ikke brukes som prosjektidentitet. Elementmodellen bruker kryptografiske UUID-er.
 
-## 8. Editoropplevelse
+## 9. Editoropplevelse
 
 Når mobilmodus senere er aktiv, skal editoren tydelig vise:
 
@@ -115,12 +132,14 @@ Når mobilmodus senere er aktiv, skal editoren tydelig vise:
 
 En mobilendring skal ikke utilsiktet endre desktopverdien.
 
-## 9. Arkitektur
+Markeringsstate er transient og skal ikke lagres som en responsiv prosjektverdi.
+
+## 10. Arkitektur
 
 Responsiv funksjonalitet deles i egne ansvarsområder:
 
 - responsive typer og datamodell
-- arv og overstyring
+- verdioppløsning og arv
 - mobilkontroller
 - CSS-generator
 - forhåndsvisning
@@ -128,7 +147,9 @@ Responsiv funksjonalitet deles i egne ansvarsområder:
 
 Dette skal ikke samles i én stor komponent.
 
-## 10. Planlagt branch
+Dagens verdioppløsning ligger ved lerretsrenderingen. Dersom flere editorområder trenger samme logikk, skal den trekkes ut til én delt, testbar funksjon i den fasen som eier responsiv redigering. Logikken skal ikke kopieres ukontrollert.
+
+## 11. Planlagt branch
 
 ```text
 feature/mobile-design-controls
@@ -138,11 +159,12 @@ Den bygges først etter elementmodell, markering, oppretting og grunnleggende ob
 
 CSS-generatoren kan få en egen branch dersom ansvaret blir stort nok.
 
-## 11. Åpne beslutninger
+## 12. Åpne beslutninger
 
 - endelig mobilbrytepunkt
 - egenskaper som kan overstyres i første versjon
 - støtte for bare-mobil-visning
 - visuell markering av arv og overstyring
 - fri eller delvis arvet mobilplassering
+- markering av element som er skjult i aktiv visning
 - organisering av eksportert HTML og CSS
