@@ -11,6 +11,7 @@ import type {
   EditorProjectState,
   ElementKind,
 } from '../model/editorProject'
+import { toggleElementLock } from './toggleElementLock'
 
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
@@ -26,6 +27,11 @@ export type EditorProjectAction =
       type: 'set-element-desktop-layout'
       elementId: string
       layout: ElementLayout
+      updatedAt: string
+    }
+  | {
+      type: 'toggle-element-lock'
+      elementId: string
       updatedAt: string
     }
 
@@ -192,6 +198,9 @@ function reduceEditorProjectState(
         },
       }
     }
+
+    case 'toggle-element-lock':
+      return toggleElementLock(state, action.elementId, action.updatedAt)
   }
 
   const unhandledAction: never = action
