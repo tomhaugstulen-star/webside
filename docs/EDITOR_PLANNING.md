@@ -1,6 +1,6 @@
 # Plan for Website-editoren
 
-Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne beslutninger.
+Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlagte utvidelser.
 
 ## 1. Implementeringsstatus
 
@@ -14,7 +14,7 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 - responsive posisjons-, størrelses- og synlighetsverdier
 - sentral prosjekt-state og aktiv side
 - transient elementmarkering
-- oppretting av alle fire elementtypene
+- oppretting av alle fire elementtyper
 - kontrollerte startstørrelser og startplassering
 - flytting og resizing med peker og tastatur
 - minimumsmål, clamping, edge-scroll og transient preview
@@ -22,7 +22,7 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 - kontrollert flerlinjet tekstredigering
 - Dependency Cruiser og samlet `npm run check`
 
-### Viktige merges
+Viktige merges:
 
 ```text
 PR #4  drag og resize
@@ -31,7 +31,7 @@ PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
 ```
 
-### Endelig venstremeny
+Endelig venstremeny:
 
 ```text
 Prosjekt
@@ -41,20 +41,18 @@ Elementer
 Innstillinger
 ```
 
-- `Prosjekt` står øverst
-- `Innstillinger` står nederst
-- paneloverskriftene følger samme navn
-- PR #8 endret ikke panelenes faktiske funksjonalitet
-
-### Gjeldende fase
+### Gjeldende branch
 
 ```text
 feature/right-properties-panel
 ```
 
-Branchen er fast-forwardet fra `main` på `a35f59d`. Dokumentasjonen er oppdatert før implementering. Ingen produksjonskode for høyremenyen er lagt inn ennå.
+```text
+base main: a35f59d
+kode og arkitekturrapporter: 2d25a542
+```
 
-Fasen skal bygge høyremenyens stabile grunnstruktur uten font-, bilde-, knapp-, farge-, slettings-, historikk- eller lagringsfunksjoner.
+Høyremenyens grunnstruktur er implementert, auditert, kontrollert og godkjent. Dokumentasjonen ferdigstilles før PR.
 
 ## 2. Bekreftede hovedkrav
 
@@ -92,7 +90,7 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - Mobil arver desktopgeometri når mobiloverstyring mangler.
 - Dagens UI redigerer den delte desktopgeometrien.
 - Egne mobiloverstyringer bygges i `feature/mobile-design-controls`.
-- Tekstinnhold og låsestatus er felles elementdata og er ikke responsive verdier.
+- Tekstinnhold og låsestatus er felles elementdata.
 
 ## 3. Elementer
 
@@ -147,31 +145,24 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - tom tekst er gyldig
 - editor-placeholder lagres ikke
 - ett klikk markerer
-- dobbeltklikk starter redigering
-- `Enter` på markert tekstboks starter redigering
+- dobbeltklikk eller `Enter` starter redigering
 - vanlig `Enter` lager ny linje
 - blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster
+- `Escape` forkaster lokal draft
 - linjeskift normaliseres til `\n`
 - `contentEditable` og `innerHTML` brukes ikke
 - tekst klippes ved elementgrensen
 - boksen vokser ikke automatisk med innholdet
 
-Se `docs/TEXT_BOX_EDITING.md`.
-
-### Bilder
+### Bilder og knapper
 
 - Bilde er foreløpig en plassholder.
-- Ekte bildeinnhold og bildevelger er ikke implementert.
-
-### Knapper
-
 - Knapp er foreløpig uten handling.
-- Faktisk handling eller lenke skal ikke aktiveres i vanlig editormodus.
+- Faktiske handlinger aktiveres ikke i vanlig editormodus.
 
 ## 4. Høyremeny
 
-### Låst oppførsel
+### Implementert produktoppførsel
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -179,40 +170,41 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-I tillegg er følgende godkjent:
-
-- skjult panel reserverer ikke en tom høyrekolonne
-- bytte av markering oppdaterer panelet
-- låst element kan fortsatt inspiseres
+- bredde 320 px
+- dokket fra 1680 px
+- overlay under 1680 px
+- overlay reduserer ikke lerretet
+- skjult panel reserverer ingen plass
+- ny markering oppdaterer panelet umiddelbart
+- låst element kan inspiseres
 - panelet kan være åpent under tekstredigering
-- klikk i panelet bruker eksisterende blur/commit
-- markeringen beholdes etter normal commit
-- panelet oppretter ikke separat tekstdraft
+- panelklikk bruker eksisterende blur/commit
+- markeringen beholdes etter commit
+- egen vertikal scrolling
+- 180 ms transform-animasjon
+- ingen animasjon ved `prefers-reduced-motion`
 
-En permanent synlig tom høyremeny er avvist.
+Visuell struktur:
 
-### Åpne beslutninger
+```text
+Egenskaper
+Tekst
 
-Før produksjonskode må dette godkjennes:
+Element
+Status: Ulåst
+```
 
-- eksakt bredde
-- oppførsel i smale nettleservinduer
-- egen scrolling
-- visuell overskrift og seksjonsstruktur
-- minimum av faktisk inspeksjonsinformasjon
-- eventuell åpne-/lukkeanimasjon
+### Implementert arkitektur
 
-### Arkitektur
-
-- panelet skal følge `selectedElementId`
-- aktiv side er kilden til elementdata
-- eksisterende `useElementSelection` skal vurderes og normalt gjenbrukes
-- panelet skal ikke lete i DOM-en
-- panelet skal ikke eie en separat kopi av elementdata
-- `EditorShell` skal bare komponere venstremeny, lerret og høyremeny
-- høyremenyen får egen komponent og egen CSS-grense
-- eksisterende `--panel-width` tilhører venstrepanelet; høyremenyen må få en egen entydig breddevariabel
-- ingen midlertidige eller falske egenskapskontroller
+- `RightPropertiesPanel.tsx` presenterer valgt elementtype og status
+- eksisterende `useElementSelection` er autoritativ avledning
+- `EditorShell` komponerer panelområdet uten å eie egenskapslogikk
+- ingen DOM-søk, separat elementkopi eller ny reducer-action
+- innhold rendres bare når et element finnes
+- `--properties-panel-width` er 320 px
+- `--properties-panel-reserved-width` er den eneste koblingen til lerretsbredden
+- panel-CSS styrer ikke canvas-klasser direkte
+- ingen falske egenskapskontroller
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
@@ -239,7 +231,7 @@ Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 - fontstørrelse fra kontrollert liste
 - tekstfarge kobles til fargesystemet
 - fet og kursiv
-- formatering av hele boksen kontra markert tekst må avklares før kode
+- hele boksen kontra markert tekst må avklares før kode
 
 ## 6. Prosjektområdet
 
@@ -252,7 +244,7 @@ Det skal senere eie:
 - importere prosjekt
 - eventuell eksport og duplisering etter egen beslutning
 
-PR #8 endret bare navn og rekkefølge. Nytt prosjekt, åpning og import er ikke implementert.
+Disse funksjonene er ikke implementert.
 
 ## 7. Arkitektur og arbeidsmåte
 
@@ -270,7 +262,6 @@ PR #8 endret bare navn og rekkefølge. Nytt prosjekt, åpning og import er ikke 
 
 ## 8. Planlagte branches
 
-- `feature/right-properties-panel` — gjeldende fase
 - `feature/text-properties`
 - `feature/button-element`
 - `feature/image-import-and-placement`
@@ -286,8 +277,8 @@ PR #8 endret bare navn og rekkefølge. Nytt prosjekt, åpning og import er ikke 
 
 ## 9. Åpne beslutninger
 
-- høyremenyens bredde, smalvinduoppførsel, scrolling og visuelle struktur
-- minimumsinnhold i høyremenyens første leveranse
+Høyremenyens grunnstruktur er låst. Senere åpne beslutninger er:
+
 - om tekstformatering gjelder hele boksen eller markert tekst
 - endelig fontliste og fontstørrelser
 - tekstjustering og linjehøyde
