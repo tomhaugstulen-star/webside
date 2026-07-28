@@ -16,19 +16,17 @@ import { useElementLayout } from '../../state/useElementLayout'
 import { useTextElementContent } from '../../state/useTextElementContent'
 import type { ViewportMode } from '../../types/editor'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
+import {
+  elementKindLabels,
+  getAccessibleElementLabel,
+  getCanvasElementKeyboardShortcuts,
+} from './canvasElementAccessibility'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import {
   TextElementEditor,
   type TextEditFinishReason,
 } from './TextElementEditor'
 import { useElementPointerTransform } from './useElementPointerTransform'
-
-const elementKindLabels: Record<EditorElement['kind'], string> = {
-  section: 'Seksjon',
-  image: 'Bilde',
-  text: 'Tekstboks',
-  button: 'Knapp',
-}
 
 const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
   ArrowUp: { x: 0, y: -1 },
@@ -48,22 +46,6 @@ type EditorCanvasElementProps = {
   onStartTextEditing: (elementId: string) => void
   onFinishTextEditing: (elementId: string) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
-}
-
-function getAccessibleElementLabel(element: EditorElement) {
-  const kindLabel = elementKindLabels[element.kind]
-
-  if (element.locked) {
-    return `${kindLabel}, låst. Bruk objektverktøyet for å låse opp.`
-  }
-
-  if (element.kind === 'text') {
-    const summary = element.content.trim().replace(/\s+/g, ' ').slice(0, 80)
-    const contentLabel = summary ? `Innhold: ${summary}.` : 'Tom tekstboks.'
-    return `${contentLabel} Dobbeltklikk eller trykk Enter når elementet er markert for å redigere. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse.`
-  }
-
-  return `${kindLabel}. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse.`
 }
 
 export function EditorCanvasElement({
@@ -206,9 +188,7 @@ export function EditorCanvasElement({
         aria-keyshortcuts={
           isTextEditing
             ? undefined
-            : element.locked
-              ? 'Enter Space'
-              : 'Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight Control+ArrowUp Control+ArrowDown Control+ArrowLeft Control+ArrowRight Meta+ArrowUp Meta+ArrowDown Meta+ArrowLeft Meta+ArrowRight'
+            : getCanvasElementKeyboardShortcuts(element.locked)
         }
         aria-pressed={isTextEditing ? undefined : selected}
         data-element-id={element.id}
