@@ -18,7 +18,7 @@ npm install
 npm run dev
 ```
 
-`npm run dev` starter Vite og åpner editoren automatisk i standardnettleseren.
+`npm run dev` bruker `vite --open` og åpner editoren automatisk i standardnettleseren.
 
 ## Kvalitetskontroll
 
@@ -28,12 +28,7 @@ npm run architecture:json
 npm run architecture:diagram
 ```
 
-`npm run check` kjører:
-
-- ESLint
-- TypeScript-kontroll
-- Dependency Cruiser
-- produksjonsbuild
+`npm run check` kjører ESLint, TypeScript-kontroll, Dependency Cruiser og produksjonsbuild.
 
 Arkitekturrapportene skrives til:
 
@@ -44,12 +39,12 @@ docs/dependency-graph.mmd
 
 ## Branch-regel
 
-Det utvikles ikke direkte på `main`.
+Det utvikles aldri direkte på `main`.
 
 ```text
 main
-  → egen feature-, fix-, chore-, tooling- eller docs-branch
-  → avgrenset implementering
+  → egen avgrenset branch
+  → implementering
   → npm run check
   → arkitekturrapporter ved strukturendringer
   → visuell kontroll
@@ -57,30 +52,56 @@ main
   → kontrollert merge til main
 ```
 
-PowerShell-kommandoene som brukeren skal kjøre lokalt skal alltid følge hver repoendring.
+Etter hver repoendring skal brukeren få de nøyaktige PowerShell-kommandoene som skal kjøres lokalt.
 
 ## Gjeldende status
 
-Godkjent og ferdig:
+Ferdig og merget til `main`:
 
-- editorgrunnlaget
+- stabilt editorgrunnlag
 - blankt desktop- og mobillerret
 - toppmeny og venstremeny
-- kontrollert åpning og lukking av paneler
+- kontrollert paneloppførsel
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - Dependency Cruiser og samlet `npm run check`
-- automatisk åpning av nettleseren med `npm run dev`
-- prosjekt- og elementmodellen i `feature/element-model`
+- automatisk nettleseråpning
+- prosjekt- og elementmodell
+- skjemaversjon, sikre ID-er, sider og responsive elementverdier
+- sentral prosjekt-state og aktiv side
 
-`feature/element-model` er lokalt og visuelt godkjent. Den skal merges til `main` før neste feature-branch opprettes.
-
-Neste planlagte fase:
+Gjeldende branch:
 
 ```text
 feature/element-selection
 ```
 
-Denne fasen skal bygge markering av eksisterende elementer. Den skal ikke bygge elementoppretting, draing, størrelsesendring eller tekstredigering.
+Ferdig og visuelt godkjent på branchen:
+
+- valgt element-ID i transient editor-state
+- valg av ett eksisterende element
+- tydelig valgt og fokusert tilstand
+- klikk på tomt lerret fjerner markeringen
+- Enter og mellomrom markerer fokusert element
+- ugyldige markeringsforespørsler ignoreres
+- markering ryddes ved side-/prosjektbytte og når elementet ikke finnes
+- ingen testelementer eller produksjonsinnhold ligger igjen
+- et nytt prosjekt åpner fortsatt helt blankt
+
+Den siste reducer-herdingen og dokumentendringene må gjennom `npm run check` før merge.
+
+Neste planlagte branch etter merge:
+
+```text
+feature/element-creation
+```
+
+Den skal bare opprette faktiske elementer fra Elementer-panelet. Draing, størrelsesendring, låsing og innholdsredigering kommer senere.
+
+## Viktig state-grense
+
+`selectedElementId` er transient editor-state. Den skal ikke lagres i prosjektfilen, eksporteres, publiseres eller inngå i prosjektets historikk/autolagring.
+
+`EditorProject` er fortsatt den autoritative kilden for sider og elementer.
 
 ## Dokumentasjon
 
@@ -90,16 +111,16 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 2. `docs/WORK_PLAN.md`
 3. `docs/EDITOR_PLANNING.md`
 4. `docs/PROJECT_RULES.md`
-5. `docs/ELEMENT_MODEL.md` på `feature/element-model`
-6. `docs/RESPONSIVE_DESIGN.md`
-7. `docs/CODE_AUDIT.md`
+5. `docs/ELEMENT_MODEL.md`
+6. `docs/ELEMENT_SELECTION.md`
+7. `docs/RESPONSIVE_DESIGN.md`
+8. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
-- markering av elementer
-- oppretting av synlige elementer
+- elementoppretting
 - flytting og størrelsesendring
-- låsing
+- låsing og opplåsing
 - tekstredigering
 - bildeimport
 - knappfunksjonalitet
@@ -107,4 +128,5 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 - logo/header
 - angre/gjør om
 - automatisk lokal prosjektlagring
+- åpning/import av prosjekt
 - forhåndsvisning og publisering
