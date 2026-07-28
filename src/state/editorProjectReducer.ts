@@ -11,7 +11,9 @@ import type {
   EditorProjectState,
   ElementKind,
 } from '../model/editorProject'
+import type { TextElementStylePatch } from '../model/textElementStyle'
 import { setTextElementContent } from './setTextElementContent'
+import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
 
 export type EditorProjectAction =
@@ -39,6 +41,12 @@ export type EditorProjectAction =
       type: 'set-text-element-content'
       elementId: string
       content: string
+      updatedAt: string
+    }
+  | {
+      type: 'set-text-element-style'
+      elementId: string
+      patch: TextElementStylePatch
       updatedAt: string
     }
 
@@ -214,6 +222,14 @@ function reduceEditorProjectState(
         state,
         action.elementId,
         action.content,
+        action.updatedAt,
+      )
+
+    case 'set-text-element-style':
+      return setTextElementStyle(
+        state,
+        action.elementId,
+        action.patch,
         action.updatedAt,
       )
   }
