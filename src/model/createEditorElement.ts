@@ -16,7 +16,8 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
 const CREATION_SLOT_COUNT = 16
 
 function getCreationPosition(existingElementCount: number): CanvasPosition {
-  const slot = existingElementCount % CREATION_SLOT_COUNT
+  const safeElementCount = Math.max(0, existingElementCount)
+  const slot = safeElementCount % CREATION_SLOT_COUNT
 
   return {
     x: 24 + (slot % 4) * 12,
