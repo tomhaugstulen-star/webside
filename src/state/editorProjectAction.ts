@@ -1,5 +1,6 @@
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject, ElementKind } from '../model/editorProject'
+import type { ElementLink } from '../model/elementLink'
 import type { TextElementStylePatch } from '../model/textElementStyle'
 
 export type EditorProjectAction =
@@ -33,5 +34,11 @@ export type EditorProjectAction =
       type: 'set-text-element-style'
       elementId: string
       patch: TextElementStylePatch
+      updatedAt: string
+    }
+  | {
+      type: 'set-text-element-link'
+      elementId: string
+      link: ElementLink
       updatedAt: string
     }
