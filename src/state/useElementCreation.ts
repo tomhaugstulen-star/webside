@@ -8,7 +8,7 @@ export function useElementCreation() {
 
   const createElement = useCallback(
     (kind: ElementKind) => {
-      const element = createEditorElement(kind, activePage.elements.length)
+      const element = createEditorElement(kind, activePage.elements)
 
       dispatch({
         type: 'add-element-to-active-page',
@@ -16,7 +16,7 @@ export function useElementCreation() {
         updatedAt: new Date().toISOString(),
       })
     },
-    [activePage.elements.length, dispatch],
+    [activePage.elements, dispatch],
   )
 
   return { createElement }
