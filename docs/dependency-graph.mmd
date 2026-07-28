@@ -9,6 +9,7 @@ subgraph src["src"]
     end
     subgraph src_components_canvas["canvas"]
       src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
+      src_components_canvas_EditorCanvasElement_tsx["EditorCanvasElement.tsx"]
     end
     subgraph src_components_sidebar["sidebar"]
       src_components_sidebar_LeftSidebar_tsx["LeftSidebar.tsx"]
@@ -23,6 +24,7 @@ subgraph src["src"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
+    src_state_useElementSelection_ts["useElementSelection.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
   end
   subgraph src_model["model"]
@@ -49,7 +51,13 @@ src_state_editorProjectContext_ts-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_components_canvas_EditorCanvas_tsx-->src_state_useEditorProject_ts
+src_components_canvas_EditorCanvas_tsx-->src_state_useElementSelection_ts
 src_components_canvas_EditorCanvas_tsx-->src_types_editor_ts
+src_components_canvas_EditorCanvas_tsx-->src_components_canvas_EditorCanvasElement_tsx
+src_state_useElementSelection_ts-->src_state_useEditorProject_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_model_editorProject_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
 src_components_sidebar_LeftSidebar_tsx-->src_types_editor_ts
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarPanels_tsx

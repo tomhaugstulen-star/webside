@@ -217,7 +217,9 @@
         }
       ],
       "dependents": [
-        "src/components/editor/EditorShell.tsx"
+        "src/components/editor/EditorShell.tsx",
+        "src/components/canvas/EditorCanvas.tsx",
+        "src/state/useElementSelection.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -289,7 +291,8 @@
       "dependents": [
         "src/state/editorProjectContext.ts",
         "src/state/editorProjectReducer.ts",
-        "src/model/createEditorProject.ts"
+        "src/model/createEditorProject.ts",
+        "src/components/canvas/EditorCanvasElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -394,6 +397,7 @@
       "dependents": [
         "src/components/editor/EditorShell.tsx",
         "src/components/canvas/EditorCanvas.tsx",
+        "src/components/canvas/EditorCanvasElement.tsx",
         "src/components/sidebar/LeftSidebar.tsx",
         "src/components/sidebar/SidebarPanels.tsx",
         "src/components/toolbar/TopToolbar.tsx"
@@ -411,6 +415,144 @@
     {
       "source": "src/components/canvas/EditorCanvas.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../state/useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../state/useElementSelection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useElementSelection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../types/editor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/types/editor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./EditorCanvasElement",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/EditorCanvasElement.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/useElementSelection.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/EditorCanvas.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/EditorCanvasElement.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../../types/editor",
@@ -431,7 +573,7 @@
         }
       ],
       "dependents": [
-        "src/components/editor/EditorShell.tsx"
+        "src/components/canvas/EditorCanvas.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -740,8 +882,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 17,
-    "totalDependenciesCruised": 25,
+    "totalCruised": 19,
+    "totalDependenciesCruised": 31,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
