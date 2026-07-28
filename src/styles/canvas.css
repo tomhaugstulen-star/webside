@@ -1,0 +1,49 @@
+.editor-workspace {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  background:
+    radial-gradient(circle at 64% 25%, rgba(255, 255, 255, 0.82), transparent 34%),
+    linear-gradient(135deg, #fbf7f4 0%, #f4efeb 100%);
+}
+
+.canvas-stage {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 72px 22px 52px;
+}
+
+.canvas-wrap {
+  position: relative;
+  width: fit-content;
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.canvas-page {
+  position: relative;
+  flex: 0 0 auto;
+  height: clamp(620px, calc(100vh - 230px), 820px);
+  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  box-shadow: 0 16px 44px rgba(83, 59, 45, 0.1);
+  transition: width 180ms ease;
+}
+
+.canvas-page--desktop {
+  width: min(1080px, calc(100vw - var(--rail-width) - var(--panel-width) - 112px));
+}
+
+.canvas-page--mobile {
+  width: 390px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas-page {
+    transition: none;
+  }
+}
