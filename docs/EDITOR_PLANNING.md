@@ -2,24 +2,34 @@
 
 Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlagte utvidelser.
 
-## 1. Implementeringsstatus
+## Implementeringsstatus
 
-### Ferdig og merget til `main`
+Siste `main`:
+
+```text
+8de5f2e  PR #9 – høyremenyens grunnstruktur
+```
+
+Gjeldende branch:
+
+```text
+feature/text-properties
+base main: 8de5f2e
+rapportcommit: a267ca3
+GitHub-sak: #10
+```
+
+Tekstegenskapsfasen er implementert, auditert, kontrollert og visuelt godkjent. Dokumentasjonen ferdigstilles før PR.
+
+Ferdig på `main`:
 
 - blankt PC- og Telefon-lerret
-- toppmeny og kontrollert venstremeny
-- Elementer-panel med Seksjon, Bilde, Tekst og Knapp
-- prosjekt- og elementmodell
-- stabile kryptografiske ID-er
-- responsive posisjons-, størrelses- og synlighetsverdier
-- sentral prosjekt-state og aktiv side
-- transient elementmarkering
-- oppretting av alle fire elementtyper
-- kontrollerte startstørrelser og startplassering
-- flytting og resizing med peker og tastatur
-- minimumsmål, clamping, edge-scroll og transient preview
-- objektlåsing og opplåsing
+- kontrollert topp- og venstremeny
+- Seksjon, Bilde, Tekst og Knapp
+- prosjektmodell, stabile ID-er og sentral state
+- markering, flytting, resizing og låsing
 - kontrollert flerlinjet tekstredigering
+- høyremenyens grunnstruktur
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -29,140 +39,64 @@ PR #4  drag og resize
 PR #5  objektlåsing                 a3eed45
 PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
+PR #9  høyremenyens grunnstruktur    8de5f2e
 ```
 
-Endelig venstremeny:
+## Fast ansvarsdeling
 
 ```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
 ```
 
-### Gjeldende branch
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Font, størrelse og andre egenskaper ligger i høyremenyen. `Logo og header` skal senere eie strukturelle headerdeler som ikke er vanlige frie tekstbokser.
 
-```text
-feature/right-properties-panel
-```
+## Autoritativ state
 
-```text
-base main: a35f59d
-kode og arkitekturrapporter: 2d25a542
-```
+Varig prosjektdata:
 
-Høyremenyens grunnstruktur er implementert, auditert, kontrollert og godkjent. Dokumentasjonen ferdigstilles før PR.
+- geometri
+- synlighet
+- låsestatus
+- tekstinnhold
+- tekststil
+- `updatedAt`
 
-## 2. Bekreftede hovedkrav
-
-### Blank startside
-
-- En ny side åpner helt blank.
-- Ingen synlige elementer opprettes automatisk.
-- Elementoppretting skjer bare etter eksplisitt brukerhandling.
-- Omlasting gir foreløpig blank side fordi lagring ikke er implementert.
-
-### Autoritativ prosjektmodell
-
-- `EditorProject` er autoritativ kilde for varige prosjektdata.
-- DOM-en er rendering, ikke permanent lagring.
-- Geometri, låsestatus og tekstinnhold endres gjennom reduceren.
-- State-avhengige beregninger bruker reducerens nyeste state.
-- `updatedAt` endres bare ved gyldig prosjektmutasjon.
-
-### Transient state
-
-Følgende skal ikke serialiseres, publiseres eller lagres:
+Transient state:
 
 - `selectedElementId`
-- aktiv pointer-interaksjon
-- layout-preview
-- aktiv tekstredigeringsøkt
-- lokal tekstdraft
-- aktive verktøy og paneler
-- fokus, hover og lokal UI-feedback
+- pekerinteraksjon og layout-preview
+- aktiv tekstredigering og lokal draft
+- panel-, fokus-, hover- og trykkstate
 
-Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én eksplisitt prosjektendring.
+DOM-en er rendering, ikke permanent lagring. Gyldige prosjektendringer går gjennom reduceren.
 
-### PC og Telefon
+## Elementregler
 
-- Mobil arver desktopgeometri når mobiloverstyring mangler.
-- Dagens UI redigerer den delte desktopgeometrien.
-- Egne mobiloverstyringer bygges i `feature/mobile-design-controls`.
-- Tekstinnhold og låsestatus er felles elementdata.
+Startstørrelser:
 
-## 3. Elementer
+```text
+Seksjon  320 × 180 px
+Bilde    240 × 160 px
+Tekst    240 × 96 px
+Knapp    160 × 48 px
+```
 
-### Startstørrelser
+Minimumsstørrelser:
 
-- Seksjon: 320 × 180 px
-- Bilde: 240 × 160 px
-- Tekst: 240 × 96 px
-- Knapp: 160 × 48 px
+```text
+Seksjon  160 × 90 px
+Bilde    120 × 80 px
+Tekst    120 × 48 px
+Knapp    80 × 36 px
+```
 
-### Minimumsstørrelser
+Flytting og resizing bruker transient preview og én commit ved normalt slipp. Låste elementer kan markeres, men ikke transformeres eller redigeres.
 
-- Seksjon: 160 × 90 px
-- Bilde: 120 × 80 px
-- Tekst: 120 × 48 px
-- Knapp: 80 × 36 px
+Tekstinnhold redigeres med kontrollert `textarea`. Blur og `Ctrl`/`Cmd` + `Enter` committer, mens `Escape` forkaster draften.
 
-### Oppretting
-
-- start ved x 24 px
-- første ledige vertikale gap
-- minst 16 px avstand ved oppretting
-- eksisterende elementer flyttes aldri automatisk
-- regelen gjelder bare elementets fødested
-
-### Flytting og resizing
-
-- elementer kan overlappe
-- ingen automatisk kollisjonsunngåelse
-- venstre, høyre og øvre grense håndheves
-- ingen fast nedre grense
-- lerretet forlenges nedover
-- transient preview under pekerbevegelse
-- én commit ved normalt slipp
-- cancel eller tapt capture committer ikke
-- piltaster flytter
-- `Ctrl`/`Cmd` + piltaster endrer størrelse
-- `Shift` bruker 10 px steg
-
-### Låsing
-
-- valgt element får separat objektverktøylinje
-- låst element kan markeres og fokuseres
-- låst element kan ikke transformeres
-- resize-håndtaket skjules
-- reduceren håndhever låsen
-- låsestatus er felles for PC og Telefon
-
-### Ren tekstredigering
-
-- bare `kind: 'text'` har `content`
-- tom tekst er gyldig
-- editor-placeholder lagres ikke
-- ett klikk markerer
-- dobbeltklikk eller `Enter` starter redigering
-- vanlig `Enter` lager ny linje
-- blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster lokal draft
-- linjeskift normaliseres til `\n`
-- `contentEditable` og `innerHTML` brukes ikke
-- tekst klippes ved elementgrensen
-- boksen vokser ikke automatisk med innholdet
-
-### Bilder og knapper
-
-- Bilde er foreløpig en plassholder.
-- Knapp er foreløpig uten handling.
-- Faktiske handlinger aktiveres ikke i vanlig editormodus.
-
-## 4. Høyremeny
-
-### Implementert produktoppførsel
+## Høyremenyens grunnstruktur
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -173,117 +107,115 @@ Tomt lerret     -> høyremeny lukkes
 - bredde 320 px
 - dokket fra 1680 px
 - overlay under 1680 px
-- overlay reduserer ikke lerretet
-- skjult panel reserverer ingen plass
-- ny markering oppdaterer panelet umiddelbart
-- låst element kan inspiseres
-- panelet kan være åpent under tekstredigering
-- panelklikk bruker eksisterende blur/commit
-- markeringen beholdes etter commit
+- ingen reservert plass når panelet er skjult
 - egen vertikal scrolling
 - 180 ms transform-animasjon
-- ingen animasjon ved `prefers-reduced-motion`
+- `prefers-reduced-motion` respekteres
+- eksisterende `useElementSelection` er autoritativ avledning
+- ingen separat elementkopi eller direkte prosjektmutasjon
 
-Visuell struktur:
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
+## Implementerte tekstegenskaper
+
+For en markert vanlig tekstboks:
 
 ```text
 Egenskaper
 Tekst
 
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
+
 Element
 Status: Ulåst
 ```
 
-### Implementert arkitektur
+Produktregler:
 
-- `RightPropertiesPanel.tsx` presenterer valgt elementtype og status
-- eksisterende `useElementSelection` er autoritativ avledning
-- `EditorShell` komponerer panelområdet uten å eie egenskapslogikk
-- ingen DOM-søk, separat elementkopi eller ny reducer-action
-- innhold rendres bare når et element finnes
-- `--properties-panel-width` er 320 px
-- `--properties-panel-reserved-width` er den eneste koblingen til lerretsbredden
-- panel-CSS styrer ikke canvas-klasser direkte
-- ingen falske egenskapskontroller
+- formateringen gjelder hele tekstboksen
+- åtte nettsikre fontvalg
+- størrelser fra 12 til 96 px
+- fet og kursiv som uavhengige toggles
+- venstre, midtstilt og høyre justering
+- linjehøyde 1.0, 1.2, 1.45, 1.6, 1.8 eller 2.0
+- standard: System, 16 px, normal, venstre, 1.45
+- låste tekstelementer viser verdiene, men kontrollene er deaktivert
+- tekstinnhold redigeres fortsatt bare på lerretet
+- tekstfarge bygges senere sammen med prosjektfargene
+- andre elementtyper viser ingen tekstkontroller
 
-Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+Modell og reducer:
 
-## 5. Farger, logo/header og fonter
+- prosjektskjema versjon 3
+- obligatorisk `textStyle` bare for tekstelementer
+- stabile fonttokens i prosjektdata
+- CSS-fontstacker avledes i visningslaget
+- én validert stilegenskap per handling
+- utypede, ugyldige, låste og uendrede overganger avvises
+- validatorregisteret er uttømmende ved framtidige felt
+- visning og `textarea` arver samme stil
 
-### Farger
+Godkjent fokusoppførsel:
 
-- venstremenyens navn er `Farger`
-- området skal senere vise faktiske prosjektfarger
-- ingen ferdig fargepalett
-- global endring skal oppdatere alle brukere av fargen
+- blå markeringsramme kan forsvinne når fokus flyttes til høyremenyen
+- elementet forblir valgt i state
+- høyremenyen fortsetter å virke
+- ingen retting gjøres i denne branchen
 
-### Logo og header
+Se `docs/TEXT_PROPERTIES.md`.
 
-- venstremenyens navn er `Logo og header`
-- laste opp logo
-- opprette header
-- hovedtekst og undertittel
-- redigerbar struktur
+## Audit og kontroll
 
-### Fonter
+Rettede auditfunn:
 
-- omtrent 7–8 nettsikre fonter
-- fontstørrelse fra kontrollert liste
-- tekstfarge kobles til fargesystemet
-- fet og kursiv
-- hele boksen kontra markert tekst må avklares før kode
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
 
-## 6. Prosjektområdet
+Sluttkontroll:
 
-Venstremenyens første valg heter `Prosjekt`.
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 54 moduler transformert, bygget på 164 ms
+arkitekturrapporter: a267ca3
+working tree: clean
+```
 
-Det skal senere eie:
+`EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder.
 
-- nytt prosjekt
-- åpne prosjekt
-- importere prosjekt
-- eventuell eksport og duplisering etter egen beslutning
+## Senere faser
 
-Disse funksjonene er ikke implementert.
+```text
+feature/button-element
+feature/image-import-and-placement
+feature/project-colors
+feature/logo-header
+feature/alignment-guides
+feature/mobile-design-controls
+feature/history-system
+feature/local-project-autosave
+feature/project-open-import
+feature/preview-mode
+feature/publishing
+```
 
-## 7. Arkitektur og arbeidsmåte
+Tekstfarge kobles til prosjektfargemodellen. Headertekst bygges som headerstruktur, ikke som vanlig fritt tekstelement.
 
-- én avgrenset funksjon per branch
-- `main` holdes stabil
-- 250 linjer er aktiv terskel for ansvarstrekk
-- prosjektmodell, transient state, hendelseslogikk og visning holdes separat
-- reducer-actions håndteres uttømmende
-- ugyldige og uendrede state-overganger avvises
-- Dependency Cruiser kontrollerer modulgrensene
-- arkitekturrapporter regenereres etter strukturendringer
-- repo og dokumentasjon leses før kode endres
-- PR opprettes først etter kontroll og rent arbeidsområde
-- merge krever eksplisitt godkjenning
+## Åpne beslutninger
 
-## 8. Planlagte branches
-
-- `feature/text-properties`
-- `feature/button-element`
-- `feature/image-import-and-placement`
-- `feature/project-colors`
-- `feature/logo-header`
-- `feature/alignment-guides`
-- `feature/mobile-design-controls`
-- `feature/history-system`
-- `feature/local-project-autosave`
-- `feature/project-open-import`
-- `feature/preview-mode`
-- `feature/publishing`
-
-## 9. Åpne beslutninger
-
-Høyremenyens grunnstruktur er låst. Senere åpne beslutninger er:
-
-- om tekstformatering gjelder hele boksen eller markert tekst
-- endelig fontliste og fontstørrelser
-- tekstjustering og linjehøyde
 - sletting og bekreftelsesregel
 - endelig mobilbrytepunkt
+- mobile tekststiloverstyringer
 - knappens handlinger og lenketyper
 - prosjektfilformat, migrering og lagringsintervall
 - publiseringsarkitektur

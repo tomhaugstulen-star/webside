@@ -1,5 +1,6 @@
 import type { EditorElement, ElementKind, ElementSize } from './editorProject'
 import { findElementCreationPosition } from './findElementCreationPosition'
+import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
 
 const defaultElementSizes: Record<ElementKind, ElementSize> = {
   section: { width: 320, height: 180 },
@@ -35,7 +36,12 @@ export function createEditorElement({
     case 'image':
       return { ...common, kind }
     case 'text':
-      return { ...common, kind, content: '' }
+      return {
+        ...common,
+        kind,
+        content: '',
+        textStyle: { ...DEFAULT_TEXT_ELEMENT_STYLE },
+      }
     case 'button':
       return { ...common, kind }
   }

@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert redigering av ren flerlinjet tekst. Den gjeldende branchen legger til en kontrollert høyremeny for inspeksjon av valgt element.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert flerlinjet redigering og kontrollerte tekstegenskaper i høyremenyen.
 
 ## Repo og lokal mappe
 
@@ -58,20 +58,20 @@ main
 
 ## Gjeldende `main`
 
-Siste bekreftede merge-commit:
-
 ```text
-a35f59d
+8de5f2e
 ```
 
-Denne kom fra PR #8 og låste navn og rekkefølge i venstremenyen.
+Dette er merge-commit fra PR #9, som la inn høyremenyens grunnstruktur.
+
+Viktige merges:
 
 ```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
+PR #4  drag og resize
+PR #5  objektlåsing                 a3eed45
+PR #7  ren tekstredigering          c729d33
+PR #8  navn og rekkefølge i meny    a35f59d
+PR #9  høyremenyens grunnstruktur    8de5f2e
 ```
 
 ## Ferdig og merget til `main`
@@ -89,33 +89,22 @@ Innstillinger
 - clamping, minimumsmål, edge-scroll og automatisk lerretsvekst
 - objektlåsing med tilgjengelig lås/lås opp
 - kontrollert flerlinjet tekstredigering
+- kontrollert høyremeny for valgt elementtype og låsestatus
 - Dependency Cruiser og samlet `npm run check`
 
-Viktige merges:
+## Fast ansvarsdeling
 
 ```text
-PR #4  drag og resize
-PR #5  objektlåsing                 a3eed45
-PR #7  ren tekstredigering          c729d33
-PR #8  navn og rekkefølge i meny    a35f59d
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
 ```
 
-## Gjeldende branch
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Font, størrelse og andre egenskaper skal ikke ligge i venstremenyen.
 
-```text
-feature/right-properties-panel
-```
+`Logo og header` skal senere eie strukturelle headerdeler som logo, hovedtekst, undertittel og header-oppsett.
 
-Utgangspunkt og siste kontrollerte kode-/rapportcommit:
-
-```text
-base main: a35f59d
-kode og arkitekturrapporter: 2d25a542
-```
-
-Branchen er implementert, auditert og visuelt godkjent. Dokumentasjonen ferdigstilles før PR.
-
-### Implementert høyremeny
+## Implementert høyremenygrunnlag
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -123,41 +112,101 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-Beslutninger:
-
 - bredde 320 px
-- dokket på høyre side fra 1680 px
+- dokket fra 1680 px
 - overlay under 1680 px uten å redusere lerretet
 - ingen reservert plass når panelet er skjult
 - egen vertikal scrolling
 - 180 ms transform-animasjon
 - ingen animasjon ved `prefers-reduced-motion`
-
-Visningen er:
-
-```text
-Egenskaper
-Tekst
-
-Element
-Status: Ulåst
-```
-
-Elementtype og låsestatus leses fra sentral editor-state. Panelet bruker eksisterende `useElementSelection`, oppretter ingen parallell state og muterer ingen prosjektdata.
-
-Panelinnholdet rendres bare når et gyldig element er valgt. En sentral layoutvariabel formidler reservert bredde til lerretet slik at panel-CSS ikke styrer canvas-klasser direkte.
-
-Bekreftet etter siste produksjonskodeendring:
-
-```text
-npm run check: bestått
-Dependency Cruiser: 38 moduler, 80 avhengigheter, 0 brudd
-arkitekturrapporter: oppdatert
-visuell PC-kontroll: godkjent
-working tree: clean
-```
+- valgt elementtype og `Låst`/`Ulåst` vises
+- eksisterende `useElementSelection` er autoritativ kilde
+- ingen parallell elementstate eller direkte prosjektmutasjon
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
+## Gjeldende branch
+
+```text
+feature/text-properties
+```
+
+```text
+base main: 8de5f2e
+rapportcommit: a267ca3
+sporing: docs/TEXT_PROPERTIES.md og GitHub-sak #10
+```
+
+Branchen er implementert, auditert, kontrollert og visuelt godkjent. Dokumentasjonen ferdigstilles før PR.
+
+## Implementerte tekstegenskaper
+
+For en markert vanlig tekstboks viser høyremenyen:
+
+```text
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
+```
+
+Låste beslutninger:
+
+- formateringen gjelder hele tekstboksen
+- tekstinnhold redigeres fortsatt bare på lerretet
+- åtte kontrollerte nettsikre fontvalg
+- kontrollerte størrelser fra 12 til 96 px
+- venstre, midtstilt og høyre justering
+- kontrollerte linjehøyder fra 1.0 til 2.0
+- standarden er System, 16 px, normal, venstre og 1.45
+- låste tekstbokser kan inspiseres, men kontrollene er deaktivert
+- tekstfarge utsettes til prosjektfargesystemet
+- bredde, høyde og plassering bygges ikke i denne branchen
+- headertekst, riktekst og mobile tekststiloverstyringer bygges ikke
+
+## Modell og validering
+
+- prosjektskjema versjon 3
+- obligatorisk `textStyle` bare for tekstelementer
+- stabile fonttokens lagres i prosjektdata
+- CSS-fontstacker avledes i visningslaget
+- én validert stilegenskap endres per reducerhandling
+- ugyldige, låste og uendrede overganger avvises
+- runtime-validatoren er trygg mot utypede data
+- validatorregisteret er uttømmende ved framtidige modellutvidelser
+- `updatedAt` endres bare ved reell stilendring
+- vanlig visning og `textarea` arver samme stil
+
+## Audit og sluttkontroll
+
+Rettede auditfunn:
+
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
+
+Bekreftet av brukeren etter siste produksjonskodeendring:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 54 moduler transformert, bygget på 164 ms
+arkitekturrapporter: regenerert og committet i a267ca3
+working tree: clean
+branch: synkronisert med origin
+```
+
+Den blå markeringsrammen kan forsvinne når fokus flyttes til høyremenyen. Elementet forblir valgt i state, og panelet fortsetter å virke. Denne oppførselen er eksplisitt godkjent.
+
+`EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder.
+
+Se `docs/TEXT_PROPERTIES.md`.
 
 ## State-grenser
 
@@ -166,6 +215,7 @@ Varig prosjektdata:
 - elementgeometri
 - låsestatus
 - tekstinnhold
+- tekststil
 - prosjektets `updatedAt`
 
 Transient editor-state:
@@ -181,9 +231,9 @@ Transient state skal ikke serialiseres, eksporteres, publiseres eller inngå dir
 
 ## Responsiv redigering
 
-PC og Telefon deler foreløpig desktopgeometrien. Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls`.
+PC og Telefon deler foreløpig desktopgeometrien. Tekstinnhold, låsestatus og tekststil er foreløpig felles elementdata.
 
-Tekstinnhold og låsestatus er felles elementdata og er ikke responsive verdier.
+Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls`.
 
 ## Filstørrelse og ansvar
 
@@ -198,27 +248,25 @@ Les i denne rekkefølgen:
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/RIGHT_PROPERTIES_PANEL.md`
-4. `docs/EDITOR_PLANNING.md`
-5. `docs/PROJECT_RULES.md`
-6. `docs/ELEMENT_MODEL.md`
-7. `docs/ELEMENT_SELECTION.md`
-8. `docs/ELEMENT_CREATION.md`
-9. `docs/DRAG_RESIZE.md`
-10. `docs/OBJECT_LOCKING.md`
-11. `docs/TEXT_BOX_EDITING.md`
-12. `docs/RESPONSIVE_DESIGN.md`
+3. `docs/TEXT_PROPERTIES.md`
+4. `docs/RIGHT_PROPERTIES_PANEL.md`
+5. `docs/EDITOR_PLANNING.md`
+6. `docs/PROJECT_RULES.md`
+7. `docs/ELEMENT_MODEL.md`
+8. `docs/TEXT_BOX_EDITING.md`
+9. `docs/OBJECT_LOCKING.md`
+10. `docs/DRAG_RESIZE.md`
+11. `docs/ELEMENT_SELECTION.md`
+12. `docs/ELEMENT_CREATION.md`
 13. `docs/MOBILE_DESIGN_CONTROLS.md`
 14. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
-- faktiske egenskapskontroller i høyremenyen
-- font- og riktekstkontroller
+- tekstfarge og prosjektfargesystem
 - sletting og duplisering
 - ekte bildeimport
 - knapphandling og lenker
-- prosjektfargesystem
 - logo/header
 - korrigeringslinjer
 - egne mobiloverstyringer

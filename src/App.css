@@ -4,6 +4,7 @@
 @import './styles/sidebar-content.css';
 @import './styles/canvas.css';
 @import './styles/right-properties-panel.css';
+@import './styles/text-properties.css';
 
 #root {
   min-height: 100vh;

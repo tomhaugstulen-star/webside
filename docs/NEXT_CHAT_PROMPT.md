@@ -15,73 +15,79 @@ https://github.com/tomhaugstulen-star/webside.git
 C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til å lese og skrive i repoet. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
+Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
 
-Det utvikles aldri direkte på `main`.
-
-Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer for å hente endringen lokalt.
+Det utvikles aldri direkte på `main`. Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer for å hente endringen lokalt.
 
 ## Autoritativ leserekkefølge
 
-Les før videre arbeid:
-
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/RIGHT_PROPERTIES_PANEL.md`
-4. `docs/EDITOR_PLANNING.md`
-5. `docs/PROJECT_RULES.md`
-6. `README.md`
-7. `docs/TEXT_BOX_EDITING.md`
-8. `docs/OBJECT_LOCKING.md`
-9. `docs/DRAG_RESIZE.md`
-10. `docs/ELEMENT_SELECTION.md`
-11. `docs/ELEMENT_CREATION.md`
-12. `docs/ELEMENT_MODEL.md`
-13. `docs/MOBILE_DESIGN_CONTROLS.md`
-14. `docs/CODE_AUDIT.md`
+3. `docs/TEXT_PROPERTIES.md`
+4. `docs/RIGHT_PROPERTIES_PANEL.md`
+5. `docs/EDITOR_PLANNING.md`
+6. `docs/PROJECT_RULES.md`
+7. `README.md`
+8. `docs/ELEMENT_MODEL.md`
+9. `docs/TEXT_BOX_EDITING.md`
+10. `docs/OBJECT_LOCKING.md`
+11. `docs/DRAG_RESIZE.md`
+12. `docs/ELEMENT_SELECTION.md`
+13. `docs/ELEMENT_CREATION.md`
+14. `docs/MOBILE_DESIGN_CONTROLS.md`
+15. `docs/CODE_AUDIT.md`
 
 ## Git-status
 
 Siste bekreftede `main`:
 
 ```text
-a35f59d
+8de5f2e
 ```
 
-Dette er merge-commit fra PR #8.
+Dette er merge-commit fra PR #9, som la inn høyremenyens grunnstruktur.
 
 Gjeldende branch:
 
 ```text
-feature/right-properties-panel
+feature/text-properties
 ```
 
-Siste commit med kontrollert produksjonskode og regenererte arkitekturrapporter:
+Branch-head før dokumentasjonscommitene:
 
 ```text
-2d25a542  chore: refresh architecture reports for right panel
+a267ca3  chore: refresh architecture reports for text properties
 ```
 
-Etter denne ligger bare dokumentasjonscommits, inkludert denne overleveringsprompten. Verifiser alltid faktisk branch-head gjennom GitHub før PR.
+Direkte under ligger de siste auditrettelsene:
 
-Brukeren bekreftet clean working tree før dokumentasjonsoppdateringene. Etter at dokumentasjonen er hentet lokalt, må clean tree bekreftes på nytt.
+```text
+3d01336  refactor: make text style validation exhaustive
+95dae75  fix: harden text style runtime validation
+```
 
-Det er ikke opprettet PR ennå.
+GitHub-sak:
+
+```text
+#10 Plan: text properties for selected text boxes
+```
+
+PR er ikke opprettet ennå.
 
 ## Ferdig og merget til `main`
 
 - stabilt React/TypeScript/Vite-grunnlag
 - blankt PC- og Telefon-lerret
-- toppmeny og kontrollert venstremeny
+- kontrollert topp- og venstremeny
 - sentral prosjekt- og elementmodell
 - stabile kryptografiske ID-er
 - transient `selectedElementId`
 - oppretting av Seksjon, Bilde, Tekst og Knapp
-- kontrollerte startstørrelser og startplassering
 - flytting og resizing med peker og tastatur
 - minimumsmål, clamping, edge-scroll og automatisk lerretsvekst
 - objektlåsing og opplåsing
 - kontrollert ren flerlinjet tekstredigering
+- høyremenyens grunnstruktur
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -91,23 +97,26 @@ PR #4  drag og resize
 PR #5  objektlåsing                 a3eed45
 PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
+PR #9  høyremenyens grunnstruktur    8de5f2e
 ```
 
-Endelig venstremeny:
+## Fast UX-regel
 
 ```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
 ```
 
-## Gjeldende fase: høyremenyens grunnstruktur
+Konsekvenser:
 
-Branchen er implementert, framtidsrettet kodeauditert, visuelt kontrollert og godkjent.
+- `Elementer -> Tekst` oppretter en vanlig fri tekstboks.
+- Selve tekstinnholdet redigeres bare på lerretet.
+- Høyremenyen har ikke et ekstra tekstfelt.
+- Font, størrelse og andre egenskaper skal ikke ligge i venstremenyen.
+- `Logo og header` skal senere eie strukturelle headerdeler.
 
-Låst oppførsel:
+## Implementert høyremenygrunnlag
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -115,188 +124,177 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-### Godkjente layoutvalg
-
-- bredde: 320 px
-- fra 1680 px: dokket høyremeny på høyre side
-- under 1680 px: overlay fra høyre
-- overlay ligger oppå editorområdet og reduserer ikke lerretet
+- bredde 320 px
+- dokket fra 1680 px
+- overlay under 1680 px uten å redusere lerretet
 - skjult panel reserverer ingen plass
 - egen vertikal scrolling
 - 180 ms transform-animasjon
-- ingen animasjon ved `prefers-reduced-motion`
+- `prefers-reduced-motion` respekteres
+- eksisterende `useElementSelection` er autoritativ avledning
+- ingen parallell elementstate eller direkte prosjektmutasjon
 
-### Godkjent visuell struktur
+## Gjeldende fase: tekstegenskaper
+
+Fasen er implementert, auditert, kontrollert og visuelt godkjent.
+
+Når en vanlig tekstboks er markert, viser høyremenyen:
 
 ```text
 Egenskaper
-Knapp
+Tekst
+
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
 
 Element
 Status: Ulåst
 ```
 
-Elementtypen kan være `Seksjon`, `Bilde`, `Tekst` eller `Knapp`. Status er `Låst` eller `Ulåst`.
+Formateringen gjelder hele tekstboksen. Det bygges ikke riktekst eller formatering av markerte ord og tegn.
 
-Det finnes ingen falske eller deaktiverte egenskapskontroller.
-
-### Godkjent interaksjon
-
-- markering åpner panelet
-- ny markering oppdaterer samme panel umiddelbart
-- klikk på tomt lerret lukker panelet
-- låst element kan inspiseres
-- panelet kan være åpent under tekstredigering
-- klikk i panelet bruker eksisterende blur/commit
-- markeringen beholdes etter normal tekstcommit
-- panelet oppretter ikke separat tekstdraft
-
-## Implementert arkitektur
-
-Viktige filer:
+Kontrollerte verdier:
 
 ```text
-src/components/editor/EditorShell.tsx
-src/components/properties/RightPropertiesPanel.tsx
-src/state/useElementSelection.ts
-src/styles/editor-base.css
-src/styles/canvas.css
-src/styles/sidebar.css
-src/styles/right-properties-panel.css
-src/App.css
+fonter: System, Arial, Verdana, Tahoma, Trebuchet MS,
+        Georgia, Times New Roman, Courier New
+
+størrelser: 12, 14, 16, 18, 20, 24, 28, 32, 36,
+            40, 48, 56, 64, 72, 96 px
+
+justering: venstre, midtstilt, høyre
+linjehøyde: 1.0, 1.2, 1.45, 1.6, 1.8, 2.0
 ```
 
-Ansvarsdeling:
-
-- `EditorShell` komponerer venstremeny, lerret og høyremeny.
-- Eksisterende `useElementSelection` leverer `selectedElement`.
-- `RightPropertiesPanel` er en presentasjonskomponent som mottar elementet som prop.
-- Panelet søker ikke i DOM-en og muterer ikke prosjektdata.
-- Det finnes ingen parallell selector, separat elementkopi eller ny reducer-action.
-- Panelinnholdet rendres bare når et gyldig element er valgt.
-- Paneloverflaten beholdes kun for transform-animasjonen.
-- `aria-labelledby` brukes bare når panelet er åpent.
-
-Layoutvariabler:
+Standard:
 
 ```text
---properties-panel-width: 320px
---properties-panel-reserved-width: 0px
+System, 16 px, normal, venstre, 1.45
 ```
 
-Ved åpent og dokket panel settes reservert bredde til panelbredden. Canvas- og sidebar-CSS bruker variabelen i egne breddeberegninger. Høyremenyens CSS styrer ikke `.canvas-page--desktop` direkte.
+## Modell og reducer
 
-## Framtidsrettet kodeaudit
+- prosjektskjema versjon 3
+- bare `kind: 'text'` har obligatorisk `textStyle`
+- tekststil er varig prosjektdata og foreløpig felles for PC og Telefon
+- stabile fonttokens lagres i prosjektet
+- rå CSS-fontstacker avledes i visningslaget
+- hver handling endrer én validert stilegenskap
+- reduceren bruker nyeste autoritative state
+- låste, ugyldige og uendrede overganger avvises
+- `updatedAt` endres bare ved reell endring
+- panelet eier ingen lokal stilkopi
+- vanlig visning og `textarea` arver samme stil
 
-Auditen kontrollerte:
+Runtime-validatoren avviser null, arrays, ukjente nøkler og utypede data. Validatorregisteret er uttømmende, slik at TypeScript krever validering ved framtidige modellfelt.
 
-- stale markering og stale elementdata
-- duplisert state og parallelle selectors
-- direkte DOM-søk og prosjektmutasjon
-- tekstens blur/commit
-- låste elementer
-- sideskifte og ugyldig markering
-- overlay kontra dokket layout
-- CSS-eierskap og importrekkefølge
-- skjult innhold og framtidige fokuserbare kontroller
-- `prefers-reduced-motion`
-- filstørrelser og ansvarsgrenser
+## Låste tekstbokser
 
-To funn ble rettet før sluttkontrollen:
+- kan markeres og inspiseres
+- viser gjeldende tekststil
+- alle tekstkontroller er deaktivert
+- reduceren håndhever låsen
+- opplåsing skjer gjennom eksisterende objektverktøy
 
-1. Selve panelinnholdet rendres bare når et element finnes.
-2. Panel-CSS styrer ikke lenger canvas-klassen direkte; en sentral variabel formidler reservert bredde.
+## Godkjent fokusoppførsel
 
-Ingen problemer ble funnet med reducer, låsing, tekstcommit, state-separasjon eller Dependency Cruiser.
+Når fokus flyttes til høyremenyen:
 
-## Kontrollstatus
+- elementet forblir valgt i autoritativ state
+- høyremenyen fortsetter å vise og endre samme element
+- den blå markeringsrammen kan forsvinne visuelt
 
-Brukeren kjørte etter siste produksjonskodeendring:
+Dette er eksplisitt godkjent. Ikke rett det i denne branchen.
+
+## Arkitektur
+
+Viktige nye filer:
 
 ```text
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status
+src/model/textElementStyle.ts
+src/state/editorProjectAction.ts
+src/state/setTextElementStyle.ts
+src/state/useTextElementStyle.ts
+src/components/canvas/getTextElementCssStyle.ts
+src/components/properties/TextPropertiesSection.tsx
+src/styles/text-properties.css
 ```
 
-Bekreftet resultat:
+`EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder. Senere canvaslogikk må trekkes ut.
+
+## Audit og kontrollstatus
+
+Rettede auditfunn:
+
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
+
+Brukeren kjørte sluttkontroll etter siste produksjonskodeendring:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 38 moduler, 80 avhengigheter, ingen brudd
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
 produksjonsbuild: bestått
-arkitekturrapporter: oppdatert
-visuell PC-kontroll: godkjent
-working tree før dokumentasjonscommits: clean
+Vite: 54 moduler transformert, bygget på 164 ms
+arkitekturrapporter: regenerert og committet i a267ca3
+working tree: clean
+branch: synkronisert med origin
 ```
 
-LF/CRLF-varslene fra `git diff --check` var bare linjeskiftvarsler, ikke whitespace-feil.
+`git diff --check` viste bare LF/CRLF-varsler, ikke whitespace-feil.
 
-Produksjonskode ble ikke endret etter denne kontrollen. Bare dokumentasjon ble oppdatert.
+Det finnes foreløpig ikke automatiserte enhetstester. `npm run check` dekker lint, TypeScript, arkitektur og produksjonsbuild. Brukeren har gjennomført funksjonell og visuell kontroll.
 
 ## Ikke del av branchen
 
-Ikke legg inn:
-
-- fontfamilie eller fontstørrelse
-- tekstfarge, fet, kursiv eller markert tekstformatering
-- bildevelger eller bildeegenskaper
-- knapphandlinger eller lenker
-- fargevelgere eller prosjektfargeregister
-- logo- eller headerbygger
+- tekstfarge eller prosjektfargemodell
+- bredde, høyde eller plassering i høyremenyen
+- headerens hovedtekst eller undertittel
+- riktekst eller tegnbaserte tekstspenn
+- opplasting av fonter eller eksterne webfonter
 - sletting eller duplisering
-- lagpanel
 - historikk eller lagring
-- nytt prosjekt eller prosjektimport
-- mobile geometri-overstyringer
+- mobile tekststiloverstyringer
 
 ## Neste steg
 
-Start med å be brukeren hente dokumentasjonen:
+Dokumentasjonen er oppdatert gjennom GitHub-connectoren etter den rene lokale sluttkontrollen.
+
+Be brukeren hente dokumentasjonen:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 
-git pull --ff-only origin feature/right-properties-panel
+git pull --ff-only origin feature/text-properties
 git status
-git log -1 --oneline
+git log -5 --oneline --decorate
 ```
 
-Forventet:
+Når brukeren bekrefter clean tree:
 
-```text
-On branch feature/right-properties-panel
-Your branch is up to date with 'origin/feature/right-properties-panel'.
-
-nothing to commit, working tree clean
-```
-
-Dokumentasjonsendringene krever ikke ny `npm run check`, fordi ingen produksjonskode eller arkitekturrapport ble endret etter den beståtte sluttkontrollen.
-
-Når lokal branch er clean:
-
-1. Sammenlign hele `feature/right-properties-panel` mot `main`.
-2. Kontroller at diffen bare inneholder:
-   - høyremenyens grunnstruktur
-   - tilhørende layout-CSS
-   - arkitekturrapporter
-   - relevant dokumentasjon
+1. Sammenlign hele `feature/text-properties` mot `main`.
+2. Kontroller at diffen bare inneholder tekstegenskaper, arkitekturrapporter og relevant dokumentasjon.
 3. Kontroller at branchen er foran `main` og ikke bak.
-4. Opprett draft-PR mot `main`.
-5. Dokumenter produktvalg, state-grenser, auditfunn, teststatus og visuell godkjenning.
+4. Opprett draft-PR mot `main` med `Closes #10`.
+5. Dokumenter omfang, state-grenser, auditfunn, testresultater og visuell godkjenning.
 6. Kontroller mergebarhet, review-tråder og eventuell CI.
 7. Marker PR klar for review når alt er kontrollert.
-8. Ikke merge før brukeren gir eksplisitt godkjenning, normalt formulert som `PR #<nummer>`.
+8. Ikke merge før brukeren gir eksplisitt godkjenning.
 9. Bruk forventet head-SHA ved merge.
 10. Etter merge: oppdater lokal `main` og kontroller clean tree.
 
 ## Kommunikasjonsregler
 
 - svar på norsk
-- vær direkte, presis og rolig
+- vær direkte og presis
 - ikke gjett
 - bruk GitHub-connectoren til repoarbeid
 - gi nøyaktige PowerShell-kommandoer etter repoendringer

@@ -13,6 +13,7 @@ subgraph src["src"]
       src_components_canvas_EditorCanvasElement_tsx["EditorCanvasElement.tsx"]
       src_components_canvas_canvasElementAccessibility_ts["canvasElementAccessibility.ts"]
       src_components_canvas_ElementSelectionToolbar_tsx["ElementSelectionToolbar.tsx"]
+      src_components_canvas_getTextElementCssStyle_ts["getTextElementCssStyle.ts"]
       src_components_canvas_TextElementEditor_tsx["TextElementEditor.tsx"]
       src_components_canvas_useElementPointerTransform_ts["useElementPointerTransform.ts"]
       src_components_canvas_autoScrollCanvas_ts["autoScrollCanvas.ts"]
@@ -20,6 +21,7 @@ subgraph src["src"]
     end
     subgraph src_components_properties["properties"]
       src_components_properties_RightPropertiesPanel_tsx["RightPropertiesPanel.tsx"]
+      src_components_properties_TextPropertiesSection_tsx["TextPropertiesSection.tsx"]
     end
     subgraph src_components_sidebar["sidebar"]
       src_components_sidebar_LeftSidebar_tsx["LeftSidebar.tsx"]
@@ -32,25 +34,29 @@ subgraph src["src"]
   end
   subgraph src_model["model"]
     src_model_editorProject_ts["editorProject.ts"]
+    src_model_textElementStyle_ts["textElementStyle.ts"]
+    src_model_elementLayout_ts["elementLayout.ts"]
+    src_model_createStableId_ts["createStableId.ts"]
+    src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
     src_model_createEditorElement_ts["createEditorElement.ts"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
     src_model_createEditorProject_ts["createEditorProject.ts"]
-    src_model_createStableId_ts["createStableId.ts"]
-    src_model_elementLayout_ts["elementLayout.ts"]
-    src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
   end
   subgraph src_state["state"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
-    src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
-    src_state_setTextElementContent_ts["setTextElementContent.ts"]
-    src_state_toggleElementLock_ts["toggleElementLock.ts"]
+    src_state_editorProjectAction_ts["editorProjectAction.ts"]
     src_state_useElementCreation_ts["useElementCreation.ts"]
     src_state_useElementSelection_ts["useElementSelection.ts"]
     src_state_useElementLayout_ts["useElementLayout.ts"]
     src_state_useTextElementContent_ts["useTextElementContent.ts"]
     src_state_useElementLocking_ts["useElementLocking.ts"]
+    src_state_useTextElementStyle_ts["useTextElementStyle.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
+    src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
+    src_state_setTextElementContent_ts["setTextElementContent.ts"]
+    src_state_setTextElementStyle_ts["setTextElementStyle.ts"]
+    src_state_toggleElementLock_ts["toggleElementLock.ts"]
   end
   subgraph src_types["types"]
     src_types_editor_ts["editor.ts"]
@@ -70,23 +76,14 @@ src_components_editor_EditorShell_tsx-->src_components_canvas_EditorCanvas_tsx
 src_components_editor_EditorShell_tsx-->src_components_properties_RightPropertiesPanel_tsx
 src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
 src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
+src_model_editorProject_ts-->src_model_textElementStyle_ts
 src_state_useEditorProject_ts-->src_state_editorProjectContext_ts
 src_state_editorProjectContext_ts-->src_model_editorProject_ts
-src_state_editorProjectContext_ts-->src_state_editorProjectReducer_ts
-src_state_editorProjectReducer_ts-->src_model_createEditorElement_ts
-src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
-src_state_editorProjectReducer_ts-->src_model_editorProject_ts
-src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
-src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
-src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
-src_model_createEditorElement_ts-->src_model_editorProject_ts
-src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
-src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
-src_model_createEditorProject_ts-->src_model_createStableId_ts
-src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_state_editorProjectContext_ts-->src_state_editorProjectAction_ts
+src_state_editorProjectAction_ts-->src_model_editorProject_ts
+src_state_editorProjectAction_ts-->src_model_elementLayout_ts
+src_state_editorProjectAction_ts-->src_model_textElementStyle_ts
 src_model_elementLayout_ts-->src_model_editorProject_ts
-src_state_setTextElementContent_ts-->src_model_editorProject_ts
-src_state_toggleElementLock_ts-->src_model_editorProject_ts
 src_state_useElementCreation_ts-->src_model_createStableId_ts
 src_state_useElementCreation_ts-->src_model_editorProject_ts
 src_state_useElementCreation_ts-->src_state_useEditorProject_ts
@@ -108,6 +105,7 @@ src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasElementAccessibility_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasLayoutPreview_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_ElementSelectionToolbar_tsx
+src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_getTextElementCssStyle_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_TextElementEditor_tsx
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_useElementPointerTransform_ts
 src_model_resolveResponsiveValue_ts-->src_model_editorProject_ts
@@ -118,6 +116,7 @@ src_components_canvas_canvasElementAccessibility_ts-->src_model_editorProject_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_model_elementLayout_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_state_useElementLocking_ts
 src_state_useElementLocking_ts-->src_state_useEditorProject_ts
+src_components_canvas_getTextElementCssStyle_ts-->src_model_textElementStyle_ts
 src_components_canvas_useElementPointerTransform_ts-->src_model_editorProject_ts
 src_components_canvas_useElementPointerTransform_ts-->src_model_elementLayout_ts
 src_components_canvas_useElementPointerTransform_ts-->src_components_canvas_autoScrollCanvas_ts
@@ -126,6 +125,12 @@ src_components_canvas_getCanvasContentHeight_ts-->src_model_editorProject_ts
 src_components_canvas_getCanvasContentHeight_ts-->src_model_resolveResponsiveValue_ts
 src_components_canvas_getCanvasContentHeight_ts-->src_components_canvas_canvasLayoutPreview_ts
 src_components_properties_RightPropertiesPanel_tsx-->src_model_editorProject_ts
+src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_TextPropertiesSection_tsx
+src_components_properties_TextPropertiesSection_tsx-->src_model_editorProject_ts
+src_components_properties_TextPropertiesSection_tsx-->src_model_textElementStyle_ts
+src_components_properties_TextPropertiesSection_tsx-->src_state_useTextElementStyle_ts
+src_state_useTextElementStyle_ts-->src_model_textElementStyle_ts
+src_state_useTextElementStyle_ts-->src_state_useEditorProject_ts
 src_components_sidebar_LeftSidebar_tsx-->src_model_editorProject_ts
 src_components_sidebar_LeftSidebar_tsx-->src_types_editor_ts
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarIcon_tsx
@@ -136,5 +141,23 @@ src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_ts
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
+src_state_editorProjectReducer_ts-->src_model_createEditorElement_ts
+src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
+src_state_editorProjectReducer_ts-->src_model_editorProject_ts
+src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
+src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
+src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
+src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
+src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
+src_model_createEditorElement_ts-->src_model_editorProject_ts
+src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
+src_model_createEditorElement_ts-->src_model_textElementStyle_ts
+src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
+src_model_createEditorProject_ts-->src_model_createStableId_ts
+src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_state_setTextElementContent_ts-->src_model_editorProject_ts
+src_state_setTextElementStyle_ts-->src_model_editorProject_ts
+src_state_setTextElementStyle_ts-->src_model_textElementStyle_ts
+src_state_toggleElementLock_ts-->src_model_editorProject_ts
 src_main_tsx-->src_App_tsx
 src_main_tsx-->src_index_css

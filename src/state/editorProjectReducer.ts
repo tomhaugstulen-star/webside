@@ -3,44 +3,13 @@ import {
   elementLayoutsEqual,
   getElementDesktopLayout,
   isValidElementLayout,
-  type ElementLayout,
 } from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
-import type {
-  EditorProject,
-  EditorProjectState,
-  ElementKind,
-} from '../model/editorProject'
+import type { EditorProjectState } from '../model/editorProject'
+import type { EditorProjectAction } from './editorProjectAction'
 import { setTextElementContent } from './setTextElementContent'
+import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
-
-export type EditorProjectAction =
-  | { type: 'replace-project'; project: EditorProject }
-  | { type: 'set-active-page'; pageId: string }
-  | { type: 'set-selected-element'; elementId: string | null }
-  | {
-      type: 'add-element-to-active-page'
-      elementId: string
-      kind: ElementKind
-      updatedAt: string
-    }
-  | {
-      type: 'set-element-desktop-layout'
-      elementId: string
-      layout: ElementLayout
-      updatedAt: string
-    }
-  | {
-      type: 'toggle-element-lock'
-      elementId: string
-      updatedAt: string
-    }
-  | {
-      type: 'set-text-element-content'
-      elementId: string
-      content: string
-      updatedAt: string
-    }
 
 export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
@@ -214,6 +183,14 @@ function reduceEditorProjectState(
         state,
         action.elementId,
         action.content,
+        action.updatedAt,
+      )
+
+    case 'set-text-element-style':
+      return setTextElementStyle(
+        state,
+        action.elementId,
+        action.patch,
         action.updatedAt,
       )
   }

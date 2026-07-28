@@ -1,4 +1,5 @@
 import type { EditorElement, ElementKind } from '../../model/editorProject'
+import { TextPropertiesSection } from './TextPropertiesSection'
 
 const elementKindLabels: Record<ElementKind, string> = {
   section: 'Seksjon',
@@ -27,6 +28,10 @@ export function RightPropertiesPanel({ element }: RightPropertiesPanelProps) {
             <p className="right-properties-panel__element-type">
               {elementKindLabels[element.kind]}
             </p>
+
+            {element.kind === 'text' && (
+              <TextPropertiesSection element={element} />
+            )}
 
             <section aria-labelledby="right-properties-panel-element-title">
               <h3 id="right-properties-panel-element-title">Element</h3>

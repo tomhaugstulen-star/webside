@@ -10,7 +10,7 @@ For hver avgrensede del:
 2. Oppdater og kontroller `main`.
 3. Opprett eller fast-forward en avgrenset feature-branch.
 4. Definer omfang, brukerhandlinger, state og grenser mot senere funksjoner.
-5. Få eksplisitt godkjenning på åpne produkt- og designvalg.
+5. Lås åpne produkt- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
 7. Trekk ut ansvar før en kildefil passerer 250 linjer.
 8. Gjennomfør framtidsrettet kodeaudit.
@@ -21,7 +21,7 @@ For hver avgrensede del:
 13. Kontroller synkronisert branch og clean tree.
 14. Opprett draft-PR og kontroller hele diffen, mergebarhet, review-tråder og eventuell CI.
 15. Marker PR klar for review.
-16. Merge bare etter eksplisitt bruker­godkjenning.
+16. Merge bare etter eksplisitt brukergodkjenning.
 17. Oppdater lokal `main` og kontroller clean tree før neste fase.
 
 ## 2. Ferdig og merget til `main`
@@ -68,25 +68,11 @@ Branch: `feature/drag-resize`
 
 Status: merget som PR #4.
 
-- peker- og tastaturtransform
-- minimumsmål og clamping
-- edge-scroll og automatisk lerretsvekst
-- transient preview
-- én commit ved normalt slipp
-- avbrudd uten commit ved cancel eller tapt capture
-
 ### Fase 5 – Objektlåsing
 
 Branch: `feature/object-locking`
 
 Status: merget som PR #5 med merge-commit `a3eed45`.
-
-- separat objektverktøylinje
-- lås og lås opp
-- varig `locked` gjennom reduceren
-- låste elementer kan markeres og fokuseres
-- peker- og tastaturtransform blokkeres
-- tilgjengelig låseknapp
 
 ### Fase 6 – Ren tekstredigering
 
@@ -97,10 +83,7 @@ Status: merget som PR #7 med merge-commit `c729d33`.
 - prosjektskjema versjon 2
 - `content` bare for tekstobjekter
 - kontrollert flerlinjet `textarea`
-- dobbeltklikk eller `Enter` starter redigering
-- blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster lokal draft
-- IME-sikker snarveishåndtering
+- blur, submit og cancel med eksplisitte grenser
 - låst tekst kan ikke redigeres
 - reduceren avviser ugyldige og uendrede commits
 
@@ -118,90 +101,139 @@ Elementer
 Innstillinger
 ```
 
-## 3. Gjeldende fase
-
 ### Fase 7 – Høyremenyens grunnstruktur
 
-Branch:
+Branch: `feature/right-properties-panel`
 
-```text
-feature/right-properties-panel
-```
+Status: merget som PR #9 med merge-commit `8de5f2e`.
 
-Utgangspunkt:
-
-```text
-main: a35f59d
-produksjonskode og arkitekturrapporter: 2d25a542
-```
-
-Status:
-
-- implementert
-- framtidsrettet kodeaudit gjennomført
-- auditfunn rettet
-- `npm run check` bestått etter siste kodeendring
-- Dependency Cruiser: 38 moduler, 80 avhengigheter, ingen brudd
-- arkitekturrapporter oppdatert
-- visuell PC-kontroll godkjent
-- arbeidsområdet bekreftet clean
-- dokumentasjon oppdateres før PR
-- PR er ikke opprettet ennå
-
-Låst oppførsel:
-
-```text
-Ingenting valgt -> ingen høyremeny
-Element valgt   -> høyremeny åpnes
-Tomt lerret     -> høyremeny lukkes
-```
-
-Implementerte beslutninger:
-
-- bredde 320 px
-- dokket fra 1680 px
+- ingen markering gir ingen synlig eller reservert høyremeny
+- valgt element åpner panelet
+- elementtype og låsestatus vises
+- 320 px dokket panel fra 1680 px
 - overlay under 1680 px uten å redusere lerretet
-- ingen reservert plass når panelet er skjult
 - egen vertikal scrolling
 - 180 ms transform-animasjon
-- ingen animasjon ved `prefers-reduced-motion`
-- visuell struktur: `Egenskaper`, elementtype, `Element`, `Status`
-- viser bare elementtype og `Låst`/`Ulåst`
-
-Arkitektur:
-
-- egen `RightPropertiesPanel.tsx`
+- `prefers-reduced-motion` respekteres
 - eksisterende `useElementSelection` gjenbrukes
-- ingen DOM-søk, separat elementkopi eller ny reducer-action
-- panelinnhold rendres bare når et element finnes
-- sentral `--properties-panel-reserved-width` holder panel-CSS og canvas-CSS adskilt
-- tekstens eksisterende blur/commit beholdes
+- panelinnhold rendres bare for et gyldig valgt element
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
-### Gjenstående før merge
-
-1. Hent dokumentasjonscommitene lokalt.
-2. Kontroller at working tree er clean.
-3. Sammenlign hele branchen mot `main`.
-4. Kontroller at diffen bare inneholder høyremenygrunnstruktur, arkitekturrapporter og relevant dokumentasjon.
-5. Opprett draft-PR.
-6. Kontroller mergebarhet, review-tråder og eventuell CI.
-7. Marker PR klar for review når kontrollen er ferdig.
-8. Merge bare etter brukerens eksplisitte godkjenning.
-
-## 4. Senere faser
+## 3. Gjeldende fase
 
 ### Fase 8 – Tekstegenskaper
 
-Branch: `feature/text-properties`
+```text
+branch: feature/text-properties
+base main: 8de5f2e
+sporing: docs/TEXT_PROPERTIES.md og GitHub-sak #10
+```
 
-- nettsikre fonter
-- kontrollert fontstørrelsesliste
-- linjehøyde og tekstjustering etter beslutning
-- tekstfarge kobles senere til prosjektets fargesystem
-- fet og kursiv
-- hele boksen kontra markert tekst må avklares før kode
+Fast UX-regel:
+
+```text
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
+```
+
+### Implementert
+
+For en markert vanlig tekstboks:
+
+```text
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
+```
+
+- formateringen gjelder hele tekstboksen
+- åtte kontrollerte nettsikre fonter
+- kontrollert fontstørrelsesliste fra 12 til 96 px
+- venstre, midtstilt og høyre justering
+- kontrollerte linjehøyder fra 1.0 til 2.0
+- standarden bevarer System, 16 px og 1.45
+- tekstfarge er utsatt til prosjektfargesystemet
+- tekststil er foreløpig felles for PC og Telefon
+- låste tekstelementer kan inspiseres, men kontrollene er deaktivert
+- tekstinnhold redigeres fortsatt bare på lerretet
+- andre elementtyper åpner høyremenyen uten tekstkontroller
+
+### Modell og state
+
+- prosjektskjema versjon 3
+- bare tekstelementer har obligatorisk `textStyle`
+- stabile fonttokens lagres i prosjektet
+- CSS-fontstacker avledes i visningslaget
+- hver reducerhandling endrer én validert stilegenskap
+- runtime-validatoren avviser utypede og ødelagte data
+- validatorregisteret er uttømmende ved framtidige modellutvidelser
+- låste, ugyldige og uendrede overganger avvises
+- `updatedAt` endres bare ved reell stilendring
+- panelet eier ingen separat stilstate
+- visning og `textarea` arver samme stil
+
+### Framtidsrettet audit
+
+Rettede funn:
+
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
+
+`EditorCanvasElement.tsx` er 244 linjer. Den skal ikke få flere nye ansvarsområder; senere canvaslogikk må trekkes ut.
+
+### Sluttkontroll
+
+Brukeren har bekreftet:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 54 moduler transformert, bygget på 164 ms
+arkitekturrapporter: regenerert
+working tree: clean
+branch: synkronisert med origin
+```
+
+Rapportcommit:
+
+```text
+a267ca3  chore: refresh architecture reports for text properties
+```
+
+`git diff --check` viste bare LF/CRLF-varsler.
+
+### Visuell godkjenning
+
+- alle tekstkontroller fungerer
+- hele tekstboksen endres som avtalt
+- låste kontroller er deaktivert
+- ikke-tekstelementer viser bare sine generelle elementopplysninger
+- den blå markeringsrammen kan forsvinne når fokus flyttes til høyremenyen
+- elementet forblir valgt i state, og høyremenyen fortsetter å virke
+- denne fokusoppførselen er eksplisitt godkjent
+
+### Gjenstående før PR
+
+1. Hent dokumentasjonscommitene lokalt.
+2. Kontroller clean tree på nytt.
+3. Sammenlign hele branchen mot `main`.
+4. Kontroller at diffen bare inneholder tekstegenskaper, rapporter og relevant dokumentasjon.
+5. Opprett draft-PR.
+6. Kontroller mergebarhet, review-tråder og eventuell CI.
+7. Marker PR klar for review.
+8. Merge bare etter eksplisitt godkjenning.
+
+## 4. Senere faser
 
 ### Fase 9 – Knapper
 
@@ -228,6 +260,7 @@ Branch: `feature/project-colors`
 - register over faktiske prosjektfarger
 - global endring
 - oppdatering av alle brukere av en farge
+- tekstfarge kobles hit
 
 ### Fase 12 – Logo og header
 
@@ -237,6 +270,7 @@ Branch: `feature/logo-header`
 - header
 - hovedtekst og undertittel
 - redigerbar struktur
+- headertekst er ikke en vanlig fri tekstboks
 
 ### Fase 13 – Korrigeringslinjer
 
@@ -245,7 +279,6 @@ Branch: `feature/alignment-guides`
 - horisontal midtstilling
 - samme linje og lik avstand
 - bare under flytting eller resizing
-- ingen automatisk kollisjonsunngåelse
 
 ### Fase 14 – Responsiv redigering
 
@@ -254,14 +287,12 @@ Branch: `feature/mobile-design-controls`
 - desktop er grunnlaget
 - mobil arver desktop som standard
 - eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet
-- mobilendring påvirker ikke desktop
 - **Bruk PC-oppsett** fjerner mobiloverstyringen
 
 ### Fase 15 – Angre og gjør om
 
 Branch: `feature/history-system`
 
-- eksplisitt prosjektendringsmodell
 - én historikkpost per avsluttet brukerhandling
 - transient markering, draft, panelstate og preview holdes utenfor
 
@@ -270,9 +301,7 @@ Branch: `feature/history-system`
 Branch: `feature/local-project-autosave`
 
 - prosjektmappe og lokale bilder
-- sikker automatisk lagring
-- `Lagrer`, `Lagret` og `Lagringsfeil`
-- gjenoppretting
+- sikker automatisk lagring og gjenoppretting
 
 ### Fase 17 – Åpne og importere prosjekt
 
