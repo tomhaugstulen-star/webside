@@ -6,283 +6,231 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 
 ### Ferdig og merget til `main`
 
-- blankt, hvitt lerret
-- toppmeny
-- venstremeny med kontrollert åpning og lukking
-- desktop- og mobilvisning
+- blankt, hvitt desktop- og mobillerret
+- toppmeny og venstremeny
+- kontrollert paneloppførsel
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
-- delt CSS- og komponentstruktur
-- Dependency Cruiser
-- samlet `npm run check`
-- automatisk nettleseråpning
 - prosjekt- og elementmodell
-- skjemaversjon og kryptografiske stabile ID-er
-- sider, elementtyper og responsive modellverdier
+- stabile kryptografiske ID-er
+- responsive posisjons-, størrelses- og synlighetsverdier
 - sentral prosjekt-state og aktiv side
-- nytt prosjekt starter blankt med `Forside`
-- markering av eksisterende elementer
-- transient valgt element-ID
-- klikk på tomt lerret fjerner markering
-- tastaturmarkering med Tab, Enter og mellomrom
+- transient elementmarkering
+- oppretting av alle fire elementtypene
+- kontrollerte startstørrelser og første ledige startplass
+- automatisk markering av nytt element
+- avledet lerretshøyde
+- Dependency Cruiser og samlet `npm run check`
 
-### Implementert i `feature/element-creation`
+### Implementert i `feature/drag-resize`
 
-- opprette Seksjon, Bilde, Tekst og Knapp fra Elementer-panelet
-- legge elementet til aktiv side gjennom reduceren
-- sikker element-ID og oppdatering av `updatedAt`
-- automatisk markering av det nye elementet
-- kontrollerte standardstørrelser
-- første ledige startplass med 16 px avstand
-- ingen direkte overlapping ved oppretting
-- automatisk utvidelse av lerretshøyden
-- blank side før første eksplisitte oppretting
-- desktopverdi med mobil arv
-- nøytral editorrepresentasjon for alle fire elementtypene
-- sidebar-CSS delt etter ansvar
+- flytting med peker
+- resizing fra ett firkantet håndtak nederst til høyre
+- minimumsmål per elementtype
+- venstre, høyre og øvre lerretsgrense
+- fri bevegelse nedover med automatisk lerretsvekst
+- edge-scroll under aktiv interaksjon
+- transient preview under pekerbevegelse
+- én prosjekt-commit ved normalt pekerslipp
+- avbrudd uten commit ved cancel eller tapt pointer capture
+- piltaster for flytting
+- `Ctrl`/`Cmd` + piltaster for resizing
+- `Shift` for 10 px steg
+- låste elementer kan markeres, men ikke transformeres
 
-Visuelt godkjent på desktop og mobil. Siste kodeaudit og dokumentoppdateringer må gjennom sluttkontroll før PR.
+Visuelt godkjent på desktop og mobil før siste kodeaudit. Auditendringene må gjennom ny lokal sluttkontroll før PR.
 
 ### Neste fase etter merge
 
 ```text
-feature/drag-resize
+feature/object-locking
 ```
 
-Denne fasen skal bare bygge flytting og størrelsesendring av eksisterende elementer. Låsing, direkte tekstredigering, bilder, historikk og lagring skal ikke blandes inn.
+Denne fasen skal bare bygge lås/lås opp for valgt element. Tekstredigering, bilder, historikk, sletting og lagring skal ikke blandes inn.
 
 ## 2. Bekreftede hovedkrav
 
 ### Blank startside
 
 - En ny side åpner helt blank.
-- Editorgrensesnittet kan være synlig, men nettsiden skal ikke inneholde ferdige seksjoner, tekst, bilder eller farger.
-- Objektverktøy, låseknapp og drahåndtak vises først når et faktisk objekt finnes og er markert.
+- Ingen ferdige seksjoner, tekst, bilder eller farger opprettes automatisk.
 - Elementoppretting skjer bare etter en eksplisitt brukerhandling.
 - Omlasting gir foreløpig blank side fordi lagring ikke er implementert.
 
 ### Autoritativ prosjektmodell
 
-- `EditorProject` er autoritativ kilde for prosjektdata.
-- DOM-en skal ikke brukes som permanent lagring.
-- Nye elementer opprettes gjennom prosjekt-state/reducer og legges til aktiv side.
-- Element-ID-er er kryptografiske og stabile.
+- `EditorProject` er autoritativ kilde for varige prosjektdata.
+- DOM-en er bare rendering, ikke permanent lagring.
+- Elementer og geometri endres gjennom prosjekt-state/reduceren.
 - State-avhengige prosjektberegninger bruker reducerens nyeste state.
-- UI-hooks sender intensjon, sikker ID og tidspunkt, men beregner ikke varig resultat fra et mulig utdatert React-snapshot.
+- ID og klokkeslett genereres før dispatch slik at reduceren er deterministisk.
 
-### Markeringsstate
+### Transient state
 
-`selectedElementId` er transient editor-state og skal ikke:
+Følgende skal ikke serialiseres, publiseres eller lagres:
 
-- lagres i prosjektfilen
-- utløse autolagring
-- inngå i angre-/gjør om-historikk
-- eksporteres
-- publiseres
+- `selectedElementId`
+- aktiv pointer-interaksjon
+- layout-preview under draing eller resizing
 
-Markeringsregler:
-
-- bare element på aktiv side kan markeres
-- ugyldig element-ID ignoreres
-- side- og prosjektbytte fjerner markering
-- sletting eller annen prosjektendring som fjerner valgt element skal rydde markeringen
-- klikk på objektverktøy må senere kunne beholde markeringen
-- tekstredigeringsmodus må skille mellom markering av objekt og redigering av innhold
+Når historikk og autolagring bygges, skal én ferdig pekertransform behandles som én prosjektendring.
 
 ### Desktop og mobil
 
-- Desktop og mobil er redigeringsmoduser.
-- Prosjektmodellen har `ResponsiveValue<T>` med desktopverdi og valgfri mobilverdi.
-- Lerretsrenderingen bruker mobilverdi når den finnes og ellers desktopverdien.
-- Viewport-unionen har én autoritativ definisjon i prosjektmodellen.
-- Nye elementer er foreløpig desktop-autoritative og mobil arver samme verdier.
-- Standardstørrelsene passer innenfor 390 px mobilvisning ved startpunkt x 24 px.
-- Brukergrensesnitt for arv, overstyring og skjuling er ikke implementert ennå.
-- Ferdig forhåndsvisning og eksport skal bruke kontrollerte media queries.
-- Når mobilskjuling bygges, må det avklares om et skjult element skal miste markeringen i aktiv visning.
-- Viewport-bevisst oppretting vurderes i `feature/mobile-design-controls`.
+- Prosjektmodellen bruker desktopverdi med valgfri mobilverdi.
+- Mobilvisning bruker mobilverdi når den finnes og ellers desktopverdi.
+- Nye elementer har foreløpig bare desktopgeometri.
+- I dagens UI redigerer PC og Telefon den delte desktopgeometrien.
+- Egne mobiloverstyringer bygges eksplisitt i `feature/mobile-design-controls`.
+- En mobilendring skal senere aldri endre desktopverdien utilsiktet.
 
-### Korrigerings- og hjelpesystem
+## 3. Elementer
 
-- varsle ved horisontal midtstilling
-- vise når elementer ligger på samme linje
-- vise lik avstand mellom tre eller flere elementer
-- hjelpelinjer vises bare under flytting eller størrelsesendring
-- ingen egen vertikal sentreringsfunksjon
-- ingen reaksjon bare fordi elementer nærmer seg hverandre
-- elementer kan overlappe
-- ingen usynlig automatisk flytting eller kollisjonsunngåelse
-
-Planlagt branch: `feature/alignment-guides`.
-
-## 3. Menystruktur
-
-### Nåværende editorrail
-
-1. Design
-2. Bilder og logo
-3. Elementer
-4. Filer
-5. Innstillinger
-
-`Elementer` brukes konsekvent som synlig navn, intern verktøy-ID og CSS-begrep.
-
-Elementer-panelet inneholder:
-
-- Seksjon
-- Bilde
-- Tekst
-- Knapp
-
-Valg av et elementkort oppretter elementet og lukker panelet.
-
-### Planlagte prosjektfunksjoner
-
-- Nytt prosjekt
-- Importer prosjekt
-- Farger
-- Logo/header
-- Fonts
-
-Endelig plassering er ikke fastsatt.
-
-## 4. Elementer og innhold
-
-### Elementboks
-
-Et element er et selvstendig objekt i prosjektmodellen.
-
-Bekreftede regler:
-
-- nytt element skal være stort nok til at framtidig håndtak er lett å bruke
-- ett tydelig, firkantet håndtak nederst til høyre
-- elementets høyde øker ikke automatisk på grunn av tekst
-- innhold utenfor elementets grenser klippes
-- klikk utenfor avslutter redigering og beholder størrelse/plassering
-- rammetykkelse: ingen, 1 px, 2 px, 3 px og 4 px
-- rammefarge registreres i Farger-systemet
-- elementer kan overlappe
-- valgt element eller bilde kan låses og låses opp
-
-### Elementoppretting
-
-Implementerte startstørrelser:
+### Startstørrelser
 
 - Seksjon: 320 × 180 px
 - Bilde: 240 × 160 px
 - Tekst: 240 × 96 px
 - Knapp: 160 × 48 px
 
-Implementert startplassering:
+### Minimumsstørrelser
 
-- x 24 px og første ledige vertikale gap
-- minimum 16 px avstand ved oppretting
+- Seksjon: 160 × 90 px
+- Bilde: 120 × 80 px
+- Tekst: 120 × 48 px
+- Knapp: 80 × 36 px
+
+### Opprettingsplassering
+
+- start ved x 24 px
+- første ledige vertikale gap
+- minst 16 px avstand ved oppretting
 - eksisterende elementer flyttes aldri automatisk
-- lerretet utvides ved behov
-
-Plasseringsregelen gjelder bare når elementet opprettes. Den skal ikke brukes som kollisjonskontroll under draing.
+- regelen gjelder bare elementets fødested
 
 Se `docs/ELEMENT_CREATION.md`.
 
-### Flytting og størrelsesendring
+### Flytting og resizing
 
-Neste branch skal bygge:
+- elementer kan overlappe
+- ingen automatisk kollisjonsunngåelse
+- elementet holdes innenfor venstre, høyre og øvre lerretskant
+- det finnes ingen fast nedre grense
+- lerretet forlenges automatisk nedover
+- ett resize-håndtak vises på valgt og ulåst element
+- synlig håndtak er 16 × 16 px
+- treffflaten er 32 × 32 px
+- innhold utenfor elementgrensen klippes
 
-- flytting av valgt element
-- ett firkantet håndtak nederst til høyre
-- minimumsstørrelse per elementtype
-- størrelsesendring gjennom prosjekt-state/reducer
-- klipping av innhold
-- scrolling under interaksjonen dersom nødvendig
+Pekerregler:
 
-Skal ikke bygges samtidig:
+- pointer capture brukes under interaksjonen
+- scrollforskyvning inngår i deltaet
+- preview er transient
+- normalt slipp committer én gang
+- cancel eller tapt capture committer ikke
 
-- kollisjonsunngåelse
-- korrigeringslinjer
-- låsing
-- tekstredigering
-- historikk
-- lagring
+Tastaturregler:
+
+- piltaster flytter 1 px
+- `Shift` + piltast flytter 10 px
+- `Ctrl`/`Cmd` + piltast endrer størrelse 1 px
+- `Ctrl`/`Cmd` + `Shift` + piltast endrer størrelse 10 px
+
+Se `docs/DRAG_RESIZE.md`.
+
+### Låsing
+
+Modellen har allerede `locked`.
+
+Varige regler:
+
+- låst element kan markeres
+- låst element kan ikke flyttes eller resizes
+- reduceren avviser layoutmutasjon når elementet er låst
+- resize-håndtak vises ikke når elementet er låst
+
+Selve låsegrensesnittet bygges i `feature/object-locking`.
 
 ### Tekst
 
-- `Tekst` oppretter nå en nøytral tekstplassholder.
-- Direkte tekstinnhold er ikke implementert.
-- Tekstboksen kan senere vokse med innholdet, men elementboksen vokser ikke automatisk.
-- Brukeren skal kunne skrive, markere, rette og slette tekst.
-- Markert tekst skal kunne endre font, størrelse, farge, fet og kursiv.
-- Innhold utenfor elementboksen skjules.
-- Tekstredigering må ha en egen modus slik at Enter og mellomrom ikke alltid tolkes som elementmarkering.
+- `Tekst` er foreløpig en nøytral plassholder.
+- Direkte tekstredigering bygges i egen modus.
+- Objektmarkering og innholdsredigering må skilles tydelig.
+- Innhold utenfor elementboksen klippes.
 
 ### Bilder
 
-- `Bilde` oppretter nå en nøytral bildeplassholder.
+- `Bilde` er foreløpig en nøytral plassholder.
 - Ekte bildeinnhold og bildevelger er ikke implementert.
-- bildet skal senere være et selvstendig objekt
-- flytte og endre størrelse separat
-- bildet festes ikke automatisk til elementet det ligger over
-- bildet kan låses
+- Bildet skal være et selvstendig objekt med egen geometri og låsestatus.
 
 ### Knapper
 
-- `Knapp` oppretter nå en nøytral knapprepresentasjon uten handling.
-- Knappen skal senere kunne ha redigerbar tekst, størrelse, plassering, bakgrunn, tekstfarge og ramme.
-- Handling eller lenketype fastsettes før implementering.
-- En knapphandling skal ikke aktiveres mens brukeren bare markerer knappen i editoren.
+- `Knapp` er foreløpig en nøytral representasjon uten handling.
+- Senere skal tekst, farger, ramme og handling kunne redigeres.
+- Faktisk knapphandling skal ikke aktiveres i vanlig editormodus.
+
+## 4. Korrigerings- og hjelpesystem
+
+Senere krav:
+
+- horisontal midtstilling
+- elementer på samme linje
+- lik avstand mellom tre eller flere elementer
+- vises bare under flytting eller resizing
+- ingen usynlig automatisk flytting
+- ingen generell kollisjonsunngåelse
+
+Planlagt branch: `feature/alignment-guides`.
 
 ## 5. Farger, logo/header og fonts
 
 ### Farger
 
-- panelet viser alle faktiske prosjektfarger
+- panelet skal vise faktiske prosjektfarger
 - ingen ferdig fargepalett
-- global prosjektfarge kan endres fra ett sted
-- endringen oppdaterer alle elementer som bruker fargen
+- global endring skal oppdatere alle elementer som bruker fargen
 
 ### Logo/header
 
 - laste opp logo
 - opprette header
-- logo, hovedtekst og undertittel
+- hovedtekst og undertittel
 - redigerbar struktur
 
 ### Fonts
 
 - omtrent 7–8 nettsikre fonter
-- fontstørrelse fra fast liste
-- fontfarge registreres i Farger-systemet
+- fontstørrelse fra kontrollert liste
+- fontfarge registreres i fargesystemet
 - fet og kursiv i første versjon
-- scope for fontendring avklares senere
 
 ## 6. Lokal automatisk lagring
 
 - prosjektet lagres i egen mappe på brukerens PC
-- brukeren velger eller oppretter mappen
 - prosjektdata og bilder lagres lokalt
-- automatisk lagring uten manuell lagring for hver endring
+- automatisk lagring uten manuell lagreknapp per endring
 - statusene `Lagrer`, `Lagret` og `Lagringsfeil`
 - sikker skriving og gjenoppretting
-- samme prosjektendringsmodell som angre/gjør om
-- markeringsstate og annen transient UI-state skal ikke lagres
-- serverlagring er ikke nødvendig i første lokale versjon
+- samme prosjektendringsgrense som historikksystemet
+- transient markering og pointer-preview skal ikke lagres
 
 ## 7. Arkitektur og arbeidsmåte
 
-- hver funksjon bygges i egen branch
+- én avgrenset funksjon per branch
 - `main` holdes stabil
-- 250 linjer er aktiv terskel for uttrekking av ansvar fra kildefiler
-- `App.tsx` setter bare sammen hovedstrukturen
-- prosjektmodell, transient editor-state og visuelle komponenter skal ikke blandes
-- state-avhengige mutasjoner bruker nyeste reducer-state
-- union-baserte switcher håndteres uttømmende
-- responsive viewport-typer har én autoritativ definisjon
-- Dependency Cruiser stopper sirkulære, uløselige og utilgjengelige moduler
+- 250 linjer er aktiv terskel for ansvarstrekk
+- `App.tsx` komponerer bare hovedstrukturen
+- prosjektmodell, transient state, hendelseslogikk og visning holdes separat
+- reducer-actions håndteres uttømmende
+- ugyldige og uendrede state-overganger avvises
+- pointer-transform og edge-scroll er separate ansvar
+- Dependency Cruiser kontrollerer modulgrensene
 - arkitekturrapporter regenereres etter strukturendringer
-- PowerShell-kommandoer følger hver repoendring
 
 ## 8. Planlagte branches
 
-- `feature/element-creation` — gjeldende, klar for siste kontroll etter audit
-- `feature/drag-resize` — neste etter godkjent merge
+- `feature/drag-resize` — gjeldende, auditendringer må sluttkontrolleres
 - `feature/object-locking`
 - `feature/text-box-editing`
 - `feature/button-element`
@@ -300,22 +248,14 @@ Skal ikke bygges samtidig:
 
 ## 9. Åpne beslutninger
 
-- minimumsstørrelse per elementtype
-- om elementer kan flyttes delvis utenfor lerretet
-- pekerfangst og scrolling under draing
-- mobiloppførsel for drag/resize før egne mobiloverstyringer finnes
-- plassering av Nytt prosjekt og Importer prosjekt
-- plassering av Farger, Logo/header og Fonts
-- endelig fontliste og fontstørrelser
-- scope for fontendringer
-- tekstjustering og linjehøyde
-- mobile overstyringer i første versjon
+- plassering og utforming av låsekontrollen
+- sletting og bekreftelsesregel
 - endelig mobilbrytepunkt
-- markering av element som er skjult i aktiv mobilvisning
-- fri eller proporsjonal størrelsesendring
-- låsefunksjonens plassering og utforming
-- måling og terskler for lik avstand og sentrering
+- hvilke egenskaper som kan overstyres på mobil
+- sammenslåing av gjentatte tastaturendringer i historikk
+- endelig fontliste og fontstørrelser
+- tekstjustering og linjehøyde
 - knappens handlinger og lenketyper
 - prosjektfilformat og lagringsintervall
 - sikker skriving og gjenoppretting
-- publiseringsarkitektur og eventuell senere backend
+- publiseringsarkitektur
