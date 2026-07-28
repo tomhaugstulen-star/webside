@@ -155,8 +155,7 @@
   pointer-events: none;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 16px;
-  line-height: 1.45;
+  text-align: inherit;
 }
 
 .canvas-element__text-content--empty {
@@ -177,8 +176,7 @@
   color: inherit;
   background: transparent;
   font: inherit;
-  font-size: 16px;
-  line-height: 1.45;
+  text-align: inherit;
   overflow-wrap: anywhere;
   user-select: text;
   touch-action: manipulation;
