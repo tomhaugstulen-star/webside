@@ -21,13 +21,25 @@ export function createEditorElement({
 }: CreateEditorElementInput): EditorElement {
   const size = defaultElementSizes[kind]
   const position = findElementCreationPosition(size, existingElements)
-
-  return {
+  const common = {
     id,
-    kind,
     position: { desktop: position },
     size: { desktop: { ...size } },
     visibility: { desktop: true },
     locked: false,
   }
+
+  switch (kind) {
+    case 'section':
+      return { ...common, kind }
+    case 'image':
+      return { ...common, kind }
+    case 'text':
+      return { ...common, kind, content: '' }
+    case 'button':
+      return { ...common, kind }
+  }
+
+  const unhandledKind: never = kind
+  return unhandledKind
 }
