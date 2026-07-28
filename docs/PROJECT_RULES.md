@@ -4,28 +4,25 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 
 ## 1. Branch-strategi
 
-- Hver funksjon eller avgrenset del bygges i egen branch.
+- Hver funksjon bygges i egen avgrenset branch.
 - `main` skal alltid være stabil.
 - Ingen ny funksjon utvikles direkte på `main`.
-- Feilretting og teknisk opprydding gjøres i egne branches.
-- En branch skal bare inneholde arbeidet den er opprettet for.
 - En godkjent branch merges før neste feature-branch opprettes fra oppdatert `main`.
+- En branch skal ikke inneholde skjult arbeid for senere faser.
 
 Eksempler:
 
-- `feature/element-creation`
 - `feature/drag-resize`
 - `feature/object-locking`
 - `feature/text-box-editing`
+- `feature/right-properties-panel`
 - `feature/mobile-design-controls`
-- `fix/sidebar-panel-behavior`
-- `tooling/dependency-cruiser`
 
 ## 2. Filstørrelser og moduldeling
 
-- 250 linjer er aktiv terskel for å begynne å trekke ut ansvar fra en kildefil.
+- 250 linjer er aktiv terskel for å trekke ut ansvar.
 - En fil deles tidligere dersom den får flere tydelige ansvarsområder.
-- 300 linjer er en eksplisitt kontrollgrense og skal være et unntak.
+- 300 linjer er en eksplisitt unntaksgrense.
 - Uttrekking skjer etter ansvar, ikke ved tilfeldig oppdeling.
 - Visning, varig state, transient state, hendelseslogikk og rene hjelpefunksjoner skilles når det gir naturlige grenser.
 - `App.tsx` skal bare sette sammen hovedstrukturen.
@@ -38,23 +35,24 @@ Eksempler:
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - DOM-en skal ikke brukes som permanent prosjektlagring.
-- Elementer, geometri, innhold og låsestatus endres gjennom prosjekt-state/reduceren.
+- Geometri, låsestatus, tekstinnhold og senere egenskaper endres gjennom prosjekt-state/reduceren.
 - Prosjektidentitet bruker stabile kryptografiske ID-er.
-- State-avhengige prosjektberegninger bruker reducerens nyeste state.
-- UI-hooks sender brukerintensjon og ikke-deterministisk metadata, men skal ikke beregne varig resultat fra et mulig gammelt React-snapshot.
+- State-avhengige beregninger bruker reducerens nyeste state.
+- UI-hooks sender brukerintensjon og ikke-deterministisk metadata, men beregner ikke varig resultat fra et mulig gammelt React-snapshot.
 - Reduceren skal være deterministisk for samme state og action.
 - `updatedAt` endres bare ved en reell, gyldig prosjektmutasjon.
 
 ### Transient editor-state
 
-Transient state skal holdes utenfor `EditorProject`, blant annet:
+Transient state holdes utenfor `EditorProject`, blant annet:
 
 - `selectedElementId`
 - aktiv pekerinteraksjon
-- layout-preview under draing eller resizing
+- layout-preview
 - åpne paneler og aktivt verktøy
-- fokus, hover og synlighet for objektverktøylinjer
-- framtidig tekstredigeringsmodus dersom den bare beskriver UI-tilstand
+- aktiv tekstredigeringsøkt
+- lokal tekstdraft
+- fokus, hover og synlighet for objektverktøy og egenskapspanel
 
 Transient state skal ikke:
 
@@ -64,50 +62,83 @@ Transient state skal ikke:
 - eksporteres
 - publiseres
 
-Når historikk og lagring bygges, skal ferdige prosjektmutasjoner være den eksplisitte grensen.
+Ferdige prosjektmutasjoner er den eksplisitte grensen for senere historikk og lagring.
 
-## 4. Layout- og transformregler
+## 4. Layout og transform
 
 - Opprettingsplassering gjelder bare elementets fødested.
-- Startplassering skal ikke bli et automatisk kollisjonssystem.
+- Startplassering er ikke et automatisk kollisjonssystem.
 - Elementer kan overlappe.
 - Andre elementer flyttes aldri automatisk.
 - Flytting og resizing beregnes av rene modellfunksjoner.
 - Pekerbevegelse bruker transient preview.
-- Normalt pekerslipp committer én ferdig geometriendring.
-- `pointercancel` og tapt pointer capture skal rydde preview uten commit.
-- Låste elementer kan markeres, men kan ikke transformeres.
-- Reduceren skal også avvise layoutmutasjon av låste elementer.
-- Lerretshøyde er avledet visning og skal ikke lagres i prosjektfilen.
+- Normalt pekerslipp committer én geometriendring.
+- `pointercancel` og tapt pointer capture rydder preview uten commit.
+- Låste elementer kan markeres, men ikke transformeres.
+- Reduceren avviser layoutmutasjon av låste elementer.
+- Lerretshøyde er avledet visning og lagres ikke i prosjektfilen.
 
 ## 5. Objektlåsing
 
-- `locked` er varig elementdata og er felles for PC og Telefon.
-- Låsestatus endres gjennom en eksplisitt reducer-action.
-- Neste låseverdi beregnes fra reducerens nyeste state.
+- `locked` er varig elementdata og felles for PC og Telefon.
+- Låsestatus endres gjennom reduceren.
+- Neste låseverdi beregnes fra nyeste state.
 - Ukjent element-ID gir ingen prosjektendring.
 - En gyldig låseendring oppdaterer `updatedAt`.
-- Låst element skal fortsatt kunne fokuseres og markeres.
-- Låst element skal kunne låses opp uten at markeringen fjernes.
-- Peker- og tastaturtransform blokkeres både i UI-grensen og reducer-grensen.
-- Piltaster på låst element skal ikke utløse utilsiktet scrolling.
-- Objektverktøylinjen skal være separat fra elementets `role="button"`.
-- Klikk på objektverktøy skal ikke starte flytting eller fjerne markeringen.
+- Låst element kan fokuseres, markeres og låses opp.
+- Peker- og tastaturtransform blokkeres i både UI og reducer.
+- Piltaster på låst element skal ikke utløse scrolling.
+- Objektverktøylinjen er separat fra elementets `role="button"`.
+- Klikk på objektverktøy starter ikke flytting eller fjerner markering.
 - En låseendring skal senere være én historikk-/autolagringsendring.
 
 Se `docs/OBJECT_LOCKING.md`.
 
-## 6. Responsiv grense
+## 6. Ren tekstredigering
+
+- Prosjektskjemaet er versjon 2 etter innføring av tekstinnhold.
+- `EditorElement` er en diskriminert union.
+- Bare `kind: 'text'` har obligatorisk `content: string`.
+- Nye tekstbokser starter med `content: ''`.
+- Tom tekst er gyldig prosjektdata.
+- Editor-placeholder lagres aldri som innhold.
+- Redigering bruker kontrollert `textarea`, ikke `contentEditable` eller `innerHTML`.
+- Ett klikk markerer tekstboksen.
+- Dobbeltklikk eller `Enter` på markert, ulåst tekstboks starter redigering.
+- Vanlig `Enter` lager ny linje.
+- Blur og `Ctrl`/`Cmd` + `Enter` committer.
+- `Escape` forkaster aktiv draft.
+- IME-komposisjon skal ikke avbrytes av snarveier.
+- Linjeskift normaliseres til `\n` ved commit.
+- Reduceren avviser feil type, låst element og uendret tekst.
+- Aktiv redigeringsøkt og lokal draft er transient state.
+- Under redigering deaktiveres objektets transformhendelser, snarveier, resize-håndtak og objektverktøylinje.
+- En avsluttet redigeringsøkt skal senere være én historikk-/autolagringsendring.
+- En tekstboks vokser ikke automatisk med innholdet i denne fasen.
+
+Se `docs/TEXT_BOX_EDITING.md`.
+
+## 7. Høyremeny og egenskaper
+
+- Høyremenyens grunnstruktur bygges før egenskapskontrollene.
+- Panelet skal følge `selectedElementId`, ikke lete i DOM-en.
+- Ingen valgt element gir en eksplisitt tom eller skjult tilstand.
+- Panelet skal aldri eie en separat kopi av autoritative elementdata.
+- Egenskapsendringer skal senere gå gjennom typed state-API og reducer-actions.
+- Den første panelbranchen bygger ikke font-, farge-, bilde- eller knappfunksjoner.
+- Panelstate som åpne seksjoner, fokus og hover er transient.
+- Panelkontroller må fungere uten å stjele eller ødelegge aktiv tekstredigering utilsiktet.
+
+## 8. Responsiv grense
 
 - `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen.
-- UI-typer skal være alias til modelltypen, ikke en separat union.
 - Mobil arver desktopverdier når mobiloverstyring mangler.
-- Egne mobiloverstyringer bygges eksplisitt i `feature/mobile-design-controls`.
-- En mobilendring skal ikke utilsiktet skrive desktopgeometri når mobiloverstyringer senere finnes.
-- Layout-actions og transform-API må gjøres viewport-bevisste i den fasen.
-- Låsestatus er ikke responsiv med mindre en senere eksplisitt produktbeslutning endrer dette.
+- Egne mobiloverstyringer bygges i `feature/mobile-design-controls`.
+- En mobilendring skal senere ikke skrive desktopgeometri utilsiktet.
+- Layout-actions og transform-API gjøres viewport-bevisste i den fasen.
+- Låsestatus og tekstinnhold er ikke responsive verdier uten en ny eksplisitt produktbeslutning.
 
-## 7. Arbeidsrekkefølge
+## 9. Arbeidsrekkefølge
 
 Før hver ny del avklares:
 
@@ -115,36 +146,32 @@ Før hver ny del avklares:
 2. Hvilke brukerhandlinger som finnes.
 3. Hvilken state som trengs.
 4. Om state er varig eller transient.
-5. Hvordan desktop og mobil påvirkes.
+5. Hvordan PC og Telefon påvirkes.
 6. Hvordan funksjonen påvirker historikk og lagring.
 7. Hvilke filer og ansvarsgrenser som berøres.
 8. Hvordan funksjonen testes med peker og tastatur.
 9. Hvordan test-fixtures fjernes.
 
-## 8. Endringskontroll
+## 10. Endringskontroll
 
 - Ikke bygg videre før oppførselen er definert.
-- Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige uten dokumentasjon.
+- Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige.
 - Ikke bland designendringer, datamodell og interaksjonslogikk unødvendig.
 - Små, kontrollerbare leveranser foretrekkes.
-- Før større endringer beskrives berørte filer og forventet effekt.
 - Arkitekturrapporter regenereres etter strukturendringer.
 - Nøyaktige PowerShell-kommandoer følger hver repoendring.
-- Ikke oppgi at lint, typekontroll, arkitektursjekk eller build er bestått før brukeren eller verifisert CI har bekreftet det.
+- Ikke påstå at kontrollene er bestått før brukeren eller verifisert CI har bekreftet det.
 - Ikke merge uten eksplisitt godkjenning.
 
-## 9. Kvalitetskrav
+## 11. Kvalitetskrav
 
 - TypeScript brukes konsekvent.
-- Reducer-actions og union-baserte UI-switcher håndteres uttømmende.
-- Ugyldige state-overganger ignoreres eller avvises kontrollert.
-- Uendrede prosjektmutasjoner skal ikke oppdatere state eller `updatedAt`.
-- Komponenter skal ha tydelige props og avgrenset ansvar.
-- Interaksjoner skal ha tastaturalternativ der draing ellers er eneste handling.
-- Fokusrekkefølgen skal være forutsigbar.
-- Brukerhandlinger skal ha tydelig tilbakemelding.
+- Reducer-actions og union-baserte switcher håndteres uttømmende.
+- Ugyldige og uendrede state-overganger avvises kontrollert.
+- Komponenter har tydelige props og avgrenset ansvar.
+- Fokusrekkefølgen er forutsigbar.
+- Interaksjoner har tastaturalternativ der draing ellers er eneste handling.
 - PC og Telefon testes separat.
-- Layoutsystemet skal unngå skjulte koblinger.
 - Ingen ubrukt kildekodemodul skal passere arkitektursjekken.
 
 Før en branch kan godkjennes kjøres normalt:
@@ -156,22 +183,22 @@ npm run architecture:diagram
 npm run dev
 ```
 
-## 10. Tilgjengelighet og editorinteraksjon
+## 12. Tilgjengelighet og editorinteraksjon
 
-- Enter og mellomrom markerer et fokusert element.
-- Piltaster flytter et ulåst, fokusert element.
-- `Ctrl`/`Cmd` + piltaster endrer størrelse på et ulåst element.
+- Enter og mellomrom markerer et fokusert objekt.
+- Piltaster flytter et ulåst, fokusert objekt.
+- `Ctrl`/`Cmd` + piltaster endrer størrelse.
 - `Shift` bruker større steg.
-- Resize-håndtakets treffflate skal være større enn den synlige firkanten.
-- Tilgjengelige navn skal bli mer spesifikke når elementmodellen får navn eller innhold.
-- Tekstredigering må skille objektmarkering fra innholdsredigering.
-- Faktiske knappehandlinger eller lenker aktiveres ikke i vanlig editormodus.
-- Låste elementer skal fortsatt kunne fokuseres og markeres.
-- Låseknappen skal ha dynamisk tilgjengelig navn og synlig fokustilstand.
+- Låste elementer kan fortsatt fokuseres og markeres.
+- Tekstredigering skiller objektmarkering fra innholdsredigering.
+- Under tekstredigering brukes piltaster og Enter av tekstfeltet.
+- Tilgjengelige navn skal bli mer spesifikke når elementet får innhold.
+- Faktiske knappehandlinger og lenker aktiveres ikke i vanlig editormodus.
 
-## 11. Gjeldende status
+## 13. Gjeldende status
 
-- Editorgrunnlag, prosjektmodell, markering, elementoppretting og drag/resize er merget til `main`.
-- `feature/object-locking` er implementert og visuelt godkjent på PC og Telefon før siste auditendring.
-- Siste tastaturretting, dokumentasjon og arkitekturrapporter må sluttkontrolleres før PR.
-- Neste planlagte branch etter godkjent merge er `feature/text-box-editing`.
+- Editorgrunnlag, modell, markering, oppretting, drag/resize og objektlåsing er merget til `main`.
+- `feature/text-box-editing` er implementert, kodeauditert, kontrollert og visuelt godkjent.
+- Dokumentasjon er oppdatert.
+- Arkitekturrapportene må regenereres og committes før PR.
+- Neste branch etter kontrollert merge er `feature/right-properties-panel`.
