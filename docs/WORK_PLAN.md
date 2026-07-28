@@ -10,7 +10,7 @@ For hver avgrensede del:
 2. Oppdater og kontroller `main`.
 3. Opprett eller fast-forward en avgrenset feature-branch.
 4. Definer omfang, brukerhandlinger, state og grenser mot senere funksjoner.
-5. Få eksplisitt godkjenning på åpne produkt- og designvalg.
+5. Lås åpne produkt- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
 7. Trekk ut ansvar før en kildefil passerer 250 linjer.
 8. Gjennomfør framtidsrettet kodeaudit.
@@ -21,7 +21,7 @@ For hver avgrensede del:
 13. Kontroller synkronisert branch og clean tree.
 14. Opprett draft-PR og kontroller hele diffen, mergebarhet, review-tråder og eventuell CI.
 15. Marker PR klar for review.
-16. Merge bare etter eksplisitt bruker­godkjenning.
+16. Merge bare etter eksplisitt brukergodkjenning.
 17. Oppdater lokal `main` og kontroller clean tree før neste fase.
 
 ## 2. Ferdig og merget til `main`
@@ -118,90 +118,118 @@ Elementer
 Innstillinger
 ```
 
+### Fase 7 – Høyremenyens grunnstruktur
+
+Branch: `feature/right-properties-panel`
+
+Status: merget som PR #9 med merge-commit `8de5f2e`.
+
+- ingen markering gir ingen synlig eller reservert høyremeny
+- valgt element åpner panelet
+- elementtype og låsestatus vises
+- 320 px dokket panel fra 1680 px
+- overlay under 1680 px uten å redusere lerretet
+- egen vertikal scrolling
+- 180 ms transform-animasjon
+- `prefers-reduced-motion` respekteres
+- eksisterende `useElementSelection` gjenbrukes
+- tekstens blur/commit beholdes
+- panelinnhold rendres bare for et gyldig valgt element
+- sentral variabel isolerer reservert panelbredde fra canvas-CSS
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
 ## 3. Gjeldende fase
 
-### Fase 7 – Høyremenyens grunnstruktur
+### Fase 8 – Tekstegenskaper
 
 Branch:
 
 ```text
-feature/right-properties-panel
+feature/text-properties
 ```
 
 Utgangspunkt:
 
 ```text
-main: a35f59d
-produksjonskode og arkitekturrapporter: 2d25a542
+main: 8de5f2e
+PR #9: høyremenyens grunnstruktur
 ```
 
-Status:
-
-- implementert
-- framtidsrettet kodeaudit gjennomført
-- auditfunn rettet
-- `npm run check` bestått etter siste kodeendring
-- Dependency Cruiser: 38 moduler, 80 avhengigheter, ingen brudd
-- arkitekturrapporter oppdatert
-- visuell PC-kontroll godkjent
-- arbeidsområdet bekreftet clean
-- dokumentasjon oppdateres før PR
-- PR er ikke opprettet ennå
-
-Låst oppførsel:
+Sporet i:
 
 ```text
-Ingenting valgt -> ingen høyremeny
-Element valgt   -> høyremeny åpnes
-Tomt lerret     -> høyremeny lukkes
+docs/TEXT_PROPERTIES.md
+GitHub-sak #10
 ```
 
-Implementerte beslutninger:
+Fast UX-regel:
 
-- bredde 320 px
-- dokket fra 1680 px
-- overlay under 1680 px uten å redusere lerretet
-- ingen reservert plass når panelet er skjult
-- egen vertikal scrolling
-- 180 ms transform-animasjon
-- ingen animasjon ved `prefers-reduced-motion`
-- visuell struktur: `Egenskaper`, elementtype, `Element`, `Status`
-- viser bare elementtype og `Låst`/`Ulåst`
+```text
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
+```
 
-Arkitektur:
+### Skal bygge
 
-- egen `RightPropertiesPanel.tsx`
-- eksisterende `useElementSelection` gjenbrukes
-- ingen DOM-søk, separat elementkopi eller ny reducer-action
-- panelinnhold rendres bare når et element finnes
-- sentral `--properties-panel-reserved-width` holder panel-CSS og canvas-CSS adskilt
-- tekstens eksisterende blur/commit beholdes
+For en markert vanlig tekstboks:
 
-Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+```text
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
+```
 
-### Gjenstående før merge
+Låste valg:
 
-1. Hent dokumentasjonscommitene lokalt.
-2. Kontroller at working tree er clean.
-3. Sammenlign hele branchen mot `main`.
-4. Kontroller at diffen bare inneholder høyremenygrunnstruktur, arkitekturrapporter og relevant dokumentasjon.
-5. Opprett draft-PR.
-6. Kontroller mergebarhet, review-tråder og eventuell CI.
-7. Marker PR klar for review når kontrollen er ferdig.
-8. Merge bare etter brukerens eksplisitte godkjenning.
+- formateringen gjelder hele tekstboksen
+- åtte kontrollerte nettsikre fonter
+- kontrollert fontstørrelsesliste fra 12 til 96 px
+- venstre, midtstilt og høyre justering
+- kontrollerte linjehøyder fra 1.0 til 2.0
+- standarden bevarer dagens 16 px og 1.45
+- tekstfarge utsettes til prosjektfargesystemet
+- tekststil er foreløpig felles for PC og Telefon
+- låste tekstelementer kan inspiseres, men kontrollene er deaktivert
+- tekstinnhold redigeres fortsatt bare på lerretet
+
+### Modell og state
+
+- prosjektskjemaet økes til versjon 3
+- bare tekstelementer får obligatorisk `textStyle`
+- fonttokens lagres, ikke rå CSS-fontstacker
+- tekststil er varig prosjektdata
+- kontrollene sender avgrensede stilpatcher
+- reduceren bruker nyeste state og avviser ugyldige, låste og uendrede overganger
+- `updatedAt` endres bare ved reell stilendring
+- panelet eier ingen separat kopi av tekststilen
+
+### Skal ikke bygge
+
+- tekstfarge eller prosjektfargemodell
+- bredde, høyde eller plassering i høyremenyen
+- headerens hovedtekst eller undertittel
+- riktekst eller formatering av enkeltord
+- opplasting av fonter eller eksterne webfonter
+- sletting, duplisering, historikk eller lagring
+- mobile tekststiloverstyringer
+
+### Første implementeringsrekkefølge
+
+1. Legg inn tekststiltyper, standardverdier og validering.
+2. Oppdater tekstelementets modell og oppretting.
+3. Lag reducerhjelper og dispatch-hook for stilpatcher.
+4. Avled fonttoken og tekststil til CSS for canvas.
+5. Sikre identisk stil i vanlig visning og `textarea`.
+6. Legg inn en avgrenset `TextPropertiesSection` i høyremenyen.
+7. Gjennomfør kodeaudit før visuell godkjenning.
 
 ## 4. Senere faser
-
-### Fase 8 – Tekstegenskaper
-
-Branch: `feature/text-properties`
-
-- nettsikre fonter
-- kontrollert fontstørrelsesliste
-- linjehøyde og tekstjustering etter beslutning
-- tekstfarge kobles senere til prosjektets fargesystem
-- fet og kursiv
-- hele boksen kontra markert tekst må avklares før kode
 
 ### Fase 9 – Knapper
 
@@ -228,6 +256,7 @@ Branch: `feature/project-colors`
 - register over faktiske prosjektfarger
 - global endring
 - oppdatering av alle brukere av en farge
+- tekstfarge kobles hit, ikke til fase 8
 
 ### Fase 12 – Logo og header
 
@@ -237,6 +266,7 @@ Branch: `feature/logo-header`
 - header
 - hovedtekst og undertittel
 - redigerbar struktur
+- headertekst er ikke en vanlig fri tekstboks
 
 ### Fase 13 – Korrigeringslinjer
 
