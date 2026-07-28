@@ -14,7 +14,10 @@ Dette dokumentet samler bekreftede krav og åpne planleggingsområder. Det skal 
 - Editorens designverktøy skal støtte både desktop- og mobilvisning.
 - Mobilvisningen skal være en faktisk redigeringsmodus, ikke bare en smal forhåndsvisning.
 - Elementer som finnes på desktop skal kunne skjules på mobil uten at desktopversjonen slettes.
-- Om desktop og mobil skal kunne ha forskjellige font-, bilde- og elementinnstillinger må undersøkes før implementering.
+- CSS media queries skal brukes i ferdig forhåndsvisning og eksport.
+- Desktop og mobil kan teknisk ha forskjellige font-, bilde- og elementinnstillinger.
+- Hvilke egenskaper som kan overstyres i første versjon skal avklares før implementering.
+- Den tekniske retningen er beskrevet i `docs/RESPONSIVE_DESIGN.md`.
 
 ### Korrigerings- og hjelpesystem
 
@@ -77,7 +80,7 @@ Bekreftede regler:
 - Fontfarger registreres i prosjektets felles Farger-system.
 - Fet skrift og kursiv skal være tilgjengelig i første versjon.
 - Hvilken tekst eller hvilket element fontinnstillingen gjelder, bestemmes senere.
-- Forskjellige fontvalg for desktop og mobil skal undersøkes før dette fastsettes.
+- Forskjellige fontvalg for desktop og mobil er teknisk mulig og planlegges gjennom responsive overstyringer.
 
 ### Elementer
 
@@ -156,7 +159,7 @@ Bekreftede regler:
 - Maksimal anbefalt størrelse for kildefiler er 300 linjer.
 - Filer skal deles tidligere dersom de får for mange ansvarsområder.
 - `App.tsx` skal bare sette sammen hovedstrukturen.
-- Elementer, tekstredigering, bildebehandling, korrigeringslinjer og lagring skal ha separate moduler.
+- Elementer, tekstredigering, bildebehandling, korrigeringslinjer, responsive regler og lagring skal ha separate moduler.
 
 ## 5. Foreslått funksjonsrekkefølge
 
@@ -201,7 +204,8 @@ Branches opprettes først når delen faktisk skal bygges:
 - Eksakte fontstørrelser i listen.
 - Hvilken tekst eller hvilket element en fontendring gjelder.
 - Om tekstjustering og linjehøyde skal være med.
-- Om desktop og mobil kan ha forskjellige font-, bilde- og elementinnstillinger.
+- Hvilke font-, bilde- og elementegenskaper som kan overstyres separat på mobil.
+- Endelig mobilbrytepunkt.
 - Endelig standardstørrelse og minimumsstørrelse på et nytt element.
 - Om drahåndtaket endrer bredde og høyde fritt eller proporsjonalt.
 - Nøyaktig plassering og utforming av låsefunksjonen.
