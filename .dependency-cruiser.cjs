@@ -20,8 +20,21 @@ module.exports = {
       },
     },
     {
+      name: 'no-unreachable-from-main',
+      comment: 'Alle kildekodemoduler skal være i bruk fra programmets inngangspunkt.',
+      severity: 'error',
+      from: {
+        path: '^src/main\\.tsx$',
+      },
+      to: {
+        path: '^src/',
+        pathNot: '\\.d\\.ts$',
+        reachable: false,
+      },
+    },
+    {
       name: 'no-orphans',
-      comment: 'Filer uten innkommende eller utgående avhengigheter skal vurderes fjernet eller koblet inn.',
+      comment: 'Helt frakoblede filer skal vurderes fjernet eller koblet inn.',
       severity: 'warn',
       from: {
         orphan: true,
