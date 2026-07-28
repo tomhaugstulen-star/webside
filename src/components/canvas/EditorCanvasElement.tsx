@@ -41,11 +41,6 @@ export function EditorCanvasElement({
 }: EditorCanvasElementProps) {
   const { commitElementDesktopLayout } = useElementLayout()
   const visible = resolveResponsiveValue(element.visibility, viewport)
-
-  if (!visible) {
-    return null
-  }
-
   const initialLayout: ElementLayout = {
     position: resolveResponsiveValue(element.position, viewport),
     size: resolveResponsiveValue(element.size, viewport),
@@ -67,6 +62,11 @@ export function EditorCanvasElement({
     onCommitLayout: commitElementDesktopLayout,
     onPreviewLayoutChange,
   })
+
+  if (!visible) {
+    return null
+  }
+
   const label = elementKindLabels[element.kind]
   const style: CSSProperties = {
     left: layout.position.x,
