@@ -111,20 +111,8 @@
 }
 
 @media (min-width: 1680px) {
-  .editor-shell--properties-open .canvas-page--desktop {
-    width: min(
-      1080px,
-      calc(
-        100vw - var(--rail-width) - var(--panel-width) - var(--properties-panel-width) - 112px
-      )
-    );
-  }
-
-  .editor-shell--properties-open:not(.editor-shell--panel-open) .canvas-page--desktop {
-    width: min(
-      1320px,
-      calc(100vw - var(--rail-width) - var(--properties-panel-width) - 112px)
-    );
+  .editor-shell--properties-open {
+    --properties-panel-reserved-width: var(--properties-panel-width);
   }
 }
 
