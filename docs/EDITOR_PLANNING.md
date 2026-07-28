@@ -1,10 +1,10 @@
 # Plan for Website-editoren
 
-Dette dokumentet samler bekreftede krav, implementert grunnlag og åpne beslutninger.
+Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne beslutninger.
 
-## 1. Nåværende implementeringsstatus
+## 1. Implementeringsstatus
 
-### Godkjent på `main`
+### Ferdig og merget til `main`
 
 - blankt, hvitt lerret
 - toppmeny
@@ -14,59 +14,96 @@ Dette dokumentet samler bekreftede krav, implementert grunnlag og åpne beslutni
 - delt CSS- og komponentstruktur
 - Dependency Cruiser
 - samlet `npm run check`
-- automatisk åpning av nettleseren med `npm run dev`
+- automatisk nettleseråpning
+- prosjekt- og elementmodell
+- skjemaversjon og kryptografiske stabile ID-er
+- sider, elementtyper og responsive modellverdier
+- sentral prosjekt-state og aktiv side
+- nytt prosjekt starter blankt med `Forside`
 
-### Godkjent i `feature/element-model`
+### Implementert i `feature/element-selection`
 
-- skjemaversjon for prosjektdata
-- stabil prosjekt-ID og side-ID
-- prosjekt med navn, sider og tidsstempler
-- sider med navn, slug og elementliste
-- elementtypene seksjon, bilde, tekst og knapp
-- responsive verdier for posisjon, størrelse og synlighet
-- låsestatus
-- kryptografiske stabile UUID-er
-- sentral prosjekt-state med provider og reducer
-- aktiv side fra prosjektmodellen
-- nytt prosjekt starter blankt med siden `Forside`
+- valgt element-ID i transient editor-state
+- valg av ett eksisterende element på aktiv side
+- tydelig valgt, hover- og fokusert tilstand
+- klikk på tomt lerretsområde fjerner markeringen
+- tastaturvalg med Tab, Enter og mellomrom
+- valgt element tilgjengelig gjennom `useElementSelection`
+- markering fjernes ved prosjekt- og sidebytte
+- markering fjernes dersom elementet ikke finnes etter en prosjektendring
+- ugyldig markerings-ID ignoreres
+- overflødige state-oppdateringer unngås
+- existing elementbokser renderer fra prosjektmodellen
+- responsive synlighets-, posisjons- og størrelsesverdier brukes
 
-Branchen skal merges til `main` før neste feature-branch opprettes.
+Visuelt godkjent på desktop og mobil. Den midlertidige test-fixturen er fjernet, og startsiden er igjen blank.
 
-### Neste fase
+Siste reducer-herding og dokumentendringer må gjennom sluttkontroll før merge.
+
+### Neste fase etter merge
 
 ```text
-feature/element-selection
+feature/element-creation
 ```
 
-Skal bare bygge markering av eksisterende elementer og valgt element-ID. Elementoppretting kommer etterpå i `feature/element-creation`.
+Denne fasen skal opprette faktiske elementer fra Elementer-panelet. Draing, størrelsesendring, låsing og innholdsredigering skal ikke blandes inn.
 
 ## 2. Bekreftede hovedkrav
 
 ### Blank startside
 
-- En ny side skal åpnes helt blank.
-- Editorens grensesnitt kan være synlig, men nettsiden skal ikke inneholde ferdige seksjoner, tekst, bilder eller farger.
-- Objektverktøy, låseknapp og drahåndtak skal ikke vises før et faktisk objekt finnes og er markert.
+- En ny side åpner helt blank.
+- Editorgrensesnittet kan være synlig, men nettsiden skal ikke inneholde ferdige seksjoner, tekst, bilder eller farger.
+- Objektverktøy, låseknapp og drahåndtak vises først når et faktisk objekt finnes og er markert.
+- Elementoppretting skal bare skje etter en eksplisitt brukerhandling.
+
+### Autoritativ prosjektmodell
+
+- `EditorProject` er autoritativ kilde for prosjektdata.
+- DOM-en skal ikke brukes som permanent lagring.
+- Nye elementer skal opprettes gjennom prosjekt-state/reducer og legges til aktiv side.
+- Element-ID-er skal være kryptografiske og stabile.
+- Midlertidig markeringsstate skal holdes utenfor prosjektfilen.
+
+### Markeringsstate
+
+`selectedElementId` er transient editor-state og skal ikke:
+
+- lagres i prosjektfilen
+- utløse autolagring
+- inngå i angre-/gjør om-historikk
+- eksporteres
+- publiseres
+
+Markeringsregler:
+
+- bare element på aktiv side kan markeres
+- ugyldig element-ID ignoreres
+- side- og prosjektbytte fjerner markering
+- sletting eller annen prosjektendring som fjerner valgt element skal rydde markeringen
+- klikk på objektverktøy må senere kunne beholde markeringen
+- tekstredigeringsmodus må skille mellom markering av objekt og redigering av innhold
 
 ### Desktop og mobil
 
 - Desktop og mobil er redigeringsmoduser.
 - Elementer på desktop skal kunne skjules på mobil uten å slettes på desktop.
-- Ferdig forhåndsvisning og eksport skal bruke media queries.
-- Prosjektmodellen har nå `ResponsiveValue<T>` med desktopverdi og valgfri mobilverdi.
-- Arv, overstyring og mobilkontroller er ikke implementert ennå.
-- Teknisk retning ligger i `docs/RESPONSIVE_DESIGN.md`.
+- Prosjektmodellen har `ResponsiveValue<T>` med desktopverdi og valgfri mobilverdi.
+- Lerretsrenderingen bruker mobilverdi når den finnes og ellers desktopverdien.
+- Brukergrensesnitt for arv, overstyring og skjuling er ikke implementert ennå.
+- Ferdig forhåndsvisning og eksport skal bruke kontrollerte media queries.
+- Når mobilskjuling bygges, må det avklares om et skjult element skal miste markeringen i aktiv visning.
 
 ### Korrigerings- og hjelpesystem
 
-- Varsle ved horisontal midtstilling.
-- Vise når elementer ligger på samme linje.
-- Vise lik avstand mellom tre eller flere elementer.
-- Hjelpelinjer vises bare under flytting eller størrelsesendring.
-- Vertikal midtstilling skal ikke være en egen funksjon.
-- Systemet skal ikke reagere bare fordi elementer nærmer seg hverandre.
-- Elementer kan overlappe.
-- Ingen usynlig automatisk flytting eller kollisjonsunngåelse.
+- varsle ved horisontal midtstilling
+- vise når elementer ligger på samme linje
+- vise lik avstand mellom tre eller flere elementer
+- hjelpelinjer vises bare under flytting eller størrelsesendring
+- ingen egen vertikal sentreringsfunksjon
+- ingen reaksjon bare fordi elementer nærmer seg hverandre
+- elementer kan overlappe
+- ingen usynlig automatisk flytting eller kollisjonsunngåelse
 
 Planlagt branch: `feature/alignment-guides`.
 
@@ -80,7 +117,7 @@ Planlagt branch: `feature/alignment-guides`.
 4. Filer
 5. Innstillinger
 
-`Elementer` bruker samme begrep i synlig tekst, intern verktøy-ID og CSS.
+`Elementer` brukes konsekvent som synlig navn, intern verktøy-ID og CSS-begrep.
 
 Elementer-panelet beholder:
 
@@ -97,13 +134,13 @@ Elementer-panelet beholder:
 - Logo/header
 - Fonts
 
-Endelig plassering i rail eller hovedmeny er ikke fastsatt.
+Endelig plassering er ikke fastsatt.
 
 ## 4. Elementer og innhold
 
 ### Elementboks
 
-Et element er en boks som kan inneholde tekst, bilde eller begge deler.
+Et element er en boks som senere kan inneholde tekst, bilde eller begge deler.
 
 Bekreftede regler:
 
@@ -117,25 +154,34 @@ Bekreftede regler:
 - elementer kan overlappe
 - valgt element eller bilde kan låses og låses opp
 
-### Markering
+### Elementoppretting
 
-Neste branch skal definere:
+Neste branch skal definere og bygge:
 
-- valgt element-ID
-- valg av ett element
-- tydelig valgt tilstand
-- klikk utenfor for å fjerne markering
-- sikker opprydding dersom valgt element slettes eller ikke finnes
+- hvilken menyhandling som oppretter elementet
+- standardstørrelse per elementtype eller felles standard
+- kontrollert startposisjon
+- reducer-action for å legge element til aktiv side
+- stabil ID
+- automatisk markering av nyopprettet element
+- tastaturtilgjengelig oppretting
 
-Markering skal ikke blandes med oppretting, draing eller størrelsesendring.
+Skal ikke bygges samtidig:
+
+- draing
+- størrelsesendring
+- direkte tekstredigering
+- bildevelger
+- knapphandling
 
 ### Tekst
 
-- `Tekst` oppretter senere en tekstboks som kan plasseres i et element.
+- `Tekst` oppretter senere en tekstboks.
 - Tekstboksen kan vokse med innholdet, men elementboksen vokser ikke automatisk.
 - Brukeren skal kunne skrive, markere, rette og slette tekst.
 - Markert tekst skal kunne endre font, størrelse, farge, fet og kursiv.
 - Innhold utenfor elementboksen skjules.
+- Tekstredigering må ha en egen modus slik at Enter og mellomrom ikke alltid tolkes som elementmarkering.
 
 ### Bilder
 
@@ -148,17 +194,10 @@ Markering skal ikke blandes med oppretting, draing eller størrelsesendring.
 
 ### Knapper
 
-Elementer-panelet inneholder `Knapp`.
-
-Før implementering må dette fastsettes:
-
-- redigerbar knappetekst
-- størrelse og plassering
-- bakgrunn, tekstfarge og ramme
-- handling eller lenketype
-- responsive egenskaper
-
-Planlagt branch: `feature/button-element`.
+- Elementer-panelet inneholder `Knapp`.
+- Knappen skal kunne ha redigerbar tekst, størrelse, plassering, bakgrunn, tekstfarge og ramme.
+- Handling eller lenketype fastsettes før implementering.
+- En knapphandling skal ikke aktiveres mens brukeren bare markerer knappen i editoren.
 
 ## 5. Farger, logo/header og fonts
 
@@ -192,24 +231,25 @@ Planlagt branch: `feature/button-element`.
 - automatisk lagring uten manuell lagring for hver endring
 - statusene `Lagrer`, `Lagret` og `Lagringsfeil`
 - sikker skriving og gjenoppretting
-- samme endringsmodell som angre/gjør om
+- samme prosjektendringsmodell som angre/gjør om
+- markeringsstate og annen transient UI-state skal ikke lagres
 - serverlagring er ikke nødvendig i første lokale versjon
 
 ## 7. Arkitektur og arbeidsmåte
 
-- hver funksjon i egen branch
+- hver funksjon bygges i egen branch
 - `main` holdes stabil
 - kildefiler bør være under 300 linjer og deles tidligere ved flere ansvar
 - `App.tsx` setter bare sammen hovedstrukturen
-- prosjektmodellen er autoritativ datakilde
-- DOM-en skal ikke brukes som permanent prosjektlagring
+- prosjektmodell, transient editor-state og visuelle komponenter skal ikke blandes
 - Dependency Cruiser stopper sirkulære, uløselige og utilgjengelige moduler
-- PowerShell-kommandoer skal alltid følge repoendringer
+- arkitekturrapporter regenereres etter strukturendringer
+- PowerShell-kommandoer følger hver repoendring
 
 ## 8. Planlagte branches
 
-- `feature/element-selection` — neste
-- `feature/element-creation`
+- `feature/element-selection` — gjeldende, klar for sluttkontroll
+- `feature/element-creation` — neste etter merge
 - `feature/drag-resize`
 - `feature/object-locking`
 - `feature/text-box-editing`
@@ -228,6 +268,8 @@ Planlagt branch: `feature/button-element`.
 
 ## 9. Åpne beslutninger
 
+- standard- og minimumsstørrelse for hvert element
+- startposisjon og eventuell forskyvning mellom nye elementer
 - plassering av Nytt prosjekt og Importer prosjekt
 - plassering av Farger, Logo/header og Fonts
 - endelig fontliste og fontstørrelser
@@ -235,7 +277,7 @@ Planlagt branch: `feature/button-element`.
 - tekstjustering og linjehøyde
 - mobile overstyringer i første versjon
 - endelig mobilbrytepunkt
-- standard- og minimumsstørrelse for element
+- markering av element som er skjult i aktiv mobilvisning
 - fri eller proporsjonal størrelsesendring
 - låsefunksjonens plassering og utforming
 - måling og terskler for lik avstand og sentrering
