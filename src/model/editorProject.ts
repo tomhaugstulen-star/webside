@@ -45,4 +45,5 @@ export type EditorProject = {
 export type EditorProjectState = {
   project: EditorProject
   activePageId: string
+  selectedElementId: string | null
 }
