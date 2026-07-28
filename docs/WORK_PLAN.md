@@ -86,115 +86,129 @@ Varige regler:
 
 Se `docs/ELEMENT_CREATION.md`.
 
+### Fase 4 – Flytting og størrelsesendring
+
+Branch: `feature/drag-resize`
+
+Status: **ferdig, kontrollert og merget til `main` som PR #4**.
+
+- flytting med peker
+- resizing fra ett håndtak nederst til høyre
+- minimumsmål per elementtype
+- venstre, høyre og øvre lerretsgrense
+- fri bevegelse nedover med automatisk lerretsvekst
+- edge-scroll
+- fri overlapping
+- transient layout-preview
+- én varig prosjektmutasjon ved normalt pekerslipp
+- avbrudd uten commit ved cancel eller tapt pointer capture
+- piltaster for flytting
+- `Ctrl`/`Cmd` + piltaster for resizing
+- `Shift` for 10 px steg
+- PC- og Telefon-visning med delt desktopgeometri
+
+Se `docs/DRAG_RESIZE.md`.
+
 ## 3. Gjeldende fase
 
-### Fase 4 – Flytting og størrelsesendring
+### Fase 5 – Låsing
 
 Branch:
 
 ```text
-feature/drag-resize
+feature/object-locking
 ```
 
-Status: **implementert, kodeauditert og visuelt godkjent på desktop og mobil; dokumentasjon er oppdatert før PR**.
+Status: **implementert og visuelt godkjent på PC og Telefon; siste auditendring og dokumentasjon må sluttkontrolleres før PR**.
 
 Implementert:
 
-- flytting med peker
-- størrelsesendring fra ett firkantet håndtak nederst til høyre
-- minimumsstørrelser per elementtype
-- venstre, høyre og øvre lerretsgrense
-- fri bevegelse nedover med automatisk lerretsvekst
-- edge-scroll nær editorområdets kanter
-- innhold klippes av elementgrensen
-- fri overlapping
-- transient layout-preview under pekerbevegelse
-- én varig prosjektmutasjon ved normalt pekerslipp
-- avbrudd uten commit ved `pointercancel`
-- PC- og Telefon-visning med delt desktopgeometri
-
-Minimumsmål:
-
-- Seksjon: 160 × 90 px
-- Bilde: 120 × 80 px
-- Tekst: 120 × 48 px
-- Knapp: 80 × 36 px
+- separat objektverktøylinje over valgt element
+- åpen hengelås for å låse
+- lukket hengelås for å låse opp
+- varig `locked`-endring gjennom reduceren
+- låseverdi beregnes fra reducerens nyeste state
+- prosjektets `updatedAt` oppdateres ved gyldig låseendring
+- ukjent element-ID ignoreres
+- låst element beholder markeringen
+- låst element får stiplet markeringsramme
+- resize-håndtaket skjules når elementet er låst
+- pekerflytting og pointer-resize blokkeres
+- tastaturflytting og tastatur-resize blokkeres
+- låseknappen er et eget tastaturtilgjengelig knapp-element
+- pointer-propagation fra verktøylinjen stoppes
+- låsestatus er felles for PC og Telefon
 
 Audit-herding:
 
-- tapt pointer capture rydder interaksjonen uten commit
-- låste elementer kan markeres, men ikke flyttes eller resizes
-- reduceren avviser layoutmutasjon av låste eller ukjente elementer
-- uendrede og ugyldige layouts ignoreres
-- minimumsmål returneres som kopi
-- preview-typen har én autoritativ definisjon
-- resize-håndtaket har 32 × 32 px treffflate
-- piltaster flytter 1 px
-- `Shift` + piltast flytter 10 px
-- `Ctrl`/`Cmd` + piltast endrer størrelse
-- preview-state håndteres uten synkron `setState` i effect
+- piltaster på et låst, fokusert element stoppes uten utilsiktet scrolling
+- låste elementer kan fortsatt fokuseres, markeres og låses opp
+- reduceren forblir autoritativ for transformblokkering
+- verktøylinjen er transient editor-UI, ikke prosjektdata
+- alle berørte kildefiler er under 250 linjer
 
 Branchen inneholder ikke:
 
-- automatisk kollisjonsunngåelse
-- automatisk flytting av andre elementer
-- korrigeringslinjer
-- låseknapp eller låsepanel
+- sletting
+- lagpanel
 - direkte tekstredigering
-- bildebeskjæring
+- bildeimport
 - historikk
 - lagring
 - egne mobiloverstyringer
 
 Varige regler:
 
-- peker-preview er transient og skal ikke lagres eller inngå direkte i historikk
-- én ferdig pekertransform skal senere være én historikk-/autolagringsendring
-- låste elementer skal fortsatt kunne markeres for senere opplåsing
-- mobiloverstyringer skal bygges eksplisitt i egen fase
+- `locked` er varig elementdata
+- en låseendring skal senere være én historikk-/autolagringsendring
+- fokus, hover og synlighet for objektverktøylinjen er transient
+- låst element må kunne markeres slik at brukeren kan låse det opp
 
-Se `docs/DRAG_RESIZE.md`.
+Se `docs/OBJECT_LOCKING.md`.
 
 ## 4. Neste fase etter merge
 
-### Fase 5 – Låsing
+### Fase 6 – Tekst og fonts
 
 Planlagt branch:
 
 ```text
-feature/object-locking
+feature/text-box-editing
 ```
 
 Skal bygge:
 
-- synlig lås/lås opp for valgt element
-- varig endring av `locked` gjennom reduceren
-- blokkere peker- og tastaturtransform når låst
-- fortsatt tillate markering av låst element
-- tydelig visuell låsetilstand
+- tydelig skille mellom objektmarkering og tekstredigering
+- direkte redigering av tekstinnhold
+- kontrollert commit av tekstinnhold til prosjektmodellen
+- tastaturbruk uten konflikt med objektets flyttekommandoer
+- nettsikre fonter
+- kontrollert fontstørrelsesliste
+- tekstfarge, fet og kursiv dersom omfanget godkjennes før implementering
+- klipping av tekst ved elementgrensen
 - desktop- og mobiltest
 
-Skal ikke bygge:
+Må avklares før implementering:
 
-- tekstredigering
+- eksakt handling som går inn i tekstredigeringsmodus
+- handling som avslutter tekstredigering
+- om Enter lager avsnitt eller linjeskift
+- første fontliste og fontstørrelsesliste
+- om formatering gjelder hele tekstboksen eller markert tekst i første versjon
+- hvordan tom tekst behandles
+- hvordan låst tekstboks oppfører seg
+- hvordan historikk senere grupperer skrivehandlinger
+
+Skal ikke samtidig bygge:
+
 - bildeimport
-- lagpanel
-- sletting
-- historikk
-- lagring
-
-Før implementering må plassering og utforming av låsekontrollen fastsettes.
+- knapphandlinger
+- fargesystem for hele prosjektet
+- historikkmotor
+- automatisk lagring
+- responsive mobiloverstyringer
 
 ## 5. Senere faser
-
-### Fase 6 – Tekst og fonts
-
-Branch: `feature/text-box-editing`
-
-- direkte tekstredigering
-- skille mellom elementmarkering og innholdsredigering
-- nettsikre fonter
-- fontstørrelse, farge, fet og kursiv
 
 ### Fase 7 – Knapper
 
@@ -243,11 +257,7 @@ Branch: `feature/alignment-guides`
 
 ### Fase 12 – Responsiv redigering
 
-Branch:
-
-```text
-feature/mobile-design-controls
-```
+Branch: `feature/mobile-design-controls`
 
 Sporing:
 
@@ -261,38 +271,12 @@ Mål:
 
 - desktop er grunnlaget
 - mobil arver desktopverdier som standard
-- første mobilendring kan opprette eksplisitt mobiloverstyring
+- eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet
 - mobil flytting og resizing endrer ikke desktop
-- desktopendring overskriver ikke eksplisitt mobiloppsett
 - **Bruk PC-oppsett** fjerner mobiloverstyringen
-- tydelig status for **Arver fra PC**, **Eget mobiloppsett** og **Skjult på mobil**
-- skjul på mobil uten å slette elementet
-- viewport-bevisste layout-actions og reducer-overganger
-- peker og tastatur bruker samme viewport-regler
-- editor, preview, import og eksport tolker samme responsive modell
-- media queries genereres kontrollert fra prosjektmodellen
-
-Første versjon bør minst støtte:
-
-- posisjon
-- bredde og høyde
-- synlighet på mobil
-
-Må avklares før implementering:
-
-- automatisk eller eksplisitt oppretting av første mobiloverstyring
-- regel for elementoppretting mens Telefon-visning er aktiv
-- hvordan skjulte elementer finnes og vises igjen
-- støtte for bare-mobil-elementer
-- endelig mobilbrytepunkt
-
-Ikke del av første versjon uten ny beslutning:
-
-- nettbrett som egen viewport
-- flere mobilbrytepunkter
-- automatisk omplassering eller kollisjonsunngåelse
-- AI-generert mobiloppsett
-- generell CSS-editor
+- tydelig status for arv, eget mobiloppsett og mobilskjuling
+- viewport-bevisste prosjektmutasjoner
+- kontrollerte media queries fra prosjektmodellen
 
 ### Fase 13 – Angre og gjør om
 
@@ -301,8 +285,9 @@ Branch: `feature/history-system`
 - prosjektendringsmodell
 - angre og gjør om
 - pekertransform som én historikkpost
-- vurder sammenslåing av gjentatte tastaturendringer
-- transient markering og preview holdes utenfor
+- låseendring som én historikkpost
+- gruppering av tekstskriving må fastsettes
+- transient markering, fokus, panelstate og preview holdes utenfor
 
 ### Fase 14 – Lokal automatisk lagring
 
@@ -340,12 +325,12 @@ Bygges først etter at editor, responsiv modell og lagring er stabile.
 - uttrekking starter før 250 linjer
 - state-avhengige mutasjoner bruker nyeste reducer-state
 - transient og varig state er tydelig separert
-- ugyldige og uendrede state-overganger avvises
-- tastaturalternativ finnes der draing ellers er eneste handling
-- planlagte senere faser er dokumentert uten skjult implementering i gjeldende branch
+- ugyldige state-overganger avvises kontrollert
+- tastaturbruk er kontrollert
+- planlagte senere faser er dokumentert uten skjult implementering
 - `npm run check` er bestått etter siste kodeendring
-- arkitekturrapporter er regenerert
-- desktop og mobil er testet
+- arkitekturrapporter er regenerert etter strukturendringer
+- PC og Telefon er testet
 - peker og tastatur er testet
 - dokumentasjonen er oppdatert
 - arbeidsområdet er rent
@@ -353,7 +338,7 @@ Bygges først etter at editor, responsiv modell og lagring er stabile.
 
 ## 7. Neste kontrollsteg
 
-På `feature/drag-resize`:
+På `feature/object-locking`:
 
 ```powershell
 npm run check
