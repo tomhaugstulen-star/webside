@@ -14,24 +14,20 @@ Dette dokumentet samler bekreftede krav og åpne planleggingsområder. Det skal 
 - Editorens designverktøy skal støtte både desktop- og mobilvisning.
 - Mobilvisningen skal være en faktisk redigeringsmodus, ikke bare en smal forhåndsvisning.
 - Elementer som finnes på desktop skal kunne skjules på mobil uten at desktopversjonen slettes.
-- Endringer skal kunne gjelde begge visninger, bare desktop eller bare mobil.
-- Om desktop og mobil skal kunne ha forskjellige font- og elementinnstillinger må undersøkes nærmere før implementering.
+- Om desktop og mobil skal kunne ha forskjellige font-, bilde- og elementinnstillinger må undersøkes før implementering.
 
 ### Korrigerings- og hjelpesystem
-
-Editoren skal ha visuelle korrigeringshjelpemidler under flytting og plassering.
-
-Bekreftede behov:
 
 - Varsle når et element er sentrert horisontalt på siden eller i aktuell beholder.
 - Vise når bokser eller elementer ligger på samme linje.
 - Vise når tre eller flere bokser har lik avstand mellom seg.
 - Hjelpelinjene skal bare vises under relevant flytting eller størrelsesendring.
 - Vertikal midtstilling skal ikke være en egen korrigeringsfunksjon.
-- Elementer skal som hovedregel ikke overlappe hverandre.
-- Systemet skal ikke flytte elementer uten at brukeren ser og forstår korreksjonen.
+- Systemet skal ikke reagere bare fordi en boks nærmer seg en annen.
+- Elementer kan overlappe hverandre.
+- Korrigeringssystemet skal være veiledende og ikke flytte elementer automatisk uten tydelig tilbakemelding.
 
-Arbeidsnavn for denne delen: `alignment-guides`.
+Arbeidsnavn: `alignment-guides`.
 
 ## 2. Bekreftet verktøymeny
 
@@ -43,7 +39,7 @@ Foreløpig rekkefølge:
 4. Fonts
 5. Elementer
 
-`Importer prosjekt` er bekreftet som nødvendig, men endelig plassering er ikke bestemt.
+`Importer prosjekt` er nødvendig, men endelig plassering er ikke bestemt.
 
 ### Nytt prosjekt
 
@@ -52,8 +48,8 @@ Foreløpig rekkefølge:
 
 ### Farger
 
-- Panelet skal vise alle fargene som faktisk brukes i prosjektet.
-- Dette omfatter blant annet sidebakgrunn, header, elementbakgrunner, tekst, rammer og knapper.
+- Panelet viser alle fargene som faktisk brukes i prosjektet.
+- Dette omfatter sidebakgrunn, header, elementbakgrunner, tekst, rammer og knapper.
 - En prosjektfarge skal kunne endres fra ett sted og oppdatere alle elementer som bruker den.
 - Det skal ikke ligge ferdige fargepaletter i editoren.
 
@@ -78,7 +74,7 @@ Bekreftede regler:
 
 - Første versjon skal bruke omtrent 7–8 vanlige, nettsikre skrifttyper.
 - Fontstørrelse skal velges fra en liste tilsvarende vanlige størrelsesvalg på PC.
-- Fontfarger skal registreres i prosjektets felles Farger-system.
+- Fontfarger registreres i prosjektets felles Farger-system.
 - Fet skrift og kursiv skal være tilgjengelig i første versjon.
 - Hvilken tekst eller hvilket element fontinnstillingen gjelder, bestemmes senere.
 - Forskjellige fontvalg for desktop og mobil skal undersøkes før dette fastsettes.
@@ -91,90 +87,65 @@ Panelet skal minst inneholde:
 
 - legg til element
 - legg til tekst
+- bilder
 - rammetykkelse
 - rammefarge
 
 Bekreftede regler for elementboksen:
 
-- Et nytt element opprettes som en redigerbar boks.
-- Foreløpig standardstørrelse er omtrent 2 × 4 cm på skjermen.
-- Foreløpig minste størrelse er omtrent 1 × 3 cm.
-- Størrelsen endres med ett drahåndtak nederst i høyre hjørne.
-- Elementets høyde skal ikke øke automatisk når mer tekst legges inn.
-- Et element er aktivt mens det er markert.
-- Når brukeren klikker utenfor elementet, avsluttes redigeringen og størrelsen/plasseringen blir stående.
-- Dette skal ikke kreve en egen låseknapp.
+- Et nytt element opprettes stort nok til at drahåndtaket er lett å finne og bruke.
+- Elementet kan deretter gjøres mindre ved å dra eller skyve i håndtaket.
+- Det skal være ett tydelig, firkantet drahåndtak nederst i høyre hjørne.
+- Elementets høyde øker ikke automatisk når mer tekst legges inn.
+- Tekst som går utenfor elementets grenser skal klippes bort og ikke vises utenfor boksen.
+- Når brukeren klikker utenfor elementet, avsluttes redigeringen og størrelse/plassering blir stående.
+- Ingen egen låseknapp skal brukes.
 - Rammetykkelse skal minst ha valgene ingen, 1 px, 2 px, 3 px og 4 px.
-- Rammefarge skal registreres i prosjektets felles Farger-system.
-- Elementer skal normalt ikke ligge oppå hverandre.
+- Rammefarge registreres i prosjektets felles Farger-system.
+- Elementer kan ligge oppå hverandre.
 
 ### Tekstboks i element
 
-Valget `Legg til tekst` skal opprette en tekstboks som kan plasseres inne i et element.
+Valget `Legg til tekst` oppretter en tekstboks som kan plasseres inne i et element.
 
-Bekreftede regler:
+- Tekstboksen kan utvide seg etter tekstinnholdet.
+- Tekstboksen er underordnet elementboksen den ligger i.
+- Brukeren kan skrive og redigere tekst direkte.
+- Brukeren kan markere, rette og slette tekst.
+- Markert tekst kan endre fonttype, fontstørrelse og fontfarge.
+- Markert tekst kan gjøres fet eller kursiv.
+- Innhold som går utenfor selve elementboksen skal skjules.
 
-- Tekstboksen skal kunne utvide seg etter tekstinnholdet.
-- Tekstboksen skal være underordnet elementboksen den ligger i.
-- Brukeren skal kunne skrive og redigere tekst direkte.
-- Brukeren skal kunne markere tekst.
-- Markert tekst skal kunne rettes, slettes og formateres.
-- Markert tekst skal kunne få annen fonttype, fontstørrelse og fontfarge.
-- Markert tekst skal kunne gjøres fet eller kursiv.
+### Bilder
 
-## 3. Editorområder som må planlegges
+Valget `Bilder` skal:
 
-### Elementmodell
+1. Åpne bildevelgeren på brukerens PC.
+2. La brukeren velge et bilde.
+3. Legge det valgte bildet inn på redigeringsflaten.
+4. La brukeren endre bildets størrelse.
+5. La brukeren klikke og dra bildet inn i et element.
 
-For hver elementtype må vi definere:
+Bildet skal være et selvstendig redigerbart objekt fram til det plasseres i et element.
 
-- tillatte foreldre og barn
-- størrelse og plassering
-- responsive egenskaper
-- redigerbare stiler
-- duplisering og sletting
-- lagrekkefølge
+## 3. Lagring og sikkerhet
 
-### Markering og manipulering
+- Editoren skal ha automatisk lagring.
+- Automatisk lagring regnes som en grunnfunksjon, ikke en senere ekstrafunksjon.
+- Det må finnes lokal midlertidig lagring slik at arbeid ikke forsvinner ved feil eller lukket nettleser.
+- Serverlagring, lagringsintervall, gjenoppretting og versjonshistorikk må planlegges før implementering.
+- Angre/gjør om og automatisk lagring må bruke samme tydelige endringsmodell.
 
-Det må planlegges hvordan brukeren:
+## 4. Arkitektur og arbeidsmåte
 
-- markerer ett eller flere elementer
-- flytter elementer
-- bruker drahåndtaket nederst til høyre
-- avslutter redigering ved å klikke utenfor
-- dupliserer og sletter
-- flytter elementer i lagrekkefølgen
-- avbryter en handling
+- Hver funksjon bygges i egen branch.
+- `main` skal holdes stabil.
+- Maksimal anbefalt størrelse for kildefiler er 300 linjer.
+- Filer skal deles tidligere dersom de får for mange ansvarsområder.
+- `App.tsx` skal bare sette sammen hovedstrukturen.
+- Elementer, tekstredigering, bildebehandling, korrigeringslinjer og lagring skal ha separate moduler.
 
-### Layoutsystem
-
-Før dra-og-slipp bygges må layoutmodellen velges. Løsningen må være responsiv og stabil. Elementer skal normalt ikke overlappe, og plassering på desktop må ikke ødelegge mobiloppsettet.
-
-### Historikk og lagring
-
-Det må defineres:
-
-- hvilke handlinger som registreres i angre/gjør om
-- automatisk lagringsfrekvens
-- lokal midlertidig lagring
-- serverlagring
-- gjenoppretting etter feil eller lukket nettleser
-- versjonshistorikk og konfliktbehandling
-
-### Forhåndsvisning og publisering
-
-Det må planlegges:
-
-- forhåndsvisning uten editorgrensesnitt
-- forhåndsvisning per skjermstørrelse
-- kladd kontra publisert versjon
-- domene, URL-struktur, SEO og metadata
-- publiseringsfeil og tilbakerulling
-
-## 4. Foreslått funksjonsrekkefølge
-
-Denne rekkefølgen er foreløpig og skal godkjennes før bygging:
+## 5. Foreslått funksjonsrekkefølge
 
 1. Fullføre og fryse editorens hovedlayout.
 2. Definere element- og sidemodellen.
@@ -182,50 +153,46 @@ Denne rekkefølgen er foreløpig og skal godkjennes før bygging:
 4. Bygge innsetting av ett enkelt element.
 5. Bygge flytting og størrelsesendring med drahåndtak.
 6. Bygge tekstboks og tekstredigering.
-7. Bygge korrigeringslinjer og lik avstand.
-8. Avklare og bygge desktop- og mobilspesifikke egenskaper.
-9. Bygge lagpanel og elementhierarki.
+7. Bygge bildevelger, bildeobjekt og plassering i element.
+8. Bygge korrigeringslinjer og lik avstand.
+9. Avklare og bygge desktop- og mobilspesifikke egenskaper.
 10. Bygge angre/gjør om.
-11. Bygge lagring og gjenoppretting.
-12. Bygge forhåndsvisning.
-13. Bygge publisering.
+11. Bygge automatisk lagring og gjenoppretting.
+12. Bygge lagpanel og elementhierarki.
+13. Bygge forhåndsvisning.
+14. Bygge publisering.
 
-## 5. Planlagte branches
+## 6. Planlagte branches
 
-Branches opprettes først når den aktuelle delen faktisk skal bygges:
+Branches opprettes først når delen faktisk skal bygges:
 
 - `feature/element-model`
 - `feature/element-selection`
 - `feature/drag-resize`
 - `feature/text-box-editing`
+- `feature/image-import-and-placement`
 - `feature/alignment-guides`
 - `feature/mobile-design-controls`
-- `feature/layers-panel`
 - `feature/history-system`
-- `feature/editor-persistence`
+- `feature/editor-autosave`
+- `feature/layers-panel`
 - `feature/preview-mode`
 - `feature/publishing`
 
-## 6. Åpne beslutninger
+## 7. Åpne beslutninger
 
-Følgende er ikke bestemt ennå:
-
-- endelig plassering av Importer prosjekt
-- endelig liste over de 7–8 skrifttypene
-- eksakte fontstørrelser i listen
-- hvilken tekst eller hvilket element en fontendring gjelder
-- om tekstjustering og linjehøyde skal være med
-- om desktop og mobil kan ha forskjellige fontvalg
-- om desktop og mobil kan ha forskjellig elementstørrelse og plassering
-- om målene 2 × 4 cm og 1 × 3 cm skal oversettes til faste piksler eller relativ skjermstørrelse
-- om elementer kan endres bare proporsjonalt eller fritt i bredde og høyde
-- hva som skjer når tekstinnholdet blir større enn elementboksen
-- hvordan tekstboksen plasseres og begrenses inne i elementet
-- om tekstboksen kan flyttes og endre størrelse separat
-- hvordan bilder legges inn og tilpasses i elementer
-- hvordan boksene flyttes uten overlapping
-- hvordan like avstander beregnes for to, tre og flere bokser
-- terskel og styrke for sentrering og lik avstand
-- datamodell, lagringsformat, backend og publiseringsarkitektur
-
-Disse punktene fylles inn etter hvert som kravene blir avklart.
+- Endelig plassering av Importer prosjekt.
+- Endelig liste over de 7–8 skrifttypene.
+- Eksakte fontstørrelser i listen.
+- Hvilken tekst eller hvilket element en fontendring gjelder.
+- Om tekstjustering og linjehøyde skal være med.
+- Om desktop og mobil kan ha forskjellige font-, bilde- og elementinnstillinger.
+- Endelig standardstørrelse og minimumsstørrelse på et nytt element.
+- Om drahåndtaket endrer bredde og høyde fritt eller proporsjonalt.
+- Hvordan bilder beskjæres eller tilpasses når de legges i et element.
+- Om et bilde blir låst til elementet etter innsetting, eller fortsatt kan flyttes inni boksen.
+- Hvordan tre eller flere bokser måles for lik avstand.
+- Terskel og styrke for sentrering og lik avstand.
+- Automatisk lagringsintervall.
+- Lokal lagringsmetode, serverlagring og gjenoppretting.
+- Datamodell, lagringsformat, backend og publiseringsarkitektur.
