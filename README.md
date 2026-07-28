@@ -2,11 +2,9 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren skal åpne med et blankt, hvitt lerret og gi kontroll over elementer, tekst, bilder, knapper, farger, header, desktop/mobil og lokal prosjektlagring.
+Editoren åpner med et blankt, hvitt lerret og skal gi kontroll over elementer, tekst, bilder, knapper, farger, header, desktop/mobil og lokal prosjektlagring.
 
 ## Lokal mappe
-
-Prosjektet brukes lokalt fra:
 
 ```text
 C:\Users\tomha\Desktop\website
@@ -24,27 +22,20 @@ npm run dev
 
 ## Kvalitetskontroll
 
-Kjør hele kontrollrekken:
-
 ```powershell
 npm run check
+npm run architecture:json
+npm run architecture:diagram
 ```
 
-Dette kjører:
+`npm run check` kjører:
 
 - ESLint
 - TypeScript-kontroll
 - Dependency Cruiser
 - produksjonsbuild
 
-Arkitekturrapporter oppdateres separat:
-
-```powershell
-npm run architecture:json
-npm run architecture:diagram
-```
-
-Rapportene skrives til:
+Arkitekturrapportene skrives til:
 
 ```text
 architecture.json
@@ -55,55 +46,65 @@ docs/dependency-graph.mmd
 
 Det utvikles ikke direkte på `main`.
 
-Arbeidsflyt:
-
 ```text
 main
-  → egen feature-, fix-, chore- eller tooling-branch
-  → implementering
+  → egen feature-, fix-, chore-, tooling- eller docs-branch
+  → avgrenset implementering
   → npm run check
+  → arkitekturrapporter ved strukturendringer
   → visuell kontroll
   → dokumentasjon
   → kontrollert merge til main
 ```
 
-## Gjeldende grunnbranches
+PowerShell-kommandoene som brukeren skal kjøre lokalt skal alltid følge hver repoendring.
 
-- `tooling/dependency-cruiser`
-- `chore/editor-foundation-audit`
-- `docs/project-planning`
+## Gjeldende status
 
-Disse skal testes og godkjennes før videre funksjonsutvikling bygges fra oppdatert `main`.
+Godkjent og ferdig:
 
-## Arkitekturregler
+- editorgrunnlaget
+- blankt desktop- og mobillerret
+- toppmeny og venstremeny
+- kontrollert åpning og lukking av paneler
+- Elementer-panel med Seksjon, Bilde, Tekst og Knapp
+- Dependency Cruiser og samlet `npm run check`
+- automatisk åpning av nettleseren med `npm run dev`
+- prosjekt- og elementmodellen i `feature/element-model`
 
-Dependency Cruiser kontrollerer blant annet:
+`feature/element-model` er lokalt og visuelt godkjent. Den skal merges til `main` før neste feature-branch opprettes.
 
-- sirkulære avhengigheter
-- importer som ikke kan løses
-- helt frakoblede filer
-- kildekodemoduler som ikke kan nås fra `src/main.tsx`
+Neste planlagte fase:
 
-Maksimal anbefalt filstørrelse er 300 linjer, men filer skal deles tidligere når de får flere ansvarsområder.
+```text
+feature/element-selection
+```
+
+Denne fasen skal bygge markering av eksisterende elementer. Den skal ikke bygge elementoppretting, draing, størrelsesendring eller tekstredigering.
 
 ## Dokumentasjon
 
-Planlegging og prosjektregler ligger i `docs`:
+Les i denne rekkefølgen ved ny chat eller overlevering:
 
-- `docs/PROJECT_RULES.md`
-- `docs/EDITOR_PLANNING.md`
-- `docs/WORK_PLAN.md`
-- `docs/RESPONSIVE_DESIGN.md`
-- `docs/CODE_AUDIT.md`
+1. `docs/NEXT_CHAT_PROMPT.md`
+2. `docs/WORK_PLAN.md`
+3. `docs/EDITOR_PLANNING.md`
+4. `docs/PROJECT_RULES.md`
+5. `docs/ELEMENT_MODEL.md` på `feature/element-model`
+6. `docs/RESPONSIVE_DESIGN.md`
+7. `docs/CODE_AUDIT.md`
 
-## Nåværende status
+## Ikke implementert ennå
 
-Editorgrunnlaget inneholder:
-
-- toppmeny
-- venstremeny med kontrollert åpning og lukking
-- Elementer-panel med Seksjon, Bilde, Tekst og Knapp
-- blankt desktop- og mobillerret
-- grunnleggende arkitektursjekk
-
-Objektmodell, reell elementoppretting, tekstredigering, bilder, knapper, lagring og publisering er ikke implementert ennå.
+- markering av elementer
+- oppretting av synlige elementer
+- flytting og størrelsesendring
+- låsing
+- tekstredigering
+- bildeimport
+- knappfunksjonalitet
+- fargesystem
+- logo/header
+- angre/gjør om
+- automatisk lokal prosjektlagring
+- forhåndsvisning og publisering
