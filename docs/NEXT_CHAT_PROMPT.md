@@ -27,46 +27,45 @@ Les før videre arbeid:
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/RIGHT_PROPERTIES_PANEL.md`
-4. `docs/EDITOR_PLANNING.md`
-5. `docs/PROJECT_RULES.md`
-6. `README.md`
-7. `docs/TEXT_BOX_EDITING.md`
-8. `docs/OBJECT_LOCKING.md`
-9. `docs/DRAG_RESIZE.md`
-10. `docs/ELEMENT_SELECTION.md`
-11. `docs/ELEMENT_CREATION.md`
-12. `docs/ELEMENT_MODEL.md`
-13. `docs/MOBILE_DESIGN_CONTROLS.md`
-14. `docs/CODE_AUDIT.md`
+3. `docs/TEXT_PROPERTIES.md`
+4. `docs/RIGHT_PROPERTIES_PANEL.md`
+5. `docs/EDITOR_PLANNING.md`
+6. `docs/PROJECT_RULES.md`
+7. `README.md`
+8. `docs/ELEMENT_MODEL.md`
+9. `docs/TEXT_BOX_EDITING.md`
+10. `docs/OBJECT_LOCKING.md`
+11. `docs/DRAG_RESIZE.md`
+12. `docs/ELEMENT_SELECTION.md`
+13. `docs/ELEMENT_CREATION.md`
+14. `docs/MOBILE_DESIGN_CONTROLS.md`
+15. `docs/CODE_AUDIT.md`
 
 ## Git-status
 
 Siste bekreftede `main`:
 
 ```text
-a35f59d
+8de5f2e
 ```
 
-Dette er merge-commit fra PR #8.
+Dette er merge-commit fra PR #9, som la inn høyremenyens grunnstruktur.
 
 Gjeldende branch:
 
 ```text
-feature/right-properties-panel
+feature/text-properties
 ```
 
-Siste commit med kontrollert produksjonskode og regenererte arkitekturrapporter:
+Branchen er opprettet direkte fra oppdatert `main`.
+
+GitHub-sak:
 
 ```text
-2d25a542  chore: refresh architecture reports for right panel
+#10 Plan: text properties for selected text boxes
 ```
 
-Etter denne ligger bare dokumentasjonscommits, inkludert denne overleveringsprompten. Verifiser alltid faktisk branch-head gjennom GitHub før PR.
-
-Brukeren bekreftet clean working tree før dokumentasjonsoppdateringene. Etter at dokumentasjonen er hentet lokalt, må clean tree bekreftes på nytt.
-
-Det er ikke opprettet PR ennå.
+Produksjonskode for tekstegenskaper er ikke skrevet ennå. De første branch-commitene oppdaterer bare plan og dokumentasjon.
 
 ## Ferdig og merget til `main`
 
@@ -82,6 +81,7 @@ Det er ikke opprettet PR ennå.
 - minimumsmål, clamping, edge-scroll og automatisk lerretsvekst
 - objektlåsing og opplåsing
 - kontrollert ren flerlinjet tekstredigering
+- høyremenyens grunnstruktur
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -91,23 +91,26 @@ PR #4  drag og resize
 PR #5  objektlåsing                 a3eed45
 PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
+PR #9  høyremenyens grunnstruktur    8de5f2e
 ```
 
-Endelig venstremeny:
+## Fast UX-regel
 
 ```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
 ```
 
-## Gjeldende fase: høyremenyens grunnstruktur
+Konsekvenser:
 
-Branchen er implementert, framtidsrettet kodeauditert, visuelt kontrollert og godkjent.
+- `Elementer -> Tekst` oppretter en vanlig fri tekstboks og markerer den.
+- Selve tekstinnholdet redigeres bare på lerretet.
+- Høyremenyen får ikke et ekstra stort tekstfelt.
+- Font, størrelse og andre egenskaper skal ikke legges i venstremenyen.
+- `Logo og header` skal senere eie logo, hovedtekst, undertittel og header-oppsett som strukturelle headerdeler.
 
-Låst oppførsel:
+## Implementert høyremenygrunnlag
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -115,183 +118,187 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-### Godkjente layoutvalg
-
-- bredde: 320 px
-- fra 1680 px: dokket høyremeny på høyre side
-- under 1680 px: overlay fra høyre
-- overlay ligger oppå editorområdet og reduserer ikke lerretet
+- bredde 320 px
+- dokket fra 1680 px
+- overlay under 1680 px uten å redusere lerretet
 - skjult panel reserverer ingen plass
 - egen vertikal scrolling
 - 180 ms transform-animasjon
-- ingen animasjon ved `prefers-reduced-motion`
+- `prefers-reduced-motion` respekteres
+- valgt elementtype og låsestatus vises
+- eksisterende `useElementSelection` er autoritativ avledning
+- ingen parallell elementstate eller direkte prosjektmutasjon
+- panelinnhold rendres bare når et gyldig element finnes
+- sentral CSS-variabel formidler reservert bredde uten at panel-CSS styrer canvas-klasser
 
-### Godkjent visuell struktur
+## Gjeldende fase: tekstegenskaper
+
+Når en vanlig tekstboks er markert, skal høyremenyen vise:
 
 ```text
 Egenskaper
-Knapp
+Tekst
+
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
 
 Element
 Status: Ulåst
 ```
 
-Elementtypen kan være `Seksjon`, `Bilde`, `Tekst` eller `Knapp`. Status er `Låst` eller `Ulåst`.
+Formateringen gjelder hele tekstboksen. Det bygges ikke riktekst eller formatering av markerte ord og tegn.
 
-Det finnes ingen falske eller deaktiverte egenskapskontroller.
+## Låste kontrollverdier
 
-### Godkjent interaksjon
-
-- markering åpner panelet
-- ny markering oppdaterer samme panel umiddelbart
-- klikk på tomt lerret lukker panelet
-- låst element kan inspiseres
-- panelet kan være åpent under tekstredigering
-- klikk i panelet bruker eksisterende blur/commit
-- markeringen beholdes etter normal tekstcommit
-- panelet oppretter ikke separat tekstdraft
-
-## Implementert arkitektur
-
-Viktige filer:
+### Font
 
 ```text
-src/components/editor/EditorShell.tsx
-src/components/properties/RightPropertiesPanel.tsx
-src/state/useElementSelection.ts
-src/styles/editor-base.css
-src/styles/canvas.css
-src/styles/sidebar.css
-src/styles/right-properties-panel.css
-src/App.css
+System
+Arial
+Verdana
+Tahoma
+Trebuchet MS
+Georgia
+Times New Roman
+Courier New
 ```
 
-Ansvarsdeling:
+Prosjektdata lagrer stabile fonttokens. CSS-fontstacker avledes i visningslaget.
 
-- `EditorShell` komponerer venstremeny, lerret og høyremeny.
-- Eksisterende `useElementSelection` leverer `selectedElement`.
-- `RightPropertiesPanel` er en presentasjonskomponent som mottar elementet som prop.
-- Panelet søker ikke i DOM-en og muterer ikke prosjektdata.
-- Det finnes ingen parallell selector, separat elementkopi eller ny reducer-action.
-- Panelinnholdet rendres bare når et gyldig element er valgt.
-- Paneloverflaten beholdes kun for transform-animasjonen.
-- `aria-labelledby` brukes bare når panelet er åpent.
-
-Layoutvariabler:
+### Størrelse
 
 ```text
---properties-panel-width: 320px
---properties-panel-reserved-width: 0px
+12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96 px
 ```
 
-Ved åpent og dokket panel settes reservert bredde til panelbredden. Canvas- og sidebar-CSS bruker variabelen i egne breddeberegninger. Høyremenyens CSS styrer ikke `.canvas-page--desktop` direkte.
+### Fet og kursiv
 
-## Framtidsrettet kodeaudit
+To uavhengige toggle-knapper med `aria-pressed`.
 
-Auditen kontrollerte:
-
-- stale markering og stale elementdata
-- duplisert state og parallelle selectors
-- direkte DOM-søk og prosjektmutasjon
-- tekstens blur/commit
-- låste elementer
-- sideskifte og ugyldig markering
-- overlay kontra dokket layout
-- CSS-eierskap og importrekkefølge
-- skjult innhold og framtidige fokuserbare kontroller
-- `prefers-reduced-motion`
-- filstørrelser og ansvarsgrenser
-
-To funn ble rettet før sluttkontrollen:
-
-1. Selve panelinnholdet rendres bare når et element finnes.
-2. Panel-CSS styrer ikke lenger canvas-klassen direkte; en sentral variabel formidler reservert bredde.
-
-Ingen problemer ble funnet med reducer, låsing, tekstcommit, state-separasjon eller Dependency Cruiser.
-
-## Kontrollstatus
-
-Brukeren kjørte etter siste produksjonskodeendring:
+### Justering
 
 ```text
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status
+venstre
+midtstilt
+høyre
 ```
 
-Bekreftet resultat:
+### Linjehøyde
 
 ```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 38 moduler, 80 avhengigheter, ingen brudd
-produksjonsbuild: bestått
-arkitekturrapporter: oppdatert
-visuell PC-kontroll: godkjent
-working tree før dokumentasjonscommits: clean
+1.0, 1.2, 1.45, 1.6, 1.8, 2.0
 ```
 
-LF/CRLF-varslene fra `git diff --check` var bare linjeskiftvarsler, ikke whitespace-feil.
+### Standard
 
-Produksjonskode ble ikke endret etter denne kontrollen. Bare dokumentasjon ble oppdatert.
+```text
+font: System
+størrelse: 16 px
+fontvekt: normal
+fontstil: normal
+justering: venstre
+linjehøyde: 1.45
+```
+
+## Modell og reducer
+
+- øk prosjektskjemaet fra versjon 2 til 3
+- bare `kind: 'text'` får obligatorisk `textStyle`
+- tekststil er varig prosjektdata
+- tekststil er foreløpig felles for PC og Telefon
+- bruk eksplisitte unioner eller kontrollerte tallsett
+- ikke lagre rå CSS-strenger i prosjektet
+- hver kontroll sender en avgrenset stilpatch
+- reduceren slår patchen sammen med nyeste state
+- avvis manglende element, feil type, låst element, ugyldig verdi og uendret stil
+- oppdater `updatedAt` bare ved reell endring
+- panelet skal ikke eie en lokal kopi av tekststilen
+
+## Låste tekstbokser
+
+- kan markeres og inspiseres
+- viser gjeldende tekststil
+- alle tekstkontroller er deaktivert
+- opplåsing fortsetter gjennom eksisterende objektverktøy
+- ikke legg en ny låseknapp i høyremenyen i denne fasen
+
+## Tekstredigering og rendering
+
+Klikk på en tekstkontroll under aktiv redigering skal:
+
+1. utløse eksisterende blur/commit
+2. beholde markeringen
+3. gjennomføre stilendringen i en separat reducerhandling
+
+Vanlig tekstvisning og aktivt `textarea` skal bruke samme avledede tekststil. Fjern eller erstatt hardkodede fontverdier som ellers gir visuelle hopp mellom visning og redigering.
+
+Tom placeholder er editor-UI og skal ikke lagres.
+
+## Forventet ansvarsdeling
+
+- `model` — tekststiltyper, standardverdier, kontrollerte valg og validering
+- `state` — reducerhjelper og dispatch-hook for stilpatcher
+- `properties` — liten `TextPropertiesSection`
+- `canvas` — fonttoken til CSS og felles tekststil
+- `RightPropertiesPanel` — komposisjon, ikke egen tekststate
+
+Alle nye kildefiler skal følge aktiv 250-linjersgrense.
 
 ## Ikke del av branchen
 
 Ikke legg inn:
 
-- fontfamilie eller fontstørrelse
-- tekstfarge, fet, kursiv eller markert tekstformatering
-- bildevelger eller bildeegenskaper
-- knapphandlinger eller lenker
-- fargevelgere eller prosjektfargeregister
-- logo- eller headerbygger
+- tekstfarge eller prosjektfargemodell
+- bredde, høyde eller plassering i høyremenyen
+- headerens hovedtekst eller undertittel
+- riktekst eller tegnbaserte tekstspenn
+- opplasting av fonter eller eksterne webfonter
 - sletting eller duplisering
-- lagpanel
 - historikk eller lagring
-- nytt prosjekt eller prosjektimport
-- mobile geometri-overstyringer
+- mobile tekststiloverstyringer
+- falske eller tomme fremtidsseksjoner
 
-## Neste steg
+## Første lokale steg
 
-Start med å be brukeren hente dokumentasjonen:
+Be brukeren kjøre:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 
-git pull --ff-only origin feature/right-properties-panel
+git fetch origin
+git switch --track origin/feature/text-properties
 git status
 git log -1 --oneline
 ```
 
-Forventet:
+Dersom lokal branch allerede finnes:
 
-```text
-On branch feature/right-properties-panel
-Your branch is up to date with 'origin/feature/right-properties-panel'.
-
-nothing to commit, working tree clean
+```powershell
+git switch feature/text-properties
+git pull --ff-only origin feature/text-properties
+git status
+git log -1 --oneline
 ```
 
-Dokumentasjonsendringene krever ikke ny `npm run check`, fordi ingen produksjonskode eller arkitekturrapport ble endret etter den beståtte sluttkontrollen.
+Ikke bruk reset, force eller destruktive kommandoer når vanlig fast-forward er tilstrekkelig.
 
-Når lokal branch er clean:
+## Implementeringsrekkefølge
 
-1. Sammenlign hele `feature/right-properties-panel` mot `main`.
-2. Kontroller at diffen bare inneholder:
-   - høyremenyens grunnstruktur
-   - tilhørende layout-CSS
-   - arkitekturrapporter
-   - relevant dokumentasjon
-3. Kontroller at branchen er foran `main` og ikke bak.
-4. Opprett draft-PR mot `main`.
-5. Dokumenter produktvalg, state-grenser, auditfunn, teststatus og visuell godkjenning.
-6. Kontroller mergebarhet, review-tråder og eventuell CI.
-7. Marker PR klar for review når alt er kontrollert.
-8. Ikke merge før brukeren gir eksplisitt godkjenning, normalt formulert som `PR #<nummer>`.
-9. Bruk forventet head-SHA ved merge.
-10. Etter merge: oppdater lokal `main` og kontroller clean tree.
+1. Les faktisk modell-, reducer-, canvas- og panelkode.
+2. Legg inn tekststiltyper, standardverdier og validering.
+3. Oppdater tekstelementmodellen og oppretting.
+4. Lag reducerhjelper og dispatch-hook for stilpatcher.
+5. Avled fonttokens til CSS i visningslaget.
+6. Sikre identisk tekststil i visning og `textarea`.
+7. Legg inn `TextPropertiesSection` i høyremenyen.
+8. Kjør framtidsrettet kodeaudit før sluttkontroll.
+9. Be brukeren kjøre `npm run check` etter siste produksjonskodeendring.
+10. Regenerer arkitekturrapporter og kontroller clean tree før PR.
 
 ## Kommunikasjonsregler
 
@@ -303,7 +310,7 @@ Når lokal branch er clean:
 - ikke be brukeren bruke GitHub CLI
 - ikke bland senere funksjoner inn i gjeldende branch
 - ikke påstå at tester er bestått uten brukerens output eller verifisert CI
-- ikke opprett PR før lokal branch er clean etter dokumentasjonspull
+- ikke opprett PR før lokal branch er clean
 - ikke merge uten eksplisitt godkjenning
 
 ---
