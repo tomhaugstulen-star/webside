@@ -15,6 +15,10 @@ export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
 }
 
+function activePageExists(state: EditorProjectState) {
+  return state.project.pages.some((page) => page.id === state.activePageId)
+}
+
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   return activePage?.elements.some((element) => element.id === elementId) ?? false
@@ -100,7 +104,10 @@ function reduceEditorProjectState(
     }
 
     case 'add-element-to-active-page': {
-      if (projectContainsElement(state, action.element.id)) {
+      if (
+        !activePageExists(state) ||
+        projectContainsElement(state, action.element.id)
+      ) {
         return state
       }
 
