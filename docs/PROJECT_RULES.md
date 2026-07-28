@@ -9,31 +9,27 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 - Ingen ny funksjon utvikles direkte på `main`.
 - Feilretting og teknisk opprydding gjøres i egne branches.
 - En branch skal bare inneholde arbeidet den er opprettet for.
-- En godkjent branch merges til `main` før neste feature-branch opprettes fra oppdatert `main`.
+- En godkjent branch merges før neste feature-branch opprettes fra oppdatert `main`.
 
 Eksempler:
 
-- `feature/element-selection`
 - `feature/element-creation`
 - `feature/drag-resize`
+- `feature/object-locking`
 - `feature/mobile-design-controls`
-- `feature/alignment-guides`
 - `fix/sidebar-panel-behavior`
-- `chore/editor-foundation-audit`
 - `tooling/dependency-cruiser`
 
 ## 2. Filstørrelser og moduldeling
 
-- 250 linjer er den aktive terskelen for å begynne å trekke ut ansvar fra en kildefil.
-- En kildefil skal normalt ikke vokse videre forbi 250 linjer uten at ansvar først er trukket ut, eller at en konkret teknisk begrunnelse er dokumentert.
-- En fil deles tidligere enn 250 linjer dersom den får flere tydelige ansvarsområder.
-- 300 linjer er en absolutt kontrollgrense som krever eksplisitt gjennomgang og dokumentert begrunnelse; det er ikke et akseptabelt normalmål.
-- Uttrekking skal skje etter ansvar, ikke ved tilfeldig oppdeling for å redusere linjetallet.
-- Store komponenter deles i visning, state, hendelseslogikk og hjelpefunksjoner der dette gir naturlige modulgrenser.
-- `App.tsx` skal bare sette sammen hovedstrukturen og ikke inneholde editorlogikk.
-- Visuell komponent, transient state, prosjektmodell, hjelpefunksjoner og hendelseslogikk holdes separat når det er naturlig.
-- Store CSS-filer deles etter editorområde før de blir generelle samlefiler.
-- Ingen fil skal bli en generell samlefil for all funksjonalitet.
+- 250 linjer er aktiv terskel for å begynne å trekke ut ansvar fra en kildefil.
+- En fil deles tidligere dersom den får flere tydelige ansvarsområder.
+- 300 linjer er en eksplisitt kontrollgrense og skal være et unntak.
+- Uttrekking skjer etter ansvar, ikke ved tilfeldig oppdeling.
+- Visning, varig state, transient state, hendelseslogikk og rene hjelpefunksjoner skilles når det gir naturlige grenser.
+- `App.tsx` skal bare sette sammen hovedstrukturen.
+- Store CSS-filer deles etter editorområde.
+- Ingen fil skal bli en generell samlefil.
 
 ## 3. Datagrenser
 
@@ -41,71 +37,93 @@ Eksempler:
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - DOM-en skal ikke brukes som permanent prosjektlagring.
-- Elementer skal opprettes, endres og slettes gjennom prosjekt-state/reduceren.
-- Prosjektidentitet skal bruke stabile kryptografiske ID-er.
-- State-avhengige beregninger for en prosjektmutasjon skal bruke reducerens nyeste state.
-- UI-hooks skal sende brukerintensjon og nødvendig ikke-deterministisk metadata, men skal ikke beregne varig resultat fra et mulig utdatert React-snapshot.
-- Reduceren skal være deterministisk for samme state og action; ID og klokkeslett genereres derfor før dispatch.
+- Elementer og geometri endres gjennom prosjekt-state/reduceren.
+- Prosjektidentitet bruker stabile kryptografiske ID-er.
+- State-avhengige prosjektberegninger bruker reducerens nyeste state.
+- UI-hooks sender brukerintensjon og ikke-deterministisk metadata, men skal ikke beregne varig resultat fra et mulig gammelt React-snapshot.
+- Reduceren skal være deterministisk for samme state og action.
 
 ### Transient editor-state
 
-Midlertidig brukergrensesnitt-state, som `selectedElementId`, skal holdes utenfor `EditorProject`.
+Transient state skal holdes utenfor `EditorProject`, blant annet:
 
-Transient editor-state skal ikke:
+- `selectedElementId`
+- aktiv pekerinteraksjon
+- layout-preview under draing eller resizing
+- åpne paneler og aktivt verktøy
+
+Transient state skal ikke:
 
 - serialiseres i prosjektfilen
-- utløse autolagring
-- inngå i prosjektets angre-/gjør om-historikk
+- utløse autolagring direkte
+- inngå direkte i angre-/gjør om-historikk
 - eksporteres
 - publiseres
 
-Når historikk og lagring bygges, må kodegrensen mellom prosjektmutasjoner og UI-state være eksplisitt.
+Når historikk og lagring bygges, skal ferdige prosjektmutasjoner være den eksplisitte grensen.
 
-## 4. Arbeidsrekkefølge
+## 4. Layout- og transformregler
 
-Før implementering av hver ny del skal dette avklares:
+- Opprettingsplassering gjelder bare elementets fødested.
+- Startplassering skal ikke bli et automatisk kollisjonssystem.
+- Elementer kan overlappe.
+- Andre elementer flyttes aldri automatisk.
+- Flytting og resizing beregnes av rene modellfunksjoner.
+- Pekerbevegelse bruker transient preview.
+- Normalt pekerslipp committer én ferdig geometriendring.
+- `pointercancel` og tapt pointer capture skal rydde preview uten commit.
+- Låste elementer kan markeres, men kan ikke transformeres.
+- Reduceren skal også avvise layoutmutasjon av låste elementer.
+- Lerretshøyde er avledet visning og skal ikke lagres i prosjektfilen.
+
+## 5. Responsiv grense
+
+- `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen.
+- UI-typer skal være alias til modelltypen, ikke en separat union.
+- Mobil arver desktopverdier når mobiloverstyring mangler.
+- Egne mobiloverstyringer bygges eksplisitt i `feature/mobile-design-controls`.
+- En mobilendring skal ikke utilsiktet skrive desktopgeometri når mobiloverstyringer senere finnes.
+- Layout-actions og transform-API må gjøres viewport-bevisste i den fasen.
+
+## 6. Arbeidsrekkefølge
+
+Før hver ny del avklares:
 
 1. Hva funksjonen skal gjøre.
 2. Hvilke brukerhandlinger som finnes.
-3. Hvilken tilstand som må lagres.
-4. Om tilstanden er varig prosjektdata eller transient editor-state.
-5. Hvordan funksjonen virker på desktop.
-6. Hvordan funksjonen virker på mobil.
-7. Hvordan funksjonen påvirker angre/gjør om og lagring.
-8. Hvilke filer og komponenter som opprettes eller endres.
-9. Hvordan funksjonen skal fordeles før noen berørt fil nærmer seg 250 linjer.
-10. Hvordan funksjonen testes.
-11. Hvordan midlertidige test-fixtures fjernes før godkjenning.
+3. Hvilken state som trengs.
+4. Om state er varig eller transient.
+5. Hvordan desktop og mobil påvirkes.
+6. Hvordan funksjonen påvirker historikk og lagring.
+7. Hvilke filer og ansvarsgrenser som berøres.
+8. Hvordan funksjonen testes med peker og tastatur.
+9. Hvordan test-fixtures fjernes.
 
-## 5. Endringskontroll
+## 7. Endringskontroll
 
-- Ikke bygg videre på en funksjon før oppførselen er definert.
-- Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige uten tydelig dokumentasjon.
-- Midlertidige fixtures skal være isolert og fjernes før merge med mindre brukeren eksplisitt godkjenner noe annet.
-- Ikke bland designendringer, datamodell og interaksjonslogikk uten at det er nødvendig.
-- Små, kontrollerbare leveranser foretrekkes fremfor store samleendringer.
+- Ikke bygg videre før oppførselen er definert.
+- Ikke legg inn midlertidige funksjoner som kan oppfattes som ferdige uten dokumentasjon.
+- Ikke bland designendringer, datamodell og interaksjonslogikk unødvendig.
+- Små, kontrollerbare leveranser foretrekkes.
 - Før større endringer beskrives berørte filer og forventet effekt.
-- Rapportfiler fra arkitektursjekken regenereres etter strukturendringer.
-- PowerShell-kommandoene brukeren skal kjøre lokalt følger hver repoendring.
-- Ikke oppgi at lint, typekontroll, arkitektursjekk eller build er bestått før brukeren har kjørt kommandoene lokalt eller verifisert CI finnes.
+- Arkitekturrapporter regenereres etter strukturendringer.
+- Nøyaktige PowerShell-kommandoer følger hver repoendring.
+- Ikke oppgi at lint, typekontroll, arkitektursjekk eller build er bestått før brukeren eller verifisert CI har bekreftet det.
+- Ikke merge uten eksplisitt godkjenning.
 
-## 6. Kvalitetskrav
+## 8. Kvalitetskrav
 
 - TypeScript brukes konsekvent.
-- Reducer-actions skal håndteres eksplisitt og uttømmende.
-- Union-baserte UI-switcher skal også være uttømmende, slik at nye verdier gir typefeil fremfor tomt grensesnitt.
-- Ugyldige state-overganger skal ignoreres eller avvises kontrollert.
-- Overflødige state-oppdateringer skal unngås når det er enkelt og tydelig.
+- Reducer-actions og union-baserte UI-switcher håndteres uttømmende.
+- Ugyldige state-overganger ignoreres eller avvises kontrollert.
+- Uendrede prosjektmutasjoner skal ikke oppdatere state eller `updatedAt`.
 - Komponenter skal ha tydelige props og avgrenset ansvar.
-- Interaksjoner skal fungere med tastatur der det er relevant.
-- Brukerhandlinger må ha forutsigbar tilbakemelding.
-- Desktop- og mobilresultat testes separat.
-- Responsive viewport-typer skal ha én autoritativ definisjon.
-- Layoutsystemet skal unngå skjulte avhengigheter mellom komponenter.
-- Startplassering ved oppretting skal ikke utvikles til et automatisk kollisjonssystem for draing.
-- Ingen automatisk generert design skal overskrive brukerens eksplisitte valg uten tydelig varsel.
-- Automatisk lagring skal senere være en grunnfunksjon i editoren.
-- Ingen kildekodemodul skal ligge ubrukt uten å bli oppdaget av arkitektursjekken.
+- Interaksjoner skal ha tastaturalternativ der draing ellers er eneste handling.
+- Fokusrekkefølgen skal være forutsigbar.
+- Brukerhandlinger skal ha tydelig tilbakemelding.
+- Desktop og mobil testes separat.
+- Layoutsystemet skal unngå skjulte koblinger.
+- Ingen ubrukt kildekodemodul skal passere arkitektursjekken.
 
 Før en branch kan godkjennes kjøres normalt:
 
@@ -116,23 +134,21 @@ npm run architecture:diagram
 npm run dev
 ```
 
-## 7. Tilgjengelighet og editorinteraksjon
+## 9. Tilgjengelighet og editorinteraksjon
 
-- Fokusrekkefølgen skal være forutsigbar.
-- Enter og mellomrom kan brukes for kontrollaktivering der semantikken tilsvarer en knapp.
-- Tilgjengelige navn må bli mer spesifikke når elementmodellen får navn eller innhold.
-- Tekstredigering må skille mellom objektmarkering og innholdsredigering.
-- Faktiske knappehandlinger eller lenker skal ikke aktiveres i vanlig editor-markeringsmodus.
-- Klikk på framtidige objektverktøy skal kunne beholde valgt element.
-- Fokusoppførsel etter tastaturoppretting skal vurderes når objektverktøy og direkte redigering bygges.
+- Enter og mellomrom markerer et fokusert element.
+- Piltaster flytter et fokusert element.
+- `Ctrl`/`Cmd` + piltaster endrer størrelse.
+- `Shift` bruker større steg.
+- Resize-håndtakets treffflate skal være større enn den synlige firkanten.
+- Tilgjengelige navn skal bli mer spesifikke når elementmodellen får navn eller innhold.
+- Tekstredigering må skille objektmarkering fra innholdsredigering.
+- Faktiske knappehandlinger eller lenker aktiveres ikke i vanlig editormodus.
+- Låste elementer skal fortsatt kunne fokuseres og markeres.
 
-## 8. Gjeldende status
+## 10. Gjeldende status
 
-- Editorgrunnlaget er godkjent og merget til `main`.
-- Prosjekt- og elementmodellen er godkjent og merget til `main`.
-- Elementmarkering er godkjent og merget til `main`.
-- Dependency Cruiser og `npm run check` er konfigurert.
-- `npm run dev` åpner nettleseren automatisk.
-- `feature/element-creation` er implementert og visuelt godkjent på desktop og mobil.
-- Siste kodeaudit og dokumentoppdateringer må sluttkontrolleres før PR og merge.
-- Neste branch etter godkjent merge er `feature/drag-resize`.
+- Editorgrunnlag, prosjektmodell, markering og elementoppretting er merget til `main`.
+- `feature/drag-resize` er implementert og visuelt godkjent på desktop og mobil før siste audit.
+- Auditendringene må sluttkontrolleres lokalt før PR.
+- Neste branch etter godkjent merge er `feature/object-locking`.
