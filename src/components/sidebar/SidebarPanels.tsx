@@ -1,3 +1,4 @@
+import type { ElementKind } from '../../model/editorProject'
 import type { EditorTool } from '../../types/editor'
 import { SidebarIcon, type SidebarIconName } from './SidebarIcon'
 
@@ -5,7 +6,11 @@ type PanelProps = {
   onSelect: () => void
 }
 
-type SidebarPanelProps = PanelProps & {
+type ElementsPanelProps = {
+  onCreateElement: (kind: ElementKind) => void
+}
+
+type SidebarPanelProps = PanelProps & ElementsPanelProps & {
   activeTool: EditorTool
 }
 
@@ -38,12 +43,16 @@ function MediaPanel({ onSelect }: PanelProps) {
   )
 }
 
-function ElementsPanel({ onSelect }: PanelProps) {
-  const items: Array<{ label: string; icon: SidebarIconName }> = [
-    { label: 'Seksjon', icon: 'section' },
-    { label: 'Bilde', icon: 'image' },
-    { label: 'Tekst', icon: 'text' },
-    { label: 'Knapp', icon: 'button' },
+function ElementsPanel({ onCreateElement }: ElementsPanelProps) {
+  const items: Array<{
+    kind: ElementKind
+    label: string
+    icon: SidebarIconName
+  }> = [
+    { kind: 'section', label: 'Seksjon', icon: 'section' },
+    { kind: 'image', label: 'Bilde', icon: 'image' },
+    { kind: 'text', label: 'Tekst', icon: 'text' },
+    { kind: 'button', label: 'Knapp', icon: 'button' },
   ]
 
   return (
@@ -52,7 +61,12 @@ function ElementsPanel({ onSelect }: PanelProps) {
       <p className="panel-intro">Velg et element for å legge det til på siden.</p>
       <div className="element-grid">
         {items.map((item) => (
-          <button key={item.label} className="element-card" type="button" onClick={onSelect}>
+          <button
+            key={item.kind}
+            className="element-card"
+            type="button"
+            onClick={() => onCreateElement(item.kind)}
+          >
             <SidebarIcon name={item.icon} />
             <span>{item.label}</span>
           </button>
@@ -85,14 +99,18 @@ function SettingsPanel({ onSelect }: PanelProps) {
   )
 }
 
-export function SidebarPanel({ activeTool, onSelect }: SidebarPanelProps) {
+export function SidebarPanel({
+  activeTool,
+  onSelect,
+  onCreateElement,
+}: SidebarPanelProps) {
   switch (activeTool) {
     case 'design':
       return <DesignPanel onSelect={onSelect} />
     case 'media':
       return <MediaPanel onSelect={onSelect} />
     case 'elements':
-      return <ElementsPanel onSelect={onSelect} />
+      return <ElementsPanel onCreateElement={onCreateElement} />
     case 'files':
       return <FilesPanel onSelect={onSelect} />
     case 'settings':
