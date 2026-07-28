@@ -61,21 +61,30 @@ export const DEFAULT_TEXT_ELEMENT_STYLE: TextElementStyle = {
   lineHeight: 1.45,
 }
 
-const textElementStyleKeys = [
-  'fontFamily',
-  'fontSize',
-  'fontWeight',
-  'fontStyle',
-  'textAlign',
-  'lineHeight',
-] as const satisfies readonly (keyof TextElementStyle)[]
-
 function includesValue<T extends readonly unknown[]>(values: T, value: unknown) {
   return values.includes(value as T[number])
 }
 
+const textElementStyleValidators: Record<
+  keyof TextElementStyle,
+  (value: unknown) => boolean
+> = {
+  fontFamily: (value) => includesValue(textFontFamilies, value),
+  fontSize: (value) => includesValue(textFontSizes, value),
+  fontWeight: (value) => includesValue(textFontWeights, value),
+  fontStyle: (value) => includesValue(textFontStyles, value),
+  textAlign: (value) => includesValue(textAlignments, value),
+  lineHeight: (value) => includesValue(textLineHeights, value),
+}
+
+const textElementStyleKeys = Object.keys(textElementStyleValidators)
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isTextElementStyleKey(key: string): key is keyof TextElementStyle {
+  return Object.hasOwn(textElementStyleValidators, key)
 }
 
 export function isValidTextElementStyle(style: unknown): style is TextElementStyle {
@@ -87,13 +96,8 @@ export function isValidTextElementStyle(style: unknown): style is TextElementSty
 
   return (
     keys.length === textElementStyleKeys.length &&
-    keys.every((key) => textElementStyleKeys.includes(key as keyof TextElementStyle)) &&
-    includesValue(textFontFamilies, style.fontFamily) &&
-    includesValue(textFontSizes, style.fontSize) &&
-    includesValue(textFontWeights, style.fontWeight) &&
-    includesValue(textFontStyles, style.fontStyle) &&
-    includesValue(textAlignments, style.textAlign) &&
-    includesValue(textLineHeights, style.lineHeight)
+    keys.every(isTextElementStyleKey) &&
+    keys.every((key) => textElementStyleValidators[key](style[key]))
   )
 }
 
@@ -112,22 +116,7 @@ export function isValidTextElementStylePatch(
 
   const [key, value] = entries[0]
 
-  switch (key) {
-    case 'fontFamily':
-      return includesValue(textFontFamilies, value)
-    case 'fontSize':
-      return includesValue(textFontSizes, value)
-    case 'fontWeight':
-      return includesValue(textFontWeights, value)
-    case 'fontStyle':
-      return includesValue(textFontStyles, value)
-    case 'textAlign':
-      return includesValue(textAlignments, value)
-    case 'lineHeight':
-      return includesValue(textLineHeights, value)
-    default:
-      return false
-  }
+  return isTextElementStyleKey(key) && textElementStyleValidators[key](value)
 }
 
 export function textElementStylesEqual(
