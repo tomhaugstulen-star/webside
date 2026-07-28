@@ -11,6 +11,7 @@ import type {
   EditorProjectState,
   ElementKind,
 } from '../model/editorProject'
+import { setTextElementContent } from './setTextElementContent'
 import { toggleElementLock } from './toggleElementLock'
 
 export type EditorProjectAction =
@@ -32,6 +33,12 @@ export type EditorProjectAction =
   | {
       type: 'toggle-element-lock'
       elementId: string
+      updatedAt: string
+    }
+  | {
+      type: 'set-text-element-content'
+      elementId: string
+      content: string
       updatedAt: string
     }
 
@@ -201,6 +208,14 @@ function reduceEditorProjectState(
 
     case 'toggle-element-lock':
       return toggleElementLock(state, action.elementId, action.updatedAt)
+
+    case 'set-text-element-content':
+      return setTextElementContent(
+        state,
+        action.elementId,
+        action.content,
+        action.updatedAt,
+      )
   }
 
   const unhandledAction: never = action

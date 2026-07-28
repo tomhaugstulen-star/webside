@@ -4,19 +4,12 @@ Kopier teksten under inn i neste chat.
 
 ---
 
-Du er ansvarlig for videre utvikling av Website-editoren. Arbeid i GitHub-repoet, aldri direkte på `main`. Bruk GitHub-connectoren til å lese repoet før du foreslår eller endrer kode. Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer.
+Du er ansvarlig for videre utvikling av Website-editoren. Arbeid i GitHub-repoet, aldri direkte på `main`. Bruk GitHub-connectoren til å lese repoet før kode eller plan endres. Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer.
 
 ## Repo og lokal mappe
 
-GitHub:
-
 ```text
 https://github.com/tomhaugstulen-star/webside.git
-```
-
-Lokal mappe:
-
-```text
 C:\Users\tomha\Desktop\website
 ```
 
@@ -34,243 +27,219 @@ npm run dev
 3. `docs/EDITOR_PLANNING.md`
 4. `docs/PROJECT_RULES.md`
 5. `docs/ELEMENT_MODEL.md`
-6. `docs/ELEMENT_SELECTION.md`
-7. `docs/ELEMENT_CREATION.md`
-8. `docs/DRAG_RESIZE.md`
-9. `docs/OBJECT_LOCKING.md`
-10. `docs/RESPONSIVE_DESIGN.md`
-11. `docs/MOBILE_DESIGN_CONTROLS.md`
-12. `docs/CODE_AUDIT.md`
-13. `README.md`
+6. `docs/TEXT_BOX_EDITING.md`
+7. `docs/RIGHT_PROPERTIES_PANEL.md`
+8. `docs/OBJECT_LOCKING.md`
+9. `docs/DRAG_RESIZE.md`
+10. `docs/MOBILE_DESIGN_CONTROLS.md`
+11. `README.md`
 
 Les deretter faktisk kode, spesielt:
 
 ```text
 src/model/editorProject.ts
-src/model/elementLayout.ts
+src/model/createEditorElement.ts
 src/state/editorProjectReducer.ts
-src/state/toggleElementLock.ts
-src/state/useElementLocking.ts
-src/state/useElementSelection.ts
-src/state/useElementLayout.ts
+src/state/setTextElementContent.ts
+src/state/useTextElementContent.ts
 src/components/canvas/EditorCanvas.tsx
 src/components/canvas/EditorCanvasElement.tsx
-src/components/canvas/ElementSelectionToolbar.tsx
+src/components/canvas/TextElementEditor.tsx
+src/components/canvas/canvasElementAccessibility.ts
 src/components/canvas/useElementPointerTransform.ts
 src/styles/canvas.css
 ```
 
-Repoet og dokumentasjonen er kilden til sannhet. Ikke stol på en eldre chatoppsummering dersom den avviker.
+Repoet og dokumentasjonen er kilden til sannhet.
 
 ## Ferdig og merget til `main`
 
 - stabilt React/TypeScript/Vite-grunnlag
-- blankt desktop- og mobillerret
+- blankt PC- og Telefon-lerret
 - toppmeny og venstremeny
-- kontrollert paneloppførsel
-- Elementer-panel med Seksjon, Bilde, Tekst og Knapp
-- Dependency Cruiser og samlet `npm run check`
-- prosjekt- og elementmodell med responsive verdier og stabile ID-er
-- sentral prosjekt-state og aktiv side
+- Elementer-panel
+- prosjekt- og elementmodell
 - transient elementmarkering
-- oppretting av alle fire elementtyper
-- kontrollerte startstørrelser og startplassering
+- oppretting av Seksjon, Bilde, Tekst og Knapp
 - flytting og resizing med peker og tastatur
-- minimumsmål, clamping, edge-scroll og automatisk lerretsvekst
-- transient pointer-preview og én commit ved normalt pekerslipp
+- minimumsmål, clamping, edge-scroll og lerretsvekst
+- objektlåsing og opplåsing
 
-PR #4 merget `feature/drag-resize` til `main` med merge-commit:
+PR #5 merget objektlåsing med merge-commit:
 
 ```text
-cfddf90
+a3eed45
 ```
 
 ## Gjeldende branch
 
 ```text
-feature/object-locking
+feature/text-box-editing
 ```
 
-Branchen er implementert og visuelt godkjent på PC og Telefon før siste kodeaudit.
+Branchen er implementert, kodeauditert og visuelt godkjent på PC og Telefon.
 
-Implementert:
+Brukeren har bekreftet:
 
-- separat objektverktøylinje over valgt element
-- åpen hengelås for **Lås**
-- lukket hengelås for **Lås opp**
-- varig `locked`-mutasjon gjennom reduceren
-- neste låseverdi beregnes fra reducerens nyeste state
-- gyldig endring oppdaterer prosjektets `updatedAt`
-- ukjent element-ID ignoreres
-- låst element beholder markeringen
-- låst element får stiplet markeringsramme
-- resize-håndtaket skjules når låst
-- pekerflytting og pointer-resize blokkeres
-- tastaturflytting og tastatur-resize blokkeres
-- låseknappen er tastaturtilgjengelig
-- pointer-propagation fra verktøylinjen stoppes
-- låsestatus er felles for PC og Telefon
+- `npm run check` bestått etter siste kodeendring
+- all tekstoppførsel fungerer
+- øvrige elementtyper har ingen regresjon
+- arbeidsområdet var rent før dokumentoppdateringen
 
-## Siste kodeaudit
+## Implementert tekstmodell
 
-Auditen kontrollerte:
+Prosjektskjemaet er versjon 2.
 
-1. **State-avhengig toggle**
-   - UI sender element-ID og tidspunkt.
-   - Reduceren beregner neste `locked`-verdi fra nyeste state.
+`EditorElement` er en diskriminert union. Bare tekstobjekter har:
 
-2. **Dobbel transformbeskyttelse**
-   - UI starter ikke peker- eller tastaturtransform når låst.
-   - Reduceren avviser layoutmutasjon av låst element.
-
-3. **Markering og opplåsing**
-   - Låst element kan fortsatt fokuseres og markeres.
-   - Objektverktøylinjen forblir tilgjengelig for opplåsing.
-
-4. **Event-propagation**
-   - Verktøylinjen er en separat sibling, ikke en knapp inni elementets `role="button"`.
-   - Pointer down stoppes slik at låseknappen ikke starter flytting eller fjerner markering.
-
-5. **Tastaturkant**
-   - Piltaster på låst element stoppes før låsesjekken.
-   - Elementet flyttes ikke, og nettleseren scroller ikke utilsiktet.
-
-6. **Filansvar**
-   - State-overgang, hook, verktøylinje, elementrendering og CSS er delt etter ansvar.
-   - Alle berørte kildefiler er under 250 linjer.
-
-Den siste tastaturrettingen og dokumentendringene er ikke lokalt sluttkontrollert ennå.
-
-## Kritiske arkitekturgrenser
-
-### Varig prosjektdata
-
-- `EditorProject` er autoritativ kilde.
-- `locked` er varig elementdata.
-- Gyldig låseendring går gjennom reduceren og oppdaterer `updatedAt`.
-- En låseendring skal senere være én historikk-/autolagringsendring.
-
-### Transient state
-
-Følgende skal ikke lagres, eksporteres eller inngå direkte i historikk:
-
-- `selectedElementId`
-- aktiv pointer-interaksjon
-- layout-preview
-- fokus, hover og synlighet for objektverktøylinjen
-
-### Låsing
-
-- låst element kan markeres og fokuseres
-- låst element kan ikke flyttes eller resizes
-- låst element kan låses opp fra objektverktøylinjen
-- låsestatus er felles for PC og Telefon
-- låseknappen skal ikke starte transform eller fjerne markering
-
-## Responsiv design må ikke glemmes
-
-Dagens midlertidige regel:
-
-- PC og Telefon deler desktopgeometrien
-- en transform i Telefon påvirker derfor også PC
-- ingen mobiloverstyring opprettes skjult
-
-Endelig responsiv redigering er dokumentert og spores i:
-
-```text
-docs/MOBILE_DESIGN_CONTROLS.md
-docs/RESPONSIVE_DESIGN.md
-GitHub-sak #3
-feature/mobile-design-controls
+```ts
+kind: 'text'
+content: string
 ```
 
-Låsestatus er ikke responsiv. Den gjelder elementet i begge visninger.
+Nye tekstbokser starter med `content: ''`. Tom tekst er gyldig. Editor-placeholder lagres ikke.
 
-## Første oppgave i neste chat
+Det finnes ingen lagring/import ennå, derfor ingen migreringskode i denne branchen. Skjemamigrering bygges senere med prosjektimport.
 
-Kontroller lokal branch og arbeidsområde:
+## Implementert tekstinteraksjon
+
+- ett klikk markerer
+- dobbeltklikk starter redigering
+- `Enter` på markert tekstboks starter redigering
+- kontrollert flerlinjet `textarea`
+- vanlig `Enter` lager ny linje
+- blur committer
+- `Ctrl`/`Cmd` + `Enter` committer
+- `Escape` forkaster aktiv draft
+- snarveier respekterer IME-komposisjon
+- tom tekst fungerer
+- låst tekstboks kan ikke redigeres
+- objekttransform, resize-håndtak og objektverktøylinje er deaktivert under redigering
+
+## State- og commitgrenser
+
+Varig prosjektdata:
+
+- tekstinnhold
+- geometri
+- låsestatus
+- `updatedAt`
+
+Transient state:
+
+- aktiv tekstredigeringsøkt
+- lokal tekstdraft
+- markering
+- pointer-preview og interaksjon
+- panel- og fokusstate
+
+Reducerens tekstovergang:
+
+- krever eksisterende tekstobjekt på aktiv side
+- avviser låst element
+- normaliserer linjeskift til `\n`
+- avviser uendret tekst
+- oppdaterer `updatedAt` bare ved reell endring
+
+En avsluttet tekstøkt skal senere være én historikk-/autolagringsendring. Hvert tastetrykk skal ikke bli en egen prosjektmutasjon.
+
+## Kodeaudit
+
+Auditen bekreftet:
+
+- ingen `contentEditable` eller `innerHTML`
+- lokal draft er kontrollert
+- avslutning er idempotent
+- `Escape`, blur og submit har tydelige grenser
+- IME-komposisjon beskyttes
+- objekt- og tekstsnarveier kolliderer ikke
+- reduceren er autoritativ
+- alle berørte TypeScript- og TSX-filer er under 250 linjer
+- branchen inneholder ikke font-, riktekst- eller høyremenyfunksjoner
+
+Ingen produksjonskode ble endret etter brukerens beståtte sluttkontroll. Etter kontrollen ble bare dokumentasjon lagt til og oppdatert.
+
+## Før PR
+
+Hent dokumentendringene og regenerer arkitekturrapportene:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 
-git status
-git branch --show-current
-git fetch origin
-git log --oneline origin/feature/object-locking..HEAD
-```
+git pull --ff-only origin feature/text-box-editing
 
-Forventet branch:
-
-```text
-feature/object-locking
-```
-
-Hent siste audit- og dokumentendringer:
-
-```powershell
-cd C:\Users\tomha\Desktop\website
-
-git pull --ff-only origin feature/object-locking
-npm run check
 npm run architecture:json
 npm run architecture:diagram
-npm run dev
-```
 
-Kjør kort regresjonstest:
-
-- opprett alle fire elementtypene
-- lås og lås opp hver type
-- kontroller at markering beholdes
-- kontroller stiplet markeringsramme
-- kontroller at resize-håndtaket forsvinner og kommer tilbake
-- kontroller at pekerflytting og resizing blokkeres når låst
-- Tab til et låst element og trykk piltaster
-- elementet skal ikke flyttes, og editoren skal ikke scrolles utilsiktet
-- Tab videre til låseknappen og lås opp med Enter eller mellomrom
-- klikk på tomt lerret og kontroller at verktøylinjen skjules
-- test PC og Telefon
-
-Stopp serveren med `Ctrl + C` og kjør:
-
-```powershell
 git status
 ```
 
-Arkitekturrapportene må regenereres fordi branchen har nye kildekodemoduler. Dersom bare rapportene er endret:
+Arkitekturrapportene skal være endret fordi branchen har nye kildekodemoduler. Commit og push bare rapportene:
 
 ```powershell
 git add architecture.json
 git add docs/dependency-graph.mmd
-git commit -m "chore: refresh architecture reports for object locking"
-git push origin feature/object-locking
+
+git commit -m "chore: refresh architecture reports for text editing"
+git push origin feature/text-box-editing
+
 git status
 ```
 
-Ikke påstå at sluttkontrollen er bestått før brukeren har bekreftet resultat og rent arbeidsområde.
+Forventet sluttstatus:
+
+```text
+On branch feature/text-box-editing
+Your branch is up to date with 'origin/feature/text-box-editing'.
+
+nothing to commit, working tree clean
+```
+
+Produksjonskoden er allerede kontrollert etter siste kodeendring. Dokumentendringene krever ikke en ny visuell regresjonstest. Ikke opprett PR før rapportene er pushet og arbeidsområdet er rent.
 
 ## PR og merge
 
-Når sluttkontrollen er bestått:
+Når arbeidsområdet er rent:
 
-1. Gjennomgå hele diffen mot `main`.
-2. Kontroller at branchen bare inneholder objektlåsing, audit-herding og tilhørende dokumentasjon.
+1. Sammenlign hele branchen mot `main`.
+2. Kontroller at diffen bare inneholder ren tekstredigering, arkitekturrapporter og dokumentasjon.
 3. Opprett draft-PR mot `main`.
-4. Dokumenter state-grenser, tilgjengelighet og kontrollstatus.
-5. Kontroller mergebarhet og åpne review-tråder.
-6. Marker PR klar først etter eksplisitt godkjenning.
-7. Merge bare med forventet head-SHA.
-8. Kontroller oppdatert `main` lokalt.
+4. Dokumenter skjema versjon 2, state-grenser, interaksjoner, tilgjengelighet og kontrollstatus.
+5. Kontroller mergebarhet, review-tråder og eventuell CI.
+6. Marker PR klar for review.
+7. Merge bare etter brukerens eksplisitte godkjenning og med forventet head-SHA.
+8. Kontroller oppdatert lokal `main`.
 
 ## Neste planlagte branch
 
-Etter godkjent merge:
+Etter merge:
 
 ```text
-feature/text-box-editing
+feature/right-properties-panel
 ```
 
-Før implementering må redigeringsmodus, Enter-regel, fontliste, fontstørrelser, formateringsscope, tom tekst og historikkgrense fastsettes. Ikke bygg dette før `feature/object-locking` er kontrollert og merget.
+Sporet i:
+
+```text
+docs/RIGHT_PROPERTIES_PANEL.md
+GitHub-sak #6
+```
+
+Denne branchen skal bare bygge høyremenyens grunnstruktur. Den skal ikke bygge font-, farge-, bilde-, knapp-, slettings-, historikk- eller lagringsfunksjoner.
+
+Før kode må panelbredde, tom tilstand, smal vindusbredde, scrolling og samspill med aktiv tekstredigering godkjennes.
+
+## Responsiv plan
+
+PC og Telefon deler fortsatt desktopgeometrien. Tekstinnhold og låsestatus er felles elementdata.
+
+Egne mobiloverstyringer spores i:
+
+```text
+docs/MOBILE_DESIGN_CONTROLS.md
+GitHub-sak #3
+feature/mobile-design-controls
+```
 
 ## Kommunikasjonsregler
 
@@ -278,7 +247,7 @@ Før implementering må redigeringsmodus, Enter-regel, fontliste, fontstørrelse
 - vær direkte og presis
 - bruk GitHub-connectoren til repoarbeid
 - gi nøyaktige PowerShell-kommandoer etter repoendringer
-- ikke bland neste fase med senere funksjoner
+- ikke bland senere funksjoner inn i gjeldende branch
 - ikke merge uten eksplisitt godkjenning
 
 ---

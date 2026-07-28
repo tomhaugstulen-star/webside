@@ -20,16 +20,24 @@ type CanvasPreviewState = {
   preview: ElementLayoutPreview
 }
 
+type TextEditingState = {
+  pageId: string
+  elementId: string
+}
+
 export function EditorCanvas({ viewport }: EditorCanvasProps) {
   const { activePage } = useEditorProject()
   const { selectedElementId, selectElement, clearSelection } = useElementSelection()
   const [previewState, setPreviewState] = useState<CanvasPreviewState | null>(null)
+  const [textEditingState, setTextEditingState] = useState<TextEditingState | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const layoutPreview =
     previewState?.pageId === activePage.id && previewState.viewport === viewport
       ? previewState.preview
       : null
+  const editingElementId =
+    textEditingState?.pageId === activePage.id ? textEditingState.elementId : null
   const contentHeight = getCanvasContentHeight(
     activePage.elements,
     viewport,
@@ -49,6 +57,19 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
     )
   }
 
+  const startTextEditing = (elementId: string) => {
+    selectElement(elementId)
+    setTextEditingState({ pageId: activePage.id, elementId })
+  }
+
+  const finishTextEditing = (elementId: string) => {
+    setTextEditingState((current) =>
+      current?.pageId === activePage.id && current.elementId === elementId
+        ? null
+        : current,
+    )
+  }
+
   return (
     <main className="editor-workspace" onPointerDown={clearSelection}>
       <div className="canvas-stage" ref={scrollContainerRef}>
@@ -65,9 +86,12 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
                 element={element}
                 viewport={viewport}
                 selected={element.id === selectedElementId}
+                editing={element.id === editingElementId}
                 canvasRef={canvasRef}
                 scrollContainerRef={scrollContainerRef}
                 onSelect={selectElement}
+                onStartTextEditing={startTextEditing}
+                onFinishTextEditing={finishTextEditing}
                 onPreviewLayoutChange={handlePreviewLayoutChange}
               />
             ))}
