@@ -61,7 +61,13 @@ export function useElementPointerTransform({
     mode: TransformMode,
     event: PointerEvent<HTMLElement>,
   ) => {
-    if (event.button !== 0 || element.locked) {
+    if (event.button !== 0) {
+      return
+    }
+
+    onSelect(element.id)
+
+    if (element.locked) {
       return
     }
 
@@ -72,7 +78,6 @@ export function useElementPointerTransform({
       return
     }
 
-    onSelect(element.id)
     event.currentTarget.setPointerCapture(event.pointerId)
 
     interactionRef.current = {
