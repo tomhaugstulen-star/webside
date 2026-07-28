@@ -8,6 +8,7 @@ Dette dokumentet samler bekreftede krav og åpne planleggingsområder. Det skal 
 
 - En ny side skal åpnes helt blank.
 - Editorens eget grensesnitt kan være synlig, men nettsiden skal ikke inneholde ferdige seksjoner, tekst, bilder eller farger.
+- Objektverktøy, låseknapp og drahåndtak skal ikke vises før et faktisk objekt finnes og er markert.
 
 ### Desktop og mobil
 
@@ -32,22 +33,41 @@ Dette dokumentet samler bekreftede krav og åpne planleggingsområder. Det skal 
 
 Arbeidsnavn: `alignment-guides`.
 
-## 2. Bekreftet verktøymeny
+## 2. Menystruktur
 
-Foreløpig rekkefølge:
+### Nåværende editorrail
 
-1. Nytt prosjekt
-2. Farger
-3. Logo/header
-4. Fonts
-5. Elementer
+Editorgrunnlaget har disse hovedvalgene:
 
-`Importer prosjekt` er nødvendig, men endelig plassering er ikke bestemt.
+1. Design
+2. Bilder og logo
+3. Elementer
+4. Filer
+5. Innstillinger
+
+`Elementer` het tidligere `Bokser`. Både synlig navn og intern verktøy-ID skal bruke begrepet Elementer.
+
+Elementer-panelet skal beholde:
+
+- Seksjon
+- Bilde
+- Tekst
+- Knapp
+
+### Planlagte prosjektfunksjoner
+
+Følgende funksjoner er bekreftet, men endelig plassering i eksisterende rail eller hovedmeny er ikke fastsatt:
+
+- Nytt prosjekt
+- Importer prosjekt
+- Farger
+- Logo/header
+- Fonts
 
 ### Nytt prosjekt
 
 - Oppretter et nytt, blankt prosjekt.
-- Ulagrede endringer må håndteres før et eksisterende prosjekt erstattes.
+- Ulagrede eller ikke ferdig skrevne endringer må håndteres før et eksisterende prosjekt erstattes.
 
 ### Farger
 
@@ -82,20 +102,13 @@ Bekreftede regler:
 - Hvilken tekst eller hvilket element fontinnstillingen gjelder, bestemmes senere.
 - Forskjellige fontvalg for desktop og mobil er teknisk mulig og planlegges gjennom responsive overstyringer.
 
-### Elementer
+## 3. Elementer og innhold
+
+### Elementboks
 
 Et element er en boks som kan inneholde tekst, bilde eller begge deler.
 
-Panelet skal minst inneholde:
-
-- legg til element
-- legg til tekst
-- bilder
-- rammetykkelse
-- rammefarge
-- lås/lås opp valgt objekt
-
-Bekreftede regler for elementboksen:
+Bekreftede regler:
 
 - Et nytt element opprettes stort nok til at drahåndtaket er lett å finne og bruke.
 - Elementet kan deretter gjøres mindre ved å dra eller skyve i håndtaket.
@@ -111,7 +124,7 @@ Bekreftede regler for elementboksen:
 
 ### Tekstboks i element
 
-Valget `Legg til tekst` oppretter en tekstboks som kan plasseres inne i et element.
+Valget `Tekst` skal opprette en tekstboks som kan plasseres inne i et element.
 
 - Tekstboksen kan utvide seg etter tekstinnholdet.
 - Tekstboksen er underordnet elementboksen den ligger i.
@@ -123,7 +136,7 @@ Valget `Legg til tekst` oppretter en tekstboks som kan plasseres inne i et eleme
 
 ### Bilder
 
-Valget `Bilder` skal:
+Valget `Bilde` eller bildeverktøyet skal:
 
 1. Åpne bildevelgeren på brukerens PC.
 2. La brukeren velge et bilde.
@@ -139,7 +152,21 @@ Bekreftede regler:
 - Brukeren flytter bildet separat.
 - Bildet skal kunne låses for å hindre utilsiktet flytting eller størrelsesendring.
 
-## 3. Lokal automatisk lagring
+### Knapper
+
+Elementer-panelet skal inneholde `Knapp`.
+
+Før faktisk knappobjekt bygges må det defineres:
+
+- redigerbar knappetekst
+- størrelse og plassering
+- bakgrunn, tekstfarge og ramme
+- hvilken handling eller lenketype knappen skal støtte
+- responsive egenskaper
+
+Planlagt branch: `feature/button-element`.
+
+## 4. Lokal automatisk lagring
 
 - Editoren skal ha automatisk lagring som grunnfunksjon.
 - Prosjektet skal lagres direkte på brukerens PC i en egen prosjektmappe.
@@ -152,32 +179,16 @@ Bekreftede regler:
 - Automatisk lagring og angre/gjør om skal bruke samme tydelige endringsmodell.
 - Serverlagring er ikke et krav for første lokale versjon.
 
-## 4. Arkitektur og arbeidsmåte
+## 5. Arkitektur og arbeidsmåte
 
 - Hver funksjon bygges i egen branch.
 - `main` skal holdes stabil.
 - Maksimal anbefalt størrelse for kildefiler er 300 linjer.
 - Filer skal deles tidligere dersom de får for mange ansvarsområder.
 - `App.tsx` skal bare sette sammen hovedstrukturen.
-- Elementer, tekstredigering, bildebehandling, korrigeringslinjer, responsive regler og lagring skal ha separate moduler.
-
-## 5. Foreslått funksjonsrekkefølge
-
-1. Fullføre og fryse editorens hovedlayout.
-2. Definere element- og sidemodellen.
-3. Bygge markering av elementer.
-4. Bygge innsetting av ett enkelt element.
-5. Bygge flytting og størrelsesendring med drahåndtak.
-6. Bygge låsing og opplåsing av objekter.
-7. Bygge tekstboks og tekstredigering.
-8. Bygge bildevelger, bildeobjekt og fri plassering.
-9. Bygge korrigeringslinjer og lik avstand.
-10. Avklare og bygge desktop- og mobilspesifikke egenskaper.
-11. Bygge angre/gjør om.
-12. Bygge lokal automatisk lagring og gjenoppretting.
-13. Bygge lagpanel og elementhierarki.
-14. Bygge forhåndsvisning.
-15. Bygge publisering.
+- Elementer, tekstredigering, bildebehandling, knapper, korrigeringslinjer, responsive regler og lagring skal ha separate moduler.
+- Dependency Cruiser skal stoppe sirkulære, uløselige og kildekodemoduler som ikke kan nås fra `src/main.tsx`.
+- Gjennomført grunnlagskontroll er dokumentert i `docs/CODE_AUDIT.md`.
 
 ## 6. Planlagte branches
 
@@ -185,21 +196,27 @@ Branches opprettes først når delen faktisk skal bygges:
 
 - `feature/element-model`
 - `feature/element-selection`
+- `feature/element-creation`
 - `feature/drag-resize`
 - `feature/object-locking`
 - `feature/text-box-editing`
+- `feature/button-element`
 - `feature/image-import-and-placement`
+- `feature/project-colors`
+- `feature/logo-header`
 - `feature/alignment-guides`
 - `feature/mobile-design-controls`
 - `feature/history-system`
 - `feature/local-project-autosave`
+- `feature/project-open-import`
 - `feature/layers-panel`
 - `feature/preview-mode`
 - `feature/publishing`
 
 ## 7. Åpne beslutninger
 
-- Endelig plassering av Importer prosjekt.
+- Endelig plassering av Nytt prosjekt og Importer prosjekt.
+- Hvordan Farger, Logo/header og Fonts plasseres i den nåværende menystrukturen.
 - Endelig liste over de 7–8 skrifttypene.
 - Eksakte fontstørrelser i listen.
 - Hvilken tekst eller hvilket element en fontendring gjelder.
@@ -211,6 +228,7 @@ Branches opprettes først når delen faktisk skal bygges:
 - Nøyaktig plassering og utforming av låsefunksjonen.
 - Hvordan tre eller flere bokser måles for lik avstand.
 - Terskel og styrke for sentrering og lik avstand.
+- Knappens handlinger og lenketyper.
 - Filformatet for prosjektdata i prosjektmappen.
 - Nøyaktig lagringsintervall og metode for sikker skriving uten ødelagte filer.
 - Hvordan prosjektet åpnes igjen fra en eksisterende prosjektmappe.
