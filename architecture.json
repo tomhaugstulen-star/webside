@@ -42,6 +42,13 @@
         "src/main.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     },
     {
@@ -59,6 +66,13 @@
         "src/App.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     },
     {
@@ -138,6 +152,13 @@
         "src/App.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     },
     {
@@ -147,10 +168,17 @@
         "src/components/editor/EditorShell.tsx",
         "src/components/canvas/EditorCanvas.tsx",
         "src/components/sidebar/LeftSidebar.tsx",
-        "src/components/toolbar/TopToolbar.tsx",
-        "src/components/sidebar/InspectorRail.tsx"
+        "src/components/sidebar/SidebarPanels.tsx",
+        "src/components/toolbar/TopToolbar.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     },
     {
@@ -179,6 +207,13 @@
         "src/components/editor/EditorShell.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     },
     {
@@ -201,12 +236,122 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SidebarIcon",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/sidebar/SidebarIcon.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SidebarPanels",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/sidebar/SidebarPanels.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/sidebar/SidebarIcon.tsx",
+      "dependencies": [],
+      "dependents": [
+        "src/components/sidebar/LeftSidebar.tsx",
+        "src/components/sidebar/SidebarPanels.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/sidebar/SidebarPanels.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../types/editor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/types/editor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SidebarIcon",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/sidebar/SidebarIcon.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/LeftSidebar.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     },
     {
@@ -235,32 +380,13 @@
         "src/components/editor/EditorShell.tsx"
       ],
       "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/sidebar/InspectorRail.tsx",
-      "dependencies": [
+      "reachable": [
         {
-          "dynamic": false,
-          "module": "../../types/editor",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/types/editor.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
         }
       ],
-      "dependents": [],
-      "orphan": false,
       "valid": true
     },
     {
@@ -320,6 +446,13 @@
         "src/main.tsx"
       ],
       "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
       "valid": true
     }
   ],
@@ -329,8 +462,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 10,
-    "totalDependenciesCruised": 12,
+    "totalCruised": 11,
+    "totalDependenciesCruised": 15,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
@@ -390,8 +523,22 @@
           "scope": "module"
         },
         {
+          "name": "no-unreachable-from-main",
+          "comment": "Alle kildekodemoduler skal være i bruk fra programmets inngangspunkt.",
+          "severity": "error",
+          "from": {
+            "path": "^src/main\\.tsx$"
+          },
+          "to": {
+            "path": "^src/",
+            "pathNot": "\\.d\\.ts$",
+            "reachable": false
+          },
+          "scope": "module"
+        },
+        {
           "name": "no-orphans",
-          "comment": "Filer uten innkommende eller utgående avhengigheter skal vurderes fjernet eller koblet inn.",
+          "comment": "Helt frakoblede filer skal vurderes fjernet eller koblet inn.",
           "severity": "warn",
           "from": {
             "orphan": true,
