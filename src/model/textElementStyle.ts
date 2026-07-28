@@ -61,12 +61,33 @@ export const DEFAULT_TEXT_ELEMENT_STYLE: TextElementStyle = {
   lineHeight: 1.45,
 }
 
+const textElementStyleKeys = [
+  'fontFamily',
+  'fontSize',
+  'fontWeight',
+  'fontStyle',
+  'textAlign',
+  'lineHeight',
+] as const satisfies readonly (keyof TextElementStyle)[]
+
 function includesValue<T extends readonly unknown[]>(values: T, value: unknown) {
   return values.includes(value as T[number])
 }
 
-export function isValidTextElementStyle(style: TextElementStyle) {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+export function isValidTextElementStyle(style: unknown): style is TextElementStyle {
+  if (!isRecord(style)) {
+    return false
+  }
+
+  const keys = Object.keys(style)
+
   return (
+    keys.length === textElementStyleKeys.length &&
+    keys.every((key) => textElementStyleKeys.includes(key as keyof TextElementStyle)) &&
     includesValue(textFontFamilies, style.fontFamily) &&
     includesValue(textFontSizes, style.fontSize) &&
     includesValue(textFontWeights, style.fontWeight) &&
@@ -76,8 +97,14 @@ export function isValidTextElementStyle(style: TextElementStyle) {
   )
 }
 
-export function isValidTextElementStylePatch(patch: TextElementStylePatch) {
-  const entries = Object.entries(patch) as [keyof TextElementStyle, unknown][]
+export function isValidTextElementStylePatch(
+  patch: unknown,
+): patch is TextElementStylePatch {
+  if (!isRecord(patch)) {
+    return false
+  }
+
+  const entries = Object.entries(patch)
 
   if (entries.length !== 1) {
     return false
