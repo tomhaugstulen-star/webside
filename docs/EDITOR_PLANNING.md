@@ -7,7 +7,7 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 ### Ferdig og merget til `main`
 
 - blankt PC- og Telefon-lerret
-- toppmeny og venstremeny
+- toppmeny og kontrollert venstremeny
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - prosjekt- og elementmodell
 - stabile kryptografiske ID-er
@@ -19,33 +19,42 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 - flytting og resizing med peker og tastatur
 - minimumsmål, clamping, edge-scroll og transient preview
 - objektlåsing og opplåsing
+- kontrollert flerlinjet tekstredigering
 - Dependency Cruiser og samlet `npm run check`
 
-### Implementert i `feature/text-box-editing`
+### Viktige merges
 
-- prosjektskjema versjon 2
-- diskriminert elementunion
-- tekstobjekter har obligatorisk `content`
-- nye tekstbokser starter med tom tekst
-- tydelig skille mellom objektmarkering og tekstredigering
-- kontrollert flerlinjet `textarea`
-- blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster aktiv draft
-- vanlig `Enter` lager ny linje
-- tom tekst er gyldig
-- låst tekstboks kan ikke redigeres
-- transform og objektverktøy er deaktivert under redigering
-- reduceren validerer tekstcommit og oppdaterer `updatedAt` bare ved reell endring
+```text
+PR #4  drag og resize
+PR #5  objektlåsing                 a3eed45
+PR #7  ren tekstredigering          c729d33
+PR #8  navn og rekkefølge i meny    a35f59d
+```
 
-Brukeren har bekreftet at `npm run check` bestod, at all oppførsel fungerer på PC og Telefon, og at arbeidsområdet var rent før dokumentoppdateringen.
+### Endelig venstremeny
 
-### Neste fase etter merge
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+- `Prosjekt` står øverst
+- `Innstillinger` står nederst
+- paneloverskriftene følger samme navn
+- PR #8 endret ikke panelenes faktiske funksjonalitet
+
+### Gjeldende fase
 
 ```text
 feature/right-properties-panel
 ```
 
-Denne fasen skal bygge høyremenyens stabile grunnstruktur uten å legge inn font-, bilde-, knapp- eller fargekontroller.
+Branchen er fast-forwardet fra `main` på `a35f59d`. Dokumentasjonen er oppdatert før implementering. Ingen produksjonskode for høyremenyen er lagt inn ennå.
+
+Fasen skal bygge høyremenyens stabile grunnstruktur uten font-, bilde-, knapp-, farge-, slettings-, historikk- eller lagringsfunksjoner.
 
 ## 2. Bekreftede hovedkrav
 
@@ -73,7 +82,8 @@ Følgende skal ikke serialiseres, publiseres eller lagres:
 - layout-preview
 - aktiv tekstredigeringsøkt
 - lokal tekstdraft
-- fokus, hover og synlighet for objektverktøy og paneler
+- aktive verktøy og paneler
+- fokus, hover og lokal UI-feedback
 
 Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én eksplisitt prosjektendring.
 
@@ -161,33 +171,69 @@ Se `docs/TEXT_BOX_EDITING.md`.
 
 ## 4. Høyremeny
 
-Neste kontrollerte fase bygger bare inspeksjonspanelets arkitektur:
+### Låst oppførsel
 
-- høyre kolonne i editorshellet
-- følger valgt element
-- viser elementtype og grunnidentitet
-- tydelig tom/skjult tilstand
-- stabil seksjonsstruktur for senere egenskaper
-- ingen midlertidige egenskapskontroller
+```text
+Ingenting valgt -> ingen høyremeny
+Element valgt   -> høyremeny åpnes
+Tomt lerret     -> høyremeny lukkes
+```
 
-Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges først etter at panelet er stabilt.
+I tillegg er følgende godkjent:
 
-## 5. Farger, logo/header og fonts
+- skjult panel reserverer ikke en tom høyrekolonne
+- bytte av markering oppdaterer panelet
+- låst element kan fortsatt inspiseres
+- panelet kan være åpent under tekstredigering
+- klikk i panelet bruker eksisterende blur/commit
+- markeringen beholdes etter normal commit
+- panelet oppretter ikke separat tekstdraft
+
+En permanent synlig tom høyremeny er avvist.
+
+### Åpne beslutninger
+
+Før produksjonskode må dette godkjennes:
+
+- eksakt bredde
+- oppførsel i smale nettleservinduer
+- egen scrolling
+- visuell overskrift og seksjonsstruktur
+- minimum av faktisk inspeksjonsinformasjon
+- eventuell åpne-/lukkeanimasjon
+
+### Arkitektur
+
+- panelet skal følge `selectedElementId`
+- aktiv side er kilden til elementdata
+- eksisterende `useElementSelection` skal vurderes og normalt gjenbrukes
+- panelet skal ikke lete i DOM-en
+- panelet skal ikke eie en separat kopi av elementdata
+- `EditorShell` skal bare komponere venstremeny, lerret og høyremeny
+- høyremenyen får egen komponent og egen CSS-grense
+- eksisterende `--panel-width` tilhører venstrepanelet; høyremenyen må få en egen entydig breddevariabel
+- ingen midlertidige eller falske egenskapskontroller
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
+## 5. Farger, logo/header og fonter
 
 ### Farger
 
-- panelet skal vise faktiske prosjektfarger
+- venstremenyens navn er `Farger`
+- området skal senere vise faktiske prosjektfarger
 - ingen ferdig fargepalett
 - global endring skal oppdatere alle brukere av fargen
 
-### Logo/header
+### Logo og header
 
+- venstremenyens navn er `Logo og header`
 - laste opp logo
 - opprette header
 - hovedtekst og undertittel
 - redigerbar struktur
 
-### Fonts
+### Fonter
 
 - omtrent 7–8 nettsikre fonter
 - fontstørrelse fra kontrollert liste
@@ -195,7 +241,20 @@ Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges f�
 - fet og kursiv
 - formatering av hele boksen kontra markert tekst må avklares før kode
 
-## 6. Arkitektur og arbeidsmåte
+## 6. Prosjektområdet
+
+Venstremenyens første valg heter `Prosjekt`.
+
+Det skal senere eie:
+
+- nytt prosjekt
+- åpne prosjekt
+- importere prosjekt
+- eventuell eksport og duplisering etter egen beslutning
+
+PR #8 endret bare navn og rekkefølge. Nytt prosjekt, åpning og import er ikke implementert.
+
+## 7. Arkitektur og arbeidsmåte
 
 - én avgrenset funksjon per branch
 - `main` holdes stabil
@@ -205,11 +264,13 @@ Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges f�
 - ugyldige og uendrede state-overganger avvises
 - Dependency Cruiser kontrollerer modulgrensene
 - arkitekturrapporter regenereres etter strukturendringer
+- repo og dokumentasjon leses før kode endres
+- PR opprettes først etter kontroll og rent arbeidsområde
+- merge krever eksplisitt godkjenning
 
-## 7. Planlagte branches
+## 8. Planlagte branches
 
-- `feature/text-box-editing` — gjeldende, klar for arkitekturrapporter og PR
-- `feature/right-properties-panel`
+- `feature/right-properties-panel` — gjeldende fase
 - `feature/text-properties`
 - `feature/button-element`
 - `feature/image-import-and-placement`
@@ -223,9 +284,10 @@ Font, tekststørrelse, farge, bildeinnstillinger og knappinnstillinger bygges f�
 - `feature/preview-mode`
 - `feature/publishing`
 
-## 8. Åpne beslutninger
+## 9. Åpne beslutninger
 
-- høyremenyens eksakte bredde og oppførsel i smale vinduer
+- høyremenyens bredde, smalvinduoppførsel, scrolling og visuelle struktur
+- minimumsinnhold i høyremenyens første leveranse
 - om tekstformatering gjelder hele boksen eller markert tekst
 - endelig fontliste og fontstørrelser
 - tekstjustering og linjehøyde
