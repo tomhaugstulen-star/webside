@@ -19,8 +19,9 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 
 ## 2. Filstørrelser og moduldeling
 
-- Maksimal anbefalt størrelse for en kildefil er 250 linjer.
-- Filer som nærmer seg 250 linjer skal vurderes delt før mer logikk legges til.
+- Maksimal anbefalt størrelse for en kildefil er 300 linjer.
+- 300 linjer er en øvre grense, ikke et mål.
+- Filer skal deles tidligere dersom de får for mange ansvarsområder.
 - Store komponenter skal deles etter ansvar, ikke tilfeldig etter linjetall.
 - `App.tsx` skal bare sette sammen hovedstrukturen og skal ikke inneholde editorlogikk.
 - Visuell komponent, tilstand, datamodell, hjelpefunksjoner og hendelseslogikk skal holdes separat når det er naturlig.
@@ -31,6 +32,7 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
   - mobilredigering
   - markerings- og hjelpelinjer
 - Ingen fil skal bli en generell samlefil for all funksjonalitet.
+- En feil eller endring i én del skal i minst mulig grad stoppe arbeid i andre deler.
 
 ## 3. Arbeidsrekkefølge
 
@@ -62,6 +64,7 @@ For hver ny del skal følgende avklares før implementering:
 - Desktop- og mobilresultat skal testes separat.
 - Layoutsystemet skal unngå skjulte avhengigheter mellom komponenter.
 - Ingen automatisk generert design skal overskrive brukerens eksplisitte valg uten tydelig varsel.
+- Automatisk lagring skal være en grunnfunksjon i editoren.
 
 ## 6. Gjeldende status
 
