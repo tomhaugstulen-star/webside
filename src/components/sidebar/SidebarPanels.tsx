@@ -116,4 +116,7 @@ export function SidebarPanel({
     case 'settings':
       return <SettingsPanel onSelect={onSelect} />
   }
+
+  const unhandledTool: never = activeTool
+  return unhandledTool
 }
