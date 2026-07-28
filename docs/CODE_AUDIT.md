@@ -4,7 +4,7 @@ Denne gjennomgangen gjelder editorgrunnlaget før videre funksjonsutvikling.
 
 ## 1. Omfang
 
-Følgende ble kontrollert:
+Kontrollert:
 
 - inngangspunkt og hovedkomponent
 - editorens hovedskall
@@ -17,133 +17,108 @@ Følgende ble kontrollert:
 - ubrukte kildekodemoduler
 - risiko for navne- og ansvarsblanding
 
-Kodeoppryddingen ligger i:
+Kodeoppryddingen ble utført i:
 
 ```text
 chore/editor-foundation-audit
 ```
 
-## 2. Funn som er rettet
+## 2. Funn som ble rettet
 
 ### Ubrukt kode
 
-`InspectorRail.tsx` var ikke koblet inn i applikasjonen. Filen importerte en type og ble derfor ikke fanget av den opprinnelige orphan-regelen.
-
-Utført:
-
-- ubrukt `InspectorRail.tsx` er fjernet
-- ubrukt `InspectorTool` er fjernet
-- Dependency Cruiser har fått regelen `no-unreachable-from-main`
-- en kildekodemodul som ikke kan nås fra `src/main.tsx` skal nå stoppe arkitektursjekken
+- ubrukt `InspectorRail.tsx` ble fjernet
+- ubrukt `InspectorTool` ble fjernet
+- Dependency Cruiser fikk regelen `no-unreachable-from-main`
+- kildekodemoduler som ikke kan nås fra `src/main.tsx` stopper arkitektursjekken
 
 ### Bokser og Elementer
 
-Den synlige menyen het Elementer, mens interne typer og ID-er fortsatt brukte `boxes`.
+- intern verktøy-ID ble endret fra `boxes` til `elements`
+- ikonnavn ble endret til `elements`
+- CSS-navn ble endret til `element-grid` og `element-card`
 
-Utført:
-
-- intern verktøy-ID er endret til `elements`
-- ikonnavn er endret til `elements`
-- CSS-navn er endret fra `box-grid` og `box-card` til `element-grid` og `element-card`
-
-Dette reduserer risikoen for parallelle begreper i datamodellen senere.
+Synlige og interne begreper bruker nå Elementer konsekvent.
 
 ### Blank startside
 
-Det blanke lerretet inneholdt en flytende objektmeny, fire markeringshåndtak og en låseknapp selv om ingen objekter fantes.
+- midlertidig objektmeny ble fjernet
+- fire midlertidige håndtak ble fjernet
+- midlertidig låseknapp ble fjernet
+- lerretet ble en ren, hvit side med nøytral kant
 
-Utført:
+Objektverktøy vises først når faktiske elementer og markering finnes.
 
-- objektmenyen er fjernet fra den blanke siden
-- de fire håndtakene er fjernet
-- den midlertidige låseknappen på selve siden er fjernet
-- lerretet vises som en ren, hvit side med en nøytral kant
+### CSS-struktur
 
-Objektverktøy, låsing og drahåndtak bygges senere sammen med den faktiske objektmodellen.
-
-### For stor CSS-fil
-
-`src/styles/editor.css` hadde 669 linjer og ansvar for hele editoren.
-
-Utført oppdeling:
+Den tidligere samlefilen på 669 linjer ble delt i:
 
 - `editor-base.css`
 - `toolbar.css`
 - `sidebar.css`
 - `canvas.css`
 
-Den separate `sidebar-panel.css` er slått sammen med `sidebar.css`. Alle de nye CSS-filene er under 300 linjer.
+Alle filene er under prosjektets kontrollgrense på 300 linjer.
 
-### Venstremenyens ansvar
+### Venstremeny
 
-`LeftSidebar.tsx` inneholdt både navigasjon, alle SVG-ikoner og alle panelene.
-
-Utført oppdeling:
-
-- `LeftSidebar.tsx` håndterer bare navigasjon og panelbeholder
-- `SidebarIcon.tsx` håndterer ikonene
-- `SidebarPanels.tsx` håndterer panelinnholdet
+- `LeftSidebar.tsx` håndterer navigasjon og panelbeholder
+- `SidebarIcon.tsx` håndterer ikoner
+- `SidebarPanels.tsx` håndterer panelinnhold
 
 ### Hovedmeny
 
-Hovedmenyen kunne åpnes, men lukket ikke forutsigbart ved klikk utenfor.
+- lukkes ved klikk utenfor
+- lukkes med Escape
+- event listeners fjernes ved lukking og demontering
 
-Utført:
+### Lokal utviklingsstart
 
-- menyen lukkes ved klikk utenfor
-- menyen lukkes med Escape
-- event listeners fjernes når menyen lukkes eller komponenten demonteres
+- `npm run dev` bruker `vite --open`
+- editoren åpnes automatisk i standardnettleseren
 
 ## 3. Bekreftet arkitekturretning
 
-- `App.tsx` setter bare sammen applikasjonen.
-- `EditorShell` eier foreløpig bare skalltilstand som aktivt verktøy og valgt visning.
-- Verktøymeny, panelinnhold og ikoner er separert.
-- Lerretet inneholder ikke objektlogikk før objektmodellen er definert.
-- Responsive prosjektverdier skal ikke lagres direkte i DOM-en.
-- Automatisk lagring bygges etter at prosjektmodell og historikkmodell er definert.
+- `App.tsx` setter bare sammen applikasjonen
+- editorshellet eier bare skalltilstand
+- prosjektdata skal eies av sentral prosjekt-state
+- verktøymeny, panelinnhold og ikoner er separert
+- lerretet skal ikke få tilfeldig objektlogikk
+- responsive prosjektverdier lagres i prosjektmodellen, ikke i DOM-en
+- automatisk lagring bygges etter prosjektmodell og historikkmodell
 
 ## 4. Midlertidige kontroller
 
-Flere knapper i toppmenyen og panelene er fortsatt visuelle skallkontroller uten ferdig funksjon. Dette gjelder blant annet forhåndsvisning, lagring, publisering og flere panelvalg.
+Flere knapper er fortsatt visuelle skallkontroller uten ferdig funksjon, blant annet forhåndsvisning, lagring, publisering og flere panelvalg.
 
-De skal ikke få tilfeldig logikk i editorgrunnlaget. Hver kontroll kobles til reell funksjonalitet i sin planlagte feature-branch.
+Hver kontroll kobles til reell funksjonalitet i sin planlagte feature-branch. Tilfeldig midlertidig logikk skal ikke legges inn.
 
 ## 5. Automatisert lokal kontroll
 
-Kontrollen ble kjørt lokalt 28. juli 2026.
+Bekreftet 28. juli 2026:
 
-Bekreftet:
-
-- `npm install`: ingen sårbarheter funnet
+- `npm install`: ingen kjente sårbarheter
 - ESLint: bestått
 - TypeScript: bestått
 - Dependency Cruiser: ingen regelbrudd
 - arkitekturrapport: 11 moduler og 15 avhengigheter
 - produksjonsbuild: bestått
-- `architecture.json`: regenerert
-- `docs/dependency-graph.mmd`: regenerert
+- arkitekturrapporter regenerert
 
-Kommandoene som ble kjørt:
+## 6. Visuell kontroll
 
-```powershell
-npm install
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-```
+Godkjent:
 
-## 6. Visuell kontroll før merge
-
-Følgende skal fortsatt kontrolleres med `npm run dev`:
-
-- siden åpnes helt blank
-- Elementer-menyen åpnes og inneholder Seksjon, Bilde, Tekst og Knapp
-- samme verktøy lukker panelet ved nytt klikk
+- siden åpner helt blank
+- Elementer inneholder Seksjon, Bilde, Tekst og Knapp
+- samme verktøy åpner og lukker panelet
 - Escape lukker venstrepanelet
 - hovedmenyen lukkes med Escape og klikk utenfor
-- desktop- og mobilknappen endrer bredden på lerretet
+- desktop og mobil endrer lerretsbredde
+- nettleseren åpnes automatisk ved `npm run dev`
 
 ## 7. Godkjenningsstatus
 
-Kodegjennomgangen og alle automatiserte kvalitetskontroller er bestått. Branchen kan vurderes for merge etter at arkitekturrapportene er committet og den visuelle kontrollen er godkjent.
+Editorgrunnlaget og teknisk opprydding er ferdig, lokalt kontrollert, visuelt godkjent og merget til `main`.
+
+Videre utvikling skal følge `docs/WORK_PLAN.md`. Prosjekt- og elementmodellen er ferdig i `feature/element-model`, og neste planlagte fase etter merge er `feature/element-selection`.
