@@ -8,16 +8,16 @@ For hver avgrensede del:
 
 1. Kontroller riktig branch og rent arbeidsområde.
 2. Oppdater og kontroller `main`.
-3. Opprett eller fast-forward en avgrenset feature-branch.
+3. Opprett en avgrenset feature-branch.
 4. Definer omfang, brukerhandlinger, state og grenser mot senere funksjoner.
-5. Lås åpne produkt- og designvalg før produksjonskode.
+5. Lås produkt- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
 7. Trekk ut ansvar før en kildefil passerer 250 linjer.
 8. Gjennomfør framtidsrettet kodeaudit.
 9. Kjør `npm run check` etter siste produksjonskodeendring.
 10. Regenerer arkitekturrapporter ved strukturendringer.
 11. Test PC, Telefon, peker og tastatur der det er relevant.
-12. Oppdater all relevant dokumentasjon, ikke bare funksjonsspesifikasjonen.
+12. Oppdater all relevant dokumentasjon.
 13. Kontroller synkronisert branch og clean tree.
 14. Opprett PR og kontroller hele diffen, mergebarhet, review-tråder og eventuell CI.
 15. Merge bare etter eksplisitt brukergodkjenning.
@@ -56,7 +56,7 @@ Branch: `feature/element-creation`
 
 - Seksjon, Bilde, Tekst og Knapp
 - sikre ID-er og `updatedAt`
-- kontrollerte standardstørrelser og første ledige startplass
+- kontrollerte standardstørrelser og startplassering
 - automatisk markering
 - avledet lerretshøyde
 
@@ -70,13 +70,13 @@ Status: merget som PR #4.
 
 Branch: `feature/object-locking`
 
-Status: merget som PR #5 med merge-commit `a3eed45`.
+Status: merget som PR #5 med mergecommit `a3eed45`.
 
 ### Fase 6 – Ren tekstredigering
 
 Branch: `feature/text-box-editing`
 
-Status: merget som PR #7 med merge-commit `c729d33`.
+Status: merget som PR #7 med mergecommit `c729d33`.
 
 - prosjektskjema versjon 2
 - `content` bare for tekstobjekter
@@ -88,13 +88,13 @@ Status: merget som PR #7 med merge-commit `c729d33`.
 
 Branch: `feature/left-menu-labels`
 
-Status: merget som PR #8 med merge-commit `a35f59d`.
+Status: merget som PR #8 med mergecommit `a35f59d`.
 
 ### Fase 7 – Høyremenyens grunnstruktur
 
 Branch: `feature/right-properties-panel`
 
-Status: merget som PR #9 med merge-commit `8de5f2e`.
+Status: merget som PR #9 med mergecommit `8de5f2e`.
 
 - valgt element åpner panelet
 - 320 px dokket panel fra 1680 px
@@ -109,91 +109,33 @@ Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
 Branch: `feature/text-properties`
 
-Status: merget som PR #11 med merge-commit `452b491`.
+Status: merget som PR #11 med mergecommit `452b491`.
 
 - prosjektskjema versjon 3
 - obligatorisk `textStyle` bare for tekstelementer
 - font, størrelse, fet, kursiv, justering og linjehøyde
 - formatering gjelder hele tekstboksen
 - låste tekstbokser kan inspiseres, men ikke endres
-- tekstinnhold redigeres fortsatt bare på lerretet
 
 Se `docs/TEXT_PROPERTIES.md`.
 
-## 3. Gjeldende mellomfase – frittstående elementlenker
+### Mellomfase – Frittstående elementlenker
 
-```text
-branch: feature/element-links
-base main: 452b491
-PR: #14 Add standalone links for text elements
-sporing: docs/ELEMENT_LINKS.md og GitHub-sak #13
-```
+Branch: `feature/element-links`
 
-Denne fasen er bevisst frittstående. Den bygger en gjenbrukbar lenkemodell uten å blande inn knappbibliotek, knappdesign, riktekst, forhåndsvisning eller publisering.
+Status: merget som PR #14 med mergecommit `f71b354`.
 
-### Implementert
-
-For en markert vanlig tekstboks viser høyremenyen:
-
-```text
-Lenke
-Type: Ingen / Ekstern lenke
-Nettadresse
-Åpne i ny fane
-Lag lenke / Lagre lenke / Fjern lenke
-```
-
-Regler:
-
-- hele tekstboksen får lenken
-- bare absolutte `http://`- og `https://`-adresser godtas
-- ugyldig URL muterer ikke prosjektet
+- prosjektskjema versjon 4
+- hele tekstboksen kan få ekstern `http://`- eller `https://`-lenke
 - `openInNewTab` lagres eksplisitt
-- låste tekstbokser kan inspiseres, men kontrollene er deaktivert
+- ugyldig URL muterer ikke prosjektet
+- låste tekstbokser kan inspiseres, men ikke endres
 - lagring gir grønn og tekstlig bekreftelse
-- lenken åpnes aldri i editormodus
+- lenken aktiveres aldri i editormodus
 - markerte enkeltord får ikke egne lenker
+- gjenbrukbar lenkemodell for senere grafiske knapper
 
-### Modell og state
-
-- prosjektskjema versjon 4 på branchen
-- bare `kind: 'text'` får obligatorisk `link` i første leveranse
-- lenkemodell: `none` eller `external-url { url, openInNewTab }`
-- runtime-validatoren tåler utypede data og ukjente nøkler
-- validatorregisteret er uttømmende ved framtidige lenketyper
-- reduceren avviser manglende, låste, ugyldige og uendrede overganger
-- `updatedAt` endres bare ved reell prosjektendring
-- inputdraft, feil- og lagringsmelding er transient UI-state
-- editorens DOM inneholder ikke et aktivt anker
-
-### Arkitektur
-
-Nye ansvar er isolert i:
-
-```text
-src/model/elementLink.ts
-src/state/setTextElementLink.ts
-src/state/useTextElementLink.ts
-src/components/properties/ElementLinkPropertiesSection.tsx
-src/styles/element-link-properties.css
-```
-
-`EditorCanvasElement.tsx` er ikke endret i denne fasen og skal fortsatt ikke få flere nye ansvarsområder.
-
-### Verifisert kontroll
-
-Brukeren har bekreftet:
-
-```text
-gyldig lenke lagres
-gjeldende URL vises igjen etter nytt valg
-lagreknappen gir grønn bekreftelse
-ugyldig URL avvises
-lenken åpnes ikke i editoren
-låste elementer har deaktiverte lenkekontroller
-```
-
-Siste verifiserte kontroll etter produksjonskoden:
+Verifisert før merge:
 
 ```text
 ESLint: bestått
@@ -201,39 +143,176 @@ TypeScript: bestått
 Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
 produksjonsbuild: bestått
 Vite: 58 moduler transformert
-arkitekturrapporter: regenerert
-working tree: clean før dokumentasjonsrevisjonen
 ```
 
-PR #14 er åpen og mergebar. Den skal ikke merges uten eksplisitt godkjenning.
+Se `docs/ELEMENT_LINKS.md`.
+
+## 3. Gjeldende fase – Sikker sletting av elementer
+
+```text
+branch: feature/element-deletion
+base main: f71b354
+GitHub-sak: #15
+sporing: docs/ELEMENT_DELETION.md
+```
+
+Plancommit:
+
+```text
+7269cb1 docs: define safe element deletion
+```
+
+Produksjonskode er ikke implementert ennå. PR er ikke opprettet.
+
+### Mål
+
+Gjør det mulig å slette ett markert element på en sikker måte:
+
+- Seksjon
+- Bilde
+- Tekst
+- Knapp
+
+### Fast plassering
+
+Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
+
+```text
+Element
+
+Status: Ulåst
+
+Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
+```
+
+Regler:
+
+- samme bredde som statusboksen
+- vanlig dokumentflyt, ikke festet nederst
+- rød tekst og rød ramme
+- deaktivert når elementet er låst
+- krever ingen scrolling i dagens panel
+
+### Bekreftelse
+
+Sletting krever alltid dialog fordi angre/gjør om ikke finnes ennå.
+
+```text
+Slett tekstboksen?
+
+Dette kan ikke angres.
+
+Avbryt    Slett
+```
+
+Dialogen skal støtte tastatur, `Escape`, kontrollert fokus og ny validering mot siste state ved bekreftelse.
+
+### Tastatur
+
+`Delete` åpner samme dialog for markert element.
+
+Global sletting skal ikke utløses under:
+
+- tekstredigering
+- input, textarea eller select
+- button eller dialogkontroller
+- contenteditable
+- andre interaktive skjemaelementer
+
+`Backspace` brukes ikke globalt i første leveranse.
+
+### Modell og state
+
+Prosjektskjemaet forblir versjon 4.
+
+Forventet handling:
+
+```text
+delete-element-from-active-page { elementId, updatedAt }
+```
+
+Reducergrensen avviser:
+
+- manglende aktiv side
+- manglende element
+- element på feil side
+- låst element
+- utdatert eller no-op handling
+
+Ved gyldig sletting:
+
+- bare målelementet fjernes
+- `project.updatedAt` oppdateres
+- `selectedElementId` settes til `null`
+- høyremenyen lukkes gjennom eksisterende selection-avledning
+
+Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; andre elementer blir stående.
+
+### Arkitektur
+
+Forventet ansvarsdeling:
+
+```text
+state       -> egen reducerhjelper
+state       -> egen dispatch-hook
+properties  -> liten sletteseksjon
+ dialog      -> avgrenset bekreftelsesdialog
+keyboard    -> global Delete-grense
+```
+
+`EditorCanvasElement.tsx` skal ikke få sletteansvaret.
+
+Alle nye kildefiler skal være under 250 linjer.
+
+### Ikke del av fasen
+
+- angre/gjør om
+- papirkurv eller gjenoppretting
+- multisletting
+- dra til papirkurv
+- sletting av side eller prosjekt
+- automatisk sletting av visuelt overlappende elementer
+- foreldre-/barnemodell for Seksjon
+- duplisering
+- historikk eller lagring
+- bildeimport
+- knappbibliotek
+- farger
+- forhåndsvisning eller publisering
+
+### Kontroll før PR
+
+- alle fire elementtyper viser riktig knapp
+- låst element kan ikke slettes
+- klikk og `Delete` åpner samme dialog
+- tekst- og skjemaredigering forstyrres ikke
+- avbrytelse muterer ikke prosjektet
+- bekreftet sletting fjerner bare målelementet
+- markering nullstilles og høyremenyen lukkes
+- ugyldige handlinger avvises i reduceren
+- `updatedAt` endres bare ved faktisk sletting
+- eksisterende funksjoner fungerer som før
+- `npm run check` består
+- arkitekturrapportene regenereres
+- PC, Telefon, peker og tastatur kontrolleres
+- all relevant dokumentasjon oppdateres
+- working tree er clean
 
 ## 4. Senere faser
 
-### Fase 9 – Knappbibliotek
+### Fase 10 – Knappbibliotek
 
 Foreløpig branch: `feature/button-library`
 
-Produktretning:
-
 - ferdigdesignede knapper lages i Canva eller Figma
 - eksport som SVG eller PNG
-- `Elementer -> Knapp` åpner et internt knappbibliotek
-- brukeren kan legge til flere knappfiler etter behov
-- valgt knapp settes inn på lerretet
-- samme lenkemodell gjenbrukes på knappen
-- grafiske knapper får et tilgjengelig navn
-- ingen aktiv navigasjon i editormodus
+- `Elementer -> Knapp` åpner internt bibliotek
+- samme lenkemodell gjenbrukes
+- grafiske knapper får tilgjengelig navn
 
-Avklar før implementering:
+Den parkerte `feature/button-element`-branchen skal ikke merges. Sak #12 er lukket som `not_planned`.
 
-- hvor knappfilene skal ligge i prosjektet
-- om første versjon bare leser statiske filer eller skal kunne skrive til lokal mappe
-- SVG kontra PNG som anbefalt format
-- minimumsmetadata for hver knapp
-
-Den parkerte `feature/button-element`-branchen skal ikke merges. GitHub-sak #12 er lukket som `not_planned`.
-
-### Fase 10 – Bilder
+### Fase 11 – Bilder
 
 Branch: `feature/image-import-and-placement`
 
@@ -242,26 +321,23 @@ Branch: `feature/image-import-and-placement`
 - selvstendig bildeobjekt
 - fri plassering og størrelse
 
-### Fase 11 – Farger
+### Fase 12 – Farger
 
 Branch: `feature/project-colors`
 
 - register over faktiske prosjektfarger
 - global endring
-- oppdatering av alle brukere av en farge
 - tekstfarge kobles hit
 
-### Fase 12 – Logo og header
+### Fase 13 – Logo og header
 
 Branch: `feature/logo-header`
 
 - logo
-- header
 - hovedtekst og undertittel
-- redigerbar struktur
-- headertekst er ikke en vanlig fri tekstboks
+- redigerbar headerstruktur
 
-### Fase 13 – Korrigeringslinjer
+### Fase 14 – Korrigeringslinjer
 
 Branch: `feature/alignment-guides`
 
@@ -269,41 +345,30 @@ Branch: `feature/alignment-guides`
 - samme linje og lik avstand
 - bare under flytting eller resizing
 
-### Fase 14 – Responsiv redigering
+### Fase 15 – Responsiv redigering
 
 Branch: `feature/mobile-design-controls`
 
 - desktop er grunnlaget
 - mobil arver desktop som standard
-- eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet
-- **Bruk PC-oppsett** fjerner mobiloverstyringen
+- eksplisitte mobiloverstyringer
 
-### Fase 15 – Angre og gjør om
+### Fase 16 – Angre og gjør om
 
 Branch: `feature/history-system`
 
 - én historikkpost per avsluttet brukerhandling
-- transient markering, draft, panelstate og preview holdes utenfor
+- transient state holdes utenfor
 
-### Fase 16 – Lokal automatisk lagring
+### Fase 17 – Lokal automatisk lagring
 
 Branch: `feature/local-project-autosave`
 
-- prosjektmappe og lokale bilder
-- sikker automatisk lagring og gjenoppretting
-
-### Fase 17 – Åpne og importere prosjekt
+### Fase 18 – Åpne og importere prosjekt
 
 Branch: `feature/project-open-import`
 
-- validere prosjektfil
-- migrere eldre skjemaversjoner
-- laste prosjektdata og bilder
-- håndtere feil
-
-### Fase 18 – Forhåndsvisning og publisering
-
-Branches:
+### Fase 19 – Forhåndsvisning og publisering
 
 ```text
 feature/preview-mode
@@ -320,5 +385,5 @@ feature/publishing
 - 300 linjer er hard unntaksgrense.
 - Canvas-komponenten skal ikke samle nye funksjonsansvar.
 - Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
-- Transient markering, drafts, fokus, hover og statusmeldinger serialiseres ikke.
+- Transient markering, dialogstate, drafts, fokus, hover og statusmeldinger serialiseres ikke.
 - Ingen feature-branch merges uten eksplisitt brukergodkjenning.
