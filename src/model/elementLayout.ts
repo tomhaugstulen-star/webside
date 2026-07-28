@@ -1,0 +1,94 @@
+import type {
+  CanvasPosition,
+  EditorElement,
+  ElementKind,
+  ElementSize,
+} from './editorProject'
+
+export type ElementLayout = {
+  position: CanvasPosition
+  size: ElementSize
+}
+
+const minimumElementSizes: Record<ElementKind, ElementSize> = {
+  section: { width: 160, height: 90 },
+  image: { width: 120, height: 80 },
+  text: { width: 120, height: 48 },
+  button: { width: 80, height: 36 },
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(Math.max(value, minimum), maximum)
+}
+
+export function getElementMinimumSize(kind: ElementKind): ElementSize {
+  return { ...minimumElementSizes[kind] }
+}
+
+export function getElementDesktopLayout(element: EditorElement): ElementLayout {
+  return {
+    position: element.position.desktop,
+    size: element.size.desktop,
+  }
+}
+
+export function moveElementLayout(
+  initialLayout: ElementLayout,
+  delta: CanvasPosition,
+  canvasWidth: number,
+): ElementLayout {
+  const maximumX = Math.max(0, canvasWidth - initialLayout.size.width)
+
+  return {
+    position: {
+      x: clamp(initialLayout.position.x + delta.x, 0, maximumX),
+      y: Math.max(0, initialLayout.position.y + delta.y),
+    },
+    size: initialLayout.size,
+  }
+}
+
+export function resizeElementLayout(
+  kind: ElementKind,
+  initialLayout: ElementLayout,
+  delta: CanvasPosition,
+  canvasWidth: number,
+): ElementLayout {
+  const minimumSize = getElementMinimumSize(kind)
+  const maximumWidth = Math.max(minimumSize.width, canvasWidth - initialLayout.position.x)
+
+  return {
+    position: initialLayout.position,
+    size: {
+      width: clamp(initialLayout.size.width + delta.x, minimumSize.width, maximumWidth),
+      height: Math.max(minimumSize.height, initialLayout.size.height + delta.y),
+    },
+  }
+}
+
+export function elementLayoutsEqual(first: ElementLayout, second: ElementLayout) {
+  return (
+    first.position.x === second.position.x &&
+    first.position.y === second.position.y &&
+    first.size.width === second.size.width &&
+    first.size.height === second.size.height
+  )
+}
+
+export function isValidElementLayout(kind: ElementKind, layout: ElementLayout) {
+  const minimumSize = getElementMinimumSize(kind)
+  const values = [
+    layout.position.x,
+    layout.position.y,
+    layout.size.width,
+    layout.size.height,
+  ]
+
+  return (
+    values.every(Number.isFinite) &&
+    layout.position.x >= 0 &&
+    layout.position.y >= 0 &&
+    layout.size.width >= minimumSize.width &&
+    layout.size.height >= minimumSize.height
+  )
+}

@@ -51,9 +51,10 @@
   border: 1px solid #d8cec8;
   color: #625c58;
   background: #fffdfb;
-  cursor: pointer;
+  cursor: grab;
   outline: 1px solid transparent;
   outline-offset: 1px;
+  touch-action: none;
   user-select: none;
 }
 
@@ -62,6 +63,31 @@
   font-size: 13px;
   font-weight: 650;
   letter-spacing: 0.01em;
+}
+
+.canvas-element__resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: end;
+  box-sizing: border-box;
+  padding: 4px;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.canvas-element__resize-handle::after {
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 2px solid #ffffff;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(61, 38, 29, 0.28);
+  content: '';
 }
 
 .canvas-element--section {
@@ -95,6 +121,18 @@
 .canvas-element--selected {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+.canvas-element--transforming {
+  z-index: 1;
+}
+
+.canvas-element--move {
+  cursor: grabbing;
+}
+
+.canvas-element--resize {
+  cursor: nwse-resize;
 }
 
 .canvas-element:focus-visible {

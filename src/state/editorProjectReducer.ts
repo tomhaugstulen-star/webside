@@ -1,4 +1,10 @@
 import { createEditorElement } from '../model/createEditorElement'
+import {
+  elementLayoutsEqual,
+  getElementDesktopLayout,
+  isValidElementLayout,
+  type ElementLayout,
+} from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type {
   EditorProject,
@@ -14,6 +20,12 @@ export type EditorProjectAction =
       type: 'add-element-to-active-page'
       elementId: string
       kind: ElementKind
+      updatedAt: string
+    }
+  | {
+      type: 'set-element-desktop-layout'
+      elementId: string
+      layout: ElementLayout
       updatedAt: string
     }
 
@@ -131,6 +143,53 @@ function reduceEditorProjectState(
           updatedAt: action.updatedAt,
         },
         selectedElementId: element.id,
+      }
+    }
+
+    case 'set-element-desktop-layout': {
+      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+      const element = activePage?.elements.find((candidate) => candidate.id === action.elementId)
+
+      if (
+        !activePage ||
+        !element ||
+        element.locked ||
+        !isValidElementLayout(element.kind, action.layout) ||
+        elementLayoutsEqual(getElementDesktopLayout(element), action.layout)
+      ) {
+        return state
+      }
+
+      const pages = state.project.pages.map((page) =>
+        page.id === state.activePageId
+          ? {
+              ...page,
+              elements: page.elements.map((candidate) =>
+                candidate.id === action.elementId
+                  ? {
+                      ...candidate,
+                      position: {
+                        ...candidate.position,
+                        desktop: { ...action.layout.position },
+                      },
+                      size: {
+                        ...candidate.size,
+                        desktop: { ...action.layout.size },
+                      },
+                    }
+                  : candidate,
+              ),
+            }
+          : page,
+      )
+
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          pages,
+          updatedAt: action.updatedAt,
+        },
       }
     }
   }

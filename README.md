@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan nå opprette og markere grunnleggende elementtyper. Draing, størrelsesendring og innholdsredigering bygges i senere, avgrensede branches.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte og endre størrelse på grunnleggende elementtyper. Innholdsredigering, bilder, låsegrensesnitt, historikk og lagring bygges i senere, avgrensede branches.
 
 ## Lokal mappe
 
@@ -45,14 +45,15 @@ Det utvikles aldri direkte på `main`.
 main
   → egen avgrenset branch
   → implementering
+  → kodeaudit
   → npm run check
-  → arkitekturrapporter ved strukturendringer
-  → visuell kontroll
+  → arkitekturrapporter
+  → desktop- og mobiltest
   → dokumentasjon
-  → kontrollert PR og merge til main
+  → kontrollert PR og merge
 ```
 
-Etter hver repoendring skal brukeren få de nøyaktige PowerShell-kommandoene som skal kjøres lokalt.
+Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer.
 
 ## Ferdig og merget til `main`
 
@@ -64,62 +65,77 @@ Etter hver repoendring skal brukeren få de nøyaktige PowerShell-kommandoene so
 - Dependency Cruiser og samlet `npm run check`
 - automatisk nettleseråpning
 - prosjekt- og elementmodell
-- skjemaversjon, sikre ID-er, sider og responsive elementverdier
+- skjemaversjon, sikre ID-er, sider og responsive verdier
 - sentral prosjekt-state og aktiv side
 - markering av eksisterende elementer
-- klikk på tomt lerret fjerner markering
-- tastaturmarkering med Tab, Enter og mellomrom
-- transient `selectedElementId` med validerte state-overganger
+- transient `selectedElementId`
+- oppretting av alle fire elementtyper
+- kontrollerte standardstørrelser og startplassering
+- automatisk markering av nytt element
+- automatisk utvidelse av lerretshøyden
 
 ## Gjeldende branch
 
 ```text
-feature/element-creation
+feature/drag-resize
 ```
 
-Implementert og visuelt godkjent på desktop og mobil:
+Implementert og visuelt godkjent:
 
-- opprette Seksjon, Bilde, Tekst og Knapp fra Elementer-panelet
-- legge nye elementer til aktiv side i prosjektmodellen
-- sikker kryptografisk element-ID
-- automatisk markering av nytt element
-- kontrollerte standardstørrelser
-- første ledige startposisjon med 16 px avstand
-- ingen direkte overlapping ved oppretting
-- automatisk utvidelse av lerretshøyden
-- blank startside før brukeren oppretter noe
-- mobil arver desktopverdier
-- sidebar-CSS delt etter ansvar før 250-linjersgrensen
+- flytting med peker
+- ett resize-håndtak nederst til høyre
+- størrelsesendring med minimumsmål
+- clamping mot venstre, høyre og øvre lerretskant
+- fri flytting nedover med automatisk lerretsvekst
+- edge-scroll under interaksjon
+- fri overlapping uten automatisk kollisjonssystem
+- transient preview under pekerbevegelse
+- én prosjekt-commit ved normalt pekerslipp
+- desktop og mobil fungerer med delt desktopgeometri
 
-Siste kodeaudit har i tillegg sikret at:
+Siste kodeaudit har i tillegg sikret:
 
-- state-avhengig oppretting beregnes fra reducerens nyeste state
-- raske eller batchede opprettinger ikke bruker et gammelt React-snapshot
-- plasseringsalgoritmen skalerer uten kvadratisk kandidatsøk
-- viewport-typen har én autoritativ definisjon
-- nye menyverktøy må håndteres uttømmende av TypeScript
+- låste elementer kan markeres, men ikke transformeres
+- `pointercancel` og tapt pointer capture rydder preview uten commit
+- minimumsmål kan ikke muteres gjennom en delt objektreferanse
+- preview-typen har én autoritativ definisjon
+- resize-håndtaket har 32 × 32 px treffflate
+- piltaster flytter elementer
+- `Ctrl`/`Cmd` + piltaster endrer størrelse
+- `Shift` bruker 10 px steg
+- preview-state nullstilles uten synkron `setState` i effect
 
-De siste audit-endringene må gjennom ny `npm run check`, nye arkitekturrapporter og en kort visuell regresjonskontroll før PR.
+## Planlagt responsiv redigering
+
+Dagens PC- og Telefon-visning deler desktopgeometrien. Dette er en midlertidig, kontrollert regel.
+
+Egen responsiv redigering spores i:
+
+```text
+docs/MOBILE_DESIGN_CONTROLS.md
+GitHub-sak #3
+feature/mobile-design-controls
+```
+
+Planen er desktop-arv med eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet. En mobilendring skal senere ikke overskrive desktop-oppsettet.
 
 ## Viktige state-grenser
 
-`EditorProject` er autoritativ kilde for varige sider og elementer.
+`EditorProject` er autoritativ kilde for varige sider, elementer og geometri.
 
-`selectedElementId` er transient editor-state og skal ikke:
+Transient state skal ikke lagres, eksporteres, publiseres eller inngå direkte i historikk/autolagring:
 
-- lagres i prosjektfilen
-- utløse autolagring
-- inngå i prosjektets angre-/gjør om-historikk
-- eksporteres
-- publiseres
+- `selectedElementId`
+- aktiv pekerinteraksjon
+- layout-preview under draing eller resizing
 
-Elementoppretting er en prosjektmutasjon. Oppretting skjer i reduceren fra den nyeste state-versjonen.
+En ferdig pekertransform committes én gang til prosjektet ved normalt pekerslipp.
 
 ## Filstørrelse og ansvar
 
-- 250 linjer er aktiv terskel for å begynne å trekke ut ansvar.
+- 250 linjer er aktiv terskel for å trekke ut ansvar.
 - En fil deles tidligere dersom den får flere tydelige ansvarsområder.
-- 300 linjer er en eksplisitt unntaksgrense, ikke et normalmål.
+- 300 linjer er en eksplisitt unntaksgrense.
 - Deling skjer etter ansvar, ikke tilfeldig linjetall.
 
 ## Dokumentasjon
@@ -133,19 +149,22 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 5. `docs/ELEMENT_MODEL.md`
 6. `docs/ELEMENT_SELECTION.md`
 7. `docs/ELEMENT_CREATION.md`
-8. `docs/RESPONSIVE_DESIGN.md`
-9. `docs/CODE_AUDIT.md`
+8. `docs/DRAG_RESIZE.md`
+9. `docs/RESPONSIVE_DESIGN.md`
+10. `docs/MOBILE_DESIGN_CONTROLS.md`
+11. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
-- flytting og størrelsesendring
 - sletting
-- låsing og opplåsing
+- låse- og opplåsingsgrensesnitt
 - direkte tekstredigering
 - bildeimport
 - knapphandling og lenker
 - fargesystem
 - logo/header
+- korrigeringslinjer
+- egne mobiloverstyringer
 - angre/gjør om
 - automatisk lokal prosjektlagring
 - åpning/import av prosjekt
