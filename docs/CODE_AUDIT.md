@@ -109,19 +109,33 @@ Flere knapper i toppmenyen og panelene er fortsatt visuelle skallkontroller uten
 
 De skal ikke få tilfeldig logikk i editorgrunnlaget. Hver kontroll kobles til reell funksjonalitet i sin planlagte feature-branch.
 
-## 5. Kontroll som må kjøres lokalt
+## 5. Automatisert lokal kontroll
 
-Før branchen vurderes for merge:
+Kontrollen ble kjørt lokalt 28. juli 2026.
+
+Bekreftet:
+
+- `npm install`: ingen sårbarheter funnet
+- ESLint: bestått
+- TypeScript: bestått
+- Dependency Cruiser: ingen regelbrudd
+- arkitekturrapport: 11 moduler og 15 avhengigheter
+- produksjonsbuild: bestått
+- `architecture.json`: regenerert
+- `docs/dependency-graph.mmd`: regenerert
+
+Kommandoene som ble kjørt:
 
 ```powershell
 npm install
 npm run check
 npm run architecture:json
 npm run architecture:diagram
-npm run dev
 ```
 
-Kontroller visuelt:
+## 6. Visuell kontroll før merge
+
+Følgende skal fortsatt kontrolleres med `npm run dev`:
 
 - siden åpnes helt blank
 - Elementer-menyen åpnes og inneholder Seksjon, Bilde, Tekst og Knapp
@@ -130,6 +144,6 @@ Kontroller visuelt:
 - hovedmenyen lukkes med Escape og klikk utenfor
 - desktop- og mobilknappen endrer bredden på lerretet
 
-## 6. Godkjenningsstatus
+## 7. Godkjenningsstatus
 
-Kodegjennomgangen er utført og klare strukturproblemer er rettet i repoet. Build, lint, typekontroll og ny arkitekturrapport må fortsatt bekreftes lokalt etter disse endringene.
+Kodegjennomgangen og alle automatiserte kvalitetskontroller er bestått. Branchen kan vurderes for merge etter at arkitekturrapportene er committet og den visuelle kontrollen er godkjent.
