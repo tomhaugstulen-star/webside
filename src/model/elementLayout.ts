@@ -22,7 +22,7 @@ function clamp(value: number, minimum: number, maximum: number) {
 }
 
 export function getElementMinimumSize(kind: ElementKind): ElementSize {
-  return minimumElementSizes[kind]
+  return { ...minimumElementSizes[kind] }
 }
 
 export function getElementDesktopLayout(element: EditorElement): ElementLayout {
