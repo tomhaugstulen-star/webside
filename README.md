@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte og endre størrelse på grunnleggende elementtyper. Innholdsredigering, bilder, låsegrensesnitt, historikk og lagring bygges i senere, avgrensede branches.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementtyper. Innholdsredigering, ekte bilder, sletting, historikk og lagring bygges i senere, avgrensede branches.
 
 ## Lokal mappe
 
@@ -48,7 +48,7 @@ main
   → kodeaudit
   → npm run check
   → arkitekturrapporter
-  → desktop- og mobiltest
+  → desktop-, mobil-, peker- og tastaturtest
   → dokumentasjon
   → kontrollert PR og merge
 ```
@@ -57,53 +57,42 @@ Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer.
 
 ## Ferdig og merget til `main`
 
-- stabilt editorgrunnlag
+- stabilt React/TypeScript/Vite-grunnlag
 - blankt desktop- og mobillerret
 - toppmeny og venstremeny
 - kontrollert paneloppførsel
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
-- Dependency Cruiser og samlet `npm run check`
-- automatisk nettleseråpning
-- prosjekt- og elementmodell
-- skjemaversjon, sikre ID-er, sider og responsive verdier
+- prosjekt- og elementmodell med stabile ID-er og responsive verdier
 - sentral prosjekt-state og aktiv side
-- markering av eksisterende elementer
-- transient `selectedElementId`
+- transient elementmarkering
 - oppretting av alle fire elementtyper
-- kontrollerte standardstørrelser og startplassering
-- automatisk markering av nytt element
-- automatisk utvidelse av lerretshøyden
+- kontrollerte startstørrelser og startplassering
+- flytting og størrelsesendring med peker og tastatur
+- clamping, minimumsmål, edge-scroll og automatisk lerretsvekst
+- Dependency Cruiser og samlet `npm run check`
 
 ## Gjeldende branch
 
 ```text
-feature/drag-resize
+feature/object-locking
 ```
 
-Implementert og visuelt godkjent:
+Implementert og visuelt godkjent før siste auditendring:
 
-- flytting med peker
-- ett resize-håndtak nederst til høyre
-- størrelsesendring med minimumsmål
-- clamping mot venstre, høyre og øvre lerretskant
-- fri flytting nedover med automatisk lerretsvekst
-- edge-scroll under interaksjon
-- fri overlapping uten automatisk kollisjonssystem
-- transient preview under pekerbevegelse
-- én prosjekt-commit ved normalt pekerslipp
-- desktop og mobil fungerer med delt desktopgeometri
+- egen objektverktøylinje over valgt element
+- åpen hengelås for **Lås**
+- lukket hengelås for **Lås opp**
+- varig `locked`-mutasjon gjennom reduceren
+- låst element beholder markeringen
+- stiplet markeringsramme for låst element
+- resize-håndtaket skjules når elementet er låst
+- peker- og tastaturtransform blokkeres når låst
+- låseknappen er tastaturtilgjengelig og starter ikke flytting
+- låsestatus er felles for PC og Telefon
 
-Siste kodeaudit har i tillegg sikret:
+Siste kodeaudit har i tillegg sikret at piltaster på et låst, fokusert element ikke utløser utilsiktet scrolling.
 
-- låste elementer kan markeres, men ikke transformeres
-- `pointercancel` og tapt pointer capture rydder preview uten commit
-- minimumsmål kan ikke muteres gjennom en delt objektreferanse
-- preview-typen har én autoritativ definisjon
-- resize-håndtaket har 32 × 32 px treffflate
-- piltaster flytter elementer
-- `Ctrl`/`Cmd` + piltaster endrer størrelse
-- `Shift` bruker 10 px steg
-- preview-state nullstilles uten synkron `setState` i effect
+Se `docs/OBJECT_LOCKING.md`.
 
 ## Planlagt responsiv redigering
 
@@ -121,15 +110,20 @@ Planen er desktop-arv med eksplisitte mobiloverstyringer for posisjon, størrels
 
 ## Viktige state-grenser
 
-`EditorProject` er autoritativ kilde for varige sider, elementer og geometri.
+`EditorProject` er autoritativ kilde for varige sider og elementegenskaper.
+
+Varig prosjektdata:
+
+- elementgeometri
+- låsestatus
+- prosjektets `updatedAt`
 
 Transient state skal ikke lagres, eksporteres, publiseres eller inngå direkte i historikk/autolagring:
 
 - `selectedElementId`
 - aktiv pekerinteraksjon
 - layout-preview under draing eller resizing
-
-En ferdig pekertransform committes én gang til prosjektet ved normalt pekerslipp.
+- synlighet, fokus og hover for objektverktøylinjen
 
 ## Filstørrelse og ansvar
 
@@ -150,14 +144,14 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 6. `docs/ELEMENT_SELECTION.md`
 7. `docs/ELEMENT_CREATION.md`
 8. `docs/DRAG_RESIZE.md`
-9. `docs/RESPONSIVE_DESIGN.md`
-10. `docs/MOBILE_DESIGN_CONTROLS.md`
-11. `docs/CODE_AUDIT.md`
+9. `docs/OBJECT_LOCKING.md`
+10. `docs/RESPONSIVE_DESIGN.md`
+11. `docs/MOBILE_DESIGN_CONTROLS.md`
+12. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
 - sletting
-- låse- og opplåsingsgrensesnitt
 - direkte tekstredigering
 - bildeimport
 - knapphandling og lenker
