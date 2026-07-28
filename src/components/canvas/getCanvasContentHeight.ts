@@ -1,11 +1,18 @@
+import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement, ResponsiveViewport } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 
 const CANVAS_BOTTOM_PADDING = 48
 
+type ElementLayoutPreview = {
+  elementId: string
+  layout: ElementLayout
+}
+
 export function getCanvasContentHeight(
   elements: EditorElement[],
   viewport: ResponsiveViewport,
+  preview: ElementLayoutPreview | null,
 ) {
   return elements.reduce((contentHeight, element) => {
     const visible = resolveResponsiveValue(element.visibility, viewport)
@@ -14,8 +21,13 @@ export function getCanvasContentHeight(
       return contentHeight
     }
 
-    const position = resolveResponsiveValue(element.position, viewport)
-    const size = resolveResponsiveValue(element.size, viewport)
+    const previewLayout = preview?.elementId === element.id ? preview.layout : null
+    const position = previewLayout
+      ? previewLayout.position
+      : resolveResponsiveValue(element.position, viewport)
+    const size = previewLayout
+      ? previewLayout.size
+      : resolveResponsiveValue(element.size, viewport)
     const elementBottom = position.y + size.height + CANVAS_BOTTOM_PADDING
 
     return Math.max(contentHeight, elementBottom)
