@@ -68,25 +68,11 @@ Branch: `feature/drag-resize`
 
 Status: merget som PR #4.
 
-- peker- og tastaturtransform
-- minimumsmål og clamping
-- edge-scroll og automatisk lerretsvekst
-- transient preview
-- én commit ved normalt slipp
-- avbrudd uten commit ved cancel eller tapt capture
-
 ### Fase 5 – Objektlåsing
 
 Branch: `feature/object-locking`
 
 Status: merget som PR #5 med merge-commit `a3eed45`.
-
-- separat objektverktøylinje
-- lås og lås opp
-- varig `locked` gjennom reduceren
-- låste elementer kan markeres og fokuseres
-- peker- og tastaturtransform blokkeres
-- tilgjengelig låseknapp
 
 ### Fase 6 – Ren tekstredigering
 
@@ -97,10 +83,7 @@ Status: merget som PR #7 med merge-commit `c729d33`.
 - prosjektskjema versjon 2
 - `content` bare for tekstobjekter
 - kontrollert flerlinjet `textarea`
-- dobbeltklikk eller `Enter` starter redigering
-- blur og `Ctrl`/`Cmd` + `Enter` committer
-- `Escape` forkaster lokal draft
-- IME-sikker snarveishåndtering
+- blur, submit og cancel med eksplisitte grenser
 - låst tekst kan ikke redigeres
 - reduceren avviser ugyldige og uendrede commits
 
@@ -133,9 +116,7 @@ Status: merget som PR #9 med merge-commit `8de5f2e`.
 - 180 ms transform-animasjon
 - `prefers-reduced-motion` respekteres
 - eksisterende `useElementSelection` gjenbrukes
-- tekstens blur/commit beholdes
 - panelinnhold rendres bare for et gyldig valgt element
-- sentral variabel isolerer reservert panelbredde fra canvas-CSS
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
@@ -143,24 +124,10 @@ Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
 ### Fase 8 – Tekstegenskaper
 
-Branch:
-
 ```text
-feature/text-properties
-```
-
-Utgangspunkt:
-
-```text
-main: 8de5f2e
-PR #9: høyremenyens grunnstruktur
-```
-
-Sporet i:
-
-```text
-docs/TEXT_PROPERTIES.md
-GitHub-sak #10
+branch: feature/text-properties
+base main: 8de5f2e
+sporing: docs/TEXT_PROPERTIES.md og GitHub-sak #10
 ```
 
 Fast UX-regel:
@@ -171,7 +138,7 @@ Høyremeny  = egenskaper for markert element
 Lerretet   = redigere selve teksten
 ```
 
-### Skal bygge
+### Implementert
 
 For en markert vanlig tekstboks:
 
@@ -185,49 +152,86 @@ Justering
 Linjehøyde
 ```
 
-Låste valg:
-
 - formateringen gjelder hele tekstboksen
 - åtte kontrollerte nettsikre fonter
 - kontrollert fontstørrelsesliste fra 12 til 96 px
 - venstre, midtstilt og høyre justering
 - kontrollerte linjehøyder fra 1.0 til 2.0
-- standarden bevarer dagens 16 px og 1.45
-- tekstfarge utsettes til prosjektfargesystemet
+- standarden bevarer System, 16 px og 1.45
+- tekstfarge er utsatt til prosjektfargesystemet
 - tekststil er foreløpig felles for PC og Telefon
 - låste tekstelementer kan inspiseres, men kontrollene er deaktivert
 - tekstinnhold redigeres fortsatt bare på lerretet
+- andre elementtyper åpner høyremenyen uten tekstkontroller
 
 ### Modell og state
 
-- prosjektskjemaet økes til versjon 3
-- bare tekstelementer får obligatorisk `textStyle`
-- fonttokens lagres, ikke rå CSS-fontstacker
-- tekststil er varig prosjektdata
-- kontrollene sender avgrensede stilpatcher
-- reduceren bruker nyeste state og avviser ugyldige, låste og uendrede overganger
+- prosjektskjema versjon 3
+- bare tekstelementer har obligatorisk `textStyle`
+- stabile fonttokens lagres i prosjektet
+- CSS-fontstacker avledes i visningslaget
+- hver reducerhandling endrer én validert stilegenskap
+- runtime-validatoren avviser utypede og ødelagte data
+- validatorregisteret er uttømmende ved framtidige modellutvidelser
+- låste, ugyldige og uendrede overganger avvises
 - `updatedAt` endres bare ved reell stilendring
-- panelet eier ingen separat kopi av tekststilen
+- panelet eier ingen separat stilstate
+- visning og `textarea` arver samme stil
 
-### Skal ikke bygge
+### Framtidsrettet audit
 
-- tekstfarge eller prosjektfargemodell
-- bredde, høyde eller plassering i høyremenyen
-- headerens hovedtekst eller undertittel
-- riktekst eller formatering av enkeltord
-- opplasting av fonter eller eksterne webfonter
-- sletting, duplisering, historikk eller lagring
-- mobile tekststiloverstyringer
+Rettede funn:
 
-### Første implementeringsrekkefølge
+```text
+95dae75  fix: harden text style runtime validation
+3d01336  refactor: make text style validation exhaustive
+```
 
-1. Legg inn tekststiltyper, standardverdier og validering.
-2. Oppdater tekstelementets modell og oppretting.
-3. Lag reducerhjelper og dispatch-hook for stilpatcher.
-4. Avled fonttoken og tekststil til CSS for canvas.
-5. Sikre identisk stil i vanlig visning og `textarea`.
-6. Legg inn en avgrenset `TextPropertiesSection` i høyremenyen.
-7. Gjennomfør kodeaudit før visuell godkjenning.
+`EditorCanvasElement.tsx` er 244 linjer. Den skal ikke få flere nye ansvarsområder; senere canvaslogikk må trekkes ut.
+
+### Sluttkontroll
+
+Brukeren har bekreftet:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 44 moduler, 97 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 54 moduler transformert, bygget på 164 ms
+arkitekturrapporter: regenerert
+working tree: clean
+branch: synkronisert med origin
+```
+
+Rapportcommit:
+
+```text
+a267ca3  chore: refresh architecture reports for text properties
+```
+
+`git diff --check` viste bare LF/CRLF-varsler.
+
+### Visuell godkjenning
+
+- alle tekstkontroller fungerer
+- hele tekstboksen endres som avtalt
+- låste kontroller er deaktivert
+- ikke-tekstelementer viser bare sine generelle elementopplysninger
+- den blå markeringsrammen kan forsvinne når fokus flyttes til høyremenyen
+- elementet forblir valgt i state, og høyremenyen fortsetter å virke
+- denne fokusoppførselen er eksplisitt godkjent
+
+### Gjenstående før PR
+
+1. Hent dokumentasjonscommitene lokalt.
+2. Kontroller clean tree på nytt.
+3. Sammenlign hele branchen mot `main`.
+4. Kontroller at diffen bare inneholder tekstegenskaper, rapporter og relevant dokumentasjon.
+5. Opprett draft-PR.
+6. Kontroller mergebarhet, review-tråder og eventuell CI.
+7. Marker PR klar for review.
+8. Merge bare etter eksplisitt godkjenning.
 
 ## 4. Senere faser
 
@@ -256,7 +260,7 @@ Branch: `feature/project-colors`
 - register over faktiske prosjektfarger
 - global endring
 - oppdatering av alle brukere av en farge
-- tekstfarge kobles hit, ikke til fase 8
+- tekstfarge kobles hit
 
 ### Fase 12 – Logo og header
 
@@ -275,7 +279,6 @@ Branch: `feature/alignment-guides`
 - horisontal midtstilling
 - samme linje og lik avstand
 - bare under flytting eller resizing
-- ingen automatisk kollisjonsunngåelse
 
 ### Fase 14 – Responsiv redigering
 
@@ -284,14 +287,12 @@ Branch: `feature/mobile-design-controls`
 - desktop er grunnlaget
 - mobil arver desktop som standard
 - eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet
-- mobilendring påvirker ikke desktop
 - **Bruk PC-oppsett** fjerner mobiloverstyringen
 
 ### Fase 15 – Angre og gjør om
 
 Branch: `feature/history-system`
 
-- eksplisitt prosjektendringsmodell
 - én historikkpost per avsluttet brukerhandling
 - transient markering, draft, panelstate og preview holdes utenfor
 
@@ -300,9 +301,7 @@ Branch: `feature/history-system`
 Branch: `feature/local-project-autosave`
 
 - prosjektmappe og lokale bilder
-- sikker automatisk lagring
-- `Lagrer`, `Lagret` og `Lagringsfeil`
-- gjenoppretting
+- sikker automatisk lagring og gjenoppretting
 
 ### Fase 17 – Åpne og importere prosjekt
 
