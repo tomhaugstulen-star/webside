@@ -7,6 +7,7 @@ import {
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import type { EditorProjectAction } from './editorProjectAction'
+import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementLink } from './setTextElementLink'
 import { setTextElementStyle } from './setTextElementStyle'
@@ -128,6 +129,13 @@ function reduceEditorProjectState(
         selectedElementId: element.id,
       }
     }
+
+    case 'delete-element-from-active-page':
+      return deleteElementFromActivePage(
+        state,
+        action.elementId,
+        action.updatedAt,
+      )
 
     case 'set-element-desktop-layout': {
       const activePage = state.project.pages.find((page) => page.id === state.activePageId)

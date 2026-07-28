@@ -6,6 +6,7 @@
 @import './styles/right-properties-panel.css';
 @import './styles/text-properties.css';
 @import './styles/element-link-properties.css';
+@import './styles/element-deletion.css';
 
 #root {
   min-height: 100vh;

@@ -1,4 +1,5 @@
 import type { EditorElement, ElementKind } from '../../model/editorProject'
+import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
@@ -11,9 +12,16 @@ const elementKindLabels: Record<ElementKind, string> = {
 
 type RightPropertiesPanelProps = {
   element: EditorElement | null
+  onRequestElementDeletion: (
+    element: EditorElement,
+    returnFocus: HTMLElement | null,
+  ) => void
 }
 
-export function RightPropertiesPanel({ element }: RightPropertiesPanelProps) {
+export function RightPropertiesPanel({
+  element,
+  onRequestElementDeletion,
+}: RightPropertiesPanelProps) {
   const isOpen = element !== null
 
   return (
@@ -45,6 +53,10 @@ export function RightPropertiesPanel({ element }: RightPropertiesPanelProps) {
                   <dd>{element.locked ? 'Låst' : 'Ulåst'}</dd>
                 </div>
               </dl>
+              <DeleteElementSection
+                element={element}
+                onRequestDeletion={onRequestElementDeletion}
+              />
             </section>
           </div>
         )}
