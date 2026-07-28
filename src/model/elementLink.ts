@@ -9,6 +9,7 @@ export type ExternalUrlElementLink = {
 }
 
 export type ElementLink = NoElementLink | ExternalUrlElementLink
+export type ElementLinkType = ElementLink['type']
 
 export const NO_ELEMENT_LINK: NoElementLink = {
   type: 'none',
@@ -50,24 +51,29 @@ export function normalizeExternalUrl(value: string): string | null {
   }
 }
 
-export function isValidElementLink(value: unknown): value is ElementLink {
-  if (!isRecord(value) || typeof value.type !== 'string') {
-    return false
-  }
+const elementLinkValidators: Record<
+  ElementLinkType,
+  (value: Record<string, unknown>) => boolean
+> = {
+  none: (value) => hasExactKeys(value, ['type']),
+  'external-url': (value) =>
+    hasExactKeys(value, ['type', 'url', 'openInNewTab']) &&
+    typeof value.url === 'string' &&
+    normalizeExternalUrl(value.url) === value.url &&
+    typeof value.openInNewTab === 'boolean',
+}
 
-  switch (value.type) {
-    case 'none':
-      return hasExactKeys(value, ['type'])
-    case 'external-url':
-      return (
-        hasExactKeys(value, ['type', 'url', 'openInNewTab']) &&
-        typeof value.url === 'string' &&
-        normalizeExternalUrl(value.url) === value.url &&
-        typeof value.openInNewTab === 'boolean'
-      )
-    default:
-      return false
-  }
+function isElementLinkType(value: string): value is ElementLinkType {
+  return Object.hasOwn(elementLinkValidators, value)
+}
+
+export function isValidElementLink(value: unknown): value is ElementLink {
+  return (
+    isRecord(value) &&
+    typeof value.type === 'string' &&
+    isElementLinkType(value.type) &&
+    elementLinkValidators[value.type](value)
+  )
 }
 
 export function elementLinksEqual(first: ElementLink, second: ElementLink) {
