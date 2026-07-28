@@ -8,15 +8,16 @@ Dette dokumentet fastsetter arbeidsmåten for Website-editoren.
 - `main` skal alltid være stabil.
 - Ingen ny funksjon skal utvikles direkte på `main`.
 - Feilretting og teknisk opprydding gjøres i egne branches.
+- Dokumentasjon kan utvikles i `docs/project-planning`.
 - Branch-navn skal beskrive arbeidet tydelig, for eksempel:
+  - `feature/element-selection`
   - `feature/mobile-design-controls`
   - `feature/alignment-guides`
   - `fix/sidebar-panel-behavior`
   - `chore/editor-foundation-audit`
   - `tooling/dependency-cruiser`
-  - `docs/project-planning`
 - En branch skal bare inneholde arbeidet den er opprettet for.
-- Funksjoner skal testes før de vurderes for sammenslåing.
+- En godkjent branch merges til `main` før neste feature-branch opprettes fra oppdatert `main`.
 
 ## 2. Filstørrelser og moduldeling
 
@@ -52,6 +53,8 @@ For hver ny del skal følgende avklares før implementering:
 - Små, kontrollerbare leveranser foretrekkes fremfor store samleendringer.
 - Før større endringer skal berørte filer og forventet effekt beskrives.
 - Rapportfiler fra arkitektursjekken skal regenereres etter strukturendringer.
+- PowerShell-kommandoene brukeren skal kjøre lokalt skal alltid legges ved etter repoendringer.
+- Ikke oppgi at lint, typekontroll, arkitektursjekk eller build er bestått før brukeren har kjørt kommandoene lokalt eller et verifisert CI-resultat finnes.
 
 ## 5. Kvalitetskrav
 
@@ -64,6 +67,7 @@ For hver ny del skal følgende avklares før implementering:
 - Ingen automatisk generert design skal overskrive brukerens eksplisitte valg uten tydelig varsel.
 - Automatisk lagring skal være en grunnfunksjon i editoren.
 - Ingen kildekodemodul skal ligge ubrukt uten å bli oppdaget av arkitektursjekken.
+- Prosjektmodellen er autoritativ kilde for prosjektdata. DOM-en skal ikke brukes som permanent lagring.
 
 Før en branch kan godkjennes skal dette normalt kjøres:
 
@@ -71,14 +75,16 @@ Før en branch kan godkjennes skal dette normalt kjøres:
 npm run check
 npm run architecture:json
 npm run architecture:diagram
+npm run dev
 ```
 
 ## 6. Gjeldende status
 
-- Editorgrunnlaget er gjennomgått i `chore/editor-foundation-audit`.
-- Dependency Cruiser er konfigurert gjennom `tooling/dependency-cruiser`.
-- Dokumentasjonen ligger på `docs/project-planning`.
-- Lokal lint, TypeScript-kontroll, Dependency Cruiser og produksjonsbuild er bestått.
-- Arkitektursjekken rapporterte 11 moduler, 15 avhengigheter og ingen regelbrudd.
-- `npm install` rapporterte ingen kjente sårbarheter.
-- Visuell kontroll og commit av regenererte arkitekturrapporter gjenstår før branchen vurderes for merge til `main`.
+- Editorgrunnlaget er godkjent og ligger på `main`.
+- Dependency Cruiser og `npm run check` er konfigurert.
+- `npm run dev` åpner nettleseren automatisk.
+- `feature/element-model` er ferdig og godkjent lokalt og visuelt.
+- Prosjektmodellen har skjemaversjon, stabile ID-er, sider, elementtyper, responsive verdier og sentral prosjekt-state.
+- `feature/element-model` skal merges til `main` før neste fase.
+- Neste fase er `feature/element-selection`.
+- Dokumentasjon og overleveringsprompt ligger på `docs/project-planning`.
