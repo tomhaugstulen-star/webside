@@ -3,8 +3,12 @@ import type {
   KeyboardEvent,
   RefObject,
 } from 'react'
-import type { ElementLayout } from '../../model/elementLayout'
-import type { EditorElement } from '../../model/editorProject'
+import {
+  moveElementLayout,
+  resizeElementLayout,
+  type ElementLayout,
+} from '../../model/elementLayout'
+import type { CanvasPosition, EditorElement } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
 import type { ViewportMode } from '../../types/editor'
@@ -16,6 +20,13 @@ const elementKindLabels: Record<EditorElement['kind'], string> = {
   image: 'Bilde',
   text: 'Tekst',
   button: 'Knapp',
+}
+
+const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
 }
 
 type EditorCanvasElementProps = {
@@ -78,12 +89,43 @@ export function EditorCanvasElement({
     : ''
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Enter' && event.key !== ' ') {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onSelect(element.id)
+      return
+    }
+
+    const direction = keyboardDirections[event.key]
+
+    if (!direction) {
       return
     }
 
     event.preventDefault()
     onSelect(element.id)
+
+    const canvas = canvasRef.current
+
+    if (element.locked || !canvas || canvas.clientWidth <= 0) {
+      return
+    }
+
+    const step = event.shiftKey ? 10 : 1
+    const delta = {
+      x: direction.x * step,
+      y: direction.y * step,
+    }
+    const nextLayout =
+      event.ctrlKey || event.metaKey
+        ? resizeElementLayout(
+            element.kind,
+            initialLayout,
+            delta,
+            canvas.clientWidth,
+          )
+        : moveElementLayout(initialLayout, delta, canvas.clientWidth)
+
+    commitElementDesktopLayout(element.id, nextLayout)
   }
 
   return (
@@ -92,7 +134,8 @@ export function EditorCanvasElement({
       style={style}
       role="button"
       tabIndex={0}
-      aria-label={`Velg ${label.toLowerCase()}`}
+      aria-label={`${label}. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse.`}
+      aria-keyshortcuts="Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight Control+ArrowUp Control+ArrowDown Control+ArrowLeft Control+ArrowRight Meta+ArrowUp Meta+ArrowDown Meta+ArrowLeft Meta+ArrowRight"
       aria-pressed={selected}
       data-element-id={element.id}
       onPointerDown={handleMovePointerDown}
