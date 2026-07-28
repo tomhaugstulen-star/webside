@@ -48,7 +48,9 @@ export type TextElementStyle = {
   lineHeight: TextLineHeight
 }
 
-export type TextElementStylePatch = Partial<TextElementStyle>
+export type TextElementStylePatch = {
+  [Key in keyof TextElementStyle]: Pick<TextElementStyle, Key>
+}[keyof TextElementStyle]
 
 export const DEFAULT_TEXT_ELEMENT_STYLE: TextElementStyle = {
   fontFamily: 'system',
@@ -77,28 +79,28 @@ export function isValidTextElementStyle(style: TextElementStyle) {
 export function isValidTextElementStylePatch(patch: TextElementStylePatch) {
   const entries = Object.entries(patch) as [keyof TextElementStyle, unknown][]
 
-  if (entries.length === 0) {
+  if (entries.length !== 1) {
     return false
   }
 
-  return entries.every(([key, value]) => {
-    switch (key) {
-      case 'fontFamily':
-        return includesValue(textFontFamilies, value)
-      case 'fontSize':
-        return includesValue(textFontSizes, value)
-      case 'fontWeight':
-        return includesValue(textFontWeights, value)
-      case 'fontStyle':
-        return includesValue(textFontStyles, value)
-      case 'textAlign':
-        return includesValue(textAlignments, value)
-      case 'lineHeight':
-        return includesValue(textLineHeights, value)
-      default:
-        return false
-    }
-  })
+  const [key, value] = entries[0]
+
+  switch (key) {
+    case 'fontFamily':
+      return includesValue(textFontFamilies, value)
+    case 'fontSize':
+      return includesValue(textFontSizes, value)
+    case 'fontWeight':
+      return includesValue(textFontWeights, value)
+    case 'fontStyle':
+      return includesValue(textFontStyles, value)
+    case 'textAlign':
+      return includesValue(textAlignments, value)
+    case 'lineHeight':
+      return includesValue(textLineHeights, value)
+    default:
+      return false
+  }
 }
 
 export function textElementStylesEqual(
