@@ -1,28 +1,21 @@
 # Responsiv design: desktop og mobil
 
-Dette dokumentet beskriver den planlagte tekniske retningen for forskjeller mellom desktop- og mobilvisning.
+Dette dokumentet beskriver teknisk retning for forskjeller mellom desktop- og mobilvisning.
 
 ## 1. Hovedprinsipp
 
-- Ferdige nettsider skal bruke CSS media queries for responsive regler.
+- Ferdige nettsider skal bruke CSS media queries.
 - Mobilvisningen skal kunne skjule elementer som fortsatt finnes på desktop.
 - Desktop og mobil skal kunne ha egne verdier for utvalgte egenskaper.
-- Nøyaktig hvilke egenskaper som kan overstyres per visning bestemmes før implementering.
+- Nøyaktig hvilke egenskaper som kan overstyres bestemmes før mobilkontrollene implementeres.
 
 Et foreløpig brytepunkt kan være 768 px, men dette skal testes før det låses.
 
 ## 2. Prosjektdata er hovedkilden
 
-Editoren skal ikke bruke den gjeldende DOM-strukturen som permanent prosjektlagring.
+Editoren skal ikke bruke DOM-strukturen som permanent prosjektlagring.
 
-Hvert redigerbart objekt får:
-
-- en stabil og unik ID
-- felles standardverdier
-- eventuelle mobiloverstyringer
-- synlighet per visning
-
-Eksempel på prinsipp:
+`feature/element-model` har implementert dette grunnprinsippet:
 
 ```ts
 type ResponsiveValue<T> = {
@@ -30,31 +23,50 @@ type ResponsiveValue<T> = {
   mobile?: T
 }
 
-type EditorObject = {
+type EditorElement = {
   id: string
+  kind: 'section' | 'image' | 'text' | 'button'
   visibility: ResponsiveValue<boolean>
-  fontFamily?: ResponsiveValue<string>
-  fontSize?: ResponsiveValue<number>
   position: ResponsiveValue<{ x: number; y: number }>
   size: ResponsiveValue<{ width: number; height: number }>
+  locked: boolean
 }
 ```
 
-Når en mobilverdi mangler, arver mobil desktopverdien.
+Når en mobilverdi mangler, skal mobil senere arve desktopverdien.
 
-## 3. Skjule på mobil
+## 3. Implementert nå
 
-Brukeren skal kunne velge at et objekt:
+Godkjent i `feature/element-model`:
+
+- stabile prosjekt-, side- og element-ID-er
+- responsive modellfelter for posisjon, størrelse og synlighet
+- desktopverdi med valgfri mobilverdi
+- sentral prosjekt-state
+- prosjektmodellen som autoritativ datakilde
+
+Ikke implementert ennå:
+
+- beregning av arvet verdi
+- mobiloverstyringer i brukergrensesnittet
+- skjul på mobil
+- egen mobilposisjonering
+- CSS-generator
+- eksporterte media queries
+
+Desktop- og mobilknappen i toppmenyen endrer foreløpig bare bredden på editorens blanke lerret.
+
+## 4. Skjule på mobil
+
+Brukeren skal senere kunne velge at et objekt:
 
 - vises på desktop og mobil
 - bare vises på desktop
-- bare vises på mobil, dersom dette senere godkjennes
+- bare vises på mobil dersom dette godkjennes
 
-Ved eksport eller forhåndsvisning genererer editoren en media query som skjuler objektet i riktig visning.
+Prosjektdataene skal være autoritativ kilde. Preview og eksport genererer media query fra modellen.
 
-Editoren kan generere en CSS-klasse for dette, men prosjektdataene skal være den autoritative kilden.
-
-## 4. Forskjellige fonter og størrelser
+## 5. Forskjellige verdier
 
 Det er teknisk mulig å bruke ulike:
 
@@ -64,11 +76,9 @@ Det er teknisk mulig å bruke ulike:
 - posisjoner
 - bredder og høyder
 
-på desktop og mobil.
+Før dette bygges må vi fastsette hvilke egenskaper som kan overstyres i første versjon.
 
-Før dette bygges må vi fastsette hvilke av disse egenskapene som faktisk skal kunne overstyres i første versjon.
-
-## 5. CSS-generering
+## 6. CSS-generering
 
 Editoren skal generere ett kontrollert prosjektstilark fremfor mange tilfeldige `<style>`-elementer.
 
@@ -76,72 +86,63 @@ Stilgeneratoren skal:
 
 1. lese prosjektmodellen
 2. generere desktopregler
-3. generere mobilregler i en samlet media query
+3. generere mobilregler i én samlet media query
 4. bruke stabile objekt-ID-er eller genererte klassenavn
 5. produsere samme resultat for editor, forhåndsvisning og eksport
 
-`!important` skal ikke brukes som standard. Riktig rekkefølge og CSS-spesifisitet skal løse overstyringer.
+`!important` skal ikke brukes som standard.
 
-## 6. Stabile ID-er
+## 7. Stabile ID-er
 
-Objekter skal få en stabil ID når de opprettes.
-
-ID-en skal beholdes ved:
+ID-er skal beholdes ved:
 
 - automatisk lagring
 - lukking og gjenåpning
-- import av prosjekt
+- import
 - forhåndsvisning
-- eksport og publisering
+- eksport
+- publisering
 
-Tilfeldige DOM-ID-er som opprettes på nytt ved hver visning skal ikke brukes som prosjektidentitet.
+`Math.random()` skal ikke brukes som prosjektidentitet. Elementmodellen bruker kryptografiske UUID-er.
 
-## 7. Editoropplevelse
+## 8. Editoropplevelse
 
-Når mobilmodus er aktiv, skal editoren tydelig vise:
+Når mobilmodus senere er aktiv, skal editoren tydelig vise:
 
 - om en verdi er arvet fra desktop
 - om verdien er overstyrt for mobil
-- om objektet er skjult i den aktuelle visningen
+- om objektet er skjult i aktuell visning
 
 En mobilendring skal ikke utilsiktet endre desktopverdien.
 
-## 8. Arkitektur
+## 9. Arkitektur
 
-Responsiv funksjonalitet skal deles i egne ansvarsområder:
+Responsiv funksjonalitet deles i egne ansvarsområder:
 
 - responsive typer og datamodell
-- arv og overstyring av verdier
-- mobilkontroller i brukergrensesnittet
+- arv og overstyring
+- mobilkontroller
 - CSS-generator
 - forhåndsvisning
 - eksport
 
 Dette skal ikke samles i én stor komponent.
 
-## 9. Planlagt branch
-
-Implementeringen bygges senere i egen branch:
+## 10. Planlagt branch
 
 ```text
 feature/mobile-design-controls
 ```
 
-CSS-generatoren kan få en egen branch dersom arbeidet blir stort nok til å være en selvstendig funksjonsdel.
+Den bygges først etter elementmodell, markering, oppretting og grunnleggende objektredigering.
 
-## 10. Nåværende implementeringsstatus
-
-- Desktop- og mobilknappen i editorgrunnlaget endrer foreløpig bare bredden på det blanke lerretet.
-- Det finnes ennå ingen responsive prosjektverdier eller mobiloverstyringer i prosjektdata.
-- Dagens `ViewportMode` er kun skalltilstand for visning.
-- Responsiv objektlogikk skal først bygges etter at prosjekt- og objektmodellen er definert.
-- Ingen midlertidig DOM- eller CSS-generering skal legges inn før denne modellen finnes.
+CSS-generatoren kan få en egen branch dersom ansvaret blir stort nok.
 
 ## 11. Åpne beslutninger
 
-- Endelig brytepunkt for mobil.
-- Hvilke egenskaper som kan overstyres på mobil i første versjon.
-- Om bare-mobil-visning skal støttes.
-- Hvordan arvede og overstyrte verdier markeres visuelt.
-- Om mobilplassering skal være helt fri eller delvis arve desktopoppsettet.
-- Hvordan eksportert HTML og CSS organiseres i prosjektmappen.
+- endelig mobilbrytepunkt
+- egenskaper som kan overstyres i første versjon
+- støtte for bare-mobil-visning
+- visuell markering av arv og overstyring
+- fri eller delvis arvet mobilplassering
+- organisering av eksportert HTML og CSS
