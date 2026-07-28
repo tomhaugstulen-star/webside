@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -15,12 +14,22 @@ type EditorCanvasProps = {
   viewport: ViewportMode
 }
 
+type CanvasPreviewState = {
+  pageId: string
+  viewport: ViewportMode
+  preview: ElementLayoutPreview
+}
+
 export function EditorCanvas({ viewport }: EditorCanvasProps) {
   const { activePage } = useEditorProject()
   const { selectedElementId, selectElement, clearSelection } = useElementSelection()
-  const [layoutPreview, setLayoutPreview] = useState<ElementLayoutPreview | null>(null)
+  const [previewState, setPreviewState] = useState<CanvasPreviewState | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
+  const layoutPreview =
+    previewState?.pageId === activePage.id && previewState.viewport === viewport
+      ? previewState.preview
+      : null
   const contentHeight = getCanvasContentHeight(
     activePage.elements,
     viewport,
@@ -28,9 +37,17 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
   )
   const pageStyle: CSSProperties = contentHeight > 0 ? { height: contentHeight } : {}
 
-  useEffect(() => {
-    setLayoutPreview(null)
-  }, [activePage.id, viewport])
+  const handlePreviewLayoutChange = (preview: ElementLayoutPreview | null) => {
+    setPreviewState(
+      preview
+        ? {
+            pageId: activePage.id,
+            viewport,
+            preview,
+          }
+        : null,
+    )
+  }
 
   return (
     <main className="editor-workspace" onPointerDown={clearSelection}>
@@ -51,7 +68,7 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
                 canvasRef={canvasRef}
                 scrollContainerRef={scrollContainerRef}
                 onSelect={selectElement}
-                onPreviewLayoutChange={setLayoutPreview}
+                onPreviewLayoutChange={handlePreviewLayoutChange}
               />
             ))}
           </div>
