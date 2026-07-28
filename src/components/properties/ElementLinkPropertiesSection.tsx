@@ -59,13 +59,6 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
   const errorId = `${idPrefix}-error`
   const disabled = element.locked
 
-  const hasChanges =
-    draftType !== element.link.type ||
-    (draftType === 'external-url' &&
-      element.link.type === 'external-url' &&
-      (urlDraft.trim() !== element.link.url ||
-        openInNewTab !== element.link.openInNewTab))
-
   const submitLabel =
     draftType === 'none'
       ? element.link.type === 'none'
@@ -182,7 +175,7 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
         <button
           className="element-link-properties__submit"
           type="submit"
-          disabled={disabled || !hasChanges}
+          disabled={disabled}
         >
           {submitLabel}
         </button>
