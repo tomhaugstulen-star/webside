@@ -1,22 +1,24 @@
+import { createEditorElement } from '../model/createEditorElement'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type {
-  EditorElement,
   EditorProject,
   EditorProjectState,
+  ElementKind,
 } from '../model/editorProject'
 
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
   | { type: 'set-active-page'; pageId: string }
   | { type: 'set-selected-element'; elementId: string | null }
-  | { type: 'add-element-to-active-page'; element: EditorElement; updatedAt: string }
+  | {
+      type: 'add-element-to-active-page'
+      elementId: string
+      kind: ElementKind
+      updatedAt: string
+    }
 
 export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
-}
-
-function activePageExists(state: EditorProjectState) {
-  return state.project.pages.some((page) => page.id === state.activePageId)
 }
 
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
@@ -104,16 +106,20 @@ function reduceEditorProjectState(
     }
 
     case 'add-element-to-active-page': {
-      if (
-        !activePageExists(state) ||
-        projectContainsElement(state, action.element.id)
-      ) {
+      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+
+      if (!activePage || projectContainsElement(state, action.elementId)) {
         return state
       }
 
+      const element = createEditorElement({
+        id: action.elementId,
+        kind: action.kind,
+        existingElements: activePage.elements,
+      })
       const pages = state.project.pages.map((page) =>
         page.id === state.activePageId
-          ? { ...page, elements: [...page.elements, action.element] }
+          ? { ...page, elements: [...page.elements, element] }
           : page,
       )
 
@@ -124,7 +130,7 @@ function reduceEditorProjectState(
           pages,
           updatedAt: action.updatedAt,
         },
-        selectedElementId: action.element.id,
+        selectedElementId: element.id,
       }
     }
   }
