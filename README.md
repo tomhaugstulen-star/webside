@@ -80,7 +80,7 @@ Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer.
 feature/drag-resize
 ```
 
-Implementert og visuelt godkjent før siste audit:
+Implementert og visuelt godkjent:
 
 - flytting med peker
 - ett resize-håndtak nederst til høyre
@@ -103,8 +103,21 @@ Siste kodeaudit har i tillegg sikret:
 - piltaster flytter elementer
 - `Ctrl`/`Cmd` + piltaster endrer størrelse
 - `Shift` bruker 10 px steg
+- preview-state nullstilles uten synkron `setState` i effect
 
-Auditendringene må gjennom ny lokal `npm run check`, nye arkitekturrapporter og en kort regresjonstest før PR.
+## Planlagt responsiv redigering
+
+Dagens PC- og Telefon-visning deler desktopgeometrien. Dette er en midlertidig, kontrollert regel.
+
+Egen responsiv redigering spores i:
+
+```text
+docs/MOBILE_DESIGN_CONTROLS.md
+GitHub-sak #3
+feature/mobile-design-controls
+```
+
+Planen er desktop-arv med eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet. En mobilendring skal senere ikke overskrive desktop-oppsettet.
 
 ## Viktige state-grenser
 
@@ -138,7 +151,8 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 7. `docs/ELEMENT_CREATION.md`
 8. `docs/DRAG_RESIZE.md`
 9. `docs/RESPONSIVE_DESIGN.md`
-10. `docs/CODE_AUDIT.md`
+10. `docs/MOBILE_DESIGN_CONTROLS.md`
+11. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
