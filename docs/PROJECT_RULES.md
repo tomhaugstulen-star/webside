@@ -78,4 +78,7 @@ npm run architecture:diagram
 - Editorgrunnlaget er gjennomgått i `chore/editor-foundation-audit`.
 - Dependency Cruiser er konfigurert gjennom `tooling/dependency-cruiser`.
 - Dokumentasjonen ligger på `docs/project-planning`.
-- Ingen av disse branchene skal merges til `main` før lokal kontroll og visuell godkjenning er gjennomført.
+- Lokal lint, TypeScript-kontroll, Dependency Cruiser og produksjonsbuild er bestått.
+- Arkitektursjekken rapporterte 11 moduler, 15 avhengigheter og ingen regelbrudd.
+- `npm install` rapporterte ingen kjente sårbarheter.
+- Visuell kontroll og commit av regenererte arkitekturrapporter gjenstår før branchen vurderes for merge til `main`.
