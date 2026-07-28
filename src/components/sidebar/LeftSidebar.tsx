@@ -52,7 +52,7 @@ function Icon({ name }: { name: IconName }) {
 const tools: Array<{ id: EditorTool; label: string; icon: IconName }> = [
   { id: 'design', label: 'Design', icon: 'design' },
   { id: 'media', label: 'Bilder og logo', icon: 'media' },
-  { id: 'boxes', label: 'Bokser', icon: 'boxes' },
+  { id: 'boxes', label: 'Elementer', icon: 'boxes' },
   { id: 'files', label: 'Filer', icon: 'files' },
 ]
 
@@ -85,7 +85,7 @@ function MediaPanel({ onSelect }: PanelProps) {
   )
 }
 
-function BoxesPanel({ onSelect }: PanelProps) {
+function ElementsPanel({ onSelect }: PanelProps) {
   const items: Array<{ label: string; icon: IconName }> = [
     { label: 'Seksjon', icon: 'section' },
     { label: 'Bilde', icon: 'image' },
@@ -95,8 +95,8 @@ function BoxesPanel({ onSelect }: PanelProps) {
 
   return (
     <>
-      <h2>Bokser</h2>
-      <p className="panel-intro">Velg en boks for å legge den til på siden.</p>
+      <h2>Elementer</h2>
+      <p className="panel-intro">Velg et element for å legge det til på siden.</p>
       <div className="box-grid">
         {items.map((item) => (
           <button key={item.label} className="box-card" type="button" onClick={onSelect}>
@@ -168,7 +168,7 @@ export function LeftSidebar({ activeTool, onToolChange, onPanelAction }: LeftSid
           <div className="left-panel__content">
             {activeTool === 'design' && <DesignPanel onSelect={onPanelAction} />}
             {activeTool === 'media' && <MediaPanel onSelect={onPanelAction} />}
-            {activeTool === 'boxes' && <BoxesPanel onSelect={onPanelAction} />}
+            {activeTool === 'boxes' && <ElementsPanel onSelect={onPanelAction} />}
             {activeTool === 'files' && <FilesPanel onSelect={onPanelAction} />}
             {activeTool === 'settings' && <SettingsPanel onSelect={onPanelAction} />}
           </div>
