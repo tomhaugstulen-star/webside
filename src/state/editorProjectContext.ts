@@ -1,6 +1,6 @@
 import { createContext, type Dispatch } from 'react'
 import type { EditorPage, EditorProjectState } from '../model/editorProject'
-import type { EditorProjectAction } from './editorProjectReducer'
+import type { EditorProjectAction } from './editorProjectAction'
 
 export type EditorProjectContextValue = {
   state: EditorProjectState
