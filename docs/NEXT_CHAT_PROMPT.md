@@ -37,28 +37,26 @@ npm run dev
 6. `docs/ELEMENT_SELECTION.md`
 7. `docs/ELEMENT_CREATION.md`
 8. `docs/DRAG_RESIZE.md`
-9. `docs/RESPONSIVE_DESIGN.md`
-10. `docs/MOBILE_DESIGN_CONTROLS.md`
-11. `docs/CODE_AUDIT.md`
-12. `README.md`
+9. `docs/OBJECT_LOCKING.md`
+10. `docs/RESPONSIVE_DESIGN.md`
+11. `docs/MOBILE_DESIGN_CONTROLS.md`
+12. `docs/CODE_AUDIT.md`
+13. `README.md`
 
 Les deretter faktisk kode, spesielt:
 
 ```text
 src/model/editorProject.ts
 src/model/elementLayout.ts
-src/model/createEditorElement.ts
-src/model/resolveResponsiveValue.ts
 src/state/editorProjectReducer.ts
+src/state/toggleElementLock.ts
+src/state/useElementLocking.ts
 src/state/useElementSelection.ts
-src/state/useElementCreation.ts
 src/state/useElementLayout.ts
 src/components/canvas/EditorCanvas.tsx
 src/components/canvas/EditorCanvasElement.tsx
+src/components/canvas/ElementSelectionToolbar.tsx
 src/components/canvas/useElementPointerTransform.ts
-src/components/canvas/autoScrollCanvas.ts
-src/components/canvas/canvasLayoutPreview.ts
-src/components/canvas/getCanvasContentHeight.ts
 src/styles/canvas.css
 ```
 
@@ -72,90 +70,85 @@ Repoet og dokumentasjonen er kilden til sannhet. Ikke stol på en eldre chatopps
 - kontrollert paneloppførsel
 - Elementer-panel med Seksjon, Bilde, Tekst og Knapp
 - Dependency Cruiser og samlet `npm run check`
-- automatisk nettleseråpning
-- prosjekt- og elementmodell
-- responsive verdier og stabile ID-er
+- prosjekt- og elementmodell med responsive verdier og stabile ID-er
 - sentral prosjekt-state og aktiv side
-- elementmarkering med transient `selectedElementId`
+- transient elementmarkering
 - oppretting av alle fire elementtyper
 - kontrollerte startstørrelser og startplassering
-- automatisk markering av nytt element
-- automatisk utvidelse av lerretshøyden
+- flytting og resizing med peker og tastatur
+- minimumsmål, clamping, edge-scroll og automatisk lerretsvekst
+- transient pointer-preview og én commit ved normalt pekerslipp
+
+PR #4 merget `feature/drag-resize` til `main` med merge-commit:
+
+```text
+cfddf90
+```
 
 ## Gjeldende branch
 
 ```text
-feature/drag-resize
+feature/object-locking
 ```
 
-Branchen er implementert, kodeauditert og visuelt godkjent på desktop og mobil.
+Branchen er implementert og visuelt godkjent på PC og Telefon før siste kodeaudit.
 
 Implementert:
 
-- flytting med peker
-- resizing fra ett håndtak nederst til høyre
-- minimumsmål per elementtype
-- clamping mot venstre, høyre og øvre lerretskant
-- fri bevegelse nedover
-- automatisk lerretsvekst
-- edge-scroll under interaksjon
-- fri overlapping
-- transient preview under pekerbevegelse
-- én prosjekt-commit ved normalt pekerslipp
-- avbrudd uten commit ved `pointercancel` eller tapt pointer capture
-- desktop og mobil med delt desktopgeometri
-- tastaturflytting og tastatur-resizing
+- separat objektverktøylinje over valgt element
+- åpen hengelås for **Lås**
+- lukket hengelås for **Lås opp**
+- varig `locked`-mutasjon gjennom reduceren
+- neste låseverdi beregnes fra reducerens nyeste state
+- gyldig endring oppdaterer prosjektets `updatedAt`
+- ukjent element-ID ignoreres
+- låst element beholder markeringen
+- låst element får stiplet markeringsramme
+- resize-håndtaket skjules når låst
+- pekerflytting og pointer-resize blokkeres
+- tastaturflytting og tastatur-resize blokkeres
+- låseknappen er tastaturtilgjengelig
+- pointer-propagation fra verktøylinjen stoppes
+- låsestatus er felles for PC og Telefon
 
-Minimumsmål:
+## Siste kodeaudit
 
-```text
-Seksjon: 160 × 90
-Bilde:   120 × 80
-Tekst:   120 × 48
-Knapp:    80 × 36
-```
+Auditen kontrollerte:
 
-## Kodeaudit
+1. **State-avhengig toggle**
+   - UI sender element-ID og tidspunkt.
+   - Reduceren beregner neste `locked`-verdi fra nyeste state.
 
-Disse framtidsrisikoene er rettet:
+2. **Dobbel transformbeskyttelse**
+   - UI starter ikke peker- eller tastaturtransform når låst.
+   - Reduceren avviser layoutmutasjon av låst element.
 
-1. **Låste elementer kunne ikke markeres med peker**
-   - Markering skjer før låsesjekken.
-   - Låste elementer kan markeres, men transform starter ikke.
-   - Reduceren avviser layoutmutasjon av låste elementer.
+3. **Markering og opplåsing**
+   - Låst element kan fortsatt fokuseres og markeres.
+   - Objektverktøylinjen forblir tilgjengelig for opplåsing.
 
-2. **Tapt pointer capture kunne etterlate aktiv preview**
-   - `lostpointercapture` avslutter interaksjonen kontrollert.
-   - Preview ryddes uten prosjekt-commit.
+4. **Event-propagation**
+   - Verktøylinjen er en separat sibling, ikke en knapp inni elementets `role="button"`.
+   - Pointer down stoppes slik at låseknappen ikke starter flytting eller fjerner markering.
 
-3. **Preview-type var duplisert**
-   - `ElementLayoutPreview` ligger i `canvasLayoutPreview.ts`.
+5. **Tastaturkant**
+   - Piltaster på låst element stoppes før låsesjekken.
+   - Elementet flyttes ikke, og nettleseren scroller ikke utilsiktet.
 
-4. **Minimumsmål kunne eksponeres som muterbar delt referanse**
-   - `getElementMinimumSize` returnerer kopi.
+6. **Filansvar**
+   - State-overgang, hook, verktøylinje, elementrendering og CSS er delt etter ansvar.
+   - Alle berørte kildefiler er under 250 linjer.
 
-5. **Resize-håndtaket hadde liten treffflate**
-   - Synlig firkant er 16 × 16 px.
-   - Faktisk treffflate er 32 × 32 px.
-
-6. **Draing manglet tastaturalternativ**
-   - piltaster flytter 1 px
-   - `Shift` + piltast flytter 10 px
-   - `Ctrl`/`Cmd` + piltast endrer størrelse
-   - `Ctrl`/`Cmd` + `Shift` + piltast bruker 10 px
-
-7. **Preview ble nullstilt med synkron `setState` i en effect**
-   - Preview-state er nå bundet til aktiv side og viewport.
-   - Gamle previews ignoreres uten ekstra effect-render.
+Den siste tastaturrettingen og dokumentendringene er ikke lokalt sluttkontrollert ennå.
 
 ## Kritiske arkitekturgrenser
 
 ### Varig prosjektdata
 
 - `EditorProject` er autoritativ kilde.
-- Ferdig geometri committes gjennom reduceren.
-- Ugyldig, uendret eller låst layout ignoreres.
-- `updatedAt` endres bare ved reell prosjektmutasjon.
+- `locked` er varig elementdata.
+- Gyldig låseendring går gjennom reduceren og oppdaterer `updatedAt`.
+- En låseendring skal senere være én historikk-/autolagringsendring.
 
 ### Transient state
 
@@ -164,17 +157,15 @@ Følgende skal ikke lagres, eksporteres eller inngå direkte i historikk:
 - `selectedElementId`
 - aktiv pointer-interaksjon
 - layout-preview
+- fokus, hover og synlighet for objektverktøylinjen
 
-Én ferdig pekertransform skal senere være én historikk-/autolagringsendring.
+### Låsing
 
-### Layout
-
-- elementer kan overlappe
-- andre elementer flyttes aldri automatisk
-- ingen generell kollisjonsunngåelse
-- venstre, høyre og øvre grense håndheves
-- ingen fast nedre grense
-- lerretshøyde er avledet visning
+- låst element kan markeres og fokuseres
+- låst element kan ikke flyttes eller resizes
+- låst element kan låses opp fra objektverktøylinjen
+- låsestatus er felles for PC og Telefon
+- låseknappen skal ikke starte transform eller fjerne markering
 
 ## Responsiv design må ikke glemmes
 
@@ -184,7 +175,7 @@ Dagens midlertidige regel:
 - en transform i Telefon påvirker derfor også PC
 - ingen mobiloverstyring opprettes skjult
 
-Endelig responsiv redigering er dokumentert og spores eksplisitt i:
+Endelig responsiv redigering er dokumentert og spores i:
 
 ```text
 docs/MOBILE_DESIGN_CONTROLS.md
@@ -193,19 +184,7 @@ GitHub-sak #3
 feature/mobile-design-controls
 ```
 
-Planlagt modell:
-
-- desktop er grunnlaget
-- manglende mobilverdi betyr **Arver fra PC**
-- eksplisitt mobilverdi betyr **Eget mobiloppsett**
-- første mobilendring kan opprette en mobiloverstyring
-- mobil flytting og resizing skal ikke endre desktop
-- desktopendringer skal ikke overskrive eksplisitt mobiloppsett
-- **Bruk PC-oppsett** fjerner mobiloverstyringen
-- mobilskjuling sletter ikke elementet
-- UI skal vise arv, mobiloverstyring og skjuling tydelig
-
-Ikke implementer dette skjult i en annen branch. Det bygges kontrollert i `feature/mobile-design-controls` etter grunnleggende objektredigering og låsing.
+Låsestatus er ikke responsiv. Den gjelder elementet i begge visninger.
 
 ## Første oppgave i neste chat
 
@@ -217,55 +196,81 @@ cd C:\Users\tomha\Desktop\website
 git status
 git branch --show-current
 git fetch origin
-git log --oneline origin/feature/drag-resize..HEAD
+git log --oneline origin/feature/object-locking..HEAD
 ```
 
 Forventet branch:
 
 ```text
-feature/drag-resize
+feature/object-locking
 ```
 
-Hent siste dokumentendringer:
+Hent siste audit- og dokumentendringer:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 
-git pull --ff-only origin feature/drag-resize
+git pull --ff-only origin feature/object-locking
+npm run check
+npm run architecture:json
+npm run architecture:diagram
+npm run dev
+```
+
+Kjør kort regresjonstest:
+
+- opprett alle fire elementtypene
+- lås og lås opp hver type
+- kontroller at markering beholdes
+- kontroller stiplet markeringsramme
+- kontroller at resize-håndtaket forsvinner og kommer tilbake
+- kontroller at pekerflytting og resizing blokkeres når låst
+- Tab til et låst element og trykk piltaster
+- elementet skal ikke flyttes, og editoren skal ikke scrolles utilsiktet
+- Tab videre til låseknappen og lås opp med Enter eller mellomrom
+- klikk på tomt lerret og kontroller at verktøylinjen skjules
+- test PC og Telefon
+
+Stopp serveren med `Ctrl + C` og kjør:
+
+```powershell
 git status
 ```
 
-Dokumentendringene etter siste kontroll påvirker ikke produksjonskode eller arkitekturrapporter.
+Arkitekturrapportene må regenereres fordi branchen har nye kildekodemoduler. Dersom bare rapportene er endret:
+
+```powershell
+git add architecture.json
+git add docs/dependency-graph.mmd
+git commit -m "chore: refresh architecture reports for object locking"
+git push origin feature/object-locking
+git status
+```
+
+Ikke påstå at sluttkontrollen er bestått før brukeren har bekreftet resultat og rent arbeidsområde.
 
 ## PR og merge
 
-Når lokal branch er synkronisert og arbeidsområdet er rent:
+Når sluttkontrollen er bestått:
 
 1. Gjennomgå hele diffen mot `main`.
-2. Kontroller at branchen bare inneholder drag/resize, audit-herding og tilhørende dokumentasjon.
-3. Opprett PR mot `main`.
-4. Dokumenter omfang, state-grenser, tilgjengelighet, responsiv framtidsplan og kontrollstatus.
+2. Kontroller at branchen bare inneholder objektlåsing, audit-herding og tilhørende dokumentasjon.
+3. Opprett draft-PR mot `main`.
+4. Dokumenter state-grenser, tilgjengelighet og kontrollstatus.
 5. Kontroller mergebarhet og åpne review-tråder.
-6. Merge bare etter eksplisitt brukergodkjenning og med forventet head-SHA.
-7. Kontroller oppdatert `main` lokalt.
+6. Marker PR klar først etter eksplisitt godkjenning.
+7. Merge bare med forventet head-SHA.
+8. Kontroller oppdatert `main` lokalt.
 
 ## Neste planlagte branch
 
 Etter godkjent merge:
 
 ```text
-feature/object-locking
+feature/text-box-editing
 ```
 
-Skal bygge:
-
-- synlig lås/lås opp for valgt element
-- varig `locked`-mutasjon gjennom reduceren
-- tydelig låsetilstand
-- fortsatt markering av låste elementer
-- ingen transform når låst
-
-Skal ikke bygge tekstredigering, sletting, historikk, lagring eller mobiloverstyringer.
+Før implementering må redigeringsmodus, Enter-regel, fontliste, fontstørrelser, formateringsscope, tom tekst og historikkgrense fastsettes. Ikke bygg dette før `feature/object-locking` er kontrollert og merget.
 
 ## Kommunikasjonsregler
 
