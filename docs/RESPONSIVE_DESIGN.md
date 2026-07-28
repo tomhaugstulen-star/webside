@@ -2,11 +2,24 @@
 
 Dette dokumentet beskriver teknisk retning for forskjeller mellom desktop- og mobilvisning.
 
+Detaljert fasespesifikasjon:
+
+```text
+docs/MOBILE_DESIGN_CONTROLS.md
+```
+
+Åpen GitHub-sak:
+
+```text
+#3 Plan: viewport-specific mobile design controls
+```
+
 ## 1. Hovedprinsipp
 
 - Ferdige nettsider skal bruke CSS media queries.
 - Mobilvisningen skal kunne skjule elementer som fortsatt finnes på desktop.
 - Desktop og mobil skal kunne ha egne verdier for utvalgte egenskaper.
+- Desktop er grunnlaget; mobil arver til en eksplisitt mobiloverstyring finnes.
 - Nøyaktig hvilke egenskaper som kan overstyres bestemmes før mobilkontrollene implementeres.
 - Et foreløpig brytepunkt kan være 768 px, men skal testes før det låses.
 
@@ -24,6 +37,8 @@ type ResponsiveValue<T> = {
 `EditorProject` er autoritativ kilde. DOM-en er bare rendering av prosjektdataene.
 
 `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen. `ViewportMode` er et UI-alias til samme type.
+
+Manglende `mobile`-verdi betyr arv. En reset til desktop skal derfor fjerne mobilverdien, ikke kopiere desktopverdien inn i `mobile`.
 
 ## 3. Implementert grunnlag
 
@@ -59,7 +74,20 @@ Dette er en kontrollert midlertidig regel, ikke endelig responsiv redigering.
 
 Når mobiloverstyringer bygges, må transform-API og reducer-actions bli viewport-bevisste. En mobiltransform skal da ikke utilsiktet overskrive desktopgeometrien.
 
-## 5. Krav til `feature/mobile-design-controls`
+## 5. Anbefalt arv og overstyring
+
+Den planlagte modellen er:
+
+- **Arver fra PC** når `mobile` mangler
+- **Eget mobiloppsett** når `mobile` finnes
+- første mobilredigering kan opprette mobiloverstyring
+- desktopendringer påvirker arvede mobilverdier
+- desktopendringer overskriver ikke eksplisitte mobilverdier
+- **Bruk PC-oppsett** fjerner mobiloverstyringen
+
+UI-et skal tydelig vise om valgt element arver, har eget mobiloppsett eller er skjult på mobil.
+
+## 6. Krav til `feature/mobile-design-controls`
 
 Fasen må avklare og bygge:
 
@@ -73,9 +101,27 @@ Fasen må avklare og bygge:
 - markering av element som er skjult i aktiv visning
 - hvordan historikk og lagring representerer en mobilendring
 
+Første versjon bør minst støtte:
+
+- posisjon
+- bredde og høyde
+- synlighet på mobil
+
 Layout-actionen kan ikke fortsette å hete eller oppføre seg som en ren desktop-action når mobilverdier blir redigerbare.
 
-## 6. Lerretshøyde
+## 7. Viewport-bevisste mutasjoner
+
+En framtidig layout-action må eksplisitt angi viewport.
+
+Reducerregler:
+
+- desktop-action endrer bare desktopgeometri
+- mobile-action endrer bare mobilgeometri
+- reset-action fjerner mobilverdier
+- ukjent, låst, ugyldig eller uendret layout ignoreres
+- transient preview holdes utenfor prosjektdata, historikk og lagring
+
+## 8. Lerretshøyde
 
 Lerretshøyden er avledet visning og skal ikke lagres i prosjektfilen.
 
@@ -89,7 +135,7 @@ Den beregnes fra:
 
 Ved avbrutt interaksjon fjernes preview uten prosjektmutasjon.
 
-## 7. Oppretting
+## 9. Oppretting
 
 Elementoppretting er foreløpig desktop-autoritativ:
 
@@ -105,9 +151,11 @@ Når responsiv redigering bygges, må dette avklares på nytt:
 - skjulte elementers påvirkning på første ledige plass
 - eksplisitt mobiloverstyring kontra fortsatt arv
 
+Anbefalt første regel er at nye elementer fortsatt opprettes på desktop og arves til mobil. Oppretting i Telefon skal ikke lage en ukjent desktopplassering uten en eksplisitt beslutning.
+
 Startplassering skal aldri utvikles til generell kollisjonskontroll. Fri overlapping skal fortsatt være mulig.
 
-## 8. Skjule på mobil
+## 10. Skjule på mobil
 
 Senere skal brukeren kunne velge at et objekt:
 
@@ -119,10 +167,11 @@ Før funksjonen bygges må det avklares:
 
 - om skjuling fjerner markering i aktiv viewport
 - hvordan objektverktøy fungerer når valgt element ikke renderer
+- hvordan brukeren finner og viser skjulte elementer igjen
 - om bare-mobil-visning støttes i første versjon
 - hvordan skjulte elementer påvirker opprettingsplassering
 
-## 9. CSS-generering
+## 11. CSS-generering
 
 Editoren skal generere ett kontrollert prosjektstilark fremfor mange tilfeldige `<style>`-elementer.
 
@@ -136,7 +185,7 @@ Stilgeneratoren skal:
 
 `!important` skal ikke brukes som standard.
 
-## 10. Stabile ID-er
+## 12. Stabile ID-er
 
 ID-er skal beholdes ved:
 
@@ -149,7 +198,7 @@ ID-er skal beholdes ved:
 
 `Math.random()` skal ikke brukes som prosjektidentitet.
 
-## 11. Arkitektur
+## 13. Arkitektur
 
 Responsiv funksjonalitet deles i egne ansvar:
 
@@ -164,18 +213,30 @@ Responsiv funksjonalitet deles i egne ansvar:
 
 Dette skal ikke samles i én stor komponent.
 
-## 12. Planlagt branch
+## 14. Planlagt branch og sak
 
 ```text
 feature/mobile-design-controls
 ```
 
-Den bygges etter grunnleggende objektredigering og låsing.
+Fasen spores i GitHub-sak `#3` og bygges etter grunnleggende objektredigering og låsing.
 
-## 13. Åpne beslutninger
+## 15. Akseptansekriterier
+
+Minstekravene ligger i `docs/MOBILE_DESIGN_CONTROLS.md` og inkluderer:
+
+- mobiltransform endrer ikke desktop
+- desktopendring overskriver ikke eksplisitt mobiloppsett
+- arv kan gjenopprettes ved å fjerne mobiloverstyring
+- mobilskjuling sletter ikke elementet
+- status for arv, overstyring og skjuling er tydelig
+- peker og tastatur bruker samme viewport-bevisste regler
+
+## 16. Åpne beslutninger
 
 - endelig mobilbrytepunkt
-- egenskaper som kan overstyres
+- egenskaper som kan overstyres utover geometri og synlighet
+- automatisk eller eksplisitt oppretting av første mobiloverstyring
 - støtte for bare-mobil-visning
 - visuell markering av arv og overstyring
 - fri eller delvis arvet mobilplassering
