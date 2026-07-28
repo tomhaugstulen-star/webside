@@ -1,5 +1,6 @@
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
-import type { EditorElement, ResponsiveValue } from '../../model/editorProject'
+import type { EditorElement } from '../../model/editorProject'
+import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import type { ViewportMode } from '../../types/editor'
 
 const elementKindLabels: Record<EditorElement['kind'], string> = {
@@ -16,14 +17,6 @@ type EditorCanvasElementProps = {
   onSelect: (elementId: string) => void
 }
 
-function resolveResponsiveValue<T>(value: ResponsiveValue<T>, viewport: ViewportMode) {
-  if (viewport === 'mobile') {
-    return value.mobile ?? value.desktop
-  }
-
-  return value.desktop
-}
-
 export function EditorCanvasElement({
   element,
   viewport,
@@ -38,6 +31,7 @@ export function EditorCanvasElement({
 
   const position = resolveResponsiveValue(element.position, viewport)
   const size = resolveResponsiveValue(element.size, viewport)
+  const label = elementKindLabels[element.kind]
   const style: CSSProperties = {
     left: position.x,
     top: position.y,
@@ -65,15 +59,19 @@ export function EditorCanvasElement({
 
   return (
     <div
-      className={`canvas-element ${selected ? 'canvas-element--selected' : ''}`}
+      className={`canvas-element canvas-element--${element.kind} ${selected ? 'canvas-element--selected' : ''}`}
       style={style}
       role="button"
       tabIndex={0}
-      aria-label={`Velg ${elementKindLabels[element.kind].toLowerCase()}`}
+      aria-label={`Velg ${label.toLowerCase()}`}
       aria-pressed={selected}
       data-element-id={element.id}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
-    />
+    >
+      <span className="canvas-element__placeholder" aria-hidden="true">
+        {label}
+      </span>
+    </div>
   )
 }

@@ -17,6 +17,8 @@ Editoren skal ikke bruke DOM-strukturen som permanent prosjektlagring.
 Prosjektmodellen inneholder:
 
 ```ts
+type ResponsiveViewport = 'desktop' | 'mobile'
+
 type ResponsiveValue<T> = {
   desktop: T
   mobile?: T
@@ -34,40 +36,71 @@ type EditorElement = {
 
 `EditorProject` er autoritativ kilde. DOM-en er bare en rendering av prosjektdataene.
 
+`ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen. UI-typen `ViewportMode` er et alias til denne typen, slik at modell og grensesnitt ikke kan få ulike viewport-unioner.
+
 ## 3. Implementert nå
 
-Merget til `main` gjennom prosjekt- og elementmodellen:
+Merget til `main`:
 
 - stabile prosjekt-, side- og element-ID-er
 - responsive modellfelter for posisjon, størrelse og synlighet
 - desktopverdi med valgfri mobilverdi
 - sentral prosjekt-state
 - prosjektmodellen som autoritativ datakilde
-
-Implementert i `feature/element-selection`:
-
-- eksisterende elementer renderer på lerretet fra prosjektmodellen
+- eksisterende elementer renderer fra prosjektmodellen
 - desktopvisning bruker desktopverdien
 - mobilvisning bruker mobilverdien når den finnes
 - mobilvisning faller tilbake til desktopverdien når mobilverdien mangler
 - elementer med `visibility: false` for aktiv visning renderer ikke
 - markering og fokus følger den renderte elementgrensen
 
-Dette er bare renderingsgrunnlaget. Brukergrensesnitt for å opprette mobile overstyringer er ikke implementert.
+Implementert i `feature/element-creation`:
 
-## 4. Ikke implementert ennå
+- nye elementer får desktopverdi for posisjon, størrelse og synlighet
+- mobil arver desktopverdien fordi mobiloverstyring ikke opprettes ennå
+- standardstørrelsene passer innenfor 390 px mobilvisning ved startpunkt x 24 px
+- lerretshøyden beregnes fra nederste synlige element i aktiv viewport
+- høydeberegningen bruker mobilverdi når den finnes og ellers desktopverdien
+- skjulte elementer påvirker ikke avledet lerretshøyde i aktiv viewport
+- responsiv verdioppløsning ligger i én delt modellhjelper
+
+Dette er fortsatt bare renderings- og arvegrunnlaget. Brukergrensesnitt for å opprette mobile overstyringer er ikke implementert.
+
+## 4. Oppretting før full responsiv redigering
+
+Elementoppretting er foreløpig desktop-autoritativ:
+
+- plassering beregnes fra eksisterende desktopverdier
+- størrelse lagres som desktopverdi
+- synlighet lagres som `desktop: true`
+- mobil arver disse verdiene
+
+Denne regelen er kontrollert for dagens fase, men må vurderes på nytt når mobiloverstyringer bygges.
+
+Da må dette avklares:
+
+- om oppretting skal skje i aktiv viewport
+- hvordan mobile posisjoner påvirker første ledige plass
+- hvordan elementer som er skjult i aktiv visning behandles
+- hvordan bare-mobil-elementer behandles
+- om nytt element skal få en eksplisitt mobiloverstyring eller fortsatt arve desktop
+
+Startplasseringen skal ikke utvikles til generell kollisjonskontroll. Fri overlapping skal fortsatt være mulig etter at draing er implementert.
+
+## 5. Ikke implementert ennå
 
 - kontroller for arv og overstyring
 - synlig indikasjon på arvet verdi
 - skjul på mobil i brukergrensesnittet
 - egen mobilposisjonering fra UI
+- viewport-bevisst elementoppretting
 - valg av hvilke egenskaper som kan overstyres i første versjon
 - CSS-generator
 - eksporterte media queries
 
-Desktop- og mobilknappen endrer fortsatt lerretsbredden. Elementrendererens verdier følger valgt visning når elementer finnes.
+Desktop- og mobilknappen endrer lerretsbredden. Elementrendererens verdier og avledede lerretshøyde følger valgt visning.
 
-## 5. Skjule på mobil
+## 6. Skjule på mobil
 
 Brukeren skal senere kunne velge at et objekt:
 
@@ -82,8 +115,9 @@ Før funksjonen bygges må dette avklares:
 - om et element som blir skjult i aktiv visning automatisk skal miste markeringen
 - hvordan objektverktøy oppfører seg dersom valgt element ikke renderer
 - om bare-mobil-visning skal støttes i første versjon
+- om skjulte elementer skal reservere opprettingsplass i en annen viewport
 
-## 6. Forskjellige verdier
+## 7. Forskjellige verdier
 
 Det er teknisk mulig å bruke ulike:
 
@@ -95,7 +129,7 @@ Det er teknisk mulig å bruke ulike:
 
 Før mobilkontrollene bygges må det fastsettes hvilke egenskaper som kan overstyres i første versjon.
 
-## 7. CSS-generering
+## 8. CSS-generering
 
 Editoren skal generere ett kontrollert prosjektstilark fremfor mange tilfeldige `<style>`-elementer.
 
@@ -109,7 +143,7 @@ Stilgeneratoren skal:
 
 `!important` skal ikke brukes som standard.
 
-## 8. Stabile ID-er
+## 9. Stabile ID-er
 
 ID-er skal beholdes ved:
 
@@ -122,7 +156,7 @@ ID-er skal beholdes ved:
 
 `Math.random()` skal ikke brukes som prosjektidentitet. Elementmodellen bruker kryptografiske UUID-er.
 
-## 9. Editoropplevelse
+## 10. Editoropplevelse
 
 Når mobilmodus senere er aktiv, skal editoren tydelig vise:
 
@@ -134,22 +168,25 @@ En mobilendring skal ikke utilsiktet endre desktopverdien.
 
 Markeringsstate er transient og skal ikke lagres som en responsiv prosjektverdi.
 
-## 10. Arkitektur
+Lerretshøyden er avledet visning. Den beregnes fra responsive elementverdier og skal ikke lagres som prosjektdata.
+
+## 11. Arkitektur
 
 Responsiv funksjonalitet deles i egne ansvarsområder:
 
 - responsive typer og datamodell
 - verdioppløsning og arv
 - mobilkontroller
+- viewport-bevisst oppretting
 - CSS-generator
 - forhåndsvisning
 - eksport
 
 Dette skal ikke samles i én stor komponent.
 
-Dagens verdioppløsning ligger ved lerretsrenderingen. Dersom flere editorområder trenger samme logikk, skal den trekkes ut til én delt, testbar funksjon i den fasen som eier responsiv redigering. Logikken skal ikke kopieres ukontrollert.
+Dagens verdioppløsning ligger i `src/model/resolveResponsiveValue.ts` og brukes av både elementrendering og lerretshøyde. Nye områder skal gjenbruke denne funksjonen fremfor å kopiere fallback-logikken.
 
-## 11. Planlagt branch
+## 12. Planlagt branch
 
 ```text
 feature/mobile-design-controls
@@ -159,7 +196,7 @@ Den bygges først etter elementmodell, markering, oppretting og grunnleggende ob
 
 CSS-generatoren kan få en egen branch dersom ansvaret blir stort nok.
 
-## 12. Åpne beslutninger
+## 13. Åpne beslutninger
 
 - endelig mobilbrytepunkt
 - egenskaper som kan overstyres i første versjon
@@ -167,4 +204,5 @@ CSS-generatoren kan få en egen branch dersom ansvaret blir stort nok.
 - visuell markering av arv og overstyring
 - fri eller delvis arvet mobilplassering
 - markering av element som er skjult i aktiv visning
+- viewport-bevisst opprettingsregel
 - organisering av eksportert HTML og CSS

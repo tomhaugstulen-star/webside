@@ -1,10 +1,21 @@
+import { createEditorElement } from '../model/createEditorElement'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
-import type { EditorProject, EditorProjectState } from '../model/editorProject'
+import type {
+  EditorProject,
+  EditorProjectState,
+  ElementKind,
+} from '../model/editorProject'
 
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
   | { type: 'set-active-page'; pageId: string }
   | { type: 'set-selected-element'; elementId: string | null }
+  | {
+      type: 'add-element-to-active-page'
+      elementId: string
+      kind: ElementKind
+      updatedAt: string
+    }
 
 export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
@@ -13,6 +24,12 @@ export function getInitialEditorProjectState() {
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   return activePage?.elements.some((element) => element.id === elementId) ?? false
+}
+
+function projectContainsElement(state: EditorProjectState, elementId: string) {
+  return state.project.pages.some((page) =>
+    page.elements.some((element) => element.id === elementId),
+  )
 }
 
 function selectedElementExists(state: EditorProjectState) {
@@ -85,6 +102,35 @@ function reduceEditorProjectState(
       return {
         ...state,
         selectedElementId: action.elementId,
+      }
+    }
+
+    case 'add-element-to-active-page': {
+      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+
+      if (!activePage || projectContainsElement(state, action.elementId)) {
+        return state
+      }
+
+      const element = createEditorElement({
+        id: action.elementId,
+        kind: action.kind,
+        existingElements: activePage.elements,
+      })
+      const pages = state.project.pages.map((page) =>
+        page.id === state.activePageId
+          ? { ...page, elements: [...page.elements, element] }
+          : page,
+      )
+
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          pages,
+          updatedAt: action.updatedAt,
+        },
+        selectedElementId: element.id,
       }
     }
   }

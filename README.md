@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret og skal gi kontroll over elementer, tekst, bilder, knapper, farger, header, desktop/mobil og lokal prosjektlagring.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan nå opprette og markere grunnleggende elementtyper. Draing, størrelsesendring og innholdsredigering bygges i senere, avgrensede branches.
 
 ## Lokal mappe
 
@@ -49,14 +49,12 @@ main
   → arkitekturrapporter ved strukturendringer
   → visuell kontroll
   → dokumentasjon
-  → kontrollert merge til main
+  → kontrollert PR og merge til main
 ```
 
 Etter hver repoendring skal brukeren få de nøyaktige PowerShell-kommandoene som skal kjøres lokalt.
 
-## Gjeldende status
-
-Ferdig og merget til `main`:
+## Ferdig og merget til `main`
 
 - stabilt editorgrunnlag
 - blankt desktop- og mobillerret
@@ -68,40 +66,61 @@ Ferdig og merget til `main`:
 - prosjekt- og elementmodell
 - skjemaversjon, sikre ID-er, sider og responsive elementverdier
 - sentral prosjekt-state og aktiv side
+- markering av eksisterende elementer
+- klikk på tomt lerret fjerner markering
+- tastaturmarkering med Tab, Enter og mellomrom
+- transient `selectedElementId` med validerte state-overganger
 
-Gjeldende branch:
-
-```text
-feature/element-selection
-```
-
-Ferdig og visuelt godkjent på branchen:
-
-- valgt element-ID i transient editor-state
-- valg av ett eksisterende element
-- tydelig valgt og fokusert tilstand
-- klikk på tomt lerret fjerner markeringen
-- Enter og mellomrom markerer fokusert element
-- ugyldige markeringsforespørsler ignoreres
-- markering ryddes ved side-/prosjektbytte og når elementet ikke finnes
-- ingen testelementer eller produksjonsinnhold ligger igjen
-- et nytt prosjekt åpner fortsatt helt blankt
-
-Den siste reducer-herdingen og dokumentendringene må gjennom `npm run check` før merge.
-
-Neste planlagte branch etter merge:
+## Gjeldende branch
 
 ```text
 feature/element-creation
 ```
 
-Den skal bare opprette faktiske elementer fra Elementer-panelet. Draing, størrelsesendring, låsing og innholdsredigering kommer senere.
+Implementert og visuelt godkjent på desktop og mobil:
 
-## Viktig state-grense
+- opprette Seksjon, Bilde, Tekst og Knapp fra Elementer-panelet
+- legge nye elementer til aktiv side i prosjektmodellen
+- sikker kryptografisk element-ID
+- automatisk markering av nytt element
+- kontrollerte standardstørrelser
+- første ledige startposisjon med 16 px avstand
+- ingen direkte overlapping ved oppretting
+- automatisk utvidelse av lerretshøyden
+- blank startside før brukeren oppretter noe
+- mobil arver desktopverdier
+- sidebar-CSS delt etter ansvar før 250-linjersgrensen
 
-`selectedElementId` er transient editor-state. Den skal ikke lagres i prosjektfilen, eksporteres, publiseres eller inngå i prosjektets historikk/autolagring.
+Siste kodeaudit har i tillegg sikret at:
 
-`EditorProject` er fortsatt den autoritative kilden for sider og elementer.
+- state-avhengig oppretting beregnes fra reducerens nyeste state
+- raske eller batchede opprettinger ikke bruker et gammelt React-snapshot
+- plasseringsalgoritmen skalerer uten kvadratisk kandidatsøk
+- viewport-typen har én autoritativ definisjon
+- nye menyverktøy må håndteres uttømmende av TypeScript
+
+De siste audit-endringene må gjennom ny `npm run check`, nye arkitekturrapporter og en kort visuell regresjonskontroll før PR.
+
+## Viktige state-grenser
+
+`EditorProject` er autoritativ kilde for varige sider og elementer.
+
+`selectedElementId` er transient editor-state og skal ikke:
+
+- lagres i prosjektfilen
+- utløse autolagring
+- inngå i prosjektets angre-/gjør om-historikk
+- eksporteres
+- publiseres
+
+Elementoppretting er en prosjektmutasjon. Oppretting skjer i reduceren fra den nyeste state-versjonen.
+
+## Filstørrelse og ansvar
+
+- 250 linjer er aktiv terskel for å begynne å trekke ut ansvar.
+- En fil deles tidligere dersom den får flere tydelige ansvarsområder.
+- 300 linjer er en eksplisitt unntaksgrense, ikke et normalmål.
+- Deling skjer etter ansvar, ikke tilfeldig linjetall.
 
 ## Dokumentasjon
 
@@ -113,17 +132,18 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 4. `docs/PROJECT_RULES.md`
 5. `docs/ELEMENT_MODEL.md`
 6. `docs/ELEMENT_SELECTION.md`
-7. `docs/RESPONSIVE_DESIGN.md`
-8. `docs/CODE_AUDIT.md`
+7. `docs/ELEMENT_CREATION.md`
+8. `docs/RESPONSIVE_DESIGN.md`
+9. `docs/CODE_AUDIT.md`
 
 ## Ikke implementert ennå
 
-- elementoppretting
 - flytting og størrelsesendring
+- sletting
 - låsing og opplåsing
-- tekstredigering
+- direkte tekstredigering
 - bildeimport
-- knappfunksjonalitet
+- knapphandling og lenker
 - fargesystem
 - logo/header
 - angre/gjør om

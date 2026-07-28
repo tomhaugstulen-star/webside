@@ -15,6 +15,7 @@ Eksempler:
 
 - `feature/element-selection`
 - `feature/element-creation`
+- `feature/drag-resize`
 - `feature/mobile-design-controls`
 - `feature/alignment-guides`
 - `fix/sidebar-panel-behavior`
@@ -42,6 +43,9 @@ Eksempler:
 - DOM-en skal ikke brukes som permanent prosjektlagring.
 - Elementer skal opprettes, endres og slettes gjennom prosjekt-state/reduceren.
 - Prosjektidentitet skal bruke stabile kryptografiske ID-er.
+- State-avhengige beregninger for en prosjektmutasjon skal bruke reducerens nyeste state.
+- UI-hooks skal sende brukerintensjon og nødvendig ikke-deterministisk metadata, men skal ikke beregne varig resultat fra et mulig utdatert React-snapshot.
+- Reduceren skal være deterministisk for samme state og action; ID og klokkeslett genereres derfor før dispatch.
 
 ### Transient editor-state
 
@@ -89,13 +93,16 @@ Før implementering av hver ny del skal dette avklares:
 
 - TypeScript brukes konsekvent.
 - Reducer-actions skal håndteres eksplisitt og uttømmende.
+- Union-baserte UI-switcher skal også være uttømmende, slik at nye verdier gir typefeil fremfor tomt grensesnitt.
 - Ugyldige state-overganger skal ignoreres eller avvises kontrollert.
 - Overflødige state-oppdateringer skal unngås når det er enkelt og tydelig.
 - Komponenter skal ha tydelige props og avgrenset ansvar.
 - Interaksjoner skal fungere med tastatur der det er relevant.
 - Brukerhandlinger må ha forutsigbar tilbakemelding.
 - Desktop- og mobilresultat testes separat.
+- Responsive viewport-typer skal ha én autoritativ definisjon.
 - Layoutsystemet skal unngå skjulte avhengigheter mellom komponenter.
+- Startplassering ved oppretting skal ikke utvikles til et automatisk kollisjonssystem for draing.
 - Ingen automatisk generert design skal overskrive brukerens eksplisitte valg uten tydelig varsel.
 - Automatisk lagring skal senere være en grunnfunksjon i editoren.
 - Ingen kildekodemodul skal ligge ubrukt uten å bli oppdaget av arkitektursjekken.
@@ -117,14 +124,15 @@ npm run dev
 - Tekstredigering må skille mellom objektmarkering og innholdsredigering.
 - Faktiske knappehandlinger eller lenker skal ikke aktiveres i vanlig editor-markeringsmodus.
 - Klikk på framtidige objektverktøy skal kunne beholde valgt element.
+- Fokusoppførsel etter tastaturoppretting skal vurderes når objektverktøy og direkte redigering bygges.
 
 ## 8. Gjeldende status
 
 - Editorgrunnlaget er godkjent og merget til `main`.
 - Prosjekt- og elementmodellen er godkjent og merget til `main`.
+- Elementmarkering er godkjent og merget til `main`.
 - Dependency Cruiser og `npm run check` er konfigurert.
 - `npm run dev` åpner nettleseren automatisk.
-- `feature/element-selection` er implementert og visuelt godkjent.
-- Test-fixturen for markering er fjernet.
-- Siste reducer-herding og dokumentoppdateringer må sluttkontrolleres før merge.
-- Neste branch etter merge er `feature/element-creation`.
+- `feature/element-creation` er implementert og visuelt godkjent på desktop og mobil.
+- Siste kodeaudit og dokumentoppdateringer må sluttkontrolleres før PR og merge.
+- Neste branch etter godkjent merge er `feature/drag-resize`.

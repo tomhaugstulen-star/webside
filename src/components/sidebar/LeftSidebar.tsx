@@ -1,3 +1,4 @@
+import type { ElementKind } from '../../model/editorProject'
 import type { EditorTool } from '../../types/editor'
 import { SidebarIcon, type SidebarIconName } from './SidebarIcon'
 import { SidebarPanel } from './SidebarPanels'
@@ -6,6 +7,7 @@ type LeftSidebarProps = {
   activeTool: EditorTool | null
   onToolChange: (tool: EditorTool) => void
   onPanelAction: () => void
+  onCreateElement: (kind: ElementKind) => void
 }
 
 const tools: Array<{ id: EditorTool; label: string; icon: SidebarIconName }> = [
@@ -15,7 +17,12 @@ const tools: Array<{ id: EditorTool; label: string; icon: SidebarIconName }> = [
   { id: 'files', label: 'Filer', icon: 'files' },
 ]
 
-export function LeftSidebar({ activeTool, onToolChange, onPanelAction }: LeftSidebarProps) {
+export function LeftSidebar({
+  activeTool,
+  onToolChange,
+  onPanelAction,
+  onCreateElement,
+}: LeftSidebarProps) {
   return (
     <aside className="left-sidebar">
       <nav className="left-rail" aria-label="Editorverktøy">
@@ -49,7 +56,11 @@ export function LeftSidebar({ activeTool, onToolChange, onPanelAction }: LeftSid
       <section className={`left-panel ${activeTool ? 'left-panel--open' : ''}`} aria-hidden={!activeTool}>
         {activeTool && (
           <div className="left-panel__content">
-            <SidebarPanel activeTool={activeTool} onSelect={onPanelAction} />
+            <SidebarPanel
+              activeTool={activeTool}
+              onSelect={onPanelAction}
+              onCreateElement={onCreateElement}
+            />
           </div>
         )}
       </section>
