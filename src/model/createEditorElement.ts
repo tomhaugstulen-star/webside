@@ -1,5 +1,4 @@
 import type { EditorElement, ElementKind, ElementSize } from './editorProject'
-import { createStableId } from './createStableId'
 import { findElementCreationPosition } from './findElementCreationPosition'
 
 const defaultElementSizes: Record<ElementKind, ElementSize> = {
@@ -9,15 +8,22 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
   button: { width: 160, height: 48 },
 }
 
-export function createEditorElement(
-  kind: ElementKind,
-  existingElements: EditorElement[],
-): EditorElement {
+type CreateEditorElementInput = {
+  id: string
+  kind: ElementKind
+  existingElements: EditorElement[]
+}
+
+export function createEditorElement({
+  id,
+  kind,
+  existingElements,
+}: CreateEditorElementInput): EditorElement {
   const size = defaultElementSizes[kind]
   const position = findElementCreationPosition(size, existingElements)
 
   return {
-    id: createStableId(),
+    id,
     kind,
     position: { desktop: position },
     size: { desktop: { ...size } },
