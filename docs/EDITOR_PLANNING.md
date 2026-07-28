@@ -19,33 +19,33 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og åpne b
 - kontrollerte startstørrelser og første ledige startplass
 - automatisk markering av nytt element
 - avledet lerretshøyde
+- flytting og resizing med peker og tastatur
+- minimumsmål, clamping, edge-scroll og transient preview
 - Dependency Cruiser og samlet `npm run check`
 
-### Implementert i `feature/drag-resize`
+### Implementert i `feature/object-locking`
 
-- flytting med peker
-- resizing fra ett firkantet håndtak nederst til høyre
-- minimumsmål per elementtype
-- venstre, høyre og øvre lerretsgrense
-- fri bevegelse nedover med automatisk lerretsvekst
-- edge-scroll under aktiv interaksjon
-- transient preview under pekerbevegelse
-- én prosjekt-commit ved normalt pekerslipp
-- avbrudd uten commit ved cancel eller tapt pointer capture
-- piltaster for flytting
-- `Ctrl`/`Cmd` + piltaster for resizing
-- `Shift` for 10 px steg
-- låste elementer kan markeres, men ikke transformeres
+- egen objektverktøylinje over valgt element
+- åpen og lukket hengelås
+- varig `locked`-mutasjon gjennom reduceren
+- låseverdi beregnes fra reducerens nyeste state
+- låst element beholder markeringen
+- stiplet markering for låst element
+- resize-håndtak skjules når låst
+- peker- og tastaturtransform blokkeres
+- låseknappen er tastaturtilgjengelig
+- pointer-propagation fra verktøylinjen stoppes
+- låsestatus er felles for PC og Telefon
 
-Visuelt godkjent på desktop og mobil før siste kodeaudit. Auditendringene må gjennom ny lokal sluttkontroll før PR.
+Visuelt godkjent på PC og Telefon før siste kodeaudit. Siste tastaturretting må gjennom ny lokal sluttkontroll før PR.
 
 ### Neste fase etter merge
 
 ```text
-feature/object-locking
+feature/text-box-editing
 ```
 
-Denne fasen skal bare bygge lås/lås opp for valgt element. Tekstredigering, bilder, historikk, sletting og lagring skal ikke blandes inn.
+Denne fasen skal bygge direkte tekstredigering og et tydelig skille mellom objektmarkering og innholdsredigering. Bilder, knappehandlinger, historikk, lagring og mobiloverstyringer skal ikke blandes inn.
 
 ## 2. Bekreftede hovedkrav
 
@@ -60,9 +60,10 @@ Denne fasen skal bare bygge lås/lås opp for valgt element. Tekstredigering, bi
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - DOM-en er bare rendering, ikke permanent lagring.
-- Elementer og geometri endres gjennom prosjekt-state/reduceren.
+- Elementer, geometri, innhold og låsestatus endres gjennom prosjekt-state/reduceren.
 - State-avhengige prosjektberegninger bruker reducerens nyeste state.
 - ID og klokkeslett genereres før dispatch slik at reduceren er deterministisk.
+- `updatedAt` endres bare ved gyldig prosjektmutasjon.
 
 ### Transient state
 
@@ -71,8 +72,10 @@ Følgende skal ikke serialiseres, publiseres eller lagres:
 - `selectedElementId`
 - aktiv pointer-interaksjon
 - layout-preview under draing eller resizing
+- fokus, hover og synlighet for objektverktøylinjen
+- framtidig redigeringsmodus dersom den bare er UI-state
 
-Når historikk og autolagring bygges, skal én ferdig pekertransform behandles som én prosjektendring.
+Når historikk og autolagring bygges, skal én ferdig brukerhandling behandles som én eksplisitt prosjektendring.
 
 ### Desktop og mobil
 
@@ -82,6 +85,7 @@ Når historikk og autolagring bygges, skal én ferdig pekertransform behandles s
 - I dagens UI redigerer PC og Telefon den delte desktopgeometrien.
 - Egne mobiloverstyringer bygges eksplisitt i `feature/mobile-design-controls`.
 - En mobilendring skal senere aldri endre desktopverdien utilsiktet.
+- Låsestatus er felles for PC og Telefon.
 
 ## 3. Elementer
 
@@ -140,16 +144,28 @@ Se `docs/DRAG_RESIZE.md`.
 
 ### Låsing
 
-Modellen har allerede `locked`.
+Implementert:
 
-Varige regler:
+- valgt element får en separat objektverktøylinje
+- åpen hengelås låser elementet
+- lukket hengelås låser opp elementet
+- låst element beholder markeringen
+- låst element får stiplet markeringsramme
+- resize-håndtaket skjules
+- peker- og tastaturtransform blokkeres
+- låseknappen starter ikke flytting eller fjerner markering
+- piltaster på låst element utløser ikke utilsiktet scrolling
 
-- låst element kan markeres
-- låst element kan ikke flyttes eller resizes
-- reduceren avviser layoutmutasjon når elementet er låst
-- resize-håndtak vises ikke når elementet er låst
+Arkitekturregler:
 
-Selve låsegrensesnittet bygges i `feature/object-locking`.
+- `locked` er varig elementdata
+- neste låseverdi beregnes i reduceren fra nyeste state
+- ukjent element-ID ignoreres
+- gyldig endring oppdaterer `updatedAt`
+- reduceren forblir autoritativ for transformblokkering
+- objektverktøylinjens fokus og synlighet er transient UI-state
+
+Se `docs/OBJECT_LOCKING.md`.
 
 ### Tekst
 
@@ -157,6 +173,17 @@ Selve låsegrensesnittet bygges i `feature/object-locking`.
 - Direkte tekstredigering bygges i egen modus.
 - Objektmarkering og innholdsredigering må skilles tydelig.
 - Innhold utenfor elementboksen klippes.
+- Låst tekstboks skal ikke gå inn i redigeringsmodus.
+- Tastaturkommandoer for objektet må deaktiveres mens tekstinnhold redigeres.
+
+Før implementering må dette fastsettes:
+
+- hvordan redigeringsmodus startes og avsluttes
+- Enter-regel
+- første fontliste og fontstørrelsesliste
+- om formatering gjelder hele boksen eller markert tekst
+- commit-grense for tekstendringer
+- hvordan tom tekst behandles
 
 ### Bilder
 
@@ -202,8 +229,8 @@ Planlagt branch: `feature/alignment-guides`.
 
 - omtrent 7–8 nettsikre fonter
 - fontstørrelse fra kontrollert liste
-- fontfarge registreres i fargesystemet
-- fet og kursiv i første versjon
+- fontfarge registreres senere i fargesystemet
+- fet og kursiv vurderes i første tekstversjon
 
 ## 6. Lokal automatisk lagring
 
@@ -213,7 +240,7 @@ Planlagt branch: `feature/alignment-guides`.
 - statusene `Lagrer`, `Lagret` og `Lagringsfeil`
 - sikker skriving og gjenoppretting
 - samme prosjektendringsgrense som historikksystemet
-- transient markering og pointer-preview skal ikke lagres
+- transient markering, pointer-preview og verktøylinjefokus skal ikke lagres
 
 ## 7. Arkitektur og arbeidsmåte
 
@@ -224,14 +251,13 @@ Planlagt branch: `feature/alignment-guides`.
 - prosjektmodell, transient state, hendelseslogikk og visning holdes separat
 - reducer-actions håndteres uttømmende
 - ugyldige og uendrede state-overganger avvises
-- pointer-transform og edge-scroll er separate ansvar
+- pointer-transform, edge-scroll og objektverktøylinje er separate ansvar
 - Dependency Cruiser kontrollerer modulgrensene
 - arkitekturrapporter regenereres etter strukturendringer
 
 ## 8. Planlagte branches
 
-- `feature/drag-resize` — gjeldende, auditendringer må sluttkontrolleres
-- `feature/object-locking`
+- `feature/object-locking` — gjeldende, auditendring må sluttkontrolleres
 - `feature/text-box-editing`
 - `feature/button-element`
 - `feature/image-import-and-placement`
@@ -248,11 +274,13 @@ Planlagt branch: `feature/alignment-guides`.
 
 ## 9. Åpne beslutninger
 
-- plassering og utforming av låsekontrollen
+- start og avslutning av tekstredigeringsmodus
+- Enter-regel og tom tekst
+- formatering av hele tekstboksen kontra markert tekst
 - sletting og bekreftelsesregel
 - endelig mobilbrytepunkt
 - hvilke egenskaper som kan overstyres på mobil
-- sammenslåing av gjentatte tastaturendringer i historikk
+- sammenslåing av gjentatte tastatur- og tekstendringer i historikk
 - endelig fontliste og fontstørrelser
 - tekstjustering og linjehøyde
 - knappens handlinger og lenketyper
