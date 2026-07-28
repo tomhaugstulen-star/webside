@@ -1,22 +1,21 @@
 import { useCallback } from 'react'
-import { createEditorElement } from '../model/createEditorElement'
+import { createStableId } from '../model/createStableId'
 import type { ElementKind } from '../model/editorProject'
 import { useEditorProject } from './useEditorProject'
 
 export function useElementCreation() {
-  const { activePage, dispatch } = useEditorProject()
+  const { dispatch } = useEditorProject()
 
   const createElement = useCallback(
     (kind: ElementKind) => {
-      const element = createEditorElement(kind, activePage.elements)
-
       dispatch({
         type: 'add-element-to-active-page',
-        element,
+        elementId: createStableId(),
+        kind,
         updatedAt: new Date().toISOString(),
       })
     },
-    [activePage.elements, dispatch],
+    [dispatch],
   )
 
   return { createElement }
