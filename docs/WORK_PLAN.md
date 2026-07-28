@@ -15,7 +15,7 @@ For hver avgrensede del:
 7. Gjennomfør framtidsrettet kodeaudit.
 8. Kjør `npm run check`.
 9. Regenerer arkitekturrapporter ved strukturendringer.
-10. Test desktop, mobil, peker og tastatur der det er relevant.
+10. Test PC, Telefon, peker og tastatur der det er relevant.
 11. Fjern test-fixtures.
 12. Oppdater dokumentasjonen.
 13. Opprett PR og kontroller diff, mergebarhet og review-tråder.
@@ -28,9 +28,8 @@ For hver avgrensede del:
 
 - blankt lerret
 - toppmeny og venstremeny
-- desktop- og mobilvisning
+- PC- og Telefon-visning
 - kontrollert paneloppførsel
-- delt CSS- og komponentstruktur
 - Dependency Cruiser
 - samlet `npm run check`
 - automatisk nettleseråpning
@@ -39,25 +38,19 @@ For hver avgrensede del:
 
 Branch: `feature/element-model`
 
-- prosjekt med skjemaversjon, ID, navn og tidsstempler
-- sider og elementlister
-- elementtypene seksjon, bilde, tekst og knapp
+- prosjekt, sider og elementer
+- skjemaversjon, stabile ID-er og tidsstempler
 - responsive verdier for posisjon, størrelse og synlighet
 - låsestatus
-- kryptografiske stabile ID-er
-- sentral prosjekt-state, reducer og aktiv side
-- blankt prosjekt med siden `Forside`
+- sentral prosjekt-state og aktiv side
 
-### Fase 2 – Markering av elementer
+### Fase 2 – Markering
 
 Branch: `feature/element-selection`
 
 - transient `selectedElementId`
-- valg av element på aktiv side
-- valgt-, hover- og fokustilstand
+- peker- og tastaturmarkering
 - klikk på tomt lerret fjerner markering
-- Tab, Enter og mellomrom
-- validerte state-overganger
 - markering holdes utenfor prosjektfil, historikk og lagring
 
 Se `docs/ELEMENT_SELECTION.md`.
@@ -66,23 +59,12 @@ Se `docs/ELEMENT_SELECTION.md`.
 
 Branch: `feature/element-creation`
 
-- opprette Seksjon, Bilde, Tekst og Knapp
-- sikker ID og `updatedAt`
-- oppretting gjennom reducerens nyeste state
+- Seksjon, Bilde, Tekst og Knapp
+- sikre ID-er og `updatedAt`
+- kontrollerte standardstørrelser
+- første ledige startplass
 - automatisk markering
-- kontrollert standardstørrelse
-- første ledige vertikale startplass med 16 px avstand
-- ingen direkte overlapping ved oppretting
-- automatisk utvidelse av lerretshøyden
-- mobil arv fra desktop
-- blank side før eksplisitt oppretting
-
-Varige regler:
-
-- opprettingsplassering gjelder bare elementets fødested
-- eksisterende elementer flyttes aldri automatisk
-- plassering er ikke et generelt kollisjonssystem
-- lerretshøyde er avledet visning
+- avledet lerretshøyde
 
 Se `docs/ELEMENT_CREATION.md`.
 
@@ -90,136 +72,152 @@ Se `docs/ELEMENT_CREATION.md`.
 
 Branch: `feature/drag-resize`
 
-Status: **ferdig, kontrollert og merget til `main` som PR #4**.
+Status: merget som PR #4.
 
-- flytting med peker
-- resizing fra ett håndtak nederst til høyre
-- minimumsmål per elementtype
-- venstre, høyre og øvre lerretsgrense
-- fri bevegelse nedover med automatisk lerretsvekst
-- edge-scroll
-- fri overlapping
-- transient layout-preview
-- én varig prosjektmutasjon ved normalt pekerslipp
-- avbrudd uten commit ved cancel eller tapt pointer capture
-- piltaster for flytting
-- `Ctrl`/`Cmd` + piltaster for resizing
-- `Shift` for 10 px steg
-- PC- og Telefon-visning med delt desktopgeometri
+- pekerflytting og resizing
+- tastaturflytting og resizing
+- minimumsmål og clamping
+- edge-scroll og automatisk lerretsvekst
+- transient preview
+- én commit ved normalt pekerslipp
+- avbrudd uten commit ved cancel eller tapt capture
 
 Se `docs/DRAG_RESIZE.md`.
 
-## 3. Gjeldende fase
+### Fase 5 – Objektlåsing
 
-### Fase 5 – Låsing
+Branch: `feature/object-locking`
 
-Branch:
+Status: merget som PR #5 med merge-commit `a3eed45`.
 
-```text
-feature/object-locking
-```
-
-Status: **implementert og visuelt godkjent på PC og Telefon; siste auditendring og dokumentasjon må sluttkontrolleres før PR**.
-
-Implementert:
-
-- separat objektverktøylinje over valgt element
-- åpen hengelås for å låse
-- lukket hengelås for å låse opp
-- varig `locked`-endring gjennom reduceren
-- låseverdi beregnes fra reducerens nyeste state
-- prosjektets `updatedAt` oppdateres ved gyldig låseendring
-- ukjent element-ID ignoreres
-- låst element beholder markeringen
-- låst element får stiplet markeringsramme
-- resize-håndtaket skjules når elementet er låst
-- pekerflytting og pointer-resize blokkeres
-- tastaturflytting og tastatur-resize blokkeres
-- låseknappen er et eget tastaturtilgjengelig knapp-element
-- pointer-propagation fra verktøylinjen stoppes
-- låsestatus er felles for PC og Telefon
-
-Audit-herding:
-
-- piltaster på et låst, fokusert element stoppes uten utilsiktet scrolling
-- låste elementer kan fortsatt fokuseres, markeres og låses opp
-- reduceren forblir autoritativ for transformblokkering
-- verktøylinjen er transient editor-UI, ikke prosjektdata
-- alle berørte kildefiler er under 250 linjer
-
-Branchen inneholder ikke:
-
-- sletting
-- lagpanel
-- direkte tekstredigering
-- bildeimport
-- historikk
-- lagring
-- egne mobiloverstyringer
-
-Varige regler:
-
-- `locked` er varig elementdata
-- en låseendring skal senere være én historikk-/autolagringsendring
-- fokus, hover og synlighet for objektverktøylinjen er transient
-- låst element må kunne markeres slik at brukeren kan låse det opp
+- separat objektverktøylinje
+- lås og lås opp
+- varig `locked` gjennom reduceren
+- låste elementer kan markeres og fokuseres
+- peker- og tastaturtransform blokkeres
+- stiplet låsetilstand
+- tilgjengelig låseknapp
 
 Se `docs/OBJECT_LOCKING.md`.
 
-## 4. Neste fase etter merge
+## 3. Gjeldende fase
 
-### Fase 6 – Tekst og fonts
+### Fase 6 – Ren tekstredigering
 
-Planlagt branch:
+Branch:
 
 ```text
 feature/text-box-editing
 ```
 
-Skal bygge:
+Status: **implementert, kodeauditert, `npm run check` bestått og visuelt godkjent på PC og Telefon før dokumentoppdateringen**.
 
-- tydelig skille mellom objektmarkering og tekstredigering
-- direkte redigering av tekstinnhold
-- kontrollert commit av tekstinnhold til prosjektmodellen
-- tastaturbruk uten konflikt med objektets flyttekommandoer
-- nettsikre fonter
-- kontrollert fontstørrelsesliste
-- tekstfarge, fet og kursiv dersom omfanget godkjennes før implementering
-- klipping av tekst ved elementgrensen
-- desktop- og mobiltest
+Implementert:
 
-Må avklares før implementering:
+- prosjektskjema versjon 2
+- diskriminert elementunion
+- obligatorisk `content` bare for `kind: 'text'`
+- tomt standardinnhold
+- ett klikk markerer
+- dobbeltklikk starter redigering
+- `Enter` på markert tekstboks starter redigering
+- kontrollert flerlinjet `textarea`
+- vanlig `Enter` lager ny linje
+- blur og `Ctrl`/`Cmd` + `Enter` committer
+- `Escape` forkaster aktiv draft
+- IME-sikker snarveishåndtering
+- tom tekst er gyldig
+- linjeskift normaliseres til `\n`
+- låst tekstboks kan ikke redigeres
+- transform og objektverktøy er deaktivert under redigering
+- reduceren avviser feil type, låst element og uendret tekst
+- `updatedAt` endres bare ved reell tekstendring
+- tekstinnhold er felles for PC og Telefon
 
-- eksakt handling som går inn i tekstredigeringsmodus
-- handling som avslutter tekstredigering
-- om Enter lager avsnitt eller linjeskift
-- første fontliste og fontstørrelsesliste
-- om formatering gjelder hele tekstboksen eller markert tekst i første versjon
-- hvordan tom tekst behandles
-- hvordan låst tekstboks oppfører seg
-- hvordan historikk senere grupperer skrivehandlinger
+Arkitekturgrenser:
 
-Skal ikke samtidig bygge:
+- tekstinnhold er varig prosjektdata
+- aktiv redigeringsøkt og lokal draft er transient state
+- én avsluttet økt skal senere være én historikk-/autolagringsendring
+- DOM-en og `innerHTML` brukes ikke som lagringskilde
+- alle berørte TypeScript- og TSX-filer er under 250 linjer
 
+Branchen inneholder ikke:
+
+- høyremeny
+- fontfamilie eller fontstørrelse
+- tekstfarge, fet eller kursiv
+- formatering av markert tekst
 - bildeimport
 - knapphandlinger
-- fargesystem for hele prosjektet
-- historikkmotor
-- automatisk lagring
+- historikk eller lagring
 - responsive mobiloverstyringer
+
+Se `docs/TEXT_BOX_EDITING.md`.
+
+Før PR gjenstår:
+
+- hent dokumentendringene lokalt
+- regenerer arkitekturrapportene
+- commit og push rapportene
+- bekreft rent og synkronisert arbeidsområde
+
+## 4. Neste fase etter merge
+
+### Fase 7 – Høyremenyens grunnstruktur
+
+Planlagt branch:
+
+```text
+feature/right-properties-panel
+```
+
+Skal bygge:
+
+- stabil høyre kolonne i editorshellet
+- følger `selectedElementId`
+- viser valgt elementtype og grunnidentitet
+- tydelig tom/skjult tilstand når ingenting er valgt
+- kontrollert oppførsel når element låses eller tekst redigeres
+- seksjonsstruktur for senere egenskaper
+- forutsigbar fokusrekkefølge
+- PC- og Telefon-kontroll
+
+Skal ikke bygge:
+
+- fontkontroller
+- tekstformattering
+- bildeinnstillinger
+- knapphandlinger
+- fargevelgere
+- sletting
+- historikk eller lagring
+
+Menyen bygges før innholdet i den, slik at senere egenskapsfunksjoner får én stabil arkitektur.
 
 ## 5. Senere faser
 
-### Fase 7 – Knapper
+### Fase 8 – Tekstegenskaper
+
+Branch: `feature/text-properties`
+
+- nettsikre fonter
+- kontrollert fontstørrelsesliste
+- linjehøyde og tekstjustering etter eksplisitt beslutning
+- tekstfarge kobles senere til prosjektets fargesystem
+- fet og kursiv
+- om formatering gjelder hele boksen eller markert tekst må besluttes før kode
+
+### Fase 9 – Knapper
 
 Branch: `feature/button-element`
 
 - redigerbar knappetekst
 - størrelse, plassering, farger og ramme
 - handling eller lenketype avklares før implementering
-- knapphandling aktiveres ikke i vanlig editormodus
+- handling aktiveres ikke i vanlig editormodus
 
-### Fase 8 – Bilder
+### Fase 10 – Bilder
 
 Branch: `feature/image-import-and-placement`
 
@@ -228,15 +226,15 @@ Branch: `feature/image-import-and-placement`
 - selvstendig bildeobjekt
 - fri plassering og størrelse
 
-### Fase 9 – Farger
+### Fase 11 – Farger
 
 Branch: `feature/project-colors`
 
 - register over faktiske prosjektfarger
 - global endring
-- oppdatere alle brukere av fargen
+- oppdatere alle brukere av en farge
 
-### Fase 10 – Logo og header
+### Fase 12 – Logo og header
 
 Branch: `feature/logo-header`
 
@@ -245,7 +243,7 @@ Branch: `feature/logo-header`
 - hovedtekst og undertittel
 - redigerbar struktur
 
-### Fase 11 – Korrigeringslinjer
+### Fase 13 – Korrigeringslinjer
 
 Branch: `feature/alignment-guides`
 
@@ -255,41 +253,30 @@ Branch: `feature/alignment-guides`
 - bare under flytting eller resizing
 - ingen automatisk kollisjonsunngåelse
 
-### Fase 12 – Responsiv redigering
+### Fase 14 – Responsiv redigering
 
 Branch: `feature/mobile-design-controls`
 
-Sporing:
-
-```text
-GitHub-sak #3
-docs/MOBILE_DESIGN_CONTROLS.md
-docs/RESPONSIVE_DESIGN.md
-```
-
-Mål:
+Sporet i GitHub-sak #3 og `docs/MOBILE_DESIGN_CONTROLS.md`.
 
 - desktop er grunnlaget
-- mobil arver desktopverdier som standard
+- mobil arver desktop som standard
 - eksplisitte mobiloverstyringer for posisjon, størrelse og synlighet
-- mobil flytting og resizing endrer ikke desktop
+- mobilendring påvirker ikke desktop
 - **Bruk PC-oppsett** fjerner mobiloverstyringen
-- tydelig status for arv, eget mobiloppsett og mobilskjuling
 - viewport-bevisste prosjektmutasjoner
-- kontrollerte media queries fra prosjektmodellen
 
-### Fase 13 – Angre og gjør om
+### Fase 15 – Angre og gjør om
 
 Branch: `feature/history-system`
 
 - prosjektendringsmodell
-- angre og gjør om
 - pekertransform som én historikkpost
 - låseendring som én historikkpost
-- gruppering av tekstskriving må fastsettes
-- transient markering, fokus, panelstate og preview holdes utenfor
+- avsluttet tekstøkt som én historikkpost
+- transient markering, draft, panelstate og preview holdes utenfor
 
-### Fase 14 – Lokal automatisk lagring
+### Fase 16 – Lokal automatisk lagring
 
 Branch: `feature/local-project-autosave`
 
@@ -299,16 +286,16 @@ Branch: `feature/local-project-autosave`
 - `Lagrer`, `Lagret` og `Lagringsfeil`
 - gjenoppretting
 
-### Fase 15 – Åpne og importere prosjekt
+### Fase 17 – Åpne og importere prosjekt
 
 Branch: `feature/project-open-import`
 
-- åpne prosjektmappe
 - validere prosjektfil
+- migrere eldre skjemaversjoner
 - laste prosjektdata og bilder
 - håndtere feil
 
-### Fase 16 – Forhåndsvisning og publisering
+### Fase 18 – Forhåndsvisning og publisering
 
 Branches:
 
@@ -325,27 +312,24 @@ Bygges først etter at editor, responsiv modell og lagring er stabile.
 - uttrekking starter før 250 linjer
 - state-avhengige mutasjoner bruker nyeste reducer-state
 - transient og varig state er tydelig separert
-- ugyldige state-overganger avvises kontrollert
-- tastaturbruk er kontrollert
-- planlagte senere faser er dokumentert uten skjult implementering
+- ugyldige og uendrede state-overganger avvises
+- tastaturbruk og fokus er kontrollert
+- senere faser er dokumentert uten skjult implementering
 - `npm run check` er bestått etter siste kodeendring
-- arkitekturrapporter er regenerert etter strukturendringer
+- arkitekturrapporter er regenerert
 - PC og Telefon er testet
 - peker og tastatur er testet
 - dokumentasjonen er oppdatert
-- arbeidsområdet er rent
-- lokal branch er synkronisert med GitHub
+- arbeidsområdet er rent og synkronisert
 
 ## 7. Neste kontrollsteg
 
-På `feature/object-locking`:
+På `feature/text-box-editing`:
 
 ```powershell
-npm run check
 npm run architecture:json
 npm run architecture:diagram
-npm run dev
 git status
 ```
 
-Etter bestått kontroll, oppdaterte rapporter, godkjent regresjon og rent arbeidsområde kan det opprettes en kontrollert PR mot `main`.
+Rapportene committes og pushes før PR. Produksjonskoden er allerede kontrollert etter siste kodeendring; dokumentoppdateringene krever ikke ny visuell regresjonstest.
