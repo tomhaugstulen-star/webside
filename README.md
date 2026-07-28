@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert redigering av ren flerlinjet tekst.
+Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse og låse grunnleggende elementer. Tekstbokser støtter kontrollert redigering av ren flerlinjet tekst. Den gjeldende branchen legger til en kontrollert høyremeny for inspeksjon av valgt element.
 
 ## Repo og lokal mappe
 
@@ -44,13 +44,13 @@ Det utvikles aldri direkte på `main`.
 
 ```text
 main
-  -> egen avgrenset branch
+  -> avgrenset feature-branch
   -> godkjent omfang og design
   -> implementering
-  -> kodeaudit
+  -> framtidsrettet kodeaudit
   -> npm run check
   -> arkitekturrapporter
-  -> PC-, Telefon-, peker- og tastaturtest
+  -> PC-, Telefon-, peker- og tastaturkontroll
   -> dokumentasjon
   -> kontrollert PR
   -> eksplisitt mergegodkjenning
@@ -66,8 +66,6 @@ a35f59d
 
 Denne kom fra PR #8 og låste navn og rekkefølge i venstremenyen.
 
-Endelig venstremeny:
-
 ```text
 Prosjekt
 Farger
@@ -75,8 +73,6 @@ Logo og header
 Elementer
 Innstillinger
 ```
-
-`Prosjekt` står øverst. `Innstillinger` står nederst.
 
 ## Ferdig og merget til `main`
 
@@ -104,17 +100,22 @@ PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
 ```
 
-## Gjeldende branch og fase
+## Gjeldende branch
 
 ```text
 feature/right-properties-panel
 ```
 
-Branchen er fast-forwardet fra oppdatert `main` etter PR #8. Dokumentasjonen er oppdatert før implementering. Det er foreløpig ikke lagt inn produksjonskode for høyremenyen.
+Utgangspunkt og siste kontrollerte kode-/rapportcommit:
 
-Fasen bygger bare høyremenyens grunnstruktur.
+```text
+base main: a35f59d
+kode og arkitekturrapporter: 2d25a542
+```
 
-Låst oppførsel:
+Branchen er implementert, auditert og visuelt godkjent. Dokumentasjonen ferdigstilles før PR.
+
+### Implementert høyremeny
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -122,53 +123,41 @@ Element valgt   -> høyremeny åpnes
 Tomt lerret     -> høyremeny lukkes
 ```
 
-I tillegg:
+Beslutninger:
 
-- skjult panel reserverer ikke en tom høyrekolonne
-- låst element kan fortsatt inspiseres
-- panelet kan være åpent mens en tekstboks redigeres
-- klikk i panelet bruker eksisterende blur/commit
-- markeringen beholdes etter normal tekstcommit
-- panelet oppretter ikke separat tekstdraft
+- bredde 320 px
+- dokket på høyre side fra 1680 px
+- overlay under 1680 px uten å redusere lerretet
+- ingen reservert plass når panelet er skjult
+- egen vertikal scrolling
+- 180 ms transform-animasjon
+- ingen animasjon ved `prefers-reduced-motion`
 
-En permanent synlig tom høyremeny er avvist.
-
-Før kode må følgende fortsatt godkjennes:
-
-- panelbredde
-- oppførsel i smale nettleservinduer
-- egen scrolling
-- visuell overskrift og seksjonsstruktur
-- minimum av faktisk inspeksjonsinformasjon
-- eventuell åpne-/lukkeanimasjon
-
-Se `docs/RIGHT_PROPERTIES_PANEL.md` og GitHub-sak #6.
-
-Denne branchen skal ikke bygge:
-
-- font-, tekststørrelse- eller riktekstkontroller
-- fargevelgere eller prosjektfargeregister
-- bildeinnstillinger
-- knapphandlinger
-- logo- eller headerbygger
-- sletting eller duplisering
-- historikk eller lagring
-- prosjektimport
-- mobiloverstyringer
-
-## Responsiv redigering
-
-PC og Telefon deler foreløpig desktopgeometrien. Dette er en kontrollert midlertidig regel.
-
-Egne mobiloverstyringer spores i:
+Visningen er:
 
 ```text
-docs/MOBILE_DESIGN_CONTROLS.md
-GitHub-sak #3
-feature/mobile-design-controls
+Egenskaper
+Tekst
+
+Element
+Status: Ulåst
 ```
 
-Tekstinnhold og låsestatus er felles elementdata og er ikke responsive verdier.
+Elementtype og låsestatus leses fra sentral editor-state. Panelet bruker eksisterende `useElementSelection`, oppretter ingen parallell state og muterer ingen prosjektdata.
+
+Panelinnholdet rendres bare når et gyldig element er valgt. En sentral layoutvariabel formidler reservert bredde til lerretet slik at panel-CSS ikke styrer canvas-klasser direkte.
+
+Bekreftet etter siste produksjonskodeendring:
+
+```text
+npm run check: bestått
+Dependency Cruiser: 38 moduler, 80 avhengigheter, 0 brudd
+arkitekturrapporter: oppdatert
+visuell PC-kontroll: godkjent
+working tree: clean
+```
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
 ## State-grenser
 
@@ -190,6 +179,12 @@ Transient editor-state:
 
 Transient state skal ikke serialiseres, eksporteres, publiseres eller inngå direkte i historikk eller autolagring.
 
+## Responsiv redigering
+
+PC og Telefon deler foreløpig desktopgeometrien. Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls`.
+
+Tekstinnhold og låsestatus er felles elementdata og er ikke responsive verdier.
+
 ## Filstørrelse og ansvar
 
 - 250 linjer er aktiv terskel for ansvarstrekk.
@@ -199,7 +194,7 @@ Transient state skal ikke serialiseres, eksporteres, publiseres eller inngå dir
 
 ## Dokumentasjon
 
-Les i denne rekkefølgen ved ny chat eller overlevering:
+Les i denne rekkefølgen:
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
@@ -218,9 +213,9 @@ Les i denne rekkefølgen ved ny chat eller overlevering:
 
 ## Ikke implementert ennå
 
-- høyremeny/egenskapspanel
+- faktiske egenskapskontroller i høyremenyen
 - font- og riktekstkontroller
-- sletting
+- sletting og duplisering
 - ekte bildeimport
 - knapphandling og lenker
 - prosjektfargesystem
