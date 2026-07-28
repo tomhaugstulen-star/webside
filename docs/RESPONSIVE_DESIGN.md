@@ -12,10 +12,6 @@ Dette dokumentet beskriver teknisk retning for forskjeller mellom desktop- og mo
 
 ## 2. Prosjektdata er hovedkilden
 
-Editoren skal ikke bruke DOM-strukturen som permanent prosjektlagring.
-
-Prosjektmodellen inneholder:
-
 ```ts
 type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -23,113 +19,110 @@ type ResponsiveValue<T> = {
   desktop: T
   mobile?: T
 }
-
-type EditorElement = {
-  id: string
-  kind: 'section' | 'image' | 'text' | 'button'
-  visibility: ResponsiveValue<boolean>
-  position: ResponsiveValue<{ x: number; y: number }>
-  size: ResponsiveValue<{ width: number; height: number }>
-  locked: boolean
-}
 ```
 
-`EditorProject` er autoritativ kilde. DOM-en er bare en rendering av prosjektdataene.
+`EditorProject` er autoritativ kilde. DOM-en er bare rendering av prosjektdataene.
 
-`ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen. UI-typen `ViewportMode` er et alias til denne typen, slik at modell og grensesnitt ikke kan få ulike viewport-unioner.
+`ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen. `ViewportMode` er et UI-alias til samme type.
 
-## 3. Implementert nå
+## 3. Implementert grunnlag
 
 Merget til `main`:
 
-- stabile prosjekt-, side- og element-ID-er
 - responsive modellfelter for posisjon, størrelse og synlighet
 - desktopverdi med valgfri mobilverdi
-- sentral prosjekt-state
-- prosjektmodellen som autoritativ datakilde
-- eksisterende elementer renderer fra prosjektmodellen
-- desktopvisning bruker desktopverdien
-- mobilvisning bruker mobilverdien når den finnes
-- mobilvisning faller tilbake til desktopverdien når mobilverdien mangler
-- elementer med `visibility: false` for aktiv visning renderer ikke
-- markering og fokus følger den renderte elementgrensen
+- mobil fallback til desktop
+- skjulte elementer renderer ikke i aktiv viewport
+- delt `resolveResponsiveValue`
+- avledet lerretshøyde basert på synlige elementer
+- nye elementer opprettes med desktopverdier
+- mobil arver nye elementers desktopgeometri
 
-Implementert i `feature/element-creation`:
+Implementert i `feature/drag-resize`:
 
-- nye elementer får desktopverdi for posisjon, størrelse og synlighet
-- mobil arver desktopverdien fordi mobiloverstyring ikke opprettes ennå
-- standardstørrelsene passer innenfor 390 px mobilvisning ved startpunkt x 24 px
-- lerretshøyden beregnes fra nederste synlige element i aktiv viewport
-- høydeberegningen bruker mobilverdi når den finnes og ellers desktopverdien
-- skjulte elementer påvirker ikke avledet lerretshøyde i aktiv viewport
-- responsiv verdioppløsning ligger i én delt modellhjelper
+- PC- og Telefon-visningen kan brukes til å flytte og resize dagens elementer
+- clamping bruker den synlige lerretsbredden
+- transient preview påvirker avledet lerretshøyde under transform
+- varig layout-commit går foreløpig til desktopgeometrien
+- ingen mobiloverstyring opprettes skjult
 
-Dette er fortsatt bare renderings- og arvegrunnlaget. Brukergrensesnitt for å opprette mobile overstyringer er ikke implementert.
+## 4. Midlertidig regel før mobilkontroller
 
-## 4. Oppretting før full responsiv redigering
+Dagens UI kan ikke opprette mobiloverstyringer. Derfor gjelder:
+
+- nye elementer har bare desktopposisjon og desktopstørrelse
+- mobilvisningen arver samme geometri
+- transform i PC- og Telefon-visning endrer den delte desktopgeometrien
+- låsestatus er felles, ikke viewport-spesifikk
+
+Dette er en kontrollert midlertidig regel, ikke endelig responsiv redigering.
+
+Når mobiloverstyringer bygges, må transform-API og reducer-actions bli viewport-bevisste. En mobiltransform skal da ikke utilsiktet overskrive desktopgeometrien.
+
+## 5. Krav til `feature/mobile-design-controls`
+
+Fasen må avklare og bygge:
+
+- hvilke egenskaper som kan overstyres på mobil
+- tydelig visning av arv kontra overstyring
+- opprette eller fjerne mobiloverstyring
+- reset til desktopverdi
+- skjul på mobil
+- viewport-bevisst flytting og resizing
+- viewport-bevisst elementoppretting
+- markering av element som er skjult i aktiv visning
+- hvordan historikk og lagring representerer en mobilendring
+
+Layout-actionen kan ikke fortsette å hete eller oppføre seg som en ren desktop-action når mobilverdier blir redigerbare.
+
+## 6. Lerretshøyde
+
+Lerretshøyden er avledet visning og skal ikke lagres i prosjektfilen.
+
+Den beregnes fra:
+
+- elementer som er synlige i aktiv viewport
+- mobilverdi når den finnes
+- ellers desktopverdi
+- transient preview for elementet som akkurat flyttes eller resizes
+- fast luft under nederste element
+
+Ved avbrutt interaksjon fjernes preview uten prosjektmutasjon.
+
+## 7. Oppretting
 
 Elementoppretting er foreløpig desktop-autoritativ:
 
 - plassering beregnes fra eksisterende desktopverdier
 - størrelse lagres som desktopverdi
 - synlighet lagres som `desktop: true`
-- mobil arver disse verdiene
+- mobil arver verdiene
 
-Denne regelen er kontrollert for dagens fase, men må vurderes på nytt når mobiloverstyringer bygges.
+Når responsiv redigering bygges, må dette avklares på nytt:
 
-Da må dette avklares:
+- oppretting i aktiv viewport
+- bare-mobil-elementer
+- skjulte elementers påvirkning på første ledige plass
+- eksplisitt mobiloverstyring kontra fortsatt arv
 
-- om oppretting skal skje i aktiv viewport
-- hvordan mobile posisjoner påvirker første ledige plass
-- hvordan elementer som er skjult i aktiv visning behandles
-- hvordan bare-mobil-elementer behandles
-- om nytt element skal få en eksplisitt mobiloverstyring eller fortsatt arve desktop
+Startplassering skal aldri utvikles til generell kollisjonskontroll. Fri overlapping skal fortsatt være mulig.
 
-Startplasseringen skal ikke utvikles til generell kollisjonskontroll. Fri overlapping skal fortsatt være mulig etter at draing er implementert.
+## 8. Skjule på mobil
 
-## 5. Ikke implementert ennå
-
-- kontroller for arv og overstyring
-- synlig indikasjon på arvet verdi
-- skjul på mobil i brukergrensesnittet
-- egen mobilposisjonering fra UI
-- viewport-bevisst elementoppretting
-- valg av hvilke egenskaper som kan overstyres i første versjon
-- CSS-generator
-- eksporterte media queries
-
-Desktop- og mobilknappen endrer lerretsbredden. Elementrendererens verdier og avledede lerretshøyde følger valgt visning.
-
-## 6. Skjule på mobil
-
-Brukeren skal senere kunne velge at et objekt:
+Senere skal brukeren kunne velge at et objekt:
 
 - vises på desktop og mobil
 - bare vises på desktop
-- bare vises på mobil dersom dette godkjennes
+- eventuelt bare vises på mobil dersom dette godkjennes
 
-Prosjektdataene skal være autoritativ kilde. Preview og eksport genererer media query fra modellen.
+Før funksjonen bygges må det avklares:
 
-Før funksjonen bygges må dette avklares:
+- om skjuling fjerner markering i aktiv viewport
+- hvordan objektverktøy fungerer når valgt element ikke renderer
+- om bare-mobil-visning støttes i første versjon
+- hvordan skjulte elementer påvirker opprettingsplassering
 
-- om et element som blir skjult i aktiv visning automatisk skal miste markeringen
-- hvordan objektverktøy oppfører seg dersom valgt element ikke renderer
-- om bare-mobil-visning skal støttes i første versjon
-- om skjulte elementer skal reservere opprettingsplass i en annen viewport
-
-## 7. Forskjellige verdier
-
-Det er teknisk mulig å bruke ulike:
-
-- skrifttyper
-- fontstørrelser
-- synlighetsvalg
-- posisjoner
-- bredder og høyder
-
-Før mobilkontrollene bygges må det fastsettes hvilke egenskaper som kan overstyres i første versjon.
-
-## 8. CSS-generering
+## 9. CSS-generering
 
 Editoren skal generere ett kontrollert prosjektstilark fremfor mange tilfeldige `<style>`-elementer.
 
@@ -138,12 +131,12 @@ Stilgeneratoren skal:
 1. lese prosjektmodellen
 2. generere desktopregler
 3. generere mobilregler i én samlet media query
-4. bruke stabile objekt-ID-er eller genererte klassenavn
-5. produsere samme resultat for editor, forhåndsvisning og eksport
+4. bruke stabile element-ID-er eller genererte klassenavn
+5. gi samme resultat i editor, forhåndsvisning og eksport
 
 `!important` skal ikke brukes som standard.
 
-## 9. Stabile ID-er
+## 10. Stabile ID-er
 
 ID-er skal beholdes ved:
 
@@ -154,28 +147,15 @@ ID-er skal beholdes ved:
 - eksport
 - publisering
 
-`Math.random()` skal ikke brukes som prosjektidentitet. Elementmodellen bruker kryptografiske UUID-er.
-
-## 10. Editoropplevelse
-
-Når mobilmodus senere er aktiv, skal editoren tydelig vise:
-
-- om en verdi er arvet fra desktop
-- om verdien er overstyrt for mobil
-- om objektet er skjult i aktuell visning
-
-En mobilendring skal ikke utilsiktet endre desktopverdien.
-
-Markeringsstate er transient og skal ikke lagres som en responsiv prosjektverdi.
-
-Lerretshøyden er avledet visning. Den beregnes fra responsive elementverdier og skal ikke lagres som prosjektdata.
+`Math.random()` skal ikke brukes som prosjektidentitet.
 
 ## 11. Arkitektur
 
-Responsiv funksjonalitet deles i egne ansvarsområder:
+Responsiv funksjonalitet deles i egne ansvar:
 
 - responsive typer og datamodell
 - verdioppløsning og arv
+- viewport-bevisste layout-actions
 - mobilkontroller
 - viewport-bevisst oppretting
 - CSS-generator
@@ -184,25 +164,21 @@ Responsiv funksjonalitet deles i egne ansvarsområder:
 
 Dette skal ikke samles i én stor komponent.
 
-Dagens verdioppløsning ligger i `src/model/resolveResponsiveValue.ts` og brukes av både elementrendering og lerretshøyde. Nye områder skal gjenbruke denne funksjonen fremfor å kopiere fallback-logikken.
-
 ## 12. Planlagt branch
 
 ```text
 feature/mobile-design-controls
 ```
 
-Den bygges først etter elementmodell, markering, oppretting og grunnleggende objektredigering.
-
-CSS-generatoren kan få en egen branch dersom ansvaret blir stort nok.
+Den bygges etter grunnleggende objektredigering og låsing.
 
 ## 13. Åpne beslutninger
 
 - endelig mobilbrytepunkt
-- egenskaper som kan overstyres i første versjon
+- egenskaper som kan overstyres
 - støtte for bare-mobil-visning
 - visuell markering av arv og overstyring
 - fri eller delvis arvet mobilplassering
-- markering av element som er skjult i aktiv visning
+- markering av skjult element
 - viewport-bevisst opprettingsregel
 - organisering av eksportert HTML og CSS
