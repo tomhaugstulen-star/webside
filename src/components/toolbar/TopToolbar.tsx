@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ViewportMode } from '../../types/editor'
 
 type TopToolbarProps = {
@@ -62,6 +62,33 @@ function Icon({ name }: { name: IconName }) {
 
 export function TopToolbar({ viewport, onViewportChange }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return
+    }
+
+    const closeOnPointerDown = (event: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', closeOnPointerDown)
+    window.addEventListener('keydown', closeOnEscape)
+
+    return () => {
+      document.removeEventListener('pointerdown', closeOnPointerDown)
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [menuOpen])
 
   return (
     <header className="top-toolbar">
@@ -105,7 +132,7 @@ export function TopToolbar({ viewport, onViewportChange }: TopToolbarProps) {
         <button className="toolbar-action" type="button"><Icon name="eye" /><span>Forhåndsvisning</span></button>
         <button className="toolbar-action" type="button"><Icon name="save" /><span>Lagre</span></button>
         <button className="publish-button" type="button"><Icon name="publish" /><span>Publiser</span></button>
-        <div className="main-menu-wrap">
+        <div className="main-menu-wrap" ref={menuRef}>
           <button
             className="main-menu-button"
             type="button"
