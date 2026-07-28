@@ -1,5 +1,7 @@
 export const EDITOR_PROJECT_SCHEMA_VERSION = 1 as const
 
+export type ResponsiveViewport = 'desktop' | 'mobile'
+
 export type ResponsiveValue<T> = {
   desktop: T
   mobile?: T
