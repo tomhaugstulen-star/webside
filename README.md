@@ -20,6 +20,8 @@ npm install
 npm run dev
 ```
 
+`npm run dev` starter Vite og åpner editoren automatisk i standardnettleseren.
+
 ## Kvalitetskontroll
 
 Kjør hele kontrollrekken:
