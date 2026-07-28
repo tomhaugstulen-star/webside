@@ -20,6 +20,7 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 - minimumsmål, clamping, edge-scroll og transient preview
 - objektlåsing og opplåsing
 - kontrollert flerlinjet tekstredigering
+- høyremenyens stabile grunnstruktur
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -29,6 +30,7 @@ PR #4  drag og resize
 PR #5  objektlåsing                 a3eed45
 PR #7  ren tekstredigering          c729d33
 PR #8  navn og rekkefølge i meny    a35f59d
+PR #9  høyremenyens grunnstruktur    8de5f2e
 ```
 
 Endelig venstremeny:
@@ -44,15 +46,15 @@ Innstillinger
 ### Gjeldende branch
 
 ```text
-feature/right-properties-panel
+feature/text-properties
 ```
 
 ```text
-base main: a35f59d
-kode og arkitekturrapporter: 2d25a542
+base main: 8de5f2e
+sporing: docs/TEXT_PROPERTIES.md og GitHub-sak #10
 ```
 
-Høyremenyens grunnstruktur er implementert, auditert, kontrollert og godkjent. Dokumentasjonen ferdigstilles før PR.
+Fasen bygger tekstutseende for markerte vanlige tekstbokser. Ingen produksjonskode er lagt inn ennå.
 
 ## 2. Bekreftede hovedkrav
 
@@ -67,7 +69,7 @@ Høyremenyens grunnstruktur er implementert, auditert, kontrollert og godkjent. 
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - DOM-en er rendering, ikke permanent lagring.
-- Geometri, låsestatus og tekstinnhold endres gjennom reduceren.
+- Geometri, låsestatus, tekstinnhold og senere tekststil endres gjennom reduceren.
 - State-avhengige beregninger bruker reducerens nyeste state.
 - `updatedAt` endres bare ved gyldig prosjektmutasjon.
 
@@ -90,7 +92,7 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - Mobil arver desktopgeometri når mobiloverstyring mangler.
 - Dagens UI redigerer den delte desktopgeometrien.
 - Egne mobiloverstyringer bygges i `feature/mobile-design-controls`.
-- Tekstinnhold og låsestatus er felles elementdata.
+- Tekstinnhold, låsestatus og tekststil er foreløpig felles elementdata.
 
 ## 3. Elementer
 
@@ -114,7 +116,7 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - første ledige vertikale gap
 - minst 16 px avstand ved oppretting
 - eksisterende elementer flyttes aldri automatisk
-- regelen gjelder bare elementets fødested
+- opprettet element markeres automatisk
 
 ### Flytting og resizing
 
@@ -134,7 +136,7 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 
 - valgt element får separat objektverktøylinje
 - låst element kan markeres og fokuseres
-- låst element kan ikke transformeres
+- låst element kan ikke transformeres eller redigeres
 - resize-håndtaket skjules
 - reduceren håndhever låsen
 - låsestatus er felles for PC og Telefon
@@ -160,9 +162,23 @@ Når historikk og autolagring bygges, skal en avsluttet brukerhandling være én
 - Knapp er foreløpig uten handling.
 - Faktiske handlinger aktiveres ikke i vanlig editormodus.
 
-## 4. Høyremeny
+## 4. Ansvarsdeling i editoren
 
-### Implementert produktoppførsel
+Fast regel:
+
+```text
+Venstremeny = opprette og velge struktur
+Høyremeny  = egenskaper for markert element
+Lerretet   = redigere selve teksten
+```
+
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Font, størrelse og andre egenskaper skal ikke flyttes til venstremenyen.
+
+`Logo og header` skal senere eie strukturelle headerdeler som logo, hovedtekst, undertittel og header-oppsett. Disse er ikke vanlige frie tekstbokser.
+
+## 5. Høyremeny
+
+### Implementert grunnstruktur
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -177,45 +193,75 @@ Tomt lerret     -> høyremeny lukkes
 - skjult panel reserverer ingen plass
 - ny markering oppdaterer panelet umiddelbart
 - låst element kan inspiseres
-- panelet kan være åpent under tekstredigering
 - panelklikk bruker eksisterende blur/commit
-- markeringen beholdes etter commit
 - egen vertikal scrolling
 - 180 ms transform-animasjon
 - ingen animasjon ved `prefers-reduced-motion`
 
-Visuell struktur:
+Arkitektur:
+
+- `RightPropertiesPanel.tsx` presenterer valgt element
+- eksisterende `useElementSelection` er autoritativ avledning
+- `EditorShell` komponerer panelområdet uten egenskapslogikk
+- ingen DOM-søk eller separat elementkopi
+- innhold rendres bare når et element finnes
+- panel-CSS styrer ikke canvas-klasser direkte
+
+Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+
+### Gjeldende tekstegenskapsfase
+
+For en markert vanlig tekstboks:
 
 ```text
 Egenskaper
 Tekst
 
+Tekstutseende
+Font
+Størrelse
+Fet
+Kursiv
+Justering
+Linjehøyde
+
 Element
 Status: Ulåst
 ```
 
-### Implementert arkitektur
+Låste valg:
 
-- `RightPropertiesPanel.tsx` presenterer valgt elementtype og status
-- eksisterende `useElementSelection` er autoritativ avledning
-- `EditorShell` komponerer panelområdet uten å eie egenskapslogikk
-- ingen DOM-søk, separat elementkopi eller ny reducer-action
-- innhold rendres bare når et element finnes
-- `--properties-panel-width` er 320 px
-- `--properties-panel-reserved-width` er den eneste koblingen til lerretsbredden
-- panel-CSS styrer ikke canvas-klasser direkte
-- ingen falske egenskapskontroller
+- formateringen gjelder hele tekstboksen
+- åtte nettsikre fontvalg
+- kontrollert størrelse fra 12 til 96 px
+- fet og kursiv som uavhengige toggles
+- venstre, midtstilt og høyre justering
+- kontrollerte linjehøyder fra 1.0 til 2.0
+- standard: System, 16 px, normal, venstre, 1.45
+- låste tekstelementer viser verdiene, men kontrollene er deaktivert
+- tekstinnhold redigeres fortsatt bare på lerretet
+- tekstfarge bygges senere sammen med prosjektfargene
 
-Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+Modell:
 
-## 5. Farger, logo/header og fonter
+- prosjektskjema versjon 3
+- obligatorisk `textStyle` bare for tekstelementer
+- stabile fonttokens i prosjektdata
+- rå CSS-fontstacker avledes i visningslaget
+- stilpatcher slås sammen i reducerens nyeste state
+- ugyldige, låste og uendrede overganger avvises
+
+Se `docs/TEXT_PROPERTIES.md`.
+
+## 6. Farger og logo/header
 
 ### Farger
 
 - venstremenyens navn er `Farger`
 - området skal senere vise faktiske prosjektfarger
 - ingen ferdig fargepalett
-- global endring skal oppdatere alle brukere av fargen
+- global endring skal oppdatere alle brukere av en farge
+- tekstfarge kobles til denne modellen, ikke til tekstegenskapsbranchen
 
 ### Logo og header
 
@@ -224,27 +270,7 @@ Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 - opprette header
 - hovedtekst og undertittel
 - redigerbar struktur
-
-### Fonter
-
-- omtrent 7–8 nettsikre fonter
-- fontstørrelse fra kontrollert liste
-- tekstfarge kobles til fargesystemet
-- fet og kursiv
-- hele boksen kontra markert tekst må avklares før kode
-
-## 6. Prosjektområdet
-
-Venstremenyens første valg heter `Prosjekt`.
-
-Det skal senere eie:
-
-- nytt prosjekt
-- åpne prosjekt
-- importere prosjekt
-- eventuell eksport og duplisering etter egen beslutning
-
-Disse funksjonene er ikke implementert.
+- headertekst får senere egenskaper i høyremenyen, men er ikke et fritt tekstelement
 
 ## 7. Arkitektur og arbeidsmåte
 
@@ -262,7 +288,7 @@ Disse funksjonene er ikke implementert.
 
 ## 8. Planlagte branches
 
-- `feature/text-properties`
+- `feature/text-properties` — gjeldende fase
 - `feature/button-element`
 - `feature/image-import-and-placement`
 - `feature/project-colors`
@@ -275,15 +301,11 @@ Disse funksjonene er ikke implementert.
 - `feature/preview-mode`
 - `feature/publishing`
 
-## 9. Åpne beslutninger
+## 9. Senere åpne beslutninger
 
-Høyremenyens grunnstruktur er låst. Senere åpne beslutninger er:
-
-- om tekstformatering gjelder hele boksen eller markert tekst
-- endelig fontliste og fontstørrelser
-- tekstjustering og linjehøyde
 - sletting og bekreftelsesregel
 - endelig mobilbrytepunkt
+- mobile tekststiloverstyringer
 - knappens handlinger og lenketyper
 - prosjektfilformat, migrering og lagringsintervall
 - publiseringsarkitektur
