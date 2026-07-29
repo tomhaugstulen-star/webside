@@ -130,7 +130,6 @@ Status: merget som PR #14 med mergecommit `f71b354`.
 - `openInNewTab` lagres eksplisitt
 - ugyldig URL muterer ikke prosjektet
 - låste tekstbokser kan inspiseres, men ikke endres
-- lagring gir grønn og tekstlig bekreftelse
 - lenken aktiveres aldri i editormodus
 - markerte enkeltord får ikke egne lenker
 - gjenbrukbar lenkemodell for senere grafiske knapper
@@ -153,20 +152,23 @@ Se `docs/ELEMENT_LINKS.md`.
 branch: feature/element-deletion
 base main: f71b354
 GitHub-sak: #15
+produksjonscommit: 4f59b3e
+PR: ikke opprettet
 sporing: docs/ELEMENT_DELETION.md
 ```
 
-Plancommit:
+Status:
 
-```text
-7269cb1 docs: define safe element deletion
-```
+- produksjonskode implementert
+- statisk audit gjennomført
+- `npm run check` bestått
+- alle manuelle akseptansetester godkjent
+- dokumentasjon oppdatert
+- arkitekturrapporter ikke regenerert ennå
 
-Produksjonskode er ikke implementert ennå. PR er ikke opprettet.
+### Omfang
 
-### Mål
-
-Gjør det mulig å slette ett markert element på en sikker måte:
+Sletting av ett markert element:
 
 - Seksjon
 - Bilde
@@ -179,9 +181,7 @@ Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
 
 ```text
 Element
-
 Status: Ulåst
-
 Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
 ```
 
@@ -193,39 +193,18 @@ Regler:
 - deaktivert når elementet er låst
 - krever ingen scrolling i dagens panel
 
-### Bekreftelse
+### Bekreftelse og tastatur
 
-Sletting krever alltid dialog fordi angre/gjør om ikke finnes ennå.
-
-```text
-Slett tekstboksen?
-
-Dette kan ikke angres.
-
-Avbryt    Slett
-```
-
-Dialogen skal støtte tastatur, `Escape`, kontrollert fokus og ny validering mot siste state ved bekreftelse.
-
-### Tastatur
-
-`Delete` åpner samme dialog for markert element.
-
-Global sletting skal ikke utløses under:
-
-- tekstredigering
-- input, textarea eller select
-- button eller dialogkontroller
-- contenteditable
-- andre interaktive skjemaelementer
-
-`Backspace` brukes ikke globalt i første leveranse.
+- sletting krever alltid dialog
+- `Avbryt`, bakgrunnsklikk og `Escape` muterer ikke prosjektet
+- `Delete` åpner samme dialog
+- Delete blokkeres i tekst- og skjemaredigering
+- `Backspace` brukes ikke globalt
+- dialogen kontrollerer nyeste state før bekreftelse
 
 ### Modell og state
 
 Prosjektskjemaet forblir versjon 4.
-
-Forventet handling:
 
 ```text
 delete-element-from-active-page { elementId, updatedAt }
@@ -235,9 +214,10 @@ Reducergrensen avviser:
 
 - manglende aktiv side
 - manglende element
-- element på feil side
+- feil side
 - låst element
-- utdatert eller no-op handling
+- utdatert mål
+- no-op
 
 Ved gyldig sletting:
 
@@ -246,23 +226,51 @@ Ved gyldig sletting:
 - `selectedElementId` settes til `null`
 - høyremenyen lukkes gjennom eksisterende selection-avledning
 
-Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; andre elementer blir stående.
+Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen.
 
-### Arkitektur
-
-Forventet ansvarsdeling:
+### Implementert arkitektur
 
 ```text
-state       -> egen reducerhjelper
-state       -> egen dispatch-hook
-properties  -> liten sletteseksjon
- dialog      -> avgrenset bekreftelsesdialog
-keyboard    -> global Delete-grense
+state       -> deleteElementFromActivePage.ts, useElementDeletion.ts
+properties  -> DeleteElementSection.tsx
+dialog      -> ConfirmElementDeletionDialog.tsx
+keyboard    -> isElementDeletionShortcutTarget.ts, useElementDeletionShortcut.ts
+composition -> EditorShell.tsx, RightPropertiesPanel.tsx
+canvas      -> EditorCanvasElement.tsx urørt
 ```
 
-`EditorCanvasElement.tsx` skal ikke få sletteansvaret.
+Alle nye kildefiler er under 250 linjer.
 
-Alle nye kildefiler skal være under 250 linjer.
+### Verifisert kontroll
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 64 moduler transformert
+```
+
+Manuelt godkjent:
+
+- alle fire etiketter
+- plassering og disabled-tilstand
+- avbrytelse og Escape
+- sletting via knapp og Delete
+- låste elementer kan ikke slettes
+- Delete under tekstredigering sletter bare tekst
+- Seksjonssletting lar andre elementer bli stående
+
+### Gjenstår før PR
+
+1. Regenerer `architecture.json`.
+2. Regenerer `docs/dependency-graph.mmd`.
+3. Kontroller at bare forventede rapportfiler endres.
+4. Oppdater branch med rapportene gjennom kontrollert repoarbeid.
+5. Kontroller endelig diff og filstørrelser.
+6. Bekreft clean tree.
+7. Opprett og gjennomgå PR.
+8. Merge bare etter eksplisitt godkjenning.
 
 ### Ikke del av fasen
 
@@ -279,24 +287,6 @@ Alle nye kildefiler skal være under 250 linjer.
 - knappbibliotek
 - farger
 - forhåndsvisning eller publisering
-
-### Kontroll før PR
-
-- alle fire elementtyper viser riktig knapp
-- låst element kan ikke slettes
-- klikk og `Delete` åpner samme dialog
-- tekst- og skjemaredigering forstyrres ikke
-- avbrytelse muterer ikke prosjektet
-- bekreftet sletting fjerner bare målelementet
-- markering nullstilles og høyremenyen lukkes
-- ugyldige handlinger avvises i reduceren
-- `updatedAt` endres bare ved faktisk sletting
-- eksisterende funksjoner fungerer som før
-- `npm run check` består
-- arkitekturrapportene regenereres
-- PC, Telefon, peker og tastatur kontrolleres
-- all relevant dokumentasjon oppdateres
-- working tree er clean
 
 ## 4. Senere faser
 
