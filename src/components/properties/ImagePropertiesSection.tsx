@@ -1,10 +1,13 @@
 import { useId, useState, type FormEvent } from 'react'
 import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ImageEditorElement } from '../../model/editorProject'
+import { normalizeImageAltText } from '../../model/imageAsset'
 import {
-  normalizeImageAltText,
-  type ImageFit,
-} from '../../model/imageAsset'
+  DEFAULT_IMAGE_TRANSFORM,
+  MAX_IMAGE_ZOOM,
+  MIN_IMAGE_ZOOM,
+  type ImageMode,
+} from '../../model/imagePresentation'
 import { useImageProperties } from '../../state/useImageProperties'
 
 type ImagePropertiesSectionProps = {
@@ -21,7 +24,11 @@ function formatFileSize(byteSize: number) {
 export function ImagePropertiesSection({
   element,
 }: ImagePropertiesSectionProps) {
-  const { updateImageAltText, updateImageFit } = useImageProperties()
+  const {
+    updateImageAltText,
+    updateImageMode,
+    updateImageTransform,
+  } = useImageProperties()
   const { getImageAsset } = useImageAssetStore()
   const [altTextDraft, setAltTextDraft] = useState(element.altText)
   const [savedMessage, setSavedMessage] = useState<string | null>(null)
@@ -29,9 +36,10 @@ export function ImagePropertiesSection({
   const idPrefix = useId()
   const titleId = `${idPrefix}-title`
   const altTextId = `${idPrefix}-alt-text`
-  const fitId = `${idPrefix}-fit`
   const helpId = `${idPrefix}-alt-help`
+  const cropHelpId = `${idPrefix}-crop-help`
   const disabled = element.locked
+  const zoomPercent = Math.round(element.transform.zoom * 100)
 
   const handleAltTextSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -45,6 +53,10 @@ export function ImagePropertiesSection({
 
     updateImageAltText(element.id, normalizedAltText)
     setSavedMessage('Alternativ tekst er lagret.')
+  }
+
+  const selectMode = (mode: ImageMode) => {
+    updateImageMode(element.id, mode)
   }
 
   return (
@@ -83,20 +95,67 @@ export function ImagePropertiesSection({
         )}
       </form>
 
-      <label className="image-properties__field" htmlFor={fitId}>
-        <span>Tilpasning</span>
-        <select
-          id={fitId}
-          value={element.fit}
-          disabled={disabled}
-          onChange={(event) => {
-            updateImageFit(element.id, event.target.value as ImageFit)
-          }}
-        >
-          <option value="contain">Vis hele bildet</option>
-          <option value="cover">Fyll rammen</option>
-        </select>
-      </label>
+      <fieldset className="image-properties__mode" disabled={disabled}>
+        <legend>Visning</legend>
+        <label>
+          <input
+            type="radio"
+            name={`${idPrefix}-mode`}
+            value="contain"
+            checked={element.mode === 'contain'}
+            onChange={() => selectMode('contain')}
+          />
+          <span>Hele bildet</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name={`${idPrefix}-mode`}
+            value="crop"
+            checked={element.mode === 'crop'}
+            onChange={() => selectMode('crop')}
+          />
+          <span>Juster utsnitt</span>
+        </label>
+      </fieldset>
+
+      {element.mode === 'crop' && (
+        <div className="image-properties__crop-controls">
+          <label className="image-properties__zoom">
+            <span>
+              Zoom <output>{zoomPercent} %</output>
+            </span>
+            <input
+              type="range"
+              min={MIN_IMAGE_ZOOM}
+              max={MAX_IMAGE_ZOOM}
+              step="0.05"
+              value={element.transform.zoom}
+              disabled={disabled}
+              aria-describedby={cropHelpId}
+              onChange={(event) =>
+                updateImageTransform(element.id, {
+                  ...element.transform,
+                  zoom: Number(event.target.value),
+                })
+              }
+            />
+          </label>
+          <p id={cropHelpId} className="image-properties__help">
+            Dra motivet inne i rammen. Rammegrepene endrer bare det synlige området.
+          </p>
+          <button
+            className="image-properties__reset"
+            type="button"
+            disabled={disabled}
+            onClick={() =>
+              updateImageTransform(element.id, { ...DEFAULT_IMAGE_TRANSFORM })
+            }
+          >
+            Tilbakestill utsnitt
+          </button>
+        </div>
+      )}
 
       <dl className="image-properties__metadata">
         <div>
@@ -124,7 +183,7 @@ export function ImagePropertiesSection({
 
       {disabled && (
         <p className="image-properties__locked-note">
-          Lås opp bildet for å endre alternativ tekst og tilpasning.
+          Lås opp bildet for å endre tekst, ramme og utsnitt.
         </p>
       )}
     </section>
