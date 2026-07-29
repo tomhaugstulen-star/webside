@@ -1,4 +1,3 @@
-import type { ElementSize } from './editorProject'
 import type { ImageAssetMetadata } from './imageAsset'
 
 export const MIN_IMAGE_ZOOM = 1
@@ -10,6 +9,11 @@ export type ImageTransform = {
   zoom: number
   offsetX: number
   offsetY: number
+}
+
+export type ImageFrameSize = {
+  width: number
+  height: number
 }
 
 export type ImageRenderLayout = {
@@ -61,7 +65,7 @@ export function imageTransformsEqual(
 
 export function getImageRenderLayout(
   metadata: ImageAssetMetadata,
-  frameSize: ElementSize,
+  frameSize: ImageFrameSize,
   mode: ImageMode,
   transform: ImageTransform,
 ): ImageRenderLayout {
@@ -94,7 +98,7 @@ export function getImageRenderLayout(
 
 export function moveImageTransform(
   metadata: ImageAssetMetadata,
-  frameSize: ElementSize,
+  frameSize: ImageFrameSize,
   initialTransform: ImageTransform,
   deltaX: number,
   deltaY: number,
