@@ -8,6 +8,7 @@ import type { EditorProjectState } from '../model/editorProject'
 import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { reduceColorProjectAction } from './reduceColorProjectAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
@@ -202,6 +203,12 @@ function reduceEditorProjectState(
         action.assetId,
         action.updatedAt,
       )
+
+    case 'set-active-page-background-color':
+    case 'set-section-background-color':
+    case 'set-section-frame-width':
+    case 'set-section-frame-color':
+      return reduceColorProjectAction(state, action)
 
     case 'set-image-alt-text':
     case 'set-image-mode':
