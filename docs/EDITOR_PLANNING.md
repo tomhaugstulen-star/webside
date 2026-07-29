@@ -4,24 +4,20 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 
 ## Implementeringsstatus
 
-Siste `main`:
-
 ```text
-452b491  PR #11 – tekstegenskaper
+main: f71b354  PR #14 – frittstående tekstlenker
+branch: feature/element-deletion
+base main: f71b354
+GitHub-sak: #15
+PR: #16 Add safe deletion for selected elements
+produksjonscommit: 4f59b3e
+framtidsrettede rettelser: a8c6d62 og 4611de1
+arkitekturrapporter: fbd8091
 ```
 
-Gjeldende branch og PR:
+Slettefunksjonen er implementert, auditert, kompilert, manuelt godkjent og lagt i PR #16. PR-en er åpen og mergebar, men skal ikke merges uten eksplisitt brukergodkjenning.
 
-```text
-feature/element-links
-base main: 452b491
-PR #14: Add standalone links for text elements
-GitHub-sak: #13
-```
-
-Fasen er implementert, auditert, manuelt testet, bygget og dokumentert. PR #14 er åpen og mergebar, men ikke merget.
-
-Ferdig på `main`:
+## Ferdig på `main`
 
 - blankt PC- og Telefon-lerret
 - kontrollert topp- og venstremeny
@@ -31,6 +27,7 @@ Ferdig på `main`:
 - kontrollert flerlinjet tekstredigering
 - høyremenyens grunnstruktur
 - tekstegenskaper for hele tekstboksen
+- ekstern lenke for hele tekstboksen
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -42,17 +39,20 @@ PR #7   ren tekstredigering          c729d33
 PR #8   navn og rekkefølge i meny    a35f59d
 PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
+PR #14  elementlenker                f71b354
 ```
 
 ## Fast ansvarsdeling
 
 ```text
 Venstremeny = opprette og velge struktur
-Høyremeny  = egenskaper for markert element
-Lerretet   = redigere selve teksten
+Høyremeny  = egenskaper og handlinger for markert element
+Lerretet   = redigere tekst og transformere elementer
 ```
 
-`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Font, størrelse, lenke og andre egenskaper ligger i høyremenyen. `Logo og header` skal senere eie strukturelle headerdeler som ikke er vanlige frie tekstbokser.
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Tekstinnhold redigeres på lerretet. Font, størrelse, lenke og sletting ligger i høyremenyen.
+
+`Logo og header` skal senere eie strukturelle headerdeler som ikke er vanlige frie tekstbokser.
 
 ## Autoritativ state
 
@@ -66,13 +66,13 @@ Varig prosjektdata:
 - elementlenke for støttede elementtyper
 - `updatedAt`
 
-Transient state:
+Transient editor-state:
 
 - `selectedElementId`
 - pekerinteraksjon og layout-preview
 - aktiv tekstredigering og lokal draft
-- lenkeskjemaets lokale inputdraft
-- validerings- og lagringsmelding
+- lenkeskjemaets draft og feedback
+- slettedialogens mål-ID og fokusreferanse
 - panel-, fokus-, hover- og trykkstate
 
 DOM-en er rendering, ikke permanent lagring. Gyldige prosjektendringer går gjennom reduceren.
@@ -97,11 +97,11 @@ Tekst    120 × 48 px
 Knapp    80 × 36 px
 ```
 
-Flytting og resizing bruker transient preview og én commit ved normalt slipp. Låste elementer kan markeres, men ikke transformeres eller redigeres.
+Flytting og resizing bruker transient preview og én commit ved normalt slipp. Låste elementer kan markeres, men ikke transformeres, redigeres eller slettes.
 
 Tekstinnhold redigeres med kontrollert `textarea`. Blur og `Ctrl`/`Cmd` + `Enter` committer, mens `Escape` forkaster draften.
 
-## Høyremenyens grunnstruktur
+## Høyremeny
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -112,18 +112,17 @@ Tomt lerret     -> høyremeny lukkes
 - bredde 320 px
 - dokket fra 1680 px
 - overlay under 1680 px
-- ingen reservert plass når panelet er skjult
 - egen vertikal scrolling
 - 180 ms transform-animasjon
 - `prefers-reduced-motion` respekteres
-- eksisterende `useElementSelection` er autoritativ avledning
+- selection-state er autoritativ
 - ingen separat elementkopi eller direkte prosjektmutasjon
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
-## Implementerte tekstegenskaper
+## Tekstegenskaper
 
-For en markert vanlig tekstboks:
+For markert vanlig tekstboks:
 
 ```text
 Tekstutseende
@@ -135,108 +134,124 @@ Justering
 Linjehøyde
 ```
 
-Produktregler:
+Regler:
 
 - formateringen gjelder hele tekstboksen
 - åtte nettsikre fontvalg
-- størrelser fra 12 til 96 px
-- fet og kursiv som uavhengige toggles
+- størrelse 12–96 px
+- fet og kursiv er uavhengige
 - venstre, midtstilt og høyre justering
-- kontrollert linjehøyde
 - standard: System, 16 px, normal, venstre, 1.45
-- låste tekstelementer viser verdiene, men kontrollene er deaktivert
-- tekstinnhold redigeres fortsatt bare på lerretet
+- låst tekst kan inspiseres, men ikke endres
 - tekstfarge bygges senere sammen med prosjektfargene
-
-Modell:
-
-- prosjektskjema versjon 3 på `main`
-- obligatorisk `textStyle` bare for tekstelementer
-- stabile fonttokens i prosjektdata
-- CSS-fontstacker avledes i visningslaget
 
 Se `docs/TEXT_PROPERTIES.md`.
 
-## Frittstående elementlenker i PR #14
+## Frittstående tekstlenker
 
-Første leveranse gjelder hele vanlige tekstbokser:
+Prosjektskjemaet er versjon 4.
 
 ```text
-Lenke
-Type: Ingen / Ekstern lenke
-Nettadresse
-Åpne i ny fane
-Lag lenke / Lagre lenke / Fjern lenke
+none
+external-url { url, openInNewTab }
 ```
 
-Produktregler:
+Regler:
 
 - hele tekstboksen får lenken
 - bare `http://` og `https://` godtas
 - ugyldig URL lagres ikke
-- `openInNewTab` er en eksplisitt boolean
-- låste tekstelementer viser verdiene, men kontrollene er deaktivert
-- lagring gir tydelig grønn og tekstlig bekreftelse
+- låst tekst viser verdiene, men kontrollene er deaktivert
 - lenken aktiveres aldri i editormodus
-- enkeltord og tekstsegmenter kan ikke få egne lenker
+- enkeltord og tekstsegmenter får ikke egne lenker
 - forhåndsvisning og publisering bygges senere
 
-Modell og reducer:
+Se `docs/ELEMENT_LINKS.md`.
 
-- prosjektskjema versjon 4 på branchen
-- `link` er obligatorisk bare på `kind: 'text'` i første leveranse
-- discriminated union: `none` eller `external-url { url, openInNewTab }`
-- runtime-validatoren avviser `unknown`, `null`, arrays, ukjente nøkler og ugyldige URL-er
-- validatorregisteret er uttømmende
-- manglende, feiltypede, låste og uendrede overganger avvises
-- `updatedAt` endres bare ved reell endring
-- høyremenyens draft og feedback er transient
-- editorens DOM rendrer ikke et aktivt navigerbart anker
+## Sikker elementsletting i PR #16
+
+PR #16 legger til sletting av ett markert element av typen Seksjon, Bilde, Tekst eller Knapp.
+
+Plassering:
+
+```text
+Element
+Status: Ulåst
+Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
+```
+
+Regler:
+
+- sletteknappen ligger rett under statusboksen
+- låst element viser deaktivert sletteknapp
+- sletting krever alltid bekreftelsesdialog
+- `Avbryt`, bakgrunnsklikk og `Escape` lukker uten mutasjon
+- `Delete` åpner samme dialog
+- Delete blokkeres i tekst- og skjemaredigering
+- reduceren validerer nyeste elementstate
+- bekreftet sletting fjerner bare målelementet
+- markeringen nullstilles bare når målet var markert
+- en urelatert markering bevares
+- Seksjon eier ikke visuelt overlappende elementer
+- prosjektskjemaet forblir versjon 4
+- dialogens `Escape` påvirker ikke et åpent verktøypanel
 
 Arkitektur:
 
 ```text
-model       -> elementLink.ts
-state       -> setTextElementLink.ts og useTextElementLink.ts
-properties  -> ElementLinkPropertiesSection.tsx
-composition -> RightPropertiesPanel.tsx
-canvas      -> urørt av lenkehandlingen
+state       -> deleteElementFromActivePage.ts, useElementDeletion.ts
+properties  -> DeleteElementSection.tsx
+dialog      -> ConfirmElementDeletionDialog.tsx
+keyboard    -> isElementDeletionShortcutTarget.ts, useElementDeletionShortcut.ts
+composition -> EditorShell.tsx, RightPropertiesPanel.tsx
+canvas      -> EditorCanvasElement.tsx urørt
 ```
 
-Se `docs/ELEMENT_LINKS.md`.
+Se `docs/ELEMENT_DELETION.md`.
 
-## Audit og kontroll
+## Framtidsrettet audit
 
-Verifisert av brukeren etter siste produksjonskodeendring:
+Den siste gjennomgangen fant og rettet to problemer før PR:
+
+1. Sletting av et annet element enn det markerte nullstilte markeringen. Reduceren bevarer nå en urelatert markering.
+2. `Escape` i dialogen kunne også lukke et åpent verktøypanel. Dialog og panel har nå isolert Escape-håndtering.
+
+Ingen kritiske eller blokkerende kodefunn gjenstår.
+
+## Verifisert kontroll
+
+Etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
+Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
-Vite: 58 moduler transformert
+Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
 
-Manuelt verifisert:
+Arkitekturrapportene er regenerert. Det finnes ingen GitHub Actions-run for head.
 
-- gyldig lenke lagres og vises igjen
-- lagreknappen gir grønn bekreftelse
-- ugyldig adresse avvises
-- lenken åpnes ikke i editoren
-- låste kontroller er deaktivert
+Manuelt godkjent:
 
-Arkitekturrapportene er regenerert. `EditorCanvasElement.tsx` ble ikke endret og skal fortsatt ikke få flere nye ansvarsområder.
+- alle sletteetiketter
+- plassering og disabled-tilstand
+- avbrytelse og Escape
+- sletting via knapp og Delete
+- tekstredigeringsgrensen
+- låsegrensen
+- flat Seksjon-modell
 
 ## Senere knappbibliotek
-
-Full knappdesigner bygges ikke nå.
 
 Bekreftet retning:
 
 - knapper designes i Canva eller Figma
 - eksporteres som SVG eller PNG
 - `Elementer -> Knapp` åpner et internt bibliotek
-- brukeren legger til flere knappfiler etter behov
 - valgt knapp settes inn på lerretet
 - samme lenkemodell gjenbrukes
 - grafiske knapper får tilgjengelig navn
@@ -248,7 +263,7 @@ Foreløpig branch:
 feature/button-library
 ```
 
-Den gamle `feature/button-element`-branchen er parkert og skal ikke merges. Sak #12 er lukket som `not_planned`.
+Den parkerte `feature/button-element`-branchen skal ikke merges. Sak #12 er lukket som `not_planned`.
 
 ## Senere faser
 
@@ -266,14 +281,13 @@ feature/preview-mode
 feature/publishing
 ```
 
-Tekstfarge kobles til prosjektfargemodellen. Headertekst bygges som headerstruktur, ikke som vanlig fritt tekstelement. Forhåndsvisning og publisering skal tolke semantiske lenkedata og rendre aktive, tilgjengelige ankere.
+Tekstfarge kobles til prosjektfargemodellen. Headertekst bygges som headerstruktur. Forhåndsvisning og publisering skal tolke semantiske lenkedata og rendre aktive, tilgjengelige ankere.
 
 ## Åpne beslutninger
 
 - knappbibliotekets lagringsplass og filformat
 - statisk lesing kontra skrivbar lokal mappe
 - SVG kontra PNG som anbefalt knappformat
-- sletting og bekreftelsesregel
 - endelig mobilbrytepunkt
 - mobile tekststiloverstyringer
 - flere lenketyper utover ekstern URL

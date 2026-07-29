@@ -6,7 +6,7 @@ Kopier hele teksten under inn i neste chat.
 
 Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder og kodeansvarlig med presist omfang og ingen gjetting.
 
-Svar på norsk. Vær direkte og konkret. Repo og dokumentasjon er kilden til sannhet.
+Svar på norsk. Repo og dokumentasjon er kilden til sannhet.
 
 ## Repo og lokal mappe
 
@@ -17,58 +17,44 @@ C:\Users\tomha\Desktop\website
 
 Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
 
-Det utvikles aldri direkte på `main`. Etter hver repoendring skal brukeren få nøyaktige PowerShell-kommandoer for å hente endringen lokalt.
-
-Ikke merge uten eksplisitt brukergodkjenning. Ikke påstå at tester består uten verifisert output fra brukeren eller CI.
+Det utvikles aldri direkte på `main`. Etter repoendringer skal brukeren få nøyaktige PowerShell-kommandoer. Ikke merge uten eksplisitt godkjenning. Ikke påstå at tester består uten verifisert output.
 
 ## Autoritativ leserekkefølge
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/ELEMENT_LINKS.md`
-4. `docs/TEXT_PROPERTIES.md`
-5. `docs/RIGHT_PROPERTIES_PANEL.md`
-6. `docs/EDITOR_PLANNING.md`
-7. `docs/PROJECT_RULES.md`
-8. `README.md`
-9. `docs/ELEMENT_MODEL.md`
-10. `docs/TEXT_BOX_EDITING.md`
-11. `docs/OBJECT_LOCKING.md`
-12. `docs/DRAG_RESIZE.md`
-13. `docs/ELEMENT_SELECTION.md`
-14. `docs/ELEMENT_CREATION.md`
-15. `docs/MOBILE_DESIGN_CONTROLS.md`
-16. `docs/CODE_AUDIT.md`
+3. `docs/ELEMENT_DELETION.md`
+4. `docs/ELEMENT_LINKS.md`
+5. `docs/TEXT_PROPERTIES.md`
+6. `docs/RIGHT_PROPERTIES_PANEL.md`
+7. `docs/EDITOR_PLANNING.md`
+8. `docs/PROJECT_RULES.md`
+9. `README.md`
+10. `docs/ELEMENT_MODEL.md`
+11. `docs/TEXT_BOX_EDITING.md`
+12. `docs/OBJECT_LOCKING.md`
+13. `docs/DRAG_RESIZE.md`
+14. `docs/ELEMENT_SELECTION.md`
+15. `docs/ELEMENT_CREATION.md`
+16. `docs/MOBILE_DESIGN_CONTROLS.md`
+17. `docs/CODE_AUDIT.md`
 
 ## Git-status
 
-Siste bekreftede `main`:
-
 ```text
-452b491
+main: f71b354
+branch: feature/element-deletion
+base: main ved f71b354
+GitHub-sak: #15 Plan: safe deletion for selected elements
+PR: #16 Add safe deletion for selected elements
+produksjonscommit: 4f59b3e
+framtidsrettede rettelser: a8c6d62 og 4611de1
+arkitekturrapporter: fbd8091
 ```
 
-Dette er merge-commit fra PR #11, som la inn tekstegenskaper.
+PR #16 er åpen og mergebar. Den skal ikke merges uten eksplisitt brukergodkjenning.
 
-Gjeldende branch:
-
-```text
-feature/element-links
-```
-
-Åpen PR:
-
-```text
-PR #14 Add standalone links for text elements
-```
-
-GitHub-sak:
-
-```text
-#13 Plan: standalone links for text boxes and button assets
-```
-
-PR #14 er åpen, ikke draft og mergebar. Den er ikke merget. Sak #13 lukkes automatisk ved merge.
+Lokal branch var clean ved `fbd8091` før de avsluttende Markdown-statusoppdateringene ble lagt inn via GitHub-connectoren. Neste lokale handling er å pull siste branch og bekrefte clean tree.
 
 ## Ferdig og merget til `main`
 
@@ -85,6 +71,7 @@ PR #14 er åpen, ikke draft og mergebar. Den er ikke merget. Sak #13 lukkes auto
 - kontrollert flerlinjet tekstredigering
 - høyremenyens grunnstruktur
 - tekstegenskaper for hele tekstboksen
+- frittstående eksterne lenker for hele tekstboksen
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -96,229 +83,159 @@ PR #7   ren tekstredigering          c729d33
 PR #8   navn og rekkefølge i meny    a35f59d
 PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
+PR #14  elementlenker                f71b354
 ```
 
 ## Fast UX-regel
 
 ```text
 Venstremeny = opprette og velge struktur
-Høyremeny  = egenskaper for markert element
-Lerretet   = redigere selve teksten
+Høyremeny  = egenskaper og handlinger for markert element
+Lerretet   = redigere tekst og transformere elementer
 ```
 
-Konsekvenser:
+Lenker aktiveres ikke i editormodus. `EditorCanvasElement.tsx` ligger nær aktiv filgrense og skal ikke få flere nye funksjonsansvar.
 
-- `Elementer -> Tekst` oppretter en vanlig fri tekstboks.
-- Selve tekstinnholdet redigeres bare på lerretet.
-- Font, størrelse, lenke og andre egenskaper ligger i høyremenyen.
-- `Logo og header` skal senere eie strukturelle headerdeler.
-- Lenker aktiveres ikke i vanlig editormodus.
+## PR #16 – sikker sletting
 
-## Implementert tekstgrunnlag
-
-Tekstegenskaper er merget til `main` i PR #11.
-
-For en markert tekstboks viser høyremenyen:
+Autoritativ spesifikasjon:
 
 ```text
-Tekstutseende
-Font
-Størrelse
-Fet
-Kursiv
-Justering
-Linjehøyde
+docs/ELEMENT_DELETION.md
+GitHub-sak #15
 ```
 
-Formateringen gjelder hele tekstboksen. Det bygges ikke riktekst eller formatering av markerte ord og tegn.
+Første leveranse gjelder ett markert element:
 
-`EditorCanvasElement.tsx` er nær aktiv filgrense og skal ikke få flere nye ansvarsområder. Senere canvaslogikk må trekkes ut.
+- Seksjon
+- Bilde
+- Tekst
+- Knapp
 
-## Gjeldende fase – frittstående elementlenker
+### Plassering
 
-Fasen er isolert fra knappbibliotek, knappdesign, riktekst, forhåndsvisning og publisering.
-
-Første leveranse gjelder hele vanlige tekstbokser:
+Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
 
 ```text
-Marker tekstboksen
--> Høyremeny
--> Lenke
--> Ekstern lenke
--> skriv http:// eller https://
--> velg eventuelt Åpne i ny fane
--> Lag lenke / Lagre lenke
+Element
+Status: Ulåst
+Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
 ```
 
-Høyremenyen viser:
+Knappen har samme bredde som statusboksen, ligger i vanlig dokumentflyt, bruker rød tekst og ramme og er deaktivert når elementet er låst.
+
+### Bekreftelse
+
+Sletting krever alltid dialog fordi angre/gjør om ikke finnes.
 
 ```text
-Lenke
-Type: Ingen / Ekstern lenke
-Nettadresse
-Åpne i ny fane
-Lag lenke / Lagre lenke / Fjern lenke
+Slett tekstboksen?
+Dette kan ikke angres.
+Avbryt    Slett
 ```
 
-Fast funksjonsregel:
+Dialogen bruker native modal `<dialog>`, fokuserer `Avbryt`, støtter `Escape`, returnerer fokus ved avbrytelse og validerer nyeste elementstate før bekreftelse.
 
-- hele tekstboksen får lenken
-- bare absolutte `http://`- og `https://`-adresser godtas
-- ugyldig URL muterer ikke prosjektet
-- `openInNewTab` lagres eksplisitt
-- låste tekstbokser kan inspiseres, men kontrollene er deaktivert
-- lagring gir grønn knapp og teksten `Lenke lagret`
-- panelet viser også `Lenken er lagret på tekstboksen.`
-- lenken åpnes aldri i editormodus
-- enkeltord eller tegn får ikke egne lenker
+Dialogens `Escape` er isolert og lukker ikke samtidig et åpent verktøypanel.
 
-## Lenkemodell
+### Tastatur
 
-Prosjektskjemaet er versjon 4 på `feature/element-links`.
+`Delete` åpner samme dialog for markert, ulåst element.
 
-Modell:
+Global sletting blokkeres i tekstredigering, input, textarea, select, button, aktiv lenke, dialog, contenteditable og eksplisitt blokkerte områder. `Backspace` brukes ikke globalt.
+
+### Modell og reducer
+
+Prosjektskjemaet forblir versjon 4.
 
 ```text
-none
-external-url { url, openInNewTab }
+delete-element-from-active-page { elementId, updatedAt }
 ```
 
-Regler:
+Reducergrensen avviser manglende aktiv side, manglende element, feil side, låst element, utdatert mål og no-op.
 
-- bare `kind: 'text'` får obligatorisk `link` i første leveranse
-- nye tekstbokser starter med `link: none`
-- semantiske data lagres, ikke rå DOM- eller ankerattributter
-- runtime-validatoren tåler `unknown`, `null`, arrays og ukjente nøkler
-- validatorregisteret er uttømmende ved framtidige lenketyper
-- reduceren avviser manglende, feiltypede, låste, ugyldige og uendrede overganger
-- `updatedAt` endres bare ved reell prosjektendring
-- inputdraft, feil- og lagringsmelding er transient UI-state
+Ved gyldig sletting:
 
-Editorens DOM inneholder ikke `href` på tekstboksen. URL-en kan derfor ikke bekreftes i vanlig Elements-visning. Den autoritative kontrollen er at adressen vises igjen i høyremenyen når tekstboksen velges på nytt.
+- bare målelementet fjernes
+- `project.updatedAt` oppdateres
+- `selectedElementId` nullstilles bare når målet var markert
+- en urelatert markering bevares
+- høyremenyen lukkes når det markerte elementet slettes
 
-## Arkitektur
+Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; visuelt overlappende elementer blir stående.
 
-Nye filer:
+### Implementert arkitektur
 
 ```text
-src/model/elementLink.ts
-src/state/setTextElementLink.ts
-src/state/useTextElementLink.ts
-src/components/properties/ElementLinkPropertiesSection.tsx
-src/styles/element-link-properties.css
+src/state/deleteElementFromActivePage.ts
+src/state/useElementDeletion.ts
+src/components/properties/DeleteElementSection.tsx
+src/components/dialogs/ConfirmElementDeletionDialog.tsx
+src/components/editor/isElementDeletionShortcutTarget.ts
+src/components/editor/useElementDeletionShortcut.ts
+src/styles/element-deletion.css
 ```
 
-Eksisterende integrasjon:
+`EditorCanvasElement.tsx` er urørt. Alle nye kildefiler er under 250 linjer.
 
-```text
-src/model/editorProject.ts
-src/model/createEditorElement.ts
-src/state/editorProjectAction.ts
-src/state/editorProjectReducer.ts
-src/components/properties/RightPropertiesPanel.tsx
-src/App.css
-```
+## Verifisert kontroll
 
-`EditorCanvasElement.tsx` er urørt av lenkeimplementasjonen.
-
-Alle nye kildefiler er under aktiv 250-linjersgrense.
-
-## Audit og verifisert kontroll
-
-Brukeren har manuelt bekreftet:
-
-```text
-gyldig lenke lagres
-URL-en vises igjen etter at elementet velges på nytt
-lagreknappen blir grønn og viser bekreftelse
-ugyldig adresse avvises
-lenken åpnes ikke i editoren
-låste lenkekontroller er deaktivert
-```
-
-Siste verifiserte `npm run check` etter siste produksjonskodeendring:
+Brukeren kjørte `npm run check` etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
+Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
-Vite: 58 moduler transformert
+Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
 
-Arkitekturrapportene er regenerert:
+Arkitekturrapportene er regenerert. Det finnes ingen GitHub Actions-run for head.
 
-```text
-architecture.json
-docs/dependency-graph.mmd
-```
+## Manuelt godkjent
 
-Arbeidstreet var clean før den avsluttende dokumentasjonsrevisjonen. Dokumentasjonscommitene må hentes lokalt og clean tree må bekreftes igjen før merge.
+Brukeren har godkjent:
 
-## Dokumentasjonsstatus
+- alle fire sletteetiketter
+- plassering rett under statusboksen
+- deaktivert knapp og ingen Delete-dialog for låst element
+- avbrytelse uten mutasjon
+- `Escape` uten mutasjon
+- bekreftet sletting via høyremenyen
+- bekreftet sletting via `Delete`
+- høyremenyen lukkes etter sletting
+- ingen andre elementer slettes
+- Delete under tekstredigering sletter bare tekst
+- sletting av Seksjon lar visuelt overlappende elementer bli stående
 
-Oppdatert på `feature/element-links`:
+## Ikke del av slettingsfasen
 
-```text
-docs/ELEMENT_LINKS.md
-architecture.json
-docs/dependency-graph.mmd
-README.md
-docs/WORK_PLAN.md
-docs/EDITOR_PLANNING.md
-docs/NEXT_CHAT_PROMPT.md
-```
-
-`docs/ELEMENT_LINKS.md` er autoritativ spesifikasjon for PR #14.
-
-## Ikke del av PR #14
-
-- knappbibliotek eller lokal `buttons`-mappe
-- Canva/Figma-import
-- knappdesign, farger, rammer eller typografi
-- riktekst eller lenker på markerte enkeltord
+- angre/gjør om
+- papirkurv eller gjenoppretting
+- multisletting
+- dra til papirkurv
+- sletting av side eller prosjekt
+- automatisk sletting av visuelt overlappende elementer
+- foreldre-/barnemodell for Seksjon
+- duplisering
+- historikk eller lagring
+- bildeimport
+- knappbibliotek
+- farger
 - forhåndsvisning eller publisering
-- aktive ankere i editormodus
-- interne sidelenker
-- e-post-, telefon- eller nedlastingslenker
-- sletting, duplisering, historikk eller autolagring
-
-## Senere knappbibliotek
-
-Bekreftet produktretning:
-
-```text
-Canva eller Figma
--> eksporter knapp som SVG eller PNG
--> lagre i separat knappbibliotek
--> Elementer -> Knapp åpner biblioteket
--> velg knapp og sett den inn på lerretet
--> koble knappen til den samme lenkemodellen
-```
-
-Foreløpig branch:
-
-```text
-feature/button-library
-```
-
-Den gamle `feature/button-element`-branchen er parkert og skal ikke merges. Den inneholder bare tidligere planmateriale. GitHub-sak #12 er lukket som `not_planned`.
-
-Før knappbiblioteket implementeres må følgende avklares:
-
-- statisk lesing eller skrivbar lokal mappe
-- lagringsplass i prosjektet
-- SVG kontra PNG
-- metadata og tilgjengelig navn
 
 ## Neste handling
 
-1. Hent siste dokumentasjonscommits på `feature/element-links`.
-2. Kontroller at working tree er clean.
-3. Kontroller PR #14 etter dokumentasjonsoppdateringene.
-4. Ikke kjør en ny full `npm run check` bare på grunn av Markdown-endringer med mindre kode eller konfigurasjon er endret.
-5. Merge PR #14 bare etter eksplisitt brukergodkjenning.
-6. Etter merge: bytt til `main`, pull, kontroller merge-commit og clean tree.
-7. Ikke start knappbiblioteket før brukeren eksplisitt ber om det og omfanget er låst.
+1. Kjør `git pull --ff-only origin feature/element-deletion`.
+2. Bekreft `working tree clean`.
+3. Kontroller PR #16 på siste head: mergebarhet, filoversikt, review-tråder og eventuell CI.
+4. Ikke kjør `npm run check` på nytt for rene Markdown-endringer.
+5. Merge bare etter eksplisitt brukergodkjenning.
+6. Etter merge: bytt til `main`, pull og bekreft clean tree.
+
+Den parkerte `feature/button-element`-branchen skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
 
 ---

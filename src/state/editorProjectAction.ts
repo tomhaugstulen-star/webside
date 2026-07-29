@@ -14,6 +14,11 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'delete-element-from-active-page'
+      elementId: string
+      updatedAt: string
+    }
+  | {
       type: 'set-element-desktop-layout'
       elementId: string
       layout: ElementLayout

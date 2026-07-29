@@ -149,6 +149,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../state/useElementDeletion",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useElementDeletion.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../state/useElementSelection",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -201,6 +218,23 @@
         },
         {
           "dynamic": false,
+          "module": "../dialogs/ConfirmElementDeletionDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../properties/RightPropertiesPanel",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -243,6 +277,23 @@
             "import"
           ],
           "resolved": "src/components/toolbar/TopToolbar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useElementDeletionShortcut",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/editor/useElementDeletionShortcut.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -316,15 +367,19 @@
         "src/components/canvas/canvasElementAccessibility.ts",
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/canvas/getCanvasContentHeight.ts",
+        "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
         "src/components/properties/RightPropertiesPanel.tsx",
+        "src/components/properties/DeleteElementSection.tsx",
         "src/components/properties/ElementLinkPropertiesSection.tsx",
         "src/components/properties/TextPropertiesSection.tsx",
         "src/components/sidebar/LeftSidebar.tsx",
         "src/components/sidebar/SidebarPanels.tsx",
+        "src/components/editor/useElementDeletionShortcut.ts",
         "src/state/editorProjectReducer.ts",
         "src/model/createEditorElement.ts",
         "src/model/findElementCreationPosition.ts",
         "src/model/createEditorProject.ts",
+        "src/state/deleteElementFromActivePage.ts",
         "src/state/setTextElementContent.ts",
         "src/state/setTextElementLink.ts",
         "src/state/setTextElementStyle.ts",
@@ -407,6 +462,7 @@
       "dependents": [
         "src/components/editor/EditorShell.tsx",
         "src/state/useElementCreation.ts",
+        "src/state/useElementDeletion.ts",
         "src/state/useElementSelection.ts",
         "src/components/canvas/EditorCanvas.tsx",
         "src/state/useElementLayout.ts",
@@ -685,6 +741,40 @@
       "dependents": [
         "src/state/useElementCreation.ts",
         "src/model/createEditorProject.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/useElementDeletion.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -1622,6 +1712,41 @@
       "valid": true
     },
     {
+      "source": "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/components/properties/RightPropertiesPanel.tsx",
       "dependencies": [
         {
@@ -1635,6 +1760,23 @@
             "import"
           ],
           "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./DeleteElementSection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/properties/DeleteElementSection.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1679,6 +1821,41 @@
       ],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/properties/DeleteElementSection.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/properties/RightPropertiesPanel.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -2142,6 +2319,74 @@
       "valid": true
     },
     {
+      "source": "src/components/editor/useElementDeletionShortcut.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./isElementDeletionShortcutTarget",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/editor/isElementDeletionShortcutTarget.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/editor/isElementDeletionShortcutTarget.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/components/editor/useElementDeletionShortcut.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/state/EditorProjectProvider.tsx",
       "dependencies": [
         {
@@ -2257,6 +2502,23 @@
             "import"
           ],
           "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deleteElementFromActivePage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/deleteElementFromActivePage.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2537,6 +2799,41 @@
       "valid": true
     },
     {
+      "source": "src/state/deleteElementFromActivePage.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/editorProjectReducer.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/state/setTextElementContent.ts",
       "dependencies": [
         {
@@ -2783,8 +3080,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 48,
-    "totalDependenciesCruised": 109,
+    "totalCruised": 54,
+    "totalDependenciesCruised": 120,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
