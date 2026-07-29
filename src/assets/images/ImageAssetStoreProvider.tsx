@@ -41,6 +41,7 @@ export function ImageAssetStoreProvider({ children }: PropsWithChildren) {
       if (
         !isImageAssetId(assetId) ||
         !isValidImageAssetMetadata(metadata) ||
+        file.name !== metadata.fileName ||
         file.type !== metadata.mimeType ||
         file.size !== metadata.byteSize ||
         resourcesRef.current.has(assetId)
@@ -48,7 +49,14 @@ export function ImageAssetStoreProvider({ children }: PropsWithChildren) {
         return false
       }
 
-      const objectUrl = URL.createObjectURL(file)
+      let objectUrl: string
+
+      try {
+        objectUrl = URL.createObjectURL(file)
+      } catch {
+        return false
+      }
+
       const nextResources = new Map(resourcesRef.current)
       nextResources.set(assetId, {
         file,
