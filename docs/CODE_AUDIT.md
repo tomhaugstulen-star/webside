@@ -1,18 +1,22 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den framtidsrettede auditen av fase 11A og grensene som skal beskytte senere lagring, import, historikk og responsive utvidelser.
+Dette dokumentet beskriver den framtidsrettede auditen av fase 12 og grensene som skal beskytte senere lagring, import, historikk og responsive utvidelser.
 
 ## 1. Leveransestatus
 
 ```text
-fase: 11A – bildeimport, ramme og utsnitt
-GitHub-sak: #25 – lukket som fullført
-PR: #26 – merget
-mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
-prosjektskjema: versjon 6
+fase: 12 – prosjektfarger og Seksjon-rammer
+branch: feature/project-colors
+GitHub-sak: #28
+prosjektskjema: versjon 7
+implementering: ferdig
+manuell PC- og Telefon-test: godkjent
+rammebredde: Ingen eller 1–10 px
 sluttaudit: ferdig
-arkitekturrapporter: regenerert etter sluttaudit, ingen diff
-lokal main: synkronisert og clean
+automatiske kontroller etter siste 10 px-endring: gjenstår
+arkitekturrapporter: må regenereres
+PR: ikke opprettet
+merge: ikke godkjent eller utført
 ```
 
 ## 2. Arkitekturretning
@@ -21,7 +25,8 @@ lokal main: synkronisert og clean
 - `EditorShell` eier skalltilstand og hovedkomposisjon.
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
 - reducer-/state-laget er siste valideringsgrense.
-- lerret og høyremeny muterer ikke prosjektdata direkte.
+- lerret, høyremeny og venstremeny muterer ikke prosjektdata direkte.
+- fargeoversikten er avledet fra aktiv side og lagres ikke som en separat palett.
 - bildefil og Object URL ligger utenfor `EditorProject`.
 - responsive verdier lagres i prosjektmodellen, ikke i DOM-en.
 - generelle samlemapper og samlefiler skal ikke innføres.
@@ -29,187 +34,161 @@ lokal main: synkronisert og clean
 ## 3. Filgrenser etter sluttaudit
 
 ```text
-EditorCanvasElement.tsx: under 200 linjer
-ImagePropertiesSection.tsx: 199 linjer
-imagePresentation.ts: 236 innholdslinjer
-useElementPointerTransform.ts: 218 linjer
-ImageImportControl.tsx: 133 linjer
-setImageDesktopFrame.ts: under 100 linjer
-alle berørte kildefiler: under 250 linjer
+reduceColorProjectAction.ts: 156 linjer
+projectColorEntries.ts: under 100 linjer
+ColorsPanel.tsx: under 100 linjer
+FramePropertiesSection.tsx: under 100 linjer
+useSectionAppearance.ts: under 100 linjer
+useProjectColors.ts: under 100 linjer
+alle nye og berørte produksjonsfiler: under 250 linjer
 ```
 
 250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense.
 
-## 4. State- og reducergrenser
+## 4. Prosjektskjema og fargemodell
 
-Prosjektskjemaet er versjon 6.
+Prosjektskjemaet er versjon 7.
+
+Versjon 7 legger til:
+
+- sidebakgrunn i `EditorPage.appearance`
+- Seksjon-bakgrunn og ramme i `SectionEditorElement.appearance`
+- tekstfarge i eksisterende `TextElementStyle`
+
+`EditorColor` er kanonisk `#RRGGBB`. Gradienter, alpha og vilkårlige CSS-strenger inngår ikke.
+
+Seksjon-rammebredde er en lukket union fra `0` til `10`. `0` betyr `Ingen`. Menyetiketter genereres fra samme verdiliste som validatoren.
+
+## 5. State- og reducergrenser
 
 Reducerhandlinger avviser:
 
 - manglende aktiv side eller element
 - element på feil side
-- duplisert element-ID
 - feil elementtype
-- låst element
-- ugyldige eller ikke-finite verdier
-- ukjent knappasset-ID
-- ugyldig bildeasset eller metadata
-- ukjent bildevisningsmodus
-- ugyldig bildetransform
-- crop-geometri som ikke kan fylles ved lagret zoom
-- inkonsistent bilderamme og transform
+- låst Seksjon eller Tekst
+- ugyldig eller ikke-kanonisk farge
+- rammebredde utenfor `0–10`
 - uendret data
+- øvrige eksisterende layout-, knapp- og bildebrudd
 
 Ved avvisning returneres samme state. Prosjektet og `updatedAt` endres ikke.
 
-Transient markering, pekerøkter, preview, drafts, panelstate, filvelger, `File`, Object URL, fokus, hover, feedback og dialogstate serialiseres ikke.
+Fargehandlingene delegeres til `reduceColorProjectAction.ts`; den sentrale reduceren beholder komposisjonsansvar.
 
-## 5. Auditfunn og rettelser
+Transient markering, pekerøkter, preview, drafts, panelstate, fargegrupper, filvelger, `File`, Object URL, fokus, hover, feedback og dialogstate serialiseres ikke.
 
-### Funn 1: dupliserte størrelseskonstanter
+## 6. Auditfunn og konklusjoner
 
-Standard- og minimumsstørrelser ble samlet i `src/model/elementDimensions.ts`. Oppretting og layout bruker samme modellkilde.
+### Funn 1: farger lå tidligere i CSS
 
-### Funn 2: duplisert opprettingsvalidering
+Side-, Seksjon- og tekstfarger er nå eksplisitte serialiserbare prosjektverdier. CSS og DOM er ikke lenger autoritativ fargekilde.
 
-`src/state/isValidElementCreationRequest.ts` brukes av både UI-hook og reducer. Reduceren er fortsatt autoritativ.
+### Funn 2: en global palett ville koblet uavhengige elementer
 
-### Funn 3: crop-invarianter lå bare i UI
+`Farger` avledes som én oppføring per konkret side-, element- og egenskapsmål. Like fargeverdier oppretter ingen kobling eller global erstatning.
 
-Modell og reducer håndhever nå:
+### Funn 3: avledet oversikt kunne blitt duplisert state
 
-- maksimal crop-ramme ved aktuell zoom
-- gyldig overgang fra contain til crop
-- transformnormalisering mot faktisk ramme
-- ingen skjult transformmutasjon i contain
-- atomisk lagring av ramme og korrigert transform
+Fargegruppene bygges fra aktiv side og stabile element-ID-er ved rendering. Oppretting, sletting, låsing og ramme av/på gjenspeiles uten separat lagring.
 
-### Funn 4: `Alt + piltast` var fokusavhengig
+### Funn 4: høyre- og venstremeny kunne fått ulike verdier
 
-`useSelectedImageCropKeyboard.ts` håndterer snarveien på editornivå. Den fungerer etter bruk av zoomkontrollen, blokkeres i tekstfelter og dialoger, og stopper nettleserhistorikk på `Alt + venstre/høyre`.
+Begge menyene bruker den samme prosjektverdien og samme delte fargekontroll. Det finnes ingen separat rammefarge for hvert panel.
 
-```text
-Alt + piltast          4 px
-Shift + Alt + piltast 20 px
-```
+### Funn 5: rammebredde og etiketter kunne komme ut av synk
 
-### Funn 5: import kunne bli stående opptatt eller fortsette etter panelbytte
+Verdiene `0–10` ligger i én modelliste. UI mapper `0` til `Ingen` og øvrige verdier dynamisk til pikseltekst.
 
-Importflyten bruker `try/catch/finally`, rydder delvis registrert ressurs og oppdaterer ikke UI eller prosjekt etter at Elementer-panelet er demontert.
+### Funn 6: publiserbar ramme kunne blandes med editorgrenser
 
-### Funn 6: ressursmetadata kunne avvike fra faktisk fil
+Seksjon-rammen beregnes fra prosjektmodellen. Selection-outline og tekstens stiplede editorgrense forblir editorhjelp og serialiseres ikke.
 
-Ressurslageret krever samsvar for filnavn, MIME-type og byte-størrelse. Duplisert `assetId` avvises.
+### Funn 7: bred ramme kunne endre elementgeometri
 
-### Funn 7: Seksjon kunne dekke forgrunnsinnhold
+`box-sizing: border-box` gjør at rammen opptar plass innenfor elementets lagrede bredde og høyde. Farge- og rammeendringer muterer ikke layout.
 
-Seksjon rendres først som bakgrunnslag. Bilde, Tekst og Knapp rendres over uten at lagret elementrekkefølge eller den flate prosjektmodellen endres.
+### Funn 8: låste elementer kunne omgås via `Farger`
 
-### Funn 8: bilderammen hadde motstridende CSS
+Låste grupper vises for oversikt, men kontrollene er deaktivert. Reduceren avviser fortsatt mutasjon dersom UI-grensen omgås.
 
-Bildets interne border og bakgrunn eies bare av `image-element.css`. Den gamle regelen i `canvas.css` er fjernet, slik at korrekt rendering ikke avhenger av CSS-importrekkefølgen.
+### Funn 9: knappefarger kunne få konkurrerende modeller
 
-### Funn 9: grep og outline skapte ekstra utvendig kant
+Knapper beholder ferdig SVG-fargedesign. Fase 12 legger ikke CSS-overstyringer oppå assetene og oppretter ingen knappefarge i prosjektmodellen.
 
-Alle åtte grep og treffområder ligger innenfor rammen. Selection-outline ligger direkte mot bilderammen.
+### Funn 10: bilder kunne feilaktig opptre i fargeoversikten
 
-### Funn 10: crop-resize sentrerte motivet på nytt
+Bilder har ingen prosjektfarge og utelates. Bilderessurslager, crop og import berøres ikke.
 
-`getImageTransformForResizedFrame` bevarer motivets absolutte plassering. Zoom og motivstørrelse endres ikke. Aktiv kant flyttes, motsatt kant står fast, og ny normalisert offset beregnes mot den nye rammen.
+### Funn 11: responsive farger kunne bli implisitte
 
-`set-image-desktop-frame` lagrer ramme og transform atomisk.
+Versjon 7 lagrer farger felles for PC og Telefon. Eventuelle responsive farger krever eksplisitt senere modell, validering og viewport-spesifikke actions.
 
-### Funn 11: crop-geometri var koblet til en senere endringsbar standardstørrelse
+### Funn 12: framtidig import må håndtere versjon 6
 
-Crop-grunnrammen for skjemaversjon 6 er eksplisitt låst til 240 × 160 px. Senere endring av standardstørrelsen for nye bilder kan derfor ikke endre utsnitt i eksisterende versjon-6-prosjekter.
+Det finnes ennå ingen import- eller migreringsmotor. Framtidig import må migrere eller avvise versjon 6 kontrollert og validere alle nye appearance- og fargefelt før `replace-project`.
 
-En annen crop-grunnmodell krever ny skjemaversjon og migrering.
+## 7. Rendering og ansvarsdeling
 
-### Funn 12: filstørrelse begrenset ikke dekodet minnebruk
-
-Import avviser bilder som overstiger:
-
-```text
-10 MB filstørrelse
-40 megapiksler
-16 384 px bredde eller høyde
-```
-
-Samme dimensjonsregler inngår i metadata-valideringen i modellaget.
-
-### Funn 13: import kunne fullføre etter at kontrollen var demontert
-
-`ImageImportControl` bruker en monteringsreferanse. Etter unmount opprettes ingen ressurs, intet element og ingen lokal state-oppdatering.
-
-## 6. Ressurslivssyklus
-
-Prosjektmodell:
-
-- lagrer stabil `assetId`
-- lagrer validert serialiserbar metadata
-- lagrer alt-tekst, modus og transform
-- lagrer aldri filsti, `File`, Blob eller Object URL
-
-Ressurslager:
-
-- eier `File` og Object URL
-- avviser duplisert ID og metadataavvik
-- tilbakekaller URL ved ressursfjerning
-- tilbakekaller alle gjenværende URL-er ved provider-unmount
-- fjerner ressurs ved mislykket elementoppretting
-- fjerner ressurs ved sletting når asset ikke deles
-
-## 7. Bildegeometri
-
-- `contain` skalerer hele motivet proporsjonalt og sentrerer det.
-- `crop` bruker fast versjon-6-grunnskala, zoom og normalisert offset.
-- zoom normaliseres til `1..3`.
-- minimum zoom avledes fra rammen.
-- offset begrenses til `-1..1`.
-- tomrom kan ikke bli synlig i crop.
-- rammen kan endres fra åtte retninger.
-- rammeresize bevarer motivets størrelse og absolutte plassering.
-- pekertransform bruker transient preview og én commit.
-- `pointercancel` og tapt capture forkaster draft.
+- sidebakgrunn rendres fra `EditorPage.appearance`
+- Seksjon-bakgrunn og ramme rendres gjennom en ren stilfunksjon
+- tekstfarge inngår i eksisterende tekststilfunksjon
+- `EditorCanvasElement.tsx` eier ikke fargevalidering
+- `RightPropertiesPanel.tsx` forblir komposisjon
+- `ColorsPanel.tsx` avleder visning og sender intensjoner gjennom hooks
+- reduceren er autoritativ for gyldighet og faktisk mutasjon
 
 ## 8. Tilgjengelighet
 
-- eksplisitt label og hjelpetekst for alt-tekst
-- tom alt-tekst er gyldig for dekorative bilder
-- feil bruker `role="alert"`
-- lagringsfeedback bruker `role="status"`
-- radiofelt grupperes med fieldset og legend
-- zoom har label og synlig prosentverdi
-- tastatur- og pekerhjelp er dokumentert i UI
+- fargekontrollen bruker native `input type="color"`
+- kontrollen har tilgjengelig navn med nåværende farge
+- fokusmarkering er synlig
 - låste kontroller er deaktivert
-- canvas-label beskriver relevante snarveier
-- `prefers-reduced-motion` respekteres
+- gruppen viser låsestatus
+- panelet forblir åpent etter fargeendring
+- `prefers-reduced-motion` for eksisterende panelanimasjon respekteres
 
-## 9. Verifisert sluttkontroll
+## 9. Manuell godkjenning
 
-Brukerens lokale terminaloutput etter siste produksjonsendring:
+Godkjent på PC og Telefon:
+
+- blank side viser bare sidebakgrunn
+- sidebakgrunn endres uavhengig
+- flere Seksjoner kan ha samme farge og endres uavhengig
+- ramme `Ingen` skjuler rammeoppføringen i `Farger`
+- ramme `1–10 px` rendres innenfor elementet
+- rammefarge synkroniseres mellom høyremeny, `Farger` og lerret
+- tekstfarge endrer bare konkret Tekst-element
+- låste Seksjoner og Tekster kan ikke endres
+- slettede elementer fjernes fra oversikten
+- Knapp og Bilde vises ikke i `Farger`
+- PC og Telefon viser samme farger
+- eksisterende bilde-, tekst-, knapp-, flytte- og resizefunksjonalitet fungerer
+
+## 10. Siste komplette automatiske kontroll
+
+Brukerens lokale terminaloutput før utvidelsen fra 4 til 10 px:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
-Vite: 100 moduler transformert
-CSS: 30.95 kB, gzip 6.04 kB
-JavaScript: 258.38 kB, gzip 78.09 kB
-produksjonsbuild: bestått på 185 ms
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 189 ms
 ```
 
-Manuell kontroll ble godkjent for import, validering, lagrekkefølge, ramme, crop, zoom, tastatur, låsing, sletting, fallback, PC og Telefon.
+Ny komplett kontroll etter 10 px-endringen gjenstår.
 
-Arkitekturrapportene ble regenerert etter sluttauditen. `architecture.json` og `docs/dependency-graph.mmd` fikk ingen diff, fordi de siste sikkerhetsrettelsene ikke endret modul- eller avhengighetsstrukturen.
-
-## 10. Obligatoriske grenser for senere faser
+## 11. Obligatoriske grenser for senere faser
 
 ### Prosjektimport
 
 - valider hele prosjektobjektet før `replace-project`
 - krev kjent skjemaversjon
-- avvis eller migrer eldre og nyere skjema kontrollert
+- migrer eller avvis versjon 6 kontrollert
+- valider sideutseende, Seksjon-utseende, rammebredde og alle farger
 - ikke la importert metadata opprette Object URL uten en faktisk validert fil
 
 ### Prosjektbytte
@@ -225,24 +204,20 @@ Arkitekturrapportene ble regenerert etter sluttauditen. `architecture.json` og `
 ### Mobiloverstyringer
 
 - bruk viewport-spesifikke geometrihandlinger
+- responsive farger krever eksplisitte actions og modellfelt
 - ikke skriv mobilendringer inn i desktopfeltet
 
 ### Autolagring
 
 - reager bare på gyldige prosjektmutasjoner
-- ikke lagre transient editor- eller ressursstate direkte
+- ikke lagre transient editor-, panel- eller ressursstate direkte
 
-## 11. Auditkonklusjon
+## 12. Gjenstående før PR
 
-Fase 11A ble merget etter:
-
-- framtidsrettet statisk audit av alle endrede produksjonsfiler
-- bestått `npm run check`
-- godkjent manuell PC- og Telefon-test
-- clean og synkronisert feature-branch
-- kontrollerte arkitekturrapporter
-- oppdatert autoritativ dokumentasjon
-- kontrollert PR-head, mergebarhet, changed files, reviews og CI-status
-- eksplisitt brukergodkjenning
-
-Ingen kjent statisk blokkerer gjenstår fra fase 11A. Neste produksjonsfase skal starte på en ny branch fra oppdatert `main` og følge grensene i dette dokumentet.
+1. trekk siste feature-branch lokalt
+2. kjør `npm run check` etter 10 px-endringen
+3. regenerer `architecture.json` og `docs/dependency-graph.mmd`
+4. kontroller rapportdiff, `git diff --check` og clean tree
+5. oppdater kontrolltallene dersom den siste outputen endres
+6. opprett og kontroller PR mot `main`
+7. merge bare etter eksplisitt godkjenning
