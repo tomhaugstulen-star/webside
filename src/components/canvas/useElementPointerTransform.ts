@@ -12,6 +12,7 @@ import {
   type ResizeHandle,
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
+import { getImageCropSize } from '../../model/imagePresentation'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
 
@@ -132,6 +133,10 @@ export function useElementPointerTransform({
         interaction.startClientY +
         (scrollContainer.scrollTop - interaction.startScrollTop),
     }
+    const maximumSize =
+      element.kind === 'image' && element.mode === 'crop'
+        ? getImageCropSize(element.assetMetadata, element.transform)
+        : undefined
     const nextLayout =
       interaction.mode === 'move'
         ? moveElementLayout(
@@ -145,6 +150,7 @@ export function useElementPointerTransform({
             delta,
             interaction.canvasWidth,
             interaction.resizeHandle,
+            maximumSize,
           )
 
     if (
