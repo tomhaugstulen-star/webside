@@ -41,7 +41,7 @@ EditorProject
     elements: EditorElement[]
 ```
 
-Prosjektmodellen er flat. En Seksjon eier ikke automatisk elementer som ligger visuelt over den.
+Prosjektmodellen er flat. En Seksjon eier ikke automatisk elementer som ligger visuelt over den. Canvas-rendereren legger Seksjon bak Bilde, Tekst og Knapp uten å endre lagret elementrekkefølge eller innføre parent-child-relasjoner.
 
 ## 3. Felles elementdata
 
@@ -196,9 +196,10 @@ Ressursbufferen er foreløpig bare for aktiv nettleserøkt. Varig binærlagring 
 ### `contain`
 
 - hele bildet vises proporsjonalt
-- bildet sentreres i rammen
+- bildet skaleres etter gjeldende ramme og sentreres
 - tomrom er tillatt ved ulikt sideforhold
 - transformen beholdes, men brukes ikke visuelt
+- rammeresize kan derfor endre motivets viste størrelse i denne modusen
 
 ### `crop`
 
@@ -211,7 +212,17 @@ Ressursbufferen er foreløpig bare for aktiv nettleserøkt. Varig binærlagring 
 - crop-rammen kan ikke være større enn motivet ved aktiv zoom
 - overgang fra en for stor contain-ramme gir en sentrert, gyldig crop-ramme
 
-Normalisert offset gjør utsnittet uavhengig av skjermpiksler og stabilt ved kontrollert rammestørrelse.
+Crop-resize følger en egen regel:
+
+- motivets skalerte bredde og høyde beholdes
+- motivets absolutte plassering på lerretet beholdes så langt crop-grensene tillater
+- bare den aktive rammekanten flyttes
+- motsatt rammekant står fast
+- mindre ramme klipper mer av motivet i stedet for å skalere eller sentrere det på nytt
+- større ramme avslører mer av motivet uten å øke zoom automatisk
+- normalisert offset beregnes på nytt fra motivets absolutte plassering og den nye rammen
+
+Normalisert offset er serialiserbar og skjermuavhengig. Fordi normaliseringen avhenger av gjeldende overløp, må offset korrigeres når crop-rammen endrer størrelse. Ramme og korrigert transform lagres derfor i én atomisk reducerhandling.
 
 ## 8. Elementstørrelser
 
@@ -273,6 +284,19 @@ Varige mutasjoner går gjennom uttømmende reducer-actions, blant annet:
 - endre bildealternativ tekst
 - endre bildevisning
 - endre bildetransform
+- endre crop-bilderamme og korrigert transform atomisk
+
+`set-image-desktop-frame` brukes for crop-resize. Handlingen inneholder:
+
+```ts
+{
+  type: 'set-image-desktop-frame'
+  elementId: string
+  layout: ElementLayout
+  transform: ImageTransform
+  updatedAt: string
+}
+```
 
 Reducergrensene krever:
 
@@ -290,6 +314,7 @@ Bildegrensene validerer i tillegg:
 - kjent visningsmodus
 - finitte zoom- og offsetverdier
 - gyldig crop-ramme ved lagret zoom
+- transform normalisert mot den nye rammen ved atomisk crop-resize
 - ingen transformmutasjon når bildet står i `contain`
 
 Ugyldige eller uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
@@ -311,6 +336,7 @@ Transient state:
 
 - `selectedElementId`
 - pekerinteraksjon og layout-preview
+- midlertidig bilderamme og korrigert preview-transform under drag
 - aktiv tekstredigeringsøkt
 - formularutkast og feedback
 - bildefil, Object URL og ressurskart
@@ -332,4 +358,4 @@ Planlagte senere utvidelser:
 - prosjektimport og migrering
 - forhåndsvisning og publisering
 
-Ingen senere modellutvidelse er aktiv før fase 11A er kontrollert og eksplisitt godkjent for merge.
+Ingen senere modellutvidelse er aktiv før fase 11A er eksplisitt godkjent og merget.
