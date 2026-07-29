@@ -35,87 +35,75 @@ git diff --check
 ## 2. Gjeldende status
 
 ```text
-siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
-GitHub-sak: #25 – lukket som fullført
-PR: #26 – merget
-mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
-prosjektskjema: versjon 6
-manuell test: godkjent
-automatiske kontroller: godkjent
+aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
+branch: feature/project-colors
+GitHub-sak: #28
+base main: 504b6d66670eb4a10f929e5addf6c56b00782487
+prosjektskjema: versjon 7
+implementering: ferdig
+manuell PC- og Telefon-test: godkjent
+rammebredde: Ingen eller 1–10 px
 framtidsrettet sluttaudit: ferdig
-arkitekturrapporter: regenerert, ingen diff
-lokal main: synkronisert og clean
-neste produksjonsfase: ikke valgt
+automatiske kontroller etter siste 10 px-endring: gjenstår
+arkitekturrapporter etter siste produksjonsendring: gjenstår
+PR: ikke opprettet
+merge: ikke godkjent eller utført
 ```
 
-Faktisk branch- og `main`-HEAD leses fra Git.
+Faktisk branch- og `main`-HEAD leses fra Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
 
-## 3. Siste verifiserte produksjonskontroll
+## 3. Siste komplette automatiske kontroll
+
+Brukerens lokale terminaloutput før utvidelsen fra 4 til 10 px bekreftet:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
-Vite: 100 moduler transformert
-CSS: 30.95 kB, gzip 6.04 kB
-JavaScript: 258.38 kB, gzip 78.09 kB
-produksjonsbuild: bestått på 185 ms
-PC og Telefon: godkjent
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 189 ms
 ```
 
-## 4. Fase 11A – ferdig og merget funksjonsomfang
+Utvidelsen til 10 px endret bare rammeverdi-listen og menyetiketten. En ny komplett `npm run check` er likevel obligatorisk før PR.
+
+## 4. Fase 12 – implementert funksjonsomfang
 
 Leveransen omfatter:
 
-- lokal filvelger gjennom `Elementer -> Bilde`
-- PNG, JPEG og WebP
-- maksimal filstørrelse 10 MB
-- maksimal dekodet størrelse 40 megapiksler
-- maksimal bredde eller høyde 16 384 px
-- synlige feil for type, størrelse, dimensjon og dekoding
-- avbrutt filvalg uten prosjektmutasjon
-- avbrutt behandling etter panel-unmount
-- skjemaversjon 6
-- stabil bilde-`assetId`
-- serialiserbar metadata
-- alternativ tekst
-- `contain | crop`
-- zoom og normalisert offset
-- versjon-6-crop-grunnramme låst til 240 × 160 px
-- transient ressursbuffer for `File` og Object URL
-- kontrollert URL-opprydding
-- fallback ved manglende ressurs
-- åtte resizegrep på innsiden
-- resizing fra alle kanter og hjørner
-- motsatt kant står fast
-- crop-resize bevarer motivets størrelse og absolutte plassering
-- ramme og transform lagres atomisk
-- `Hele bildet` og `Juster utsnitt`
-- motivflytting med peker og tastatur
-- `Shift + dra` for rammeflytting
-- zoom 100–300 prosent
-- reset av utsnitt
-- metadata og sletting i høyremenyen
-- låste bilder kan inspiseres, men ikke muteres
-- Telefon arver desktopgeometri
-- Seksjon rendres bak forgrunnsinnhold
+- sidebakgrunn som serialiserbar sideverdi
+- Seksjon-bakgrunn som serialiserbar elementverdi
+- Seksjon-ramme med `0–10 px` og egen farge
+- tekstfarge i eksisterende `TextElementStyle`
+- validert og normalisert `EditorColor` i formatet `#RRGGBB`
+- avledet `Farger`-oversikt for aktiv side
+- én uavhengig fargekontroll per konkret egenskap
+- rammefarge i `Farger` bare når rammebredden er større enn `0`
+- samme rammeverdi i høyremeny og venstremeny
+- låste elementer vises, men kan ikke muteres
+- felles farger for PC og Telefon
+- native, tastaturtilgjengelig fargevelger
+
+Knapper beholder ferdig SVG-fargedesign og inngår ikke i fargeredigeringen. Bilder har ingen prosjektfarge og vises ikke i `Farger`.
 
 ## 5. Sluttauditens utfall
 
-Auditen bekreftet eller rettet:
+Auditen bekrefter:
 
-- én modellkilde for standard- og minimumsstørrelser
-- delt opprettingsvalidering mellom hook og reducer
-- crop-invarianter i modell og reducer
-- atomisk ramme- og transformcommit
-- global, kontrollert `Alt + piltast`
-- trygg import ved feil og unmount
-- fil/metadata-samsvar i ressurslageret
-- dekodet dimensjonsgrense
-- stabil versjon-6-tolkning av crop-transform
-- deterministisk bakgrunnslag for Seksjon
-- ingen motstridende bildestil i `canvas.css`
-- alle berørte kildefiler under 250 linjer
+- fargeoversikten lagres ikke som en separat palett
+- DOM og CSS brukes ikke som permanent fargekilde
+- rammebredder valideres fra én modellkilde
+- rammeetiketter genereres fra samme verdiliste
+- `RightPropertiesPanel.tsx` forblir komposisjon
+- sentral reducer delegerer fargeansvar
+- ugyldige, låste og uendrede handlinger returnerer samme state
+- `updatedAt` endres bare ved gyldig reell mutasjon
+- selection-outline og tekstens editorgrense er ikke publiserbare rammer
+- fargeendring påvirker ikke geometri, crop, lagrekkefølge eller ressursstate
+- alle nye og berørte produksjonsfiler er under 250 linjer
+
+Detaljene står i `docs/PROJECT_COLORS.md`.
 
 ## 6. Ferdige og mergede leveranser
 
@@ -136,24 +124,35 @@ Auditen bekreftet eller rettet:
 - dokumentasjonsstatus – PR #22 og PR #24
 - fase 11A: bildeimport, ramme og utsnitt – PR #26
 
+Fase 12 er ferdig implementert, men ikke merget.
+
 ## 7. Neste handling
 
-Ingen produksjonsfase er valgt.
+Kjør på `feature/project-colors`:
 
-Før neste fase:
+```powershell
+git pull --ff-only origin feature/project-colors
+git status
+npm run check
+npm run architecture:json
+npm run architecture:diagram
+git diff --check
+git status --short
+git diff --stat
+```
 
-1. kontroller at lokal `main` er synkronisert og clean
-2. velg fase og lås omfanget sammen med brukeren
-3. opprett en ny branch fra oppdatert `main`
-4. opprett eller oppdater GitHub-sak før produksjonskode
-5. ikke gjenbruk `feature/image-import-and-placement`
+Forventet:
 
-Fase 12 eller en annen produksjonsfase startes ikke automatisk.
+- `npm run check` består etter 10 px-endringen
+- arkitekturrapportene oppdateres i tråd med de nye modulene
+- ingen andre produksjonsfiler endres
+- ingen whitespace-feil
+
+Rapportene og dokumentasjonen committes før PR. Ingen merge uten eksplisitt godkjenning.
 
 ## 8. Planlagte senere faser
 
 ```text
-fase 12  prosjektfarger
 fase 13  logo og header
 fase 14  korrigeringslinjer
 fase 15  responsive mobiloverstyringer
@@ -166,9 +165,11 @@ fase 19  forhåndsvisning og publisering
 ## 9. Obligatoriske framtidsgrenser
 
 - prosjektimport validerer hele prosjektet og skjemaversjonen før `replace-project`
+- versjon 6 må migreres eller avvises kontrollert ved framtidig import
 - prosjektbytte avstemmer eller tømmer bilderessursbufferen
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
+- responsive farger krever eksplisitte viewport-spesifikke handlinger
 - autolagring reagerer på gyldige prosjektmutasjoner
 - endret crop-grunnmodell krever ny skjemaversjon og migrering
 
