@@ -11,6 +11,8 @@ import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementLink } from './setElementLink'
+import { setImageAltText } from './setImageAltText'
+import { setImageFit } from './setImageFit'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
@@ -199,6 +201,22 @@ function reduceEditorProjectState(
         state,
         action.elementId,
         action.assetId,
+        action.updatedAt,
+      )
+
+    case 'set-image-alt-text':
+      return setImageAltText(
+        state,
+        action.elementId,
+        action.altText,
+        action.updatedAt,
+      )
+
+    case 'set-image-fit':
+      return setImageFit(
+        state,
+        action.elementId,
+        action.fit,
         action.updatedAt,
       )
   }
