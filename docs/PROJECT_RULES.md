@@ -2,10 +2,22 @@
 
 Dette dokumentet fastsetter gjeldende arbeidsmåte, arkitekturgrenser og produktansvar for Website-editoren.
 
-## 1. Gjeldende repo-status
+## 1. Repo-status og historiske referanser
+
+Faktisk `main`-HEAD er dynamisk og skal alltid kontrolleres mot `origin/main`. Dokumentasjonen skal ikke hardkode et commitnummer som permanent «gjeldende HEAD» eller forventet topp-commit.
+
+```powershell
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git status
+git log -6 --oneline --decorate
+```
+
+Stabile historiske referanser:
 
 ```text
-main HEAD: a77a9a9
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
 PR #21: første bundlede SVG-knappbibliotek – merget
 PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
 knappbibliotekets mergecommit: 5e548ad
@@ -13,7 +25,7 @@ prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-`5e548ad` er mergecommit for selve knappbiblioteket. Faktisk nåværende `main` er `a77a9a9` etter dokumentasjons-PR #22.
+Historiske mergecommits beskriver leveranser. De skal ikke tolkes som nåværende branch-topp etter senere merges.
 
 ## 2. Branch-strategi
 
@@ -21,7 +33,7 @@ neste produksjonsfase: ikke valgt
 - `main` skal alltid være stabil.
 - Det utvikles aldri direkte på `main`.
 - En godkjent branch merges før neste produksjonsbranch starter fra oppdatert `main`.
-- En eksisterende branch som ligger bak `main`, fast-forwardes kontrollert før nytt arbeid.
+- En branch som ligger bak `main`, synkroniseres kontrollert før videre arbeid.
 - En branch skal ikke inneholde skjult arbeid for senere faser.
 - Merge krever eksplisitt brukergodkjenning.
 
@@ -80,7 +92,7 @@ versjon 4  varig elementlenke
 versjon 5  stabilt knappasset, knappetekst og knappelenke
 ```
 
-Historiske fasebeskrivelser av eldre skjemaversjoner skal ikke leses som gjeldende prosjektstatus.
+Historiske fasedokumenter kan beskrive eldre skjemaversjoner. De skal samtidig skille historisk faseversjon fra gjeldende prosjektversjon.
 
 Se `docs/ELEMENT_MODEL.md`.
 
@@ -89,8 +101,7 @@ Se `docs/ELEMENT_MODEL.md`.
 Transient state holdes utenfor `EditorProject`, blant annet:
 
 - `selectedElementId`
-- aktiv pekerinteraksjon
-- layout-preview
+- aktiv pekerinteraksjon og layout-preview
 - åpne paneler og aktivt verktøy
 - aktiv tekstredigeringsøkt og lokal tekstdraft
 - knappetekst- og lenkedrafts
@@ -107,7 +118,7 @@ Transient state skal ikke:
 - eksporteres
 - publiseres
 
-Ferdige prosjektmutasjoner er den eksplisitte grensen for senere historikk og lagring.
+Ferdige prosjektmutasjoner er grensen for senere historikk og lagring.
 
 ## 6. State- og reducergrenser
 
@@ -200,12 +211,11 @@ Innstillinger
 - `Innstillinger` står nederst.
 - Paneloverskriftene følger samme navn.
 - Interne tool-ID-er kan beholde eksisterende verdier dersom det ikke gir arkitekturfeil.
-- Menynavn skal ikke blandes sammen med senere funksjonsimplementering.
 - `Elementer` inneholder Seksjon, Bilde, Tekst og Knapp.
 - `Knapp` åpner et internt designbibliotek.
 - Det finnes ikke et separat hovedmenypunkt kalt `Knapper`.
 
-Alternative navn som `Filer`, `Alle farger` og `Fonts` er ikke implementert eller vedtatt. De kan bare behandles som åpne framtidige produktbeslutninger.
+Alternative navn som `Filer`, `Alle farger` og `Fonts` er ikke implementert eller vedtatt. De er åpne framtidige produktbeslutninger.
 
 ## 11. Fast ansvarsdeling
 
@@ -289,6 +299,7 @@ Se `docs/BUTTON_LIBRARY.md`.
 
 - `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen.
 - Mobil arver desktopverdier når mobiloverstyring mangler.
+- Dagens UI oppretter ikke mobiloverstyringer.
 - Egne mobiloverstyringer bygges i `feature/mobile-design-controls` etter ny godkjenning.
 - En framtidig mobilendring skal ikke skrive desktopgeometri utilsiktet.
 - Låsestatus, tekstinnhold, tekststil, elementlenke, knappasset og knappelabel er ikke responsive uten en ny eksplisitt produktbeslutning.
