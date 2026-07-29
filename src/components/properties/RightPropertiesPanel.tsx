@@ -2,6 +2,7 @@ import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { ButtonPropertiesSection } from './ButtonPropertiesSection'
 import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
+import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
 const elementKindLabels: Record<ElementKind, string> = {
@@ -38,6 +39,10 @@ export function RightPropertiesPanel({
             <p className="right-properties-panel__element-type">
               {elementKindLabels[element.kind]}
             </p>
+
+            {element.kind === 'image' && (
+              <ImagePropertiesSection key={element.id} element={element} />
+            )}
 
             {element.kind === 'text' && (
               <TextPropertiesSection element={element} />
