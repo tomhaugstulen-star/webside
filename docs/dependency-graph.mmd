@@ -23,6 +23,7 @@ subgraph src["src"]
     src_model_createStableId_ts["createStableId.ts"]
     src_model_editorProject_ts["editorProject.ts"]
     src_model_buttonAsset_ts["buttonAsset.ts"]
+    src_model_elementDimensions_ts["elementDimensions.ts"]
     src_model_elementLink_ts["elementLink.ts"]
     src_model_imagePresentation_ts["imagePresentation.ts"]
     src_model_textElementStyle_ts["textElementStyle.ts"]
@@ -44,6 +45,7 @@ subgraph src["src"]
       src_components_canvas_canvasLayoutPreview_ts["canvasLayoutPreview.ts"]
       src_components_canvas_EditorCanvasElement_tsx["EditorCanvasElement.tsx"]
       src_components_canvas_canvasElementAccessibility_ts["canvasElementAccessibility.ts"]
+      src_components_canvas_canvasElementKeyboard_ts["canvasElementKeyboard.ts"]
       src_components_canvas_EditorCanvasElementContent_tsx["EditorCanvasElementContent.tsx"]
       src_components_canvas_ButtonElementContent_tsx["ButtonElementContent.tsx"]
       src_components_canvas_ImageElementContent_tsx["ImageElementContent.tsx"]
@@ -84,11 +86,12 @@ subgraph src["src"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
     src_state_editorProjectAction_ts["editorProjectAction.ts"]
     src_state_useElementCreation_ts["useElementCreation.ts"]
+    src_state_isValidElementCreationRequest_ts["isValidElementCreationRequest.ts"]
     src_state_useElementDeletion_ts["useElementDeletion.ts"]
     src_state_useElementSelection_ts["useElementSelection.ts"]
     src_state_useElementLayout_ts["useElementLayout.ts"]
-    src_state_useTextElementContent_ts["useTextElementContent.ts"]
     src_state_useImageProperties_ts["useImageProperties.ts"]
+    src_state_useTextElementContent_ts["useTextElementContent.ts"]
     src_state_useElementLocking_ts["useElementLocking.ts"]
     src_state_useButtonProperties_ts["useButtonProperties.ts"]
     src_state_useElementLink_ts["useElementLink.ts"]
@@ -138,10 +141,12 @@ src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
 src_components_editor_EditorShell_tsx-->src_components_editor_useElementDeletionShortcut_ts
 src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
 src_model_editorProject_ts-->src_model_buttonAsset_ts
+src_model_editorProject_ts-->src_model_elementDimensions_ts
 src_model_editorProject_ts-->src_model_elementLink_ts
 src_model_editorProject_ts-->src_model_imageAsset_ts
 src_model_editorProject_ts-->src_model_imagePresentation_ts
 src_model_editorProject_ts-->src_model_textElementStyle_ts
+src_model_imagePresentation_ts-->src_model_elementDimensions_ts
 src_model_imagePresentation_ts-->src_model_imageAsset_ts
 src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
@@ -157,11 +162,15 @@ src_state_editorProjectAction_ts-->src_model_elementLink_ts
 src_state_editorProjectAction_ts-->src_model_imagePresentation_ts
 src_state_editorProjectAction_ts-->src_model_textElementStyle_ts
 src_model_elementLayout_ts-->src_model_editorProject_ts
-src_state_useElementCreation_ts-->src_assets_buttons_buttonAssetCatalog_ts
+src_model_elementLayout_ts-->src_model_elementDimensions_ts
+src_model_elementLayout_ts-->src_model_imagePresentation_ts
 src_state_useElementCreation_ts-->src_model_createStableId_ts
 src_state_useElementCreation_ts-->src_model_elementCreation_ts
-src_state_useElementCreation_ts-->src_model_imageAsset_ts
+src_state_useElementCreation_ts-->src_state_isValidElementCreationRequest_ts
 src_state_useElementCreation_ts-->src_state_useEditorProject_ts
+src_state_isValidElementCreationRequest_ts-->src_assets_buttons_buttonAssetCatalog_ts
+src_state_isValidElementCreationRequest_ts-->src_model_elementCreation_ts
+src_state_isValidElementCreationRequest_ts-->src_model_imageAsset_ts
 src_assets_buttons_buttonAssetCatalog_ts-->src_model_buttonAsset_ts
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_dark_rounded_svg
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_outline_rounded_svg
@@ -179,12 +188,13 @@ src_components_canvas_EditorCanvas_tsx-->src_components_canvas_getCanvasContentH
 src_components_canvas_canvasLayoutPreview_ts-->src_model_elementLayout_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_editorProject_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_elementLayout_ts
-src_components_canvas_EditorCanvasElement_tsx-->src_model_imagePresentation_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_resolveResponsiveValue_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_state_useElementLayout_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_state_useImageProperties_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_state_useTextElementContent_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasElementAccessibility_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasElementKeyboard_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasLayoutPreview_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_EditorCanvasElementContent_tsx
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_ElementSelectionToolbar_tsx
@@ -195,8 +205,13 @@ src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_useElement
 src_model_resolveResponsiveValue_ts-->src_model_editorProject_ts
 src_state_useElementLayout_ts-->src_model_elementLayout_ts
 src_state_useElementLayout_ts-->src_state_useEditorProject_ts
+src_state_useImageProperties_ts-->src_model_imagePresentation_ts
+src_state_useImageProperties_ts-->src_state_useEditorProject_ts
 src_state_useTextElementContent_ts-->src_state_useEditorProject_ts
 src_components_canvas_canvasElementAccessibility_ts-->src_model_editorProject_ts
+src_components_canvas_canvasElementKeyboard_ts-->src_model_editorProject_ts
+src_components_canvas_canvasElementKeyboard_ts-->src_model_elementLayout_ts
+src_components_canvas_canvasElementKeyboard_ts-->src_model_imagePresentation_ts
 src_components_canvas_EditorCanvasElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_ButtonElementContent_tsx
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_ImageElementContent_tsx
@@ -210,8 +225,6 @@ src_components_canvas_ImageElementContent_tsx-->src_components_canvas_useImageCr
 src_components_canvas_useImageCropTransform_ts-->src_model_editorProject_ts
 src_components_canvas_useImageCropTransform_ts-->src_model_imagePresentation_ts
 src_components_canvas_useImageCropTransform_ts-->src_state_useImageProperties_ts
-src_state_useImageProperties_ts-->src_model_imagePresentation_ts
-src_state_useImageProperties_ts-->src_state_useEditorProject_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_model_elementLayout_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_state_useElementLocking_ts
 src_state_useElementLocking_ts-->src_state_useEditorProject_ts
@@ -294,14 +307,14 @@ src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
 src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
 src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
-src_state_addElementToActivePage_ts-->src_assets_buttons_buttonAssetCatalog_ts
 src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
 src_state_addElementToActivePage_ts-->src_model_editorProject_ts
 src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
-src_state_addElementToActivePage_ts-->src_model_imageAsset_ts
+src_state_addElementToActivePage_ts-->src_state_isValidElementCreationRequest_ts
 src_model_createEditorElement_ts-->src_model_buttonAsset_ts
 src_model_createEditorElement_ts-->src_model_editorProject_ts
 src_model_createEditorElement_ts-->src_model_elementCreation_ts
+src_model_createEditorElement_ts-->src_model_elementDimensions_ts
 src_model_createEditorElement_ts-->src_model_elementLink_ts
 src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_imagePresentation_ts
