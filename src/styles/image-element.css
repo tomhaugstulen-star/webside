@@ -1,0 +1,35 @@
+.canvas-element--image {
+  padding: 0;
+  border-style: solid;
+  background: #f4f0ed;
+}
+
+.image-element__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.image-element__fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+  color: #7f7169;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), transparent),
+    repeating-linear-gradient(
+      -45deg,
+      #f2ece8,
+      #f2ece8 10px,
+      #e9e0db 10px,
+      #e9e0db 20px
+    );
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
