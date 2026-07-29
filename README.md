@@ -29,12 +29,7 @@ npm run architecture:json
 npm run architecture:diagram
 ```
 
-`npm run check` kjører:
-
-- ESLint
-- TypeScript-kontroll
-- Dependency Cruiser
-- produksjonsbuild
+`npm run check` kjører ESLint, TypeScript-kontroll, Dependency Cruiser og produksjonsbuild.
 
 Arkitekturrapportene skrives til:
 
@@ -52,7 +47,7 @@ main
   -> avgrenset feature-branch
   -> låst omfang og design
   -> implementering
-  -> kodeaudit
+  -> framtidsrettet kodeaudit
   -> npm run check
   -> arkitekturrapporter
   -> manuell kontroll
@@ -63,27 +58,16 @@ main
 
 ## Gjeldende status
 
-Siste bekreftede `main`:
-
 ```text
-f71b354  PR #14 – frittstående lenker for tekstbokser
+main: f71b354  PR #14 – frittstående tekstlenker
+branch: feature/element-deletion
+GitHub-sak: #15
+PR: #16 Add safe deletion for selected elements
+produksjonscommit: 4f59b3e
+arkitekturrapporter: fbd8091
 ```
 
-Gjeldende branch:
-
-```text
-feature/element-deletion
-```
-
-Sporing:
-
-```text
-GitHub-sak #15
-produksjonscommit 4f59b3e
-PR ikke opprettet
-```
-
-Slettefunksjonen er implementert, bygget og manuelt godkjent. Arkitekturrapportene må regenereres før PR.
+PR #16 er åpen og mergebar. Den skal ikke merges uten eksplisitt brukergodkjenning.
 
 ## Ferdig og merget til `main`
 
@@ -149,9 +133,9 @@ Regler:
 
 Se `docs/ELEMENT_LINKS.md`.
 
-## Sikker sletting
+## Sikker sletting i PR #16
 
-Gjeldende branch legger til sletting av ett markert element:
+PR #16 legger til sletting av ett markert element:
 
 ```text
 Slett seksjon
@@ -170,15 +154,17 @@ Regler:
 - `Delete` åpner samme dialog
 - Delete under tekstredigering påvirker bare teksten
 - bekreftet sletting fjerner bare målelementet
-- markeringen nullstilles og høyremenyen lukkes
+- markeringen nullstilles bare når det slettede elementet var markert
+- høyremenyen lukkes etter sletting av det markerte elementet
 - sletting av Seksjon fjerner ikke visuelt overlappende elementer
+- dialogens `Escape` påvirker ikke et åpent verktøypanel
 - prosjektskjemaet forblir versjon 4
 
 Se `docs/ELEMENT_DELETION.md`.
 
-## Verifisert status for slettingsfasen
+## Verifisert status for PR #16
 
-Brukeren har kjørt:
+Brukeren har kjørt kontroll etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
@@ -186,11 +172,16 @@ TypeScript: bestått
 Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
 Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
+
+Arkitekturrapportene er regenerert fra den endelige produksjonskoden. Det finnes ingen GitHub Actions-run for head; den brukerbekreftede lokale kontrollen er verifikasjonsgrunnlaget.
 
 Manuelt godkjent:
 
-- alle fire etiketter
+- alle fire sletteetiketter
 - plassering og disabled-tilstand
 - avbrytelse og Escape
 - sletting via knapp og Delete
