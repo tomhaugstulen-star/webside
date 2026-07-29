@@ -23,13 +23,13 @@ Det utvikles aldri direkte på `main`. Etter repoendringer skal brukeren få nø
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/ELEMENT_DELETION.md`
-4. `docs/ELEMENT_LINKS.md`
-5. `docs/TEXT_PROPERTIES.md`
-6. `docs/RIGHT_PROPERTIES_PANEL.md`
-7. `docs/EDITOR_PLANNING.md`
-8. `docs/PROJECT_RULES.md`
-9. `README.md`
+3. `docs/EDITOR_PLANNING.md`
+4. `docs/PROJECT_RULES.md`
+5. `README.md`
+6. `docs/ELEMENT_DELETION.md`
+7. `docs/ELEMENT_LINKS.md`
+8. `docs/TEXT_PROPERTIES.md`
+9. `docs/RIGHT_PROPERTIES_PANEL.md`
 10. `docs/ELEMENT_MODEL.md`
 11. `docs/TEXT_BOX_EDITING.md`
 12. `docs/OBJECT_LOCKING.md`
@@ -39,22 +39,33 @@ Det utvikles aldri direkte på `main`. Etter repoendringer skal brukeren få nø
 16. `docs/MOBILE_DESIGN_CONTROLS.md`
 17. `docs/CODE_AUDIT.md`
 
-## Git-status
+## Gjeldende repo-status
+
+Siste funksjonelle merge til `main`:
 
 ```text
-main: f71b354
-branch: feature/element-deletion
-base: main ved f71b354
-GitHub-sak: #15 Plan: safe deletion for selected elements
-PR: #16 Add safe deletion for selected elements
-produksjonscommit: 4f59b3e
-framtidsrettede rettelser: a8c6d62 og 4611de1
-arkitekturrapporter: fbd8091
+b428cac  Merge pull request #16 from tomhaugstulen-star/feature/element-deletion
 ```
 
-PR #16 er åpen og mergebar. Den skal ikke merges uten eksplisitt brukergodkjenning.
+Fullført sporing:
 
-Lokal branch var clean ved `fbd8091` før de avsluttende Markdown-statusoppdateringene ble lagt inn via GitHub-connectoren. Neste lokale handling er å pull siste branch og bekrefte clean tree.
+```text
+GitHub-sak #15: lukket som fullført
+PR #16: merget
+prosjektskjema: versjon 4
+ingen ny produksjonsfase er valgt
+```
+
+Start alltid med:
+
+```powershell
+cd C:\Users\tomha\Desktop\website
+git switch main
+git pull --ff-only origin main
+git status
+```
+
+Working tree skal være clean før ny planlegging eller branchopprettelse.
 
 ## Ferdig og merget til `main`
 
@@ -72,6 +83,7 @@ Lokal branch var clean ved `fbd8091` før de avsluttende Markdown-statusoppdater
 - høyremenyens grunnstruktur
 - tekstegenskaper for hele tekstboksen
 - frittstående eksterne lenker for hele tekstboksen
+- sikker sletting via høyremeny og `Delete`
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -84,6 +96,7 @@ PR #8   navn og rekkefølge i meny    a35f59d
 PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
+PR #16  sikker elementsletting       b428cac
 ```
 
 ## Fast UX-regel
@@ -96,23 +109,23 @@ Lerretet   = redigere tekst og transformere elementer
 
 Lenker aktiveres ikke i editormodus. `EditorCanvasElement.tsx` ligger nær aktiv filgrense og skal ikke få flere nye funksjonsansvar.
 
-## PR #16 – sikker sletting
+## Sikker sletting – ferdig fase
 
 Autoritativ spesifikasjon:
 
 ```text
 docs/ELEMENT_DELETION.md
 GitHub-sak #15
+PR #16
+mergecommit b428cac
 ```
 
-Første leveranse gjelder ett markert element:
+Leveransen gjelder ett markert element:
 
 - Seksjon
 - Bilde
 - Tekst
 - Knapp
-
-### Plassering
 
 Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
 
@@ -122,49 +135,22 @@ Status: Ulåst
 Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
 ```
 
-Knappen har samme bredde som statusboksen, ligger i vanlig dokumentflyt, bruker rød tekst og ramme og er deaktivert når elementet er låst.
+Regler:
 
-### Bekreftelse
-
-Sletting krever alltid dialog fordi angre/gjør om ikke finnes.
-
-```text
-Slett tekstboksen?
-Dette kan ikke angres.
-Avbryt    Slett
-```
-
-Dialogen bruker native modal `<dialog>`, fokuserer `Avbryt`, støtter `Escape`, returnerer fokus ved avbrytelse og validerer nyeste elementstate før bekreftelse.
-
-Dialogens `Escape` er isolert og lukker ikke samtidig et åpent verktøypanel.
-
-### Tastatur
-
-`Delete` åpner samme dialog for markert, ulåst element.
-
-Global sletting blokkeres i tekstredigering, input, textarea, select, button, aktiv lenke, dialog, contenteditable og eksplisitt blokkerte områder. `Backspace` brukes ikke globalt.
-
-### Modell og reducer
-
-Prosjektskjemaet forblir versjon 4.
-
-```text
-delete-element-from-active-page { elementId, updatedAt }
-```
-
-Reducergrensen avviser manglende aktiv side, manglende element, feil side, låst element, utdatert mål og no-op.
-
-Ved gyldig sletting:
-
+- låst element kan ikke slettes
+- sletting krever alltid bekreftelsesdialog
+- `Delete` åpner samme dialog
+- Delete blokkeres i tekstredigering og skjemakontroller
+- `Backspace` brukes ikke globalt
+- dialogen validerer nyeste elementstate før bekreftelse
 - bare målelementet fjernes
-- `project.updatedAt` oppdateres
 - `selectedElementId` nullstilles bare når målet var markert
 - en urelatert markering bevares
-- høyremenyen lukkes når det markerte elementet slettes
+- Seksjon eier ikke visuelt overlappende elementer
+- dialogens `Escape` påvirker ikke et åpent verktøypanel
+- prosjektskjemaet forblir versjon 4
 
-Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; visuelt overlappende elementer blir stående.
-
-### Implementert arkitektur
+Implementert arkitektur:
 
 ```text
 src/state/deleteElementFromActivePage.ts
@@ -178,7 +164,7 @@ src/styles/element-deletion.css
 
 `EditorCanvasElement.tsx` er urørt. Alle nye kildefiler er under 250 linjer.
 
-## Verifisert kontroll
+## Verifisert kontroll for PR #16
 
 Brukeren kjørte `npm run check` etter de siste produksjonsrettelsene:
 
@@ -193,49 +179,33 @@ JavaScript: 232.19 kB, gzip 71.23 kB
 bygget på 225 ms
 ```
 
-Arkitekturrapportene er regenerert. Det finnes ingen GitHub Actions-run for head.
+Arkitekturrapportene ble regenerert i `fbd8091`. Det fantes ingen GitHub Actions-run for head.
 
-## Manuelt godkjent
-
-Brukeren har godkjent:
+Manuelt godkjent:
 
 - alle fire sletteetiketter
 - plassering rett under statusboksen
 - deaktivert knapp og ingen Delete-dialog for låst element
 - avbrytelse uten mutasjon
 - `Escape` uten mutasjon
-- bekreftet sletting via høyremenyen
-- bekreftet sletting via `Delete`
+- sletting via høyremeny og `Delete`
 - høyremenyen lukkes etter sletting
 - ingen andre elementer slettes
 - Delete under tekstredigering sletter bare tekst
 - sletting av Seksjon lar visuelt overlappende elementer bli stående
 
-## Ikke del av slettingsfasen
+## Neste produksjonsfase
 
-- angre/gjør om
-- papirkurv eller gjenoppretting
-- multisletting
-- dra til papirkurv
-- sletting av side eller prosjekt
-- automatisk sletting av visuelt overlappende elementer
-- foreldre-/barnemodell for Seksjon
-- duplisering
-- historikk eller lagring
-- bildeimport
-- knappbibliotek
-- farger
-- forhåndsvisning eller publisering
+Ingen ny produksjonsfase er valgt. Ikke opprett kodebranch før brukeren har valgt og godkjent neste avgrensede fase.
 
-## Neste handling
+Planlagte senere faser finnes i `docs/WORK_PLAN.md`. Den parkerte `feature/button-element`-branchen skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
 
-1. Kjør `git pull --ff-only origin feature/element-deletion`.
-2. Bekreft `working tree clean`.
-3. Kontroller PR #16 på siste head: mergebarhet, filoversikt, review-tråder og eventuell CI.
-4. Ikke kjør `npm run check` på nytt for rene Markdown-endringer.
-5. Merge bare etter eksplisitt brukergodkjenning.
-6. Etter merge: bytt til `main`, pull og bekreft clean tree.
+## Faste tekniske grenser
 
-Den parkerte `feature/button-element`-branchen skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
+- 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
+- 300 linjer er hard unntaksgrense.
+- Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
+- Transient markering, dialogstate, drafts, fokus, hover og statusmeldinger serialiseres ikke.
+- Ingen feature-branch merges uten eksplisitt brukergodkjenning.
 
 ---
