@@ -37,6 +37,7 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
 branch: feature/image-import-and-placement
 GitHub-sak: #25 – Implement image import, frame resizing, and crop editing
+PR: #26 – åpen, ikke draft
 base main: 7e4c71fed4a26dfb829cc19ae81df95215c42a64
 prosjektskjema i leveransen: versjon 6
 implementering: ferdig
@@ -44,40 +45,51 @@ framtidsrettet kodeaudit: ferdig
 automatiske kontroller: bestått
 PC- og Telefon-test: godkjent
 arkitekturrapporter: regenerert og commitet
-dokumentasjon: oppdatert på feature-branchen
-PR: ikke opprettet
+dokumentasjon: oppdatert etter siste resize-rettelser
 merge: ikke godkjent eller utført
 ```
 
-Faktisk branch- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Ikke bruk et hardkodet commitnummer som permanent forventet topp-commit.
+Faktisk branch-, PR- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Ikke bruk et hardkodet commitnummer som permanent forventet topp-commit.
 
 Historiske kontrollpunkter:
 
 ```text
 main-base for fase 11A: 7e4c71f
-siste kodefix før rapporter: 964e011
-arkitekturrapporter etter audit: 4b3d0cb
+arkitekturrapporter etter første audit: 4b3d0cb
+PR #26 opprettet fra feature-branchen
+arkitekturrapporter etter siste resize-rettelser: 94ed2fb
 ```
 
-Dokumentoppdateringene kommer etter `4b3d0cb`, så faktisk feature-head er nyere og må leses fra Git.
+Dokumentoppdateringene kommer etter `94ed2fb`, så faktisk feature-head er nyere og må leses fra Git.
 
 ## Siste verifiserte kvalitetskontroll
 
-Brukerens lokale terminaloutput bekreftet:
+Brukerens lokale terminaloutput bekreftet etter siste produksjonsendring:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 89 moduler, 228 avhengigheter, ingen brudd
-Vite: 98 moduler transformert
-CSS: 31.07 kB, gzip 6.07 kB
-JavaScript: 255.44 kB, gzip 77.18 kB
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 31.06 kB, gzip 6.06 kB
+JavaScript: 258.04 kB, gzip 77.94 kB
 produksjonsbuild: bestått
 ```
 
-Manuell kontroll er godkjent for PC og Telefon, inkludert import, ramme, utsnitt, zoom, motivflytting, låsing, sletting og fallback.
+Manuell kontroll er godkjent for PC og Telefon, inkludert:
 
-Arkitekturrapportene ble regenerert etter siste produksjonsendring. Dokumentene etterpå er Markdown-endringer og krever ikke ny `npm run check` med mindre kode, konfigurasjon eller rapporter endres på nytt.
+- import, validering og avbrytelse
+- Seksjon som bakgrunnslag bak Bilde, Tekst og Knapp
+- ramme fra alle sider og hjørner
+- grep på innsiden av bilderammen
+- `Hele bildet` og `Juster utsnitt`
+- zoom, reset og motivflytting
+- `Alt + piltast`, også etter bruk av zoomkontrollen
+- crop-resize der motivets størrelse og absolutte plassering beholdes
+- fast motsatt rammekant
+- låsing, sletting og fallback
+
+Arkitekturrapportene ble regenerert etter siste state- og resize-endring og commitet i `94ed2fb`. Senere endringer er bare dokumentasjon og krever ikke ny `npm run check` med mindre kode, konfigurasjon eller rapporter endres igjen.
 
 ## Implementert funksjonalitet
 
@@ -97,7 +109,8 @@ Arkitekturrapportene ble regenerert etter siste produksjonsendring. Dokumentene 
 - alternativ tekst
 - `Hele bildet` og `Juster utsnitt`
 - zoom og normalisert motivoffset
-- åtte bilderammegrep
+- åtte bilderammegrep på innsiden
+- deterministisk bakgrunnslagring for Seksjon
 - kontrollert fallback ved manglende ressurs
 
 ## Bilde- og ressursmodell
@@ -124,6 +137,7 @@ Prosjektet lagrer aldri lokal filsti, `File`, Blob eller Object URL. Ressurslage
 ### Hele bildet
 
 - viser hele bildet proporsjonalt
+- skalerer motivet etter rammen
 - sentrerer motivet
 - tillater tomrom ved ulikt sideforhold
 - beholder lagret crop-transform for senere retur
@@ -138,6 +152,16 @@ Prosjektet lagrer aldri lokal filsti, `File`, Blob eller Object URL. Ressurslage
 - overgang fra en for stor contain-ramme gir en sentrert, gyldig crop-ramme
 - reset sentrerer og bruker minimum gyldig zoom
 
+Crop-resize:
+
+- motivets skalerte størrelse beholdes
+- motivets absolutte plassering beholdes så langt crop-grensene tillater
+- aktiv rammekant flyttes
+- motsatt kant står fast
+- mindre ramme klipper mer i stedet for å skalere eller sentrere motivet
+- ny normalisert offset beregnes mot den nye rammen
+- ramme og transform lagres atomisk gjennom `set-image-desktop-frame`
+
 Interaksjon:
 
 ```text
@@ -148,7 +172,7 @@ piltast         flytter elementet
 Ctrl/Cmd + pil  endrer størrelse fra nedre høyre hjørne
 ```
 
-Bilderammen kan endres fra topp, bunn, venstre, høyre og alle hjørner. Motsatt kant står fast.
+Bilderammen kan endres fra topp, bunn, venstre, høyre og alle hjørner. Grepene ligger innenfor rammen.
 
 ## Viktige auditrettelser
 
@@ -159,8 +183,14 @@ Bilderammen kan endres fra topp, bunn, venstre, høyre og alle hjørner. Motsatt
 - transform muteres ikke skjult i `contain`
 - bildeimport bruker `try/catch/finally` og rydder delvis registrert ressurs
 - ressurslageret krysskontrollerer filnavn, MIME-type og størrelse
-- tastaturlogikk er trukket ut av `EditorCanvasElement.tsx`
-- `EditorCanvasElement.tsx` er 189 linjer
+- motivets tastatursnarvei ligger i `useSelectedImageCropKeyboard.ts`
+- Seksjon rendres bak forgrunnselementene uten modellnesting
+- grep og selection-outline ligger direkte på innsiden av bilderammen
+- crop-resize bevarer motivets absolutte plassering
+- ramme og korrigert transform committes atomisk
+- `EditorCanvasElement.tsx` er under 200 linjer
+- `useElementPointerTransform.ts` er 218 linjer
+- `imagePresentation.ts` er 240 linjer
 - alle berørte kildefiler er under 250 linjer
 
 ## Fast ansvarsdeling
@@ -175,7 +205,7 @@ Prosjekt   = eie serialiserbar identitet, metadata og redigeringsverdier
 
 ## Første oppgave i neste chat
 
-Fase 11A skal ikke implementeres på nytt. Ikke start fase 12.
+Fase 11A skal ikke implementeres på nytt. Ikke start fase 12. Ikke opprett en ny PR.
 
 Trekk og kontroller den ferdige feature-branchen:
 
@@ -186,8 +216,9 @@ git switch feature/image-import-and-placement
 git pull --ff-only origin feature/image-import-and-placement
 git status
 git log -6 --oneline --decorate
-git diff --check
-git diff --stat origin/main...HEAD
+git diff --check 94ed2fb..HEAD
+git diff --name-only 94ed2fb..HEAD
+git diff --stat 94ed2fb..HEAD
 ```
 
 Godkjent tilstand:
@@ -196,21 +227,17 @@ Godkjent tilstand:
 - lokal branch følger remote feature-branch
 - working tree er clean
 - `git diff --check` har ingen reelle feil
+- diffen etter `94ed2fb` inneholder bare nødvendig dokumentasjon
 - branchen er ikke bak `main`
-- diffen inneholder bare fase 11A, kodeaudit, arkitekturrapporter og nødvendig dokumentasjon
 
 Deretter:
 
-1. kontroller samlet GitHub-diff mot `main`
-2. kontroller filstørrelser og at ingen foreldede `ImageFit`-/`set-image-fit`-referanser finnes
-3. opprett PR fra `feature/image-import-and-placement` til `main`
-4. PR-tittel skal beskrive bildeimport, rammeresize og utsnittsredigering
-5. PR-body skal oppsummere modell, ressurslager, UI, audit og kontroller
-6. inkluder `Closes #25`
-7. kontroller at PR-en ikke er draft og er mergebar
-8. kontroller changed files, review-tråder og eventuell CI
-9. presenter PR-nummer, base/head, commitantall og diffstatistikk
-10. ikke merge før brukeren eksplisitt skriver `godkjent`
+1. oppdater PR #26-beskrivelsen med siste kontrolltall og resize-regler hvis det ikke allerede er gjort
+2. kontroller samlet GitHub-diff mot `main`
+3. kontroller at PR #26 ikke er draft og er mergebar
+4. kontroller changed files, review-tråder, reviews og eventuell CI
+5. presenter PR-nummer, base/head, commitantall og diffstatistikk
+6. ikke merge før brukeren eksplisitt skriver `godkjent`
 
 Etter eventuell godkjent merge:
 
