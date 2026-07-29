@@ -6,6 +6,7 @@ import { useElementCreation } from '../../state/useElementCreation'
 import { useElementDeletion } from '../../state/useElementDeletion'
 import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
+import { useImageProperties } from '../../state/useImageProperties'
 import type { EditorTool, ViewportMode } from '../../types/editor'
 import { EditorCanvas } from '../canvas/EditorCanvas'
 import { ConfirmElementDeletionDialog } from '../dialogs/ConfirmElementDeletionDialog'
@@ -13,6 +14,7 @@ import { RightPropertiesPanel } from '../properties/RightPropertiesPanel'
 import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
 import { useElementDeletionShortcut } from './useElementDeletionShortcut'
+import { useSelectedImageCropKeyboard } from './useSelectedImageCropKeyboard'
 
 type DeletionRequest = {
   elementId: string
@@ -28,6 +30,7 @@ export function EditorShell() {
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
+  const { updateImageTransform } = useImageProperties()
   const { removeImageAsset } = useImageAssetStore()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
@@ -106,6 +109,11 @@ export function EditorShell() {
   useElementDeletionShortcut({
     element: selectedElement,
     onRequestDeletion: requestElementDeletion,
+  })
+  useSelectedImageCropKeyboard({
+    element: selectedElement,
+    disabled: deletionDialogOpen,
+    onCommitTransform: updateImageTransform,
   })
 
   useEffect(() => {
