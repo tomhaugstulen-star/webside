@@ -1,0 +1,32 @@
+.image-import-control {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.image-import-control__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.image-import-control .element-card {
+  width: 100%;
+}
+
+.image-import-control .element-card:disabled {
+  cursor: progress;
+  opacity: 0.65;
+}
+
+.image-import-control__error {
+  margin: 0;
+  color: #8d2f24;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}

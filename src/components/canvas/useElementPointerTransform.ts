@@ -1,16 +1,17 @@
-import {
-  useRef,
-  useState,
-  type PointerEvent,
-  type RefObject,
-} from 'react'
+import { useRef, useState, type PointerEvent, type RefObject } from 'react'
 import {
   elementLayoutsEqual,
   moveElementLayout,
   resizeElementLayout,
   type ElementLayout,
+  type ResizeHandle,
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
+import {
+  getImageCropSize,
+  getImageTransformForResizedFrame,
+  type ImageTransform,
+} from '../../model/imagePresentation'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
 
@@ -19,6 +20,7 @@ type TransformMode = 'move' | 'resize'
 type PointerInteraction = {
   pointerId: number
   mode: TransformMode
+  resizeHandle: ResizeHandle
   startClientX: number
   startClientY: number
   startScrollLeft: number
@@ -34,6 +36,11 @@ type ElementPointerTransformOptions = {
   scrollContainerRef: RefObject<HTMLDivElement | null>
   onSelect: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
+  onCommitImageFrame: (
+    elementId: string,
+    layout: ElementLayout,
+    transform: ImageTransform,
+  ) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
 }
 
@@ -44,6 +51,7 @@ export function useElementPointerTransform({
   scrollContainerRef,
   onSelect,
   onCommitLayout,
+  onCommitImageFrame,
   onPreviewLayoutChange,
 }: ElementPointerTransformOptions) {
   const [draftLayout, setDraftLayout] = useState<ElementLayout | null>(null)
@@ -57,32 +65,37 @@ export function useElementPointerTransform({
     onPreviewLayoutChange(layout ? { elementId: element.id, layout } : null)
   }
 
+  const getResizedImageTransform = (layout: ElementLayout) =>
+    element.kind === 'image' && element.mode === 'crop'
+      ? getImageTransformForResizedFrame(
+          element.assetMetadata,
+          initialLayout.size,
+          layout.size,
+          element.transform,
+          layout.position.x - initialLayout.position.x,
+          layout.position.y - initialLayout.position.y,
+        )
+      : null
+
   const startInteraction = (
     mode: TransformMode,
     event: PointerEvent<HTMLElement>,
+    resizeHandle: ResizeHandle = 'south-east',
   ) => {
-    if (event.button !== 0) {
-      return
-    }
+    if (event.button !== 0) return
 
     onSelect(element.id)
-
-    if (element.locked) {
-      return
-    }
+    if (element.locked) return
 
     const canvas = canvasRef.current
     const scrollContainer = scrollContainerRef.current
-
-    if (!canvas || !scrollContainer || canvas.clientWidth <= 0) {
-      return
-    }
+    if (!canvas || !scrollContainer || canvas.clientWidth <= 0) return
 
     event.currentTarget.setPointerCapture(event.pointerId)
-
     interactionRef.current = {
       pointerId: event.pointerId,
       mode,
+      resizeHandle,
       startClientX: event.clientX,
       startClientY: event.clientY,
       startScrollLeft: scrollContainer.scrollLeft,
@@ -99,52 +112,49 @@ export function useElementPointerTransform({
     startInteraction('move', event)
   }
 
-  const handleResizePointerDown = (event: PointerEvent<HTMLSpanElement>) => {
+  const handleResizePointerDown = (
+    handle: ResizeHandle,
+    event: PointerEvent<HTMLSpanElement>,
+  ) => {
     event.preventDefault()
     event.stopPropagation()
-    startInteraction('resize', event)
+    startInteraction('resize', event, handle)
   }
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const interaction = interactionRef.current
     const scrollContainer = scrollContainerRef.current
-
-    if (!interaction || interaction.pointerId !== event.pointerId || !scrollContainer) {
-      return
-    }
+    if (!interaction || interaction.pointerId !== event.pointerId || !scrollContainer) return
 
     autoScrollCanvasNearEdges(scrollContainer, event.clientX, event.clientY)
-
     const delta = {
       x:
-        event.clientX -
-        interaction.startClientX +
-        (scrollContainer.scrollLeft - interaction.startScrollLeft),
+        event.clientX - interaction.startClientX +
+        scrollContainer.scrollLeft - interaction.startScrollLeft,
       y:
-        event.clientY -
-        interaction.startClientY +
-        (scrollContainer.scrollTop - interaction.startScrollTop),
+        event.clientY - interaction.startClientY +
+        scrollContainer.scrollTop - interaction.startScrollTop,
     }
+    const maximumSize =
+      element.kind === 'image' && element.mode === 'crop'
+        ? getImageCropSize(element.assetMetadata, element.transform)
+        : undefined
     const nextLayout =
       interaction.mode === 'move'
-        ? moveElementLayout(
-            interaction.initialLayout,
-            delta,
-            interaction.canvasWidth,
-          )
+        ? moveElementLayout(interaction.initialLayout, delta, interaction.canvasWidth)
         : resizeElementLayout(
             element.kind,
             interaction.initialLayout,
             delta,
             interaction.canvasWidth,
+            interaction.resizeHandle,
+            maximumSize,
           )
 
     if (
       draftLayoutRef.current &&
       elementLayoutsEqual(draftLayoutRef.current, nextLayout)
-    ) {
-      return
-    }
+    ) return
 
     publishDraftLayout(nextLayout)
   }
@@ -152,48 +162,49 @@ export function useElementPointerTransform({
   const finishInteraction = (commit: boolean) => {
     const interaction = interactionRef.current
     const finalLayout = draftLayoutRef.current
-
     interactionRef.current = null
     setTransformMode(null)
     publishDraftLayout(null)
 
     if (
-      commit &&
-      interaction &&
-      finalLayout &&
-      !elementLayoutsEqual(interaction.initialLayout, finalLayout)
-    ) {
+      !commit ||
+      !interaction ||
+      !finalLayout ||
+      elementLayoutsEqual(interaction.initialLayout, finalLayout)
+    ) return
+
+    const imageTransform =
+      interaction.mode === 'resize' ? getResizedImageTransform(finalLayout) : null
+
+    if (imageTransform) {
+      onCommitImageFrame(element.id, finalLayout, imageTransform)
+    } else {
       onCommitLayout(element.id, finalLayout)
     }
   }
 
   const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    if (interactionRef.current?.pointerId !== event.pointerId) {
-      return
-    }
-
+    if (interactionRef.current?.pointerId !== event.pointerId) return
     event.stopPropagation()
     finishInteraction(true)
   }
 
   const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
-    if (interactionRef.current?.pointerId !== event.pointerId) {
-      return
-    }
-
+    if (interactionRef.current?.pointerId !== event.pointerId) return
     finishInteraction(false)
   }
 
   const handleLostPointerCapture = (event: PointerEvent<HTMLDivElement>) => {
-    if (interactionRef.current?.pointerId !== event.pointerId) {
-      return
-    }
-
+    if (interactionRef.current?.pointerId !== event.pointerId) return
     finishInteraction(false)
   }
 
   return {
     layout: draftLayout ?? initialLayout,
+    imageTransform:
+      transformMode === 'resize' && draftLayout
+        ? getResizedImageTransform(draftLayout)
+        : null,
     transformMode,
     handleMovePointerDown,
     handleResizePointerDown,

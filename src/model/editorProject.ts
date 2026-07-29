@@ -1,8 +1,13 @@
 import type { ButtonAssetId } from './buttonAsset'
+import type { ElementSize } from './elementDimensions'
 import type { ElementLink } from './elementLink'
+import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
+import type { ImageMode, ImageTransform } from './imagePresentation'
 import type { TextElementStyle } from './textElementStyle'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 5 as const
+export type { ElementKind, ElementSize } from './elementDimensions'
+
+export const EDITOR_PROJECT_SCHEMA_VERSION = 6 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -15,13 +20,6 @@ export type CanvasPosition = {
   x: number
   y: number
 }
-
-export type ElementSize = {
-  width: number
-  height: number
-}
-
-export type ElementKind = 'section' | 'image' | 'text' | 'button'
 
 type BaseEditorElement = {
   id: string
@@ -37,6 +35,11 @@ export type SectionEditorElement = BaseEditorElement & {
 
 export type ImageEditorElement = BaseEditorElement & {
   kind: 'image'
+  assetId: ImageAssetId
+  assetMetadata: ImageAssetMetadata
+  altText: string
+  mode: ImageMode
+  transform: ImageTransform
 }
 
 export type TextEditorElement = BaseEditorElement & {

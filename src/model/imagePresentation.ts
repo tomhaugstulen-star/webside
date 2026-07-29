@@ -1,0 +1,236 @@
+import {
+  IMAGE_CROP_BASE_FRAME_SIZE_V6,
+  type ElementSize,
+} from './elementDimensions'
+import type { ImageAssetMetadata } from './imageAsset'
+
+export const MIN_IMAGE_ZOOM = 1
+export const MAX_IMAGE_ZOOM = 3
+
+export type ImageMode = 'contain' | 'crop'
+
+export type ImageTransform = {
+  zoom: number
+  offsetX: number
+  offsetY: number
+}
+
+export type ImageFrameSize = ElementSize
+
+export type ImageRenderLayout = {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
+export const DEFAULT_IMAGE_MODE: ImageMode = 'contain'
+export const DEFAULT_IMAGE_TRANSFORM: ImageTransform = {
+  zoom: MIN_IMAGE_ZOOM,
+  offsetX: 0,
+  offsetY: 0,
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(Math.max(value, minimum), maximum)
+}
+
+function getBaseCropScale(metadata: ImageAssetMetadata) {
+  return Math.max(
+    IMAGE_CROP_BASE_FRAME_SIZE_V6.width / metadata.width,
+    IMAGE_CROP_BASE_FRAME_SIZE_V6.height / metadata.height,
+  )
+}
+
+function getNormalizedOffset(position: number, overflow: number) {
+  return overflow > 0 ? clamp((2 * position + overflow) / overflow, -1, 1) : 0
+}
+
+export function isImageMode(value: unknown): value is ImageMode {
+  return value === 'contain' || value === 'crop'
+}
+
+export function normalizeImageTransform(value: unknown): ImageTransform | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const candidate = value as Partial<ImageTransform>
+  const { zoom, offsetX, offsetY } = candidate
+
+  if (
+    typeof zoom !== 'number' ||
+    !Number.isFinite(zoom) ||
+    typeof offsetX !== 'number' ||
+    !Number.isFinite(offsetX) ||
+    typeof offsetY !== 'number' ||
+    !Number.isFinite(offsetY)
+  ) {
+    return null
+  }
+
+  return {
+    zoom: clamp(zoom, MIN_IMAGE_ZOOM, MAX_IMAGE_ZOOM),
+    offsetX: clamp(offsetX, -1, 1),
+    offsetY: clamp(offsetY, -1, 1),
+  }
+}
+
+export function getMinimumImageZoomForFrame(
+  metadata: ImageAssetMetadata,
+  frameSize: ImageFrameSize,
+) {
+  const baseScale = getBaseCropScale(metadata)
+  const baseWidth = metadata.width * baseScale
+  const baseHeight = metadata.height * baseScale
+
+  return clamp(
+    Math.max(frameSize.width / baseWidth, frameSize.height / baseHeight),
+    MIN_IMAGE_ZOOM,
+    MAX_IMAGE_ZOOM,
+  )
+}
+
+export function normalizeImageTransformForFrame(
+  value: unknown,
+  metadata: ImageAssetMetadata,
+  frameSize: ImageFrameSize,
+): ImageTransform | null {
+  const normalized = normalizeImageTransform(value)
+
+  if (!normalized) {
+    return null
+  }
+
+  return {
+    ...normalized,
+    zoom: Math.max(
+      normalized.zoom,
+      getMinimumImageZoomForFrame(metadata, frameSize),
+    ),
+  }
+}
+
+export function imageTransformsEqual(
+  first: ImageTransform,
+  second: ImageTransform,
+) {
+  return (
+    first.zoom === second.zoom &&
+    first.offsetX === second.offsetX &&
+    first.offsetY === second.offsetY
+  )
+}
+
+export function getImageCropSize(
+  metadata: ImageAssetMetadata,
+  transform: ImageTransform,
+): ImageFrameSize {
+  const normalizedTransform =
+    normalizeImageTransform(transform) ?? DEFAULT_IMAGE_TRANSFORM
+  const scale = getBaseCropScale(metadata) * normalizedTransform.zoom
+
+  return {
+    width: metadata.width * scale,
+    height: metadata.height * scale,
+  }
+}
+
+export function getImageRenderLayout(
+  metadata: ImageAssetMetadata,
+  frameSize: ImageFrameSize,
+  mode: ImageMode,
+  transform: ImageTransform,
+): ImageRenderLayout {
+  if (mode === 'contain') {
+    const scale = Math.min(
+      frameSize.width / metadata.width,
+      frameSize.height / metadata.height,
+    )
+    const width = metadata.width * scale
+    const height = metadata.height * scale
+
+    return {
+      width,
+      height,
+      left: (frameSize.width - width) / 2,
+      top: (frameSize.height - height) / 2,
+    }
+  }
+
+  const normalizedTransform =
+    normalizeImageTransformForFrame(transform, metadata, frameSize) ??
+    DEFAULT_IMAGE_TRANSFORM
+  const size = getImageCropSize(metadata, normalizedTransform)
+  const overflowX = Math.max(0, size.width - frameSize.width)
+  const overflowY = Math.max(0, size.height - frameSize.height)
+
+  return {
+    ...size,
+    left: -overflowX / 2 + (normalizedTransform.offsetX * overflowX) / 2,
+    top: -overflowY / 2 + (normalizedTransform.offsetY * overflowY) / 2,
+  }
+}
+
+export function getImageTransformForResizedFrame(
+  metadata: ImageAssetMetadata,
+  initialFrameSize: ImageFrameSize,
+  nextFrameSize: ImageFrameSize,
+  initialTransform: ImageTransform,
+  framePositionDeltaX: number,
+  framePositionDeltaY: number,
+): ImageTransform {
+  const normalizedTransform =
+    normalizeImageTransformForFrame(
+      initialTransform,
+      metadata,
+      initialFrameSize,
+    ) ?? DEFAULT_IMAGE_TRANSFORM
+  const initialRenderLayout = getImageRenderLayout(
+    metadata,
+    initialFrameSize,
+    'crop',
+    normalizedTransform,
+  )
+  const overflowX = Math.max(0, initialRenderLayout.width - nextFrameSize.width)
+  const overflowY = Math.max(0, initialRenderLayout.height - nextFrameSize.height)
+
+  return {
+    ...normalizedTransform,
+    offsetX: getNormalizedOffset(
+      initialRenderLayout.left - framePositionDeltaX,
+      overflowX,
+    ),
+    offsetY: getNormalizedOffset(
+      initialRenderLayout.top - framePositionDeltaY,
+      overflowY,
+    ),
+  }
+}
+
+export function moveImageTransform(
+  metadata: ImageAssetMetadata,
+  frameSize: ImageFrameSize,
+  initialTransform: ImageTransform,
+  deltaX: number,
+  deltaY: number,
+): ImageTransform {
+  const normalizedTransform =
+    normalizeImageTransformForFrame(initialTransform, metadata, frameSize) ??
+    DEFAULT_IMAGE_TRANSFORM
+  const size = getImageCropSize(metadata, normalizedTransform)
+  const overflowX = Math.max(0, size.width - frameSize.width)
+  const overflowY = Math.max(0, size.height - frameSize.height)
+
+  return {
+    ...normalizedTransform,
+    offsetX:
+      overflowX > 0
+        ? clamp(normalizedTransform.offsetX + (2 * deltaX) / overflowX, -1, 1)
+        : 0,
+    offsetY:
+      overflowY > 0
+        ? clamp(normalizedTransform.offsetY + (2 * deltaY) / overflowY, -1, 1)
+        : 0,
+  }
+}

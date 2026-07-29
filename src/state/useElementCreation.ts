@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
-import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
 import { createStableId } from '../model/createStableId'
 import type { ElementCreationRequest } from '../model/elementCreation'
+import { isValidElementCreationRequest } from './isValidElementCreationRequest'
 import { useEditorProject } from './useEditorProject'
 
 export function useElementCreation() {
@@ -9,10 +9,7 @@ export function useElementCreation() {
 
   const createElement = useCallback(
     (request: ElementCreationRequest) => {
-      if (
-        request.kind === 'button' &&
-        findButtonAsset(request.assetId) === null
-      ) {
+      if (!isValidElementCreationRequest(request)) {
         return false
       }
 

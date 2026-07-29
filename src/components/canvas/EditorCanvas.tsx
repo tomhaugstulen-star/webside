@@ -3,6 +3,7 @@ import {
   useState,
   type CSSProperties,
 } from 'react'
+import type { EditorElement } from '../../model/editorProject'
 import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
 import type { ViewportMode } from '../../types/editor'
@@ -25,6 +26,21 @@ type TextEditingState = {
   elementId: string
 }
 
+function orderElementsForRendering(elements: EditorElement[]) {
+  const sections: EditorElement[] = []
+  const foregroundElements: EditorElement[] = []
+
+  elements.forEach((element) => {
+    if (element.kind === 'section') {
+      sections.push(element)
+    } else {
+      foregroundElements.push(element)
+    }
+  })
+
+  return [...sections, ...foregroundElements]
+}
+
 export function EditorCanvas({ viewport }: EditorCanvasProps) {
   const { activePage } = useEditorProject()
   const { selectedElementId, selectElement, clearSelection } = useElementSelection()
@@ -44,6 +60,7 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
     layoutPreview,
   )
   const pageStyle: CSSProperties = contentHeight > 0 ? { height: contentHeight } : {}
+  const renderElements = orderElementsForRendering(activePage.elements)
 
   const handlePreviewLayoutChange = (preview: ElementLayoutPreview | null) => {
     setPreviewState(
@@ -80,7 +97,7 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
             style={pageStyle}
             aria-label={`Nettside: ${activePage.name}`}
           >
-            {activePage.elements.map((element) => (
+            {renderElements.map((element) => (
               <EditorCanvasElement
                 key={element.id}
                 element={element}

@@ -1,7 +1,7 @@
-import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
 import { createEditorElement } from '../model/createEditorElement'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import type { EditorProjectState } from '../model/editorProject'
+import { isValidElementCreationRequest } from './isValidElementCreationRequest'
 
 function projectContainsElement(state: EditorProjectState, elementId: string) {
   return state.project.pages.some((page) =>
@@ -22,7 +22,7 @@ export function addElementToActivePage(
   if (
     !activePage ||
     projectContainsElement(state, elementId) ||
-    (request.kind === 'button' && findButtonAsset(request.assetId) === null)
+    !isValidElementCreationRequest(request)
   ) {
     return state
   }

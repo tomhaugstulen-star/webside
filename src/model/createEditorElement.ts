@@ -1,16 +1,14 @@
 import { DEFAULT_BUTTON_LABEL } from './buttonAsset'
+import { getDefaultElementSize } from './elementDimensions'
 import type { ElementCreationRequest } from './elementCreation'
-import type { EditorElement, ElementKind, ElementSize } from './editorProject'
+import type { EditorElement } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
+import {
+  DEFAULT_IMAGE_MODE,
+  DEFAULT_IMAGE_TRANSFORM,
+} from './imagePresentation'
 import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
-
-const defaultElementSizes: Record<ElementKind, ElementSize> = {
-  section: { width: 320, height: 180 },
-  image: { width: 240, height: 160 },
-  text: { width: 240, height: 96 },
-  button: { width: 160, height: 48 },
-}
 
 type CreateEditorElementInput = {
   id: string
@@ -23,7 +21,7 @@ export function createEditorElement({
   request,
   existingElements,
 }: CreateEditorElementInput): EditorElement {
-  const size = defaultElementSizes[request.kind]
+  const size = getDefaultElementSize(request.kind)
   const position = findElementCreationPosition(size, existingElements)
   const common = {
     id,
@@ -37,7 +35,15 @@ export function createEditorElement({
     case 'section':
       return { ...common, kind: 'section' }
     case 'image':
-      return { ...common, kind: 'image' }
+      return {
+        ...common,
+        kind: 'image',
+        assetId: request.assetId,
+        assetMetadata: { ...request.assetMetadata },
+        altText: '',
+        mode: DEFAULT_IMAGE_MODE,
+        transform: { ...DEFAULT_IMAGE_TRANSFORM },
+      }
     case 'text':
       return {
         ...common,

@@ -137,11 +137,6 @@
   background: #fffdfb;
 }
 
-.canvas-element--image {
-  border-style: dashed;
-  background: linear-gradient(135deg, #f8f5f2 0%, #eee8e4 100%);
-}
-
 .canvas-element--text {
   place-items: start;
   padding: 14px;
@@ -188,7 +183,6 @@
   user-select: text;
 }
 
-
 .canvas-element:hover {
   outline-color: rgba(143, 67, 47, 0.48);
 }
@@ -206,7 +200,7 @@
   outline-style: dashed;
 }
 
-.canvas-element--transforming {
+.canvas-element--transforming:not(.canvas-element--section) {
   z-index: 1;
 }
 

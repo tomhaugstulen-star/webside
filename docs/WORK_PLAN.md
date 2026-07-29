@@ -6,24 +6,24 @@ Dette dokumentet fastsetter utviklingsrekkefølge og kontrollkrav. Det utvikles 
 
 For hver avgrensede del:
 
-1. Kontroller riktig branch og rent arbeidsområde.
+1. Kontroller riktig branch og clean tree.
 2. Oppdater og kontroller faktisk `origin/main`.
-3. Opprett én avgrenset feature- eller docs-branch.
-4. Definer omfang, brukerhandlinger, varig state og transient state.
-5. Lås produkt- og designvalg før produksjonskode.
+3. Bruk én avgrenset feature- eller docs-branch.
+4. Definer brukerhandlinger, varig state og transient state.
+5. Lås produkt-, validerings- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
 7. Trekk ut ansvar før en kildefil passerer 250 linjer.
-8. Gjennomfør framtidsrettet audit.
+8. Gjennomfør framtidsrettet kodeaudit.
 9. Kjør automatiske kontroller etter siste produksjonsendring.
-10. Regenerer arkitekturrapporter ved strukturendringer.
-11. Test PC, Telefon, peker og tastatur der det er relevant.
-12. Oppdater relevant dokumentasjon.
+10. Test PC, Telefon, peker og tastatur der det er relevant.
+11. Regenerer arkitekturrapporter etter struktur- eller avhengighetsendringer.
+12. Oppdater all autoritativ dokumentasjon.
 13. Kontroller synkronisert branch og clean tree.
-14. Opprett PR og kontroller diff, mergebarhet, review-tråder og eventuell CI.
+14. Kontroller PR-diff, mergebarhet, reviews og CI.
 15. Merge bare etter eksplisitt brukergodkjenning.
-16. Oppdater lokal `main` og kontroller clean tree før neste fase.
+16. Oppdater lokal `main` før neste fase.
 
-Produksjonsbrancher bruker normalt:
+Normale kontroller:
 
 ```powershell
 npm run check
@@ -32,61 +32,94 @@ npm run architecture:diagram
 git diff --check
 ```
 
-For en ren Markdown-branch er `git diff --check`, dokumentkontroll og clean tree normalt tilstrekkelig når ingen kode, konfigurasjon eller arkitekturrapporter er endret.
-
 ## 2. Gjeldende status
 
-Faktisk `main`-HEAD er dynamisk og skal leses fra Git, ikke hardkodes i planen.
-
-```powershell
-git fetch origin
-git switch main
-git pull --ff-only origin main
-git status
-git log -6 --oneline --decorate
-```
-
-Stabile historiske referanser:
-
 ```text
-base main før dokumentasjonssynkronisering i PR #24: a77a9a9
-PR #21: første bundlede SVG-knappbibliotek – merget
-PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
-knappbibliotekets mergecommit: 5e548ad
-GitHub-sak #20: lukket som fullført
-prosjektskjema: versjon 5
-neste produksjonsfase: ikke valgt
+aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
+branch: feature/image-import-and-placement
+GitHub-sak: #25
+PR: #26 – åpen, ikke draft
+base main: 7e4c71f
+prosjektskjema: versjon 6
+implementering: ferdig
+manuell test: godkjent
+framtidsrettet sluttaudit: ferdig
+automatiske kontroller: godkjent
+dokumentasjon: oppdatert etter sluttaudit
+arkitekturrapporter etter sluttaudit: må regenereres
+merge: ikke godkjent eller utført
 ```
 
-Siste verifiserte produksjonskontroll gjelder fase 10:
+Faktisk branch- og `main`-HEAD leses fra Git.
+
+## 3. Siste verifiserte produksjonskontroll
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
-Vite: 78 moduler transformert
-produksjonsbuild: bestått
-arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
-PC- og Telefon-test: godkjent
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
+PC og Telefon: godkjent
 ```
 
-## 3. Fase 10 – ferdig og merget
+## 4. Fase 11A – ferdig funksjonsomfang
 
 Leveransen omfatter:
 
-- skjemaversjon 5
-- stabil `assetId`, `label` og `link` for knapper
-- fire statisk bundlede SVG-design
-- `Elementer -> Knapp` som internt designbibliotek
-- knappetekst, design og ekstern lenke i høyremenyen
-- kontrollert fallback for ukjent lagret asset-ID
-- låste knapper kan inspiseres, men ikke endres
-- opprettingsansvar trukket ut av sentral reducer før merge
-- oppdaterte arkitekturrapporter og dokumentasjon
+- lokal filvelger gjennom `Elementer -> Bilde`
+- PNG, JPEG og WebP
+- maksimal filstørrelse 10 MB
+- maksimal dekodet størrelse 40 megapiksler
+- maksimal bredde eller høyde 16 384 px
+- synlige feil for type, størrelse, dimensjon og dekoding
+- avbrutt filvalg uten prosjektmutasjon
+- avbrutt behandling etter panel-unmount
+- skjemaversjon 6
+- stabil bilde-`assetId`
+- serialiserbar metadata
+- alternativ tekst
+- `contain | crop`
+- zoom og normalisert offset
+- versjon-6-crop-grunnramme låst til 240 × 160 px
+- transient ressursbuffer for `File` og Object URL
+- kontrollert URL-opprydding
+- fallback ved manglende ressurs
+- åtte resizegrep på innsiden
+- resizing fra alle kanter og hjørner
+- motsatt kant står fast
+- crop-resize bevarer motivets størrelse og absolutte plassering
+- ramme og transform lagres atomisk
+- `Hele bildet` og `Juster utsnitt`
+- motivflytting med peker og tastatur
+- `Shift + dra` for rammeflytting
+- zoom 100–300 prosent
+- reset av utsnitt
+- metadata og sletting i høyremenyen
+- låste bilder kan inspiseres, men ikke muteres
+- Telefon arver desktopgeometri
+- Seksjon rendres bak forgrunnsinnhold
 
-Se `docs/BUTTON_LIBRARY.md`.
+## 5. Sluttauditens utfall
 
-## 4. Ferdig og merget til `main`
+Auditen bekreftet eller rettet:
+
+- én modellkilde for standard- og minimumsstørrelser
+- delt opprettingsvalidering mellom hook og reducer
+- crop-invarianter i modell og reducer
+- atomisk ramme- og transformcommit
+- global, kontrollert `Alt + piltast`
+- trygg import ved feil og unmount
+- fil/metadata-samsvar i ressurslageret
+- dekodet dimensjonsgrense
+- stabil versjon-6-tolkning av crop-transform
+- deterministisk bakgrunnslag for Seksjon
+- ingen motstridende bildestil i `canvas.css`
+- alle berørte kildefiler under 250 linjer
+
+## 6. Ferdig og merget før fase 11A
 
 - fase 0: stabilt editorgrunnlag
 - fase 1: prosjekt- og elementmodell
@@ -101,88 +134,69 @@ Se `docs/BUTTON_LIBRARY.md`.
 - elementlenker – PR #14
 - fase 9: sikker sletting – PR #16
 - dokumentasjonsaudit – PR #19
-- fase 10: SVG-knappbibliotek – PR #21, mergecommit `5e548ad`
-- dokumentasjonsstatus etter knappbiblioteket – PR #22, mergecommit `a77a9a9`
+- fase 10: SVG-knappbibliotek – PR #21
+- dokumentasjonsstatus – PR #22 og PR #24
 
-Historiske mergecommits i listen er milepæler. De skal ikke tolkes som permanent gjeldende `main`-HEAD.
+## 7. Neste handling
 
-## 5. Senere faser
+Ingen ny produksjonsfase startes fra denne branchen.
 
-Ingen av fasene under er aktiv før omfanget er eksplisitt valgt og godkjent.
+Neste obligatoriske steg:
 
-### Fase 11 – Bilder
-
-Planlagt branch: `feature/image-import-and-placement`
-
-- bildevelger
-- lokale bildefiler
-- selvstendig bildeobjekt
-- fri plassering og størrelse
-- stabil ressursreferanse
-- serialiserbar metadata
-- validering og kontrollert fallback
-- alt-tekst og tilgjengelighet
-
-Før fasen starter må minst bilde-/ressursmodell, lagringsformat, filtyper, maksimal størrelse, skalering, proporsjoner, mobil arv og slettelivssyklus låses.
-
-### Fase 12 – Farger
-
-Planlagt branch: `feature/project-colors`
-
-- register over faktiske prosjektfarger
-- global endring
-- tekstfarge og senere knappfarger kobles hit
-
-### Fase 13 – Logo og header
-
-Planlagt branch: `feature/logo-header`
-
-- logo
-- hovedtekst og undertittel
-- redigerbar headerstruktur
-
-### Fase 14 – Korrigeringslinjer
-
-Planlagt branch: `feature/alignment-guides`
-
-- horisontal midtstilling
-- samme linje og lik avstand
-- bare under flytting eller resizing
-
-### Fase 15 – Responsiv redigering
-
-Planlagt branch: `feature/mobile-design-controls`
-
-- desktop er grunnlaget
-- mobil arver desktop som standard
-- eksplisitte mobiloverstyringer
-
-### Fase 16 – Angre og gjør om
-
-Planlagt branch: `feature/history-system`
-
-### Fase 17 – Lokal automatisk lagring
-
-Planlagt branch: `feature/local-project-autosave`
-
-### Fase 18 – Åpne og importere prosjekt
-
-Planlagt branch: `feature/project-open-import`
-
-### Fase 19 – Forhåndsvisning og publisering
-
-```text
-feature/preview-mode
-feature/publishing
+```powershell
+npm run architecture:json
+npm run architecture:diagram
+git status --short
+git diff --check
+git diff --stat
 ```
 
-## 6. Faste tekniske grenser
+Forventet:
 
-- 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
-- 300 linjer er hard unntaksgrense.
-- Canvas-komponenten skal ikke samle nye funksjonsansvar.
-- `RightPropertiesPanel.tsx` skal forbli komposisjon.
-- Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
-- Ugyldige og uendrede handlinger skal returnere samme state.
-- Transient markering, drafts, dialogstate, fokus, hover og feedback serialiseres ikke.
-- Ingen branch merges uten eksplisitt brukergodkjenning.
+- bare `architecture.json` og `docs/dependency-graph.mmd` endres
+- ingen reelle `git diff --check`-feil
+
+Deretter:
+
+1. commit og push bare arkitekturrapportene
+2. trekk alle dokumentcommits lokalt
+3. kontroller clean tree og samlet diff mot `main`
+4. oppdater PR #26-body med sluttkontroll og rapportcommit
+5. kontroller mergebarhet, changed files, review-tråder, reviews og CI
+6. presenter PR #26 for eksplisitt godkjenning
+7. merge først etter ordet `godkjent`
+8. oppdater lokal `main`
+9. velg neste fase eksplisitt
+
+## 8. Senere faser
+
+```text
+fase 12  prosjektfarger
+fase 13  logo og header
+fase 14  korrigeringslinjer
+fase 15  responsive mobiloverstyringer
+fase 16  angre og gjør om
+fase 17  lokal automatisk lagring
+fase 18  åpne og importere prosjekt
+fase 19  forhåndsvisning og publisering
+```
+
+## 9. Obligatoriske framtidsgrenser
+
+- prosjektimport validerer hele prosjektet og skjemaversjonen før `replace-project`
+- prosjektbytte avstemmer eller tømmer bilderessursbufferen
+- historikk lagrer bare serialiserbar prosjektstate
+- mobiloverstyringer bruker viewport-spesifikke actions
+- autolagring reagerer på gyldige prosjektmutasjoner
+- endret crop-grunnmodell krever ny skjemaversjon og migrering
+
+## 10. Faste tekniske grenser
+
+- 250 linjer er aktiv terskel
+- 300 linjer er hard unntaksgrense
+- canvas samler ikke egenskaps-, fil- eller ressursansvar
+- `RightPropertiesPanel.tsx` forblir komposisjon
+- varige data endres bare gjennom validerte reducerhandlinger
+- ugyldige og uendrede handlinger returnerer samme state
+- transient editor- og ressursstate serialiseres ikke
+- ingen branch merges uten eksplisitt godkjenning

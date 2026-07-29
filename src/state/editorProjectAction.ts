@@ -3,6 +3,7 @@ import type { ElementCreationRequest } from '../model/elementCreation'
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
+import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import type { TextElementStylePatch } from '../model/textElementStyle'
 
 export type EditorProjectAction =
@@ -59,5 +60,30 @@ export type EditorProjectAction =
       type: 'set-button-asset'
       elementId: string
       assetId: ButtonAssetId
+      updatedAt: string
+    }
+  | {
+      type: 'set-image-alt-text'
+      elementId: string
+      altText: string
+      updatedAt: string
+    }
+  | {
+      type: 'set-image-mode'
+      elementId: string
+      mode: ImageMode
+      updatedAt: string
+    }
+  | {
+      type: 'set-image-transform'
+      elementId: string
+      transform: ImageTransform
+      updatedAt: string
+    }
+  | {
+      type: 'set-image-desktop-frame'
+      elementId: string
+      layout: ElementLayout
+      transform: ImageTransform
       updatedAt: string
     }

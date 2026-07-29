@@ -1,0 +1,130 @@
+.canvas-element--image {
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.canvas-element--image.canvas-element--selected,
+.canvas-element--image:focus-visible {
+  outline-offset: 0;
+}
+
+.image-element__content {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.image-element__content--crop {
+  cursor: move;
+  touch-action: none;
+}
+
+.image-element__content--dragging {
+  cursor: grabbing;
+}
+
+.image-element__image {
+  position: absolute;
+  max-width: none;
+  max-height: none;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.image-element__fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+  color: #7f7169;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), transparent),
+    repeating-linear-gradient(
+      -45deg,
+      #f2ece8,
+      #f2ece8 10px,
+      #e9e0db 10px,
+      #e9e0db 20px
+    );
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.image-frame-handle {
+  position: absolute;
+  z-index: 3;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+
+.image-frame-handle::after {
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ffffff;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(61, 38, 29, 0.28);
+  content: '';
+}
+
+.image-frame-handle--north-west {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.image-frame-handle--north {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.image-frame-handle--north-east {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.image-frame-handle--east {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+
+.image-frame-handle--south-east {
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+}
+
+.image-frame-handle--south {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.image-frame-handle--south-west {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.image-frame-handle--west {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}

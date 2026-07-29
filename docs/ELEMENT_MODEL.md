@@ -2,17 +2,11 @@
 
 Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editoren.
 
-## 1. Gjeldende status
-
-Grunnmodellen ble utviklet i `feature/element-model` og er senere utvidet kontrollert av feature-branchene som eier nye varige elementdata.
-
-Gjeldende skjemaversjon på `main`:
+## 1. Gjeldende skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 5
+EDITOR_PROJECT_SCHEMA_VERSION = 6
 ```
-
-Historiske skjematrinn:
 
 ```text
 versjon 1  grunnmodell for prosjekt, sider og elementer
@@ -20,54 +14,39 @@ versjon 2  varig tekstinnhold
 versjon 3  varig tekststil
 versjon 4  varig elementlenke
 versjon 5  stabilt knappasset, knappetekst og knappelenke
+versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
 ```
 
-Det finnes foreløpig ingen prosjektlagring eller import. Migrering mellom skjemaversjoner bygges sammen med `feature/project-open-import`.
+Det finnes ennå ingen prosjektfilimport eller migreringsmotor. En annen bilde- eller crop-modell krever ny skjemaversjon og kontrollert migrering.
 
 ## 2. Prosjektstruktur
 
-Et `EditorProject` inneholder:
-
-- skjemaversjon
-- stabil prosjekt-ID
-- prosjektnavn
-- én eller flere sider
-- opprettet- og oppdatert-tidspunkt
+```text
+EditorProject
+  schemaVersion
+  id
+  name
+  pages: EditorPage[]
+    elements: EditorElement[]
+  createdAt
+  updatedAt
+```
 
 Et nytt prosjekt starter med én blank side kalt `Forside`.
 
-`EditorProject` er framtidig autoritativ kilde for lagring, import, forhåndsvisning, eksport og publisering.
+Prosjektmodellen er flat. En Seksjon eier ikke elementer som ligger visuelt over den. Rendering plasserer Seksjon bak Bilde, Tekst og Knapp uten å endre lagret elementrekkefølge.
 
-## 3. Sider
+## 3. Felles elementdata
 
-Hver side inneholder:
-
-- stabil side-ID
-- navn
-- slug
-- liste over elementer
-
-Aktiv side ligger i editorens sentrale state.
-
-Prosjektmodellen er flat:
-
-```text
-page.elements: EditorElement[]
+```ts
+type BaseEditorElement = {
+  id: string
+  position: ResponsiveValue<CanvasPosition>
+  size: ResponsiveValue<ElementSize>
+  visibility: ResponsiveValue<boolean>
+  locked: boolean
+}
 ```
-
-En Seksjon eier derfor ikke elementer som ligger visuelt over den. Foreldre-/barnemodell er ikke innført.
-
-## 4. Elementunion
-
-`EditorElement` er en diskriminert union basert på `kind`.
-
-Felles felter:
-
-- stabil ID
-- responsiv posisjon
-- responsiv størrelse
-- responsiv synlighet
-- låsestatus
 
 ```ts
 type EditorElement =
@@ -76,6 +55,8 @@ type EditorElement =
   | TextEditorElement
   | ButtonEditorElement
 ```
+
+## 4. Elementtyper
 
 ### Seksjon
 
@@ -90,12 +71,41 @@ type SectionEditorElement = BaseEditorElement & {
 ```ts
 type ImageEditorElement = BaseEditorElement & {
   kind: 'image'
+  assetId: ImageAssetId
+  assetMetadata: ImageAssetMetadata
+  altText: string
+  mode: 'contain' | 'crop'
+  transform: ImageTransform
 }
 ```
 
-Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressurs-ID, filmetadata, alt-tekst og skaleringsmodell er ikke implementert ennå og skal avklares i fase 11 – Bilder.
+```ts
+type ImageAssetMetadata = {
+  fileName: string
+  mimeType: 'image/png' | 'image/jpeg' | 'image/webp'
+  byteSize: number
+  width: number
+  height: number
+}
 
-### Tekstelement
+type ImageTransform = {
+  zoom: number
+  offsetX: number
+  offsetY: number
+}
+```
+
+Nye bilder starter med:
+
+```text
+altText: ''
+mode: contain
+zoom: 1
+offsetX: 0
+offsetY: 0
+```
+
+### Tekst
 
 ```ts
 type TextEditorElement = BaseEditorElement & {
@@ -106,17 +116,7 @@ type TextEditorElement = BaseEditorElement & {
 }
 ```
 
-Nye tekstbokser starter med:
-
-```text
-content: ''
-textStyle: DEFAULT_TEXT_ELEMENT_STYLE
-link: none
-```
-
-Tom tekst er gyldig. Editor-placeholder er ikke prosjektdata.
-
-### Knappelement
+### Knapp
 
 ```ts
 type ButtonEditorElement = BaseEditorElement & {
@@ -127,90 +127,133 @@ type ButtonEditorElement = BaseEditorElement & {
 }
 ```
 
-Nye knapper starter med:
+## 5. Stabile asset-ID-er
+
+### Knapp
+
+- peker til en statisk katalog som bundles av Vite
+- prosjektet lagrer ikke filsti, rå SVG eller Vite-URL
+- ukjent ID gir kontrollert fallback
+
+### Bilde
+
+- kryptografisk UUID-basert identitet
+- nøkkel til et separat transient ressurslager
+- prosjektet lagrer ikke filsti, `File`, Blob eller Object URL
+- manglende ressurs gir kontrollert fallback
+
+## 6. Bilderessurslager
 
 ```text
-assetId: button.primary-rounded.v1
-label: Les mer
-link: none
+ImageAssetId -> {
+  file: File
+  objectUrl: string
+  metadata: ImageAssetMetadata
+}
 ```
-
-`assetId`, `label` og `link` er obligatorisk varig prosjektdata for knappen.
-
-## 5. Stabil knappasset-ID
-
-`ButtonAssetId` er en brandet, validert streng.
 
 Regler:
 
-- ID-en er stabil prosjektidentitet
-- ID-en er ikke filsti eller import-URL
-- ID-en er ikke `keyof` den nåværende katalogen
-- modellaget importerer ikke SVG-filer
-- publiserte ID-er endres eller slettes ikke uten migrering eller kompatibilitetsmapping
-- vesentlig visuell eller skaleringsmessig endring får ny versjonert ID
+- fil og metadata har samme filnavn, MIME-type og byte-størrelse
+- samme `assetId` registreres ikke to ganger
+- Object URL tilbakekalles ved ressursfjerning
+- alle URL-er tilbakekalles ved provider-unmount
+- sletting fjerner ressursen bare når asset ikke deles
+- mislykket elementoppretting rydder registrert ressurs
+- import som avsluttes etter panel-unmount oppretter ikke ressurs eller element
 
-Første ID-er:
+Ressursbufferen gjelder bare aktiv nettleserøkt. Varig binærlagring bygges senere.
 
-```text
-button.primary-rounded.v1
-button.secondary-rounded.v1
-button.outline-rounded.v1
-button.dark-rounded.v1
-```
+## 7. Bildevalidering
 
-En ukjent lagret ID skal ikke krasje editoren. Rendering bruker kontrollert fallback, og høyremenyen viser reparasjonsvalg.
-
-## 6. Knappetekst
-
-`label` er ekte HTML-tekst, ikke tekst i SVG-filen.
-
-Regler:
-
-- brukes som synlig knappetekst
-- brukes som tilgjengelig navn
-- trimmes før lagring
-- tom eller whitespace-only tekst avvises
-- uendret tekst gir ingen prosjektmutasjon
-- låst knapp kan inspiseres, men ikke endres
-
-## 7. Tekststil
-
-`textStyle` er varig prosjektdata bare for tekstelementer og inneholder kontrollerte verdier for:
-
-- fontfamilie
-- fontstørrelse
-- fontvekt
-- fontstil
-- tekstjustering
-- linjehøyde
-
-Tekststilen gjelder hele tekstboksen. Riktekst og tegnbaserte stilspenn er ikke del av modellen.
-
-## 8. Elementlenke
-
-`link` er varig prosjektdata og bruker en diskriminert union:
+Autoritative import- og metadatagrenser:
 
 ```text
-none
-external-url { url, openInNewTab }
+format: PNG, JPEG eller WebP
+maks filstørrelse: 10 MB
+maks dekodet pikselmengde: 40 megapiksler
+maks bredde eller høyde: 16 384 px
 ```
 
-På `main` støttes lenken av:
+Metadata er gyldig bare når:
 
-- tekstbokser
-- knapper
+- filnavnet er ikke tomt
+- MIME-type er støttet
+- byte-størrelse er heltall innenfor grensen
+- bredde og høyde er positive heltall
+- dimensjon og pikselmengde er innenfor modellgrensene
 
-Regler:
+Disse reglene gjelder både UI-import og framtidig prosjektvalidering.
 
-- bare absolutte `http://`- og `https://`-adresser godtas
-- ugyldig URL muterer ikke prosjektet
-- uendret lenke muterer ikke prosjektet
-- lenken aktiveres ikke i editormodus
-- teksten eller knappen får lenken som helhet
-- enkeltord og tekstsegmenter har ikke egne lenker
+## 8. Bildevisning og transform
 
-## 9. Responsive verdier
+### `contain`
+
+- hele motivet vises proporsjonalt
+- motivet sentreres i rammen
+- tomrom er tillatt ved ulikt sideforhold
+- transform beholdes, men brukes ikke visuelt
+
+### `crop`
+
+- motivet fyller rammen uten tomrom
+- sideforholdet bevares
+- zoom begrenses til `1..3`
+- minimum zoom økes når rammen krever det
+- offset normaliseres til `-1..1`
+- offset begrenses slik at tomrom ikke blir synlig
+- rammen kan ikke være større enn motivet ved aktiv zoom
+
+## 9. Fast crop-grunnramme for versjon 6
+
+Versjon-6-transformen er definert mot:
+
+```text
+IMAGE_CROP_BASE_FRAME_SIZE_V6 = 240 × 160 px
+```
+
+Denne verdien er en skjemainvariant, ikke bare standardstørrelsen for nye bilder. Senere endring av bildets opprettingsstørrelse skal derfor ikke endre hvordan lagret `zoom`, `offsetX` eller `offsetY` tolkes.
+
+Endring av crop-grunnrammen krever:
+
+1. ny skjemaversjon
+2. eksplisitt migrering av transformdata
+3. verifisering av eksisterende prosjekter
+
+## 10. Rammeresize i crop
+
+Bilderammen og motivet er separate konsepter.
+
+Ved rammeresize:
+
+- aktiv kant flyttes
+- motsatt kant står fast
+- motivets størrelse beholdes
+- motivets absolutte plassering på lerretet beholdes
+- ny normalisert offset beregnes mot den nye rammen
+- ramme og transform lagres atomisk
+
+Pekerpreview og reducercommit bruker samme modellberegning.
+
+## 11. Elementstørrelser
+
+```text
+Standard:
+Seksjon  320 × 180 px
+Bilde    240 × 160 px
+Tekst    240 × 96 px
+Knapp    160 × 48 px
+
+Minimum:
+Seksjon  160 × 90 px
+Bilde    120 × 80 px
+Tekst    120 × 48 px
+Knapp    80 × 36 px
+```
+
+Bildeelementets størrelse er den synlige rammen, ikke motivets egen størrelse.
+
+## 12. Responsive verdier
 
 ```ts
 type ResponsiveValue<T> = {
@@ -219,7 +262,7 @@ type ResponsiveValue<T> = {
 }
 ```
 
-Når mobilverdien mangler, arver Telefon-visningen desktopverdien.
+Når mobilverdien mangler, arver Telefon desktopverdien.
 
 Responsive verdier:
 
@@ -230,45 +273,23 @@ Responsive verdier:
 Foreløpig felles for PC og Telefon:
 
 - låsestatus
-- tekstinnhold
-- tekststil
+- tekstinnhold og tekststil
 - elementlenke
-- knappens `assetId`
-- knappens `label`
+- knappdata
+- bildeasset, metadata, alt-tekst, modus og transform
 
-Eksplisitte mobiloverstyringer bygges i `feature/mobile-design-controls`.
+## 13. Sentral state og reducergrenser
 
-## 10. Stabile ID-er
+Varige mutasjoner går gjennom typede actions for blant annet:
 
-Element-, side- og prosjekt-ID-er opprettes med nettleserens kryptografiske UUID-funksjon.
-
-- `crypto.randomUUID()` brukes når tilgjengelig
-- `crypto.getRandomValues()` brukes som sikker reserve
-- `Math.random()` brukes ikke til prosjektidentitet
-
-## 11. Sentral state
-
-`EditorProjectProvider` eier:
-
-- aktiv prosjektmodell
-- aktiv side
-- transient editor-state som markering
-
-Varige mutasjoner går gjennom uttømmende reducer-actions, blant annet:
-
-- erstatte prosjekt
-- bytte aktiv side
 - opprette og slette element
 - endre desktopgeometri
 - endre låsestatus
-- endre tekstinnhold og tekststil
-- endre elementlenke
-- endre knappetekst
-- endre knappdesign
-
-Høyremenyen eier aldri en separat elementmodell. Den leser valgt element fra autoritativ state og sender typede brukerintensjoner tilbake til state-laget.
-
-## 12. Validerte reducergrenser
+- endre tekst, stil og lenke
+- endre knappetekst og design
+- endre bildealternativ tekst
+- endre bildevisning og transform
+- endre crop-ramme og transform atomisk
 
 Reducergrensene krever:
 
@@ -276,57 +297,48 @@ Reducergrensene krever:
 - eksisterende element på aktiv side
 - riktig elementtype
 - ulåst element ved mutasjon
-- gyldig verdi
+- gyldige verdier og metadata
+- gyldig crop-geometri
 - faktisk endring
 
-Knappespesifikke krav:
+Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
 
-- oppretting med knapp krever kjent katalog-ID
-- designbytte krever kjent katalog-ID
-- knappetekst må være ikke-tom etter trimming
+## 14. Varig og transient state
 
-Lenkekrav:
+Varig:
 
-- bare `none` eller gyldig `external-url`
-- URL må normaliseres og valideres
-
-Ugyldige eller uendrede actions returnerer samme state og endrer ikke `updatedAt`.
-
-## 13. Prosjektdata og transient editor-state
-
-Varig prosjektdata:
-
-- sider og elementer
-- geometri og synlighet
-- låsestatus
-- tekstinnhold og tekststil
-- elementlenke
-- knappens asset-ID og label
+- prosjekt, sider og elementer
+- geometri, synlighet og låsestatus
+- innhold, stil, lenker og asset-ID-er
+- bildemetadata, modus og transform
 - tidsstempler
 
-Transient editor-state:
+Transient:
 
-- `selectedElementId`
-- pekerinteraksjon og layout-preview
-- aktiv tekstredigeringsøkt
-- tekst-, knappetekst- og lenkedrafts
-- katalogvisning
-- validering og feedback
-- slettedialogens mål og fokusreferanse
-- åpne paneler, fokus og hover
+- markering
+- pekerøkter og preview
+- redigeringsøkter og drafts
+- `File`, Object URL og ressurskart
+- paneler, dialoger, fokus og feedback
 
-Transient state skal ikke serialiseres, eksporteres eller publiseres.
+## 15. Krav til senere utvidelser
 
-## 14. Videre modellutvidelser
+### Prosjektimport
 
-Planlagte eksempler:
+Hele prosjektet må valideres før `replace-project`. Kjent skjemaversjon, unike ID-er, aktive sider, elementunion, layout og bildeinvarianter må kontrolleres samlet.
 
-- bildeinnhold i `feature/image-import-and-placement`
-- prosjektfarger i `feature/project-colors`
-- eksplisitte mobiloverstyringer i `feature/mobile-design-controls`
-- historikk i `feature/history-system`
-- lagring og migrering i senere lagringsfaser
+### Prosjektbytte
 
-Ingen av disse utvidelsene er aktiv produksjonsfase før omfanget er eksplisitt valgt og godkjent.
+Bilderessursbufferen må avstemmes eller tømmes, og foreldede Object URL-er må tilbakekalles.
 
-Se også `docs/BUTTON_LIBRARY.md` og `docs/ELEMENT_LINKS.md`.
+### Historikk
+
+Angre/gjør om lagrer bare serialiserbar prosjektstate. `File`, Object URL og aktive interaksjoner skal aldri inngå.
+
+### Mobiloverstyringer
+
+Egne mobilgeometrier må bruke viewport-spesifikke actions og ikke overskrive desktopverdier.
+
+### Autolagring
+
+Autolagring skal trigges av gyldig prosjektstate, ikke transient editor- eller ressursstate.

@@ -1,13 +1,14 @@
 import {
   elementLayoutsEqual,
   getElementDesktopLayout,
-  isValidElementLayout,
+  isValidElementDesktopLayout,
 } from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementLink } from './setElementLink'
@@ -120,7 +121,7 @@ function reduceEditorProjectState(
         !activePage ||
         !element ||
         element.locked ||
-        !isValidElementLayout(element.kind, action.layout) ||
+        !isValidElementDesktopLayout(element, action.layout) ||
         elementLayoutsEqual(getElementDesktopLayout(element), action.layout)
       ) {
         return state
@@ -201,6 +202,12 @@ function reduceEditorProjectState(
         action.assetId,
         action.updatedAt,
       )
+
+    case 'set-image-alt-text':
+    case 'set-image-mode':
+    case 'set-image-transform':
+    case 'set-image-desktop-frame':
+      return reduceImageProjectAction(state, action)
   }
 
   const unhandledAction: never = action

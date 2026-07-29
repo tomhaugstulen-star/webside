@@ -1,171 +1,227 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet samler den historiske grunnlagsauditen og den framtidsrettede kontrollen som ble gjennomført før PR #21.
+Dette dokumentet beskriver den framtidsrettede auditen av fase 11A og grensene som skal beskytte senere lagring, import, historikk og responsive utvidelser.
 
-## Historisk grunnlagsaudit
+## 1. Arkitekturretning
 
-Editorgrunnlaget ble ryddet i `chore/editor-foundation-audit`.
+- `App.tsx` setter sammen providers og editorskall.
+- `EditorShell` eier skalltilstand og hovedkomposisjon.
+- `EditorProject` er autoritativ kilde for varige prosjektdata.
+- reducer-/state-laget er siste valideringsgrense.
+- lerret og høyremeny muterer ikke prosjektdata direkte.
+- bildefil og Object URL ligger utenfor `EditorProject`.
+- responsive verdier lagres i prosjektmodellen, ikke i DOM-en.
+- generelle samlemapper og samlefiler skal ikke innføres.
 
-Viktige rettelser:
+## 2. Filgrenser etter sluttaudit
 
-- ubrukt kode ble fjernet
-- Dependency Cruiser fikk `no-unreachable-from-main`
-- intern terminologi ble standardisert til `Elementer`
-- editoren åpner med blankt lerret
-- `npm run dev` bruker `vite --open`
-- venstremeny, ikoner og panelinnhold fikk separate ansvar
+```text
+EditorCanvasElement.tsx: under 200 linjer
+ImagePropertiesSection.tsx: 199 linjer
+imagePresentation.ts: 236 innholdslinjer
+useElementPointerTransform.ts: 218 linjer
+ImageImportControl.tsx: 133 linjer
+setImageDesktopFrame.ts: under 100 linjer
+alle berørte kildefiler: under 250 linjer
+```
 
-Historiske modul- og avhengighetstall fra grunnlagsfasen er ikke gjeldende etter senere funksjonsutvidelser.
+250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense.
 
-## Bekreftet arkitekturretning
+## 3. State- og reducergrenser
 
-- `App.tsx` setter sammen applikasjonen
-- `EditorShell` eier skalltilstand og komposisjon
-- sentral prosjekt-state eier varig prosjektdata
-- reducer-/state-laget er autoritativ valideringsgrense
-- høyremenyen eier ingen separat elementmodell
-- lerretet skal ikke få tilfeldig egenskaps- eller kataloglogikk
-- responsive prosjektverdier lagres i prosjektmodellen, ikke i DOM-en
-- automatisk lagring bygges etter prosjektmodell og historikkmodell
+Prosjektskjemaet i leveransen er versjon 6.
 
-## Faste filgrenser
+Reducerhandlinger avviser:
 
-- 250 linjer er aktiv terskel for ansvarstrekk
-- 300 linjer er hard unntaksgrense
-- en fil deles tidligere når den får flere tydelige ansvar
-- `EditorCanvasElement.tsx` er 247 linjer og skal ikke få flere nye funksjonsansvar
-- `RightPropertiesPanel.tsx` skal være komposisjon
-- tilfeldig generell `features`-samlemappe skal ikke innføres
-
-## State- og reducergrenser
-
-Reducerhandlinger skal avvise:
-
-- manglende aktiv side
-- manglende element
+- manglende aktiv side eller element
 - element på feil side
 - duplisert element-ID
 - feil elementtype
 - låst element
-- ugyldig verdi
+- ugyldige eller ikke-finite verdier
 - ukjent knappasset-ID
+- ugyldig bildeasset eller metadata
+- ukjent bildevisningsmodus
+- ugyldig bildetransform
+- crop-geometri som ikke kan fylles ved lagret zoom
+- inkonsistent bilderamme og transform
 - uendret data
 
-Ved avvisning returneres samme state, prosjektet muteres ikke og `updatedAt` endres ikke.
+Ved avvisning returneres samme state. Prosjektet og `updatedAt` endres ikke.
 
-Transient markering, pekerinteraksjon, layout-preview, åpne paneler, drafts, validering, feedback, fokus, hover og dialogstate serialiseres ikke.
+Transient markering, pekerøkter, preview, drafts, panelstate, filvelger, `File`, Object URL, fokus, hover, feedback og dialogstate serialiseres ikke.
 
-## Knappbibliotekaudit
+## 4. Auditfunn og rettelser
+
+### Funn 1: dupliserte størrelseskonstanter
+
+Standard- og minimumsstørrelser ble samlet i `src/model/elementDimensions.ts`. Oppretting og layout bruker samme modellkilde.
+
+### Funn 2: duplisert opprettingsvalidering
+
+`src/state/isValidElementCreationRequest.ts` brukes av både UI-hook og reducer. Reduceren er fortsatt autoritativ.
+
+### Funn 3: crop-invarianter lå bare i UI
+
+Modell og reducer håndhever nå:
+
+- maksimal crop-ramme ved aktuell zoom
+- gyldig overgang fra contain til crop
+- transformnormalisering mot faktisk ramme
+- ingen skjult transformmutasjon i contain
+- atomisk lagring av ramme og korrigert transform
+
+### Funn 4: `Alt + piltast` var fokusavhengig
+
+`useSelectedImageCropKeyboard.ts` håndterer snarveien på editornivå. Den fungerer etter bruk av zoomkontrollen, blokkeres i tekstfelter og dialoger, og stopper nettleserhistorikk på `Alt + venstre/høyre`.
 
 ```text
-GitHub-sak #20: fullført
-PR #21: merget
-mergecommit: 5e548ad
-prosjektskjema: versjon 5
+Alt + piltast          4 px
+Shift + Alt + piltast 20 px
 ```
 
-Kontrollert ansvarsdeling:
+### Funn 5: import kunne bli stående opptatt eller fortsette etter panelbytte
+
+Importflyten bruker `try/catch/finally`, rydder delvis registrert ressurs og oppdaterer ikke UI eller prosjekt etter at Elementer-panelet er demontert.
+
+### Funn 6: ressursmetadata kunne avvike fra faktisk fil
+
+Ressurslageret krever samsvar for filnavn, MIME-type og byte-størrelse. Duplisert `assetId` avvises.
+
+### Funn 7: Seksjon kunne dekke forgrunnsinnhold
+
+Seksjon rendres først som bakgrunnslag. Bilde, Tekst og Knapp rendres over uten at lagret elementrekkefølge eller den flate prosjektmodellen endres.
+
+### Funn 8: bilderammen hadde motstridende CSS
+
+Bildets interne border og bakgrunn eies bare av `image-element.css`. Den gamle regelen i `canvas.css` er fjernet, slik at korrekt rendering ikke avhenger av CSS-importrekkefølgen.
+
+### Funn 9: grep og outline skapte ekstra utvendig kant
+
+Alle åtte grep og treffområder ligger innenfor rammen. Selection-outline ligger direkte mot bilderammen.
+
+### Funn 10: crop-resize sentrerte motivet på nytt
+
+`getImageTransformForResizedFrame` bevarer motivets absolutte plassering. Zoom og motivstørrelse endres ikke. Aktiv kant flyttes, motsatt kant står fast, og ny normalisert offset beregnes mot den nye rammen.
+
+`set-image-desktop-frame` lagrer ramme og transform atomisk.
+
+### Funn 11: crop-geometri var koblet til en senere endringsbar standardstørrelse
+
+Crop-grunnrammen for skjemaversjon 6 er nå eksplisitt låst til 240 × 160 px. Senere endring av standardstørrelsen for nye bilder kan derfor ikke endre utsnitt i eksisterende versjon-6-prosjekter.
+
+En annen crop-grunnmodell krever ny skjemaversjon og migrering.
+
+### Funn 12: filstørrelse begrenset ikke dekodet minnebruk
+
+Import avviser nå bilder som overstiger:
 
 ```text
-model
-  buttonAsset.ts
-  editorProject.ts
-  elementCreation.ts
-
-assets/buttons
-  fire SVG-filer
-  buttonAssetCatalog.ts
-
-state
-  addElementToActivePage.ts
-  setButtonLabel.ts
-  setButtonAsset.ts
-  setElementLink.ts
-
-sidebar
-  ElementsPanel.tsx
-  ButtonLibraryPanel.tsx
-
-properties
-  ButtonPropertiesSection.tsx
-  ElementLinkPropertiesSection.tsx
-
-canvas
-  ButtonElementContent.tsx
+10 MB filstørrelse
+40 megapiksler
+16 384 px bredde eller høyde
 ```
 
-## Asset-audit
+Samme dimensjonsregler inngår i metadata-valideringen i modellaget.
 
-- prosjektet lagrer stabil `assetId`
-- prosjektet lagrer ikke filsti, import-URL eller rå SVG
-- modellaget importerer ikke SVG-filer
-- katalogen eier mapping fra ID til bundlet fil og metadata
-- publiserte ID-er er versjonerte
-- ukjent lagret ID gir fallback, ikke krasj
-- ukjent ny ID avvises ved brukerendring og i state-grensen
+### Funn 13: import kunne fullføre etter at kontrollen var demontert
 
-SVG-kontroll:
+`ImageImportControl` bruker en monteringsreferanse. Etter unmount opprettes ingen ressurs, intet element og ingen lokal state-oppdatering.
 
-- gyldig `viewBox`
-- ingen tekst
-- ingen script eller `foreignObject`
-- ingen eksterne URL-er eller filer
-- ingen rasterbilder
-- transparent bakgrunn
-- fri bredde- og høydeskalering
+## 5. Ressurslivssyklus
 
-## Knappetekst- og designaudit
+Prosjektmodell:
 
-- label er ekte HTML-tekst og tilgjengelig navn
-- SVG-en er dekorativ
-- inputdraft er transient
-- teksten trimmes før lagring
-- tom tekst avvises
-- uendret tekst gir ingen mutasjon
-- låst knapp kan ikke endres
-- designvalget valideres mot katalogen
-- ukjent lagret design kan repareres fra høyremenyen
-- canvas-rendering bruker kontrollert fallback
+- lagrer stabil `assetId`
+- lagrer validert serialiserbar metadata
+- lagrer alt-tekst, modus og transform
+- lagrer aldri filsti, `File`, Blob eller Object URL
 
-## Lenke- og høyremenyaudit
+Ressurslager:
 
-- tekst og knapp bruker samme `ElementLink`
-- bare `http://` og `https://` godtas
-- ugyldig URL lagres ikke
-- uendret lenke gir ingen mutasjon
-- låst element kan ikke endre lenke
-- lenker aktiveres aldri i editormodus
-- `RightPropertiesPanel` komponerer etter `element.kind`
-- tekst- og knappkontroller ligger i separate komponenter
+- eier `File` og Object URL
+- avviser duplisert ID og metadataavvik
+- tilbakekaller URL ved ressursfjerning
+- tilbakekaller alle gjenværende URL-er ved provider-unmount
+- fjerner ressurs ved mislykket elementoppretting
+- fjerner ressurs ved sletting når asset ikke deles
+
+## 6. Bildegeometri
+
+- `contain` skalerer hele motivet proporsjonalt og sentrerer det.
+- `crop` bruker fast versjon-6-grunnskala, zoom og normalisert offset.
+- zoom normaliseres til `1..3`.
+- minimum zoom avledes fra rammen.
+- offset begrenses til `-1..1`.
+- tomrom kan ikke bli synlig i crop.
+- rammen kan endres fra åtte retninger.
+- rammeresize bevarer motivets størrelse og absolutte plassering.
+- pekertransform bruker transient preview og én commit.
+- `pointercancel` og tapt capture forkaster draft.
+
+## 7. Tilgjengelighet
+
+- eksplisitt label og hjelpetekst for alt-tekst
+- tom alt-tekst er gyldig for dekorative bilder
 - feil bruker `role="alert"`
 - lagringsfeedback bruker `role="status"`
+- radiofelt grupperes med fieldset og legend
+- zoom har label og synlig prosentverdi
+- tastatur- og pekerhjelp er dokumentert i UI
+- låste kontroller er deaktivert
+- canvas-label beskriver relevante snarveier
+- `prefers-reduced-motion` respekteres
 
-## Framtidsrettet refaktor før merge
+## 8. Verifisert sluttkontroll
 
-Auditen fant at `editorProjectReducer.ts` hadde nådd 250 linjer. Elementoppretting ble derfor trukket ut til `addElementToActivePage.ts`.
-
-Etter refaktoren:
-
-```text
-editorProjectReducer.ts: 217 linjer
-addElementToActivePage.ts: 52 linjer
-```
-
-Valideringen for aktiv side, unik element-ID og gyldig knappasset ligger fortsatt innenfor state-/reducergrensen.
-
-## Sluttkontroll for knappbibliotekfasen
+Brukerens lokale terminaloutput etter siste produksjonsendring:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
-Vite: 78 moduler transformert
-CSS: 24.43 kB, gzip 5.12 kB
-JavaScript: 239.41 kB, gzip 72.88 kB
-produksjonsbuild: bestått
-arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
 ```
 
-Manuell kontroll ble godkjent for alle fire designvarianter, oppretting, markering, flytting, resizing, knappetekst, tomtekstvalidering, designbytte, ekstern lenke, låsing, sletting, PC, Telefon, peker og tastatur.
+Manuell kontroll er godkjent for import, validering, lagrekkefølge, ramme, crop, zoom, tastatur, låsing, sletting, fallback, PC og Telefon.
 
-PR #21 var mergebar, hadde ingen review-tråder, ingen endringskrav og ingen ventende GitHub Actions-status. Merge ble utført med låst head-SHA.
+## 9. Obligatoriske grenser for senere faser
+
+### Prosjektimport
+
+- valider hele prosjektobjektet før `replace-project`
+- krev kjent skjemaversjon
+- avvis eller migrer eldre og nyere skjema kontrollert
+- ikke la importert metadata opprette Object URL uten en faktisk validert fil
+
+### Prosjektbytte
+
+- avstem eller tøm bilderessursbufferen
+- tilbakekall URL-er som ikke lenger tilhører aktivt prosjekt
+
+### Angre og gjør om
+
+- historikk inneholder bare serialiserbar prosjektstate
+- `File`, Object URL og aktive pekerøkter skal aldri inngå
+
+### Mobiloverstyringer
+
+- bruk viewport-spesifikke geometrihandlinger
+- ikke skriv mobilendringer inn i desktopfeltet
+
+### Autolagring
+
+- reager bare på gyldige prosjektmutasjoner
+- ikke lagre transient editor- eller ressursstate direkte
+
+## 10. Gjenstående før merge
+
+- regenerer `architecture.json` og `docs/dependency-graph.mmd`
+- kontroller at bare rapportene endres
+- commit og push rapportene
+- trekk og kontroller alle dokumentendringer lokalt
+- kontroller `git diff --check`, clean tree, PR-head, mergebarhet, reviews og CI
+- merge bare etter eksplisitt brukergodkjenning

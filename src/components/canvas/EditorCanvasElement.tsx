@@ -5,37 +5,24 @@ import {
   type MouseEvent,
   type RefObject,
 } from 'react'
-import {
-  moveElementLayout,
-  resizeElementLayout,
-  type ElementLayout,
-} from '../../model/elementLayout'
-import type { CanvasPosition, EditorElement } from '../../model/editorProject'
+import type { ElementLayout } from '../../model/elementLayout'
+import type { EditorElement } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
 import { useTextElementContent } from '../../state/useTextElementContent'
 import type { ViewportMode } from '../../types/editor'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
 import {
-  elementKindLabels,
   getAccessibleElementLabel,
   getCanvasElementKeyboardShortcuts,
 } from './canvasElementAccessibility'
-import { ButtonElementContent } from './ButtonElementContent'
+import { handleCanvasElementKeyDown } from './canvasElementKeyboard'
+import { EditorCanvasElementContent } from './EditorCanvasElementContent'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import { getTextElementCssStyle } from './getTextElementCssStyle'
-import {
-  TextElementEditor,
-  type TextEditFinishReason,
-} from './TextElementEditor'
+import { ImageResizeHandles } from './ImageResizeHandles'
+import type { TextEditFinishReason } from './TextElementEditor'
 import { useElementPointerTransform } from './useElementPointerTransform'
-
-const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
-  ArrowUp: { x: 0, y: -1 },
-  ArrowDown: { x: 0, y: 1 },
-  ArrowLeft: { x: -1, y: 0 },
-  ArrowRight: { x: 1, y: 0 },
-}
 
 type EditorCanvasElementProps = {
   element: EditorElement
@@ -63,7 +50,8 @@ export function EditorCanvasElement({
   onPreviewLayoutChange,
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
-  const { commitElementDesktopLayout } = useElementLayout()
+  const { commitElementDesktopLayout, commitImageDesktopFrame } =
+    useElementLayout()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
   const initialLayout: ElementLayout = {
@@ -72,6 +60,7 @@ export function EditorCanvasElement({
   }
   const {
     layout,
+    imageTransform,
     transformMode,
     handleMovePointerDown,
     handleResizePointerDown,
@@ -86,6 +75,7 @@ export function EditorCanvasElement({
     scrollContainerRef,
     onSelect,
     onCommitLayout: commitElementDesktopLayout,
+    onCommitImageFrame: commitImageDesktopFrame,
     onPreviewLayoutChange,
   })
 
@@ -94,7 +84,10 @@ export function EditorCanvasElement({
   }
 
   const isTextEditing = editing && element.kind === 'text'
-  const label = elementKindLabels[element.kind]
+  const contentElement =
+    element.kind === 'image' && imageTransform
+      ? { ...element, transform: imageTransform }
+      : element
   const style: CSSProperties = {
     left: layout.position.x,
     top: layout.position.y,
@@ -110,55 +103,16 @@ export function EditorCanvasElement({
   const accessibleLabel = getAccessibleElementLabel(element)
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-
-      if (element.kind === 'text' && selected && !element.locked) {
-        onStartTextEditing(element.id)
-      } else {
-        onSelect(element.id)
-      }
-
-      return
-    }
-
-    if (event.key === ' ') {
-      event.preventDefault()
-      onSelect(element.id)
-      return
-    }
-
-    const direction = keyboardDirections[event.key]
-
-    if (!direction) {
-      return
-    }
-
-    event.preventDefault()
-    onSelect(element.id)
-
-    const canvas = canvasRef.current
-
-    if (element.locked || !canvas || canvas.clientWidth <= 0) {
-      return
-    }
-
-    const step = event.shiftKey ? 10 : 1
-    const delta = {
-      x: direction.x * step,
-      y: direction.y * step,
-    }
-    const nextLayout =
-      event.ctrlKey || event.metaKey
-        ? resizeElementLayout(
-            element.kind,
-            initialLayout,
-            delta,
-            canvas.clientWidth,
-          )
-        : moveElementLayout(initialLayout, delta, canvas.clientWidth)
-
-    commitElementDesktopLayout(element.id, nextLayout)
+    handleCanvasElementKeyDown(event, {
+      element,
+      selected,
+      initialLayout,
+      canvasWidth: canvasRef.current?.clientWidth ?? 0,
+      onSelect,
+      onStartTextEditing,
+      onCommitLayout: commitElementDesktopLayout,
+      onCommitImageFrame: commitImageDesktopFrame,
+    })
   }
 
   const handleDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -191,7 +145,7 @@ export function EditorCanvasElement({
         aria-keyshortcuts={
           isTextEditing
             ? undefined
-            : getCanvasElementKeyboardShortcuts(element.locked)
+            : getCanvasElementKeyboardShortcuts(element)
         }
         aria-pressed={isTextEditing ? undefined : selected}
         data-element-id={element.id}
@@ -203,34 +157,27 @@ export function EditorCanvasElement({
         onDoubleClick={isTextEditing ? undefined : handleDoubleClick}
         onKeyDown={isTextEditing ? undefined : handleKeyDown}
       >
-        {element.kind === 'text' ? (
-          isTextEditing ? (
-            <TextElementEditor
-              initialContent={element.content}
-              onCommit={(content) => commitTextElementContent(element.id, content)}
-              onFinish={finishTextEditing}
-            />
+        <EditorCanvasElementContent
+          element={contentElement}
+          editing={isTextEditing}
+          selected={selected}
+          frameSize={layout.size}
+          onSelect={onSelect}
+          onCommitText={(content) => commitTextElementContent(element.id, content)}
+          onFinishTextEditing={finishTextEditing}
+        />
+        {selected && !element.locked && !isTextEditing && (
+          element.kind === 'image' ? (
+            <ImageResizeHandles onPointerDown={handleResizePointerDown} />
           ) : (
             <span
-              className={`canvas-element__text-content ${element.content ? '' : 'canvas-element__text-content--empty'}`}
+              className="canvas-element__resize-handle"
               aria-hidden="true"
-            >
-              {element.content || 'Dobbeltklikk for å skrive'}
-            </span>
+              onPointerDown={(event) =>
+                handleResizePointerDown('south-east', event)
+              }
+            />
           )
-        ) : element.kind === 'button' ? (
-          <ButtonElementContent element={element} />
-        ) : (
-          <span className="canvas-element__placeholder" aria-hidden="true">
-            {label}
-          </span>
-        )}
-        {selected && !element.locked && !isTextEditing && (
-          <span
-            className="canvas-element__resize-handle"
-            aria-hidden="true"
-            onPointerDown={handleResizePointerDown}
-          />
         )}
       </div>
       {selected && transformMode === null && !isTextEditing && (

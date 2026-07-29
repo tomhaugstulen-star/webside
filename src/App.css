@@ -2,12 +2,16 @@
 @import './styles/toolbar.css';
 @import './styles/sidebar.css';
 @import './styles/sidebar-content.css';
+@import './styles/image-import.css';
 @import './styles/button-library.css';
 @import './styles/canvas.css';
+@import './styles/image-element.css';
 @import './styles/button-element.css';
 @import './styles/right-properties-panel.css';
 @import './styles/text-properties.css';
 @import './styles/button-properties.css';
+@import './styles/image-properties.css';
+@import './styles/image-crop-properties.css';
 @import './styles/element-link-properties.css';
 @import './styles/element-deletion.css';
 

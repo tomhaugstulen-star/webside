@@ -15,7 +15,7 @@ GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing når lokal utførelse er nødvendig.
+Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
 
 Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. Ikke påstå at lokale tester eller clean tree er godkjent uten faktisk terminaloutput.
 
@@ -26,213 +26,189 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 3. `docs/EDITOR_PLANNING.md`
 4. `docs/PROJECT_RULES.md`
 5. `README.md`
-6. `docs/BUTTON_LIBRARY.md`
-7. `docs/ELEMENT_MODEL.md`
-8. `docs/ELEMENT_LINKS.md`
-9. `docs/RIGHT_PROPERTIES_PANEL.md`
-10. `docs/CODE_AUDIT.md`
-11. relevante øvrige fasedokumenter
+6. `docs/ELEMENT_MODEL.md`
+7. `docs/RIGHT_PROPERTIES_PANEL.md`
+8. `docs/CODE_AUDIT.md`
+9. relevante øvrige fasedokumenter
 
-## Repo- og arbeidsstatus
-
-Ikke stol på et hardkodet commitnummer som «gjeldende main HEAD». Kontroller alltid faktisk `origin/main` og GitHub-status før planlegging eller arbeid.
-
-Stabile historiske referanser:
+## Gjeldende status
 
 ```text
-base main før dokumentasjonssynkronisering i PR #24: a77a9a9
-knappbibliotekets mergecommit: 5e548ad
-PR #21: Build first bundled SVG button library – merget
-PR #22: Update status after button library merge – merget
-PR #24: dokumentasjonssynkronisering; kontroller faktisk status på GitHub
-GitHub-sak #20: lukket som fullført
-prosjektskjema: versjon 5
-neste produksjonsfase: ikke valgt
+aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
+branch: feature/image-import-and-placement
+GitHub-sak: #25
+PR: #26 – åpen, ikke draft
+base main: 7e4c71fed4a26dfb829cc19ae81df95215c42a64
+prosjektskjema: versjon 6
+implementering: ferdig
+manuell PC- og Telefon-test: godkjent
+framtidsrettet sluttaudit: ferdig
+siste produksjonskontroll: bestått
+arkitekturrapporter etter sluttaudit: må regenereres
+merge: ikke godkjent eller utført
 ```
 
-`5e548ad` er mergecommit for selve knappbiblioteket. `a77a9a9` er base-commit før PR #24, ikke en permanent forventet topp-commit.
+Faktisk feature- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Ikke bruk et hardkodet commitnummer som permanent forventet topp-commit.
 
-Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
+Historiske kontrollpunkter:
+
+```text
+main-base for fase 11A: 7e4c71f
+arkitekturrapporter før sluttaudit: 94ed2fb
+første fullførte dokumentstatus: 9c92fb1
+siste verifiserte produksjonscommit ved kontrollen: 7378e24
+```
+
+Dokumentcommits ligger etter `7378e24`. Faktisk feature-head må leses fra Git.
+
+## Siste verifiserte kvalitetskontroll
+
+Brukerens lokale terminaloutput bekreftet etter den endelige kodeauditen:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
-Vite: 78 moduler transformert
-CSS: 24.43 kB, gzip 5.12 kB
-JavaScript: 239.41 kB, gzip 72.88 kB
-produksjonsbuild: bestått
-arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
-PC og Telefon: godkjent
-peker og tastatur: godkjent
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
 ```
 
-Start alltid med faktisk lokal status:
+## Implementert funksjonalitet
+
+- blankt PC- og Telefon-lerret
+- kontrollert toppmeny, venstremeny og høyremeny
+- Seksjon, Bilde, Tekst og Knapp
+- sentral prosjektmodell og state
+- markering, flytting, resizing og låsing
+- flerlinjet tekstredigering
+- tekststil og eksterne lenker
+- sikker sletting
+- bundlet SVG-knappbibliotek
+- lokal bildeimport for PNG, JPEG og WebP
+- transient ressursbuffer for `File` og Object URL
+- stabil bilde-`assetId` og serialiserbar metadata
+- alt-tekst, `Hele bildet` og `Juster utsnitt`
+- zoom, reset, pekerdrag og tastaturstyrt motivflytting
+- åtte resizegrep innenfor bilderammen
+- Seksjon rendret bak Bilde, Tekst og Knapp
+- crop-resize med stasjonært motiv og fast motsatt kant
+- kontrollert fallback ved manglende ressurs
+
+## Autoritative bildegrenser
+
+```text
+maks filstørrelse: 10 MB
+maks dekodet pikselmengde: 40 megapiksler
+maks bredde eller høyde: 16 384 px
+crop-grunnramme for skjemaversjon 6: 240 × 160 px
+zoom: 1..3
+offsetX og offsetY: -1..1
+```
+
+Crop-grunnrammen er en skjemainvariant. Senere endring av standardstørrelsen for nye bilder skal ikke endre versjon-6-transformer. En annen grunnmodell krever ny skjemaversjon og migrering.
+
+## Bildeinteraksjon
+
+```text
+Hele bildet     viser hele motivet proporsjonalt og sentrert
+Juster utsnitt  fyller rammen uten tomrom
+vanlig dra      flytter motivet
+Shift + dra     flytter hele rammen
+Alt + piltast   flytter motivet 4 px
+Shift+Alt+pil   flytter motivet 20 px
+piltast         flytter elementet
+Ctrl/Cmd + pil  endrer størrelse fra nedre høyre hjørne
+```
+
+Ved crop-resize:
+
+- motivets størrelse og absolutte plassering beholdes
+- bare den aktive rammekanten flyttes
+- motsatt kant står fast
+- ny normalisert offset beregnes mot ny ramme
+- ramme og transform lagres atomisk
+
+## Sluttauditens viktigste rettelser
+
+- crop-invarianter håndheves i modell og reducer
+- `Alt + piltast` fungerer etter bruk av zoomkontrollen
+- nettleserhistorikk stoppes for `Alt + venstre/høyre`
+- Seksjon rendres deterministisk bak forgrunnsinnhold
+- bilderammen har ingen motstridende regel i `canvas.css`
+- grep og treffområder ligger innenfor bilderammen
+- import avsluttes sikkert ved feil og panel-unmount
+- metadata kontrolleres mot faktisk fil
+- dekodet bildestørrelse er begrenset
+- crop-grunnskala er låst til skjemaversjon 6
+- alle berørte kildefiler er under 250 linjer
+
+## Obligatoriske grenser for senere arbeid
+
+### Prosjektimport
+
+Valider hele prosjektobjektet og skjemaversjonen før `replace-project`. Ikke stol på TypeScript-typen for eksterne data.
+
+### Prosjektbytte
+
+Avstem eller tøm den transiente bilderessursbufferen og tilbakekall foreldede Object URL-er.
+
+### Angre/gjør om
+
+Historikk inneholder bare serialiserbar prosjektstate. `File`, Object URL og aktive interaksjoner skal ikke inngå.
+
+### Mobiloverstyringer
+
+Bruk viewport-spesifikke geometrihandlinger. Ikke skriv mobilendringer inn i desktopfeltet.
+
+### Autolagring
+
+Lagre gyldige prosjektmutasjoner, ikke transient editor- eller ressursstate.
+
+## Første oppgave i neste chat
+
+Fase 11A skal ikke implementeres på nytt. Ikke start fase 12.
+
+Trekk siste feature-branch og regenerer arkitekturrapportene etter sluttauditen:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
-git fetch origin
+git pull --ff-only origin feature/image-import-and-placement
+git status
+git log -10 --oneline --decorate
+npm run architecture:json
+npm run architecture:diagram
+git status --short
+git diff --check
+git diff --stat
+```
+
+Forventet:
+
+- working tree var clean før rapportgenerering
+- bare `architecture.json` og `docs/dependency-graph.mmd` endres
+- `git diff --check` har ingen reelle feil
+
+Etter lokal rapportkontroll:
+
+1. commit og push bare de to rapportene
+2. trekk og kontroller alle dokumentcommits lokalt
+3. kontroller samlet PR #26 mot `main`
+4. kontroller PR-head, mergebarhet, changed files, review-tråder, reviews og CI
+5. oppdater PR-body med siste kontroll og rapportcommit
+6. presenter PR #26 for eksplisitt brukergodkjenning
+7. ikke merge før brukeren skriver `godkjent`
+
+Etter eventuell godkjent merge:
+
+```powershell
 git switch main
 git pull --ff-only origin main
 git status
 git log -6 --oneline --decorate
 ```
 
-Godkjent starttilstand:
-
-- aktiv branch er `main`
-- lokal `main` følger `origin/main`
-- lokal og remote `main` peker på samme faktiske commit
-- working tree er clean
-- topp-commit vurderes mot faktisk GitHub-status, ikke mot et hardkodet nummer i dokumentasjonen
-
-## Ferdig funksjonalitet
-
-- blankt PC- og Telefon-lerret
-- kontrollert topp- og venstremeny
-- Seksjon, Bilde, Tekst og Knapp
-- prosjektmodell og sentral state
-- markering, flytting, resizing og låsing
-- kontrollert flerlinjet tekstredigering
-- høyremenyens grunnstruktur
-- tekstegenskaper
-- eksterne lenker
-- sikker sletting
-- første bundlede SVG-knappbibliotek
-
-## Gjeldende venstremeny
-
-```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
-```
-
-`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp. Det finnes ikke et separat hovedmenypunkt kalt `Knapper`.
-
-## Knappbiblioteket på `main`
-
-Brukerflyt:
-
-```text
-Elementer -> Knapp -> velg ett av fire design
-```
-
-Stabile asset-ID-er:
-
-```text
-button.primary-rounded.v1
-button.secondary-rounded.v1
-button.outline-rounded.v1
-button.dark-rounded.v1
-```
-
-Assets ligger under `src/assets/buttons/`, bundles statisk av Vite og inneholder ikke tekst, script, `foreignObject`, eksterne URL-er eller rasterbilder.
-
-Prosjektdata lagrer stabil `assetId`, aldri filsti, import-URL eller rå SVG.
-
-## Fast ansvarsdeling
-
-```text
-Venstremeny = opprette elementer og velge ferdig design
-Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere tekst og transformere elementer
-```
-
-For knapper:
-
-```text
-Venstremeny = velge design og opprette knapp
-Høyremeny  = endre knappetekst, design og lenke
-Lerretet   = markere, flytte og endre størrelse
-```
-
-## Prosjektmodell versjon 5
-
-```ts
-type ButtonEditorElement = BaseEditorElement & {
-  kind: 'button'
-  assetId: ButtonAssetId
-  label: string
-  link: ElementLink
-}
-```
-
-Standard:
-
-```text
-assetId: button.primary-rounded.v1
-label: Les mer
-link: none
-```
-
-`ButtonAssetId` er en validert og brandet stabil streng. Modellaget importerer ikke SVG-filer eller Vite-genererte adresser.
-
-Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressurs-ID, filmetadata, alt-tekst og skaleringsmodell er ikke implementert.
-
-## State- og valideringsgrenser
-
-Alle varige endringer går gjennom typede reducer-actions.
-
-Reducergrensene avviser blant annet:
-
-- manglende aktiv side
-- manglende element
-- element på feil side
-- duplisert element-ID
-- feil elementtype
-- låst element
-- ugyldig verdi
-- ukjent knappasset-ID
-- uendret data
-
-Ugyldige eller uendrede handlinger muterer ikke prosjektet eller `updatedAt`.
-
-Opprettingsansvaret ligger i `src/state/addElementToActivePage.ts`. Den sentrale reduceren er 217 linjer etter framtidsrettet refaktor.
-
-## Høyremeny for knapp
-
-Markert knapp viser knappetekst, design, lenke, status og sletting.
-
-- knappetekst trimmes
-- tom tekst avvises
-- ukjent lagret `assetId` gir fallback og synlig varsel
-- ukjent design kan repareres ved å velge gyldig design
-- låst knapp kan inspiseres, men ikke endres
-- lenken åpnes aldri i editormodus
-
-## Faste fil- og arkitekturgrenser
-
-- 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
-- 300 linjer er hard unntaksgrense.
-- `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar.
-- `RightPropertiesPanel.tsx` skal være komposisjon.
-- modell, asset-katalog, state, venstrepanel, høyremeny og rendering skal ha tydelige ansvar.
-- ingen tilfeldig generell `features`-samlemappe.
-
-## Neste arbeid
-
-Ingen ny produksjonsfase er valgt.
-
-Den planlagte neste fasen i `docs/WORK_PLAN.md` er fase 11 – Bilder, men den er ikke aktiv eller godkjent. Før eventuell implementering må bilde-/ressursmodell, stabil asset-ID, serialisering, filtyper, maksimal størrelse, feilhåndtering, skalering, proporsjoner, mobil arv og alt-tekst avklares og låses.
-
-Ikke opprett produksjonssak, feature-branch eller kode før omfanget er eksplisitt valgt og godkjent.
-
-Fast videre arbeidsmåte:
-
-1. bekreft faktisk lokal `main`, `origin/main` og clean tree
-2. les autoritative dokumenter og faktisk kode
-3. velg én avgrenset fase sammen med brukeren
-4. avklar varig og transient state
-5. lås produkt-, design- og valideringsregler
-6. opprett GitHub-sak og feature-branch først etter godkjenning
-7. implementer i små logiske commits
-8. gjennomfør framtidsrettet audit og filstørrelseskontroll
-9. kjør nødvendige lokale kontroller etter siste produksjonsendring
-10. oppdater dokumentasjon og arkitekturrapporter der relevant
-11. kontroller hele diffen, branchstatus, PR og review-tråder
-12. merge bare etter eksplisitt brukergodkjenning
+Velg først deretter neste produksjonsfase sammen med brukeren.
 
 ---

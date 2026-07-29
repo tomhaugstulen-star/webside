@@ -7,7 +7,7 @@ type LeftSidebarProps = {
   activeTool: EditorTool | null
   onToolChange: (tool: EditorTool) => void
   onPanelAction: () => void
-  onCreateElement: (request: ElementCreationRequest) => void
+  onCreateElement: (request: ElementCreationRequest) => boolean
 }
 
 const tools: Array<{ id: EditorTool; label: string; icon: SidebarIconName }> = [
@@ -53,7 +53,10 @@ export function LeftSidebar({
         </button>
       </nav>
 
-      <section className={`left-panel ${activeTool ? 'left-panel--open' : ''}`} aria-hidden={!activeTool}>
+      <section
+        className={`left-panel ${activeTool ? 'left-panel--open' : ''}`}
+        aria-hidden={!activeTool}
+      >
         {activeTool && (
           <div className="left-panel__content">
             <SidebarPanel
