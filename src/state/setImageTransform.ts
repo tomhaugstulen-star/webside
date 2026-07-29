@@ -1,7 +1,7 @@
 import type { EditorProjectState } from '../model/editorProject'
 import {
   imageTransformsEqual,
-  normalizeImageTransform,
+  normalizeImageTransformForFrame,
   type ImageTransform,
 } from '../model/imagePresentation'
 
@@ -13,7 +13,14 @@ export function setImageTransform(
 ): EditorProjectState {
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   const element = activePage?.elements.find((candidate) => candidate.id === elementId)
-  const normalizedTransform = normalizeImageTransform(transform)
+  const normalizedTransform =
+    element?.kind === 'image'
+      ? normalizeImageTransformForFrame(
+          transform,
+          element.assetMetadata,
+          element.size.desktop,
+        )
+      : null
 
   if (
     !activePage ||
