@@ -1,6 +1,7 @@
 import type { EditorProjectState } from '../model/editorProject'
 import type { EditorProjectAction } from './editorProjectAction'
 import { setImageAltText } from './setImageAltText'
+import { setImageDesktopFrame } from './setImageDesktopFrame'
 import { setImageMode } from './setImageMode'
 import { setImageTransform } from './setImageTransform'
 
@@ -11,6 +12,7 @@ export type ImageProjectAction = Extract<
       | 'set-image-alt-text'
       | 'set-image-mode'
       | 'set-image-transform'
+      | 'set-image-desktop-frame'
   }
 >
 
@@ -37,6 +39,14 @@ export function reduceImageProjectAction(
       return setImageTransform(
         state,
         action.elementId,
+        action.transform,
+        action.updatedAt,
+      )
+    case 'set-image-desktop-frame':
+      return setImageDesktopFrame(
+        state,
+        action.elementId,
+        action.layout,
         action.transform,
         action.updatedAt,
       )
