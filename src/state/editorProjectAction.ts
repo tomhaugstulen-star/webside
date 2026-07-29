@@ -3,7 +3,7 @@ import type { ElementCreationRequest } from '../model/elementCreation'
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
-import type { ImageFit } from '../model/imageAsset'
+import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import type { TextElementStylePatch } from '../model/textElementStyle'
 
 export type EditorProjectAction =
@@ -69,8 +69,14 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
-      type: 'set-image-fit'
+      type: 'set-image-mode'
       elementId: string
-      fit: ImageFit
+      mode: ImageMode
+      updatedAt: string
+    }
+  | {
+      type: 'set-image-transform'
+      elementId: string
+      transform: ImageTransform
       updatedAt: string
     }
