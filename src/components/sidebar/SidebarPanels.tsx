@@ -8,7 +8,7 @@ type PanelProps = {
 }
 
 type ElementsPanelProps = {
-  onCreateElement: (request: ElementCreationRequest) => void
+  onCreateElement: (request: ElementCreationRequest) => boolean
 }
 
 type SidebarPanelProps = PanelProps & ElementsPanelProps & {
