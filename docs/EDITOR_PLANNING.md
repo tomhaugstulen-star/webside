@@ -5,18 +5,17 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 ## Gjeldende arbeidsstatus
 
 ```text
-aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
-branch: feature/image-import-and-placement
-GitHub-sak: #25
-PR: #26 – åpen, ikke draft
-base main: 7e4c71f
+siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
+GitHub-sak: #25 – lukket som fullført
+PR: #26 – merget
+mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
 prosjektskjema: versjon 6
-implementering: ferdig
 framtidsrettet sluttaudit: ferdig
 automatiske kontroller: bestått
 PC og Telefon: godkjent
-arkitekturrapporter etter sluttaudit: må regenereres
-merge: ikke godkjent eller utført
+arkitekturrapporter: regenerert etter sluttaudit, ingen diff
+lokal main: synkronisert og clean
+neste produksjonsfase: ikke valgt
 ```
 
 Faktisk branch- og `main`-HEAD leses alltid fra Git.
@@ -220,4 +219,4 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Ingen ny fase startes før PR #26 er kontrollert og eksplisitt godkjent for merge.
+Ingen ny produksjonsfase startes automatisk etter fase 11A. Neste fase velges og avgrenses eksplisitt sammen med brukeren før en ny branch opprettes.

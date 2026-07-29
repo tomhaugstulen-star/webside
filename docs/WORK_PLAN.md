@@ -35,19 +35,17 @@ git diff --check
 ## 2. Gjeldende status
 
 ```text
-aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
-branch: feature/image-import-and-placement
-GitHub-sak: #25
-PR: #26 – åpen, ikke draft
-base main: 7e4c71f
+siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
+GitHub-sak: #25 – lukket som fullført
+PR: #26 – merget
+mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
 prosjektskjema: versjon 6
-implementering: ferdig
 manuell test: godkjent
-framtidsrettet sluttaudit: ferdig
 automatiske kontroller: godkjent
-dokumentasjon: oppdatert etter sluttaudit
-arkitekturrapporter etter sluttaudit: må regenereres
-merge: ikke godkjent eller utført
+framtidsrettet sluttaudit: ferdig
+arkitekturrapporter: regenerert, ingen diff
+lokal main: synkronisert og clean
+neste produksjonsfase: ikke valgt
 ```
 
 Faktisk branch- og `main`-HEAD leses fra Git.
@@ -65,7 +63,7 @@ produksjonsbuild: bestått på 185 ms
 PC og Telefon: godkjent
 ```
 
-## 4. Fase 11A – ferdig funksjonsomfang
+## 4. Fase 11A – ferdig og merget funksjonsomfang
 
 Leveransen omfatter:
 
@@ -119,7 +117,7 @@ Auditen bekreftet eller rettet:
 - ingen motstridende bildestil i `canvas.css`
 - alle berørte kildefiler under 250 linjer
 
-## 6. Ferdig og merget før fase 11A
+## 6. Ferdige og mergede leveranser
 
 - fase 0: stabilt editorgrunnlag
 - fase 1: prosjekt- og elementmodell
@@ -136,39 +134,23 @@ Auditen bekreftet eller rettet:
 - dokumentasjonsaudit – PR #19
 - fase 10: SVG-knappbibliotek – PR #21
 - dokumentasjonsstatus – PR #22 og PR #24
+- fase 11A: bildeimport, ramme og utsnitt – PR #26
 
 ## 7. Neste handling
 
-Ingen ny produksjonsfase startes fra denne branchen.
+Ingen produksjonsfase er valgt.
 
-Neste obligatoriske steg:
+Før neste fase:
 
-```powershell
-npm run architecture:json
-npm run architecture:diagram
-git status --short
-git diff --check
-git diff --stat
-```
+1. kontroller at lokal `main` er synkronisert og clean
+2. velg fase og lås omfanget sammen med brukeren
+3. opprett en ny branch fra oppdatert `main`
+4. opprett eller oppdater GitHub-sak før produksjonskode
+5. ikke gjenbruk `feature/image-import-and-placement`
 
-Forventet:
+Fase 12 eller en annen produksjonsfase startes ikke automatisk.
 
-- bare `architecture.json` og `docs/dependency-graph.mmd` endres
-- ingen reelle `git diff --check`-feil
-
-Deretter:
-
-1. commit og push bare arkitekturrapportene
-2. trekk alle dokumentcommits lokalt
-3. kontroller clean tree og samlet diff mot `main`
-4. oppdater PR #26-body med sluttkontroll og rapportcommit
-5. kontroller mergebarhet, changed files, review-tråder, reviews og CI
-6. presenter PR #26 for eksplisitt godkjenning
-7. merge først etter ordet `godkjent`
-8. oppdater lokal `main`
-9. velg neste fase eksplisitt
-
-## 8. Senere faser
+## 8. Planlagte senere faser
 
 ```text
 fase 12  prosjektfarger
