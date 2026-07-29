@@ -12,7 +12,11 @@ import {
   type ResizeHandle,
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
-import { getImageCropSize } from '../../model/imagePresentation'
+import {
+  getImageCropSize,
+  getImageTransformForResizedFrame,
+  type ImageTransform,
+} from '../../model/imagePresentation'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
 
@@ -37,6 +41,11 @@ type ElementPointerTransformOptions = {
   scrollContainerRef: RefObject<HTMLDivElement | null>
   onSelect: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
+  onCommitImageFrame: (
+    elementId: string,
+    layout: ElementLayout,
+    transform: ImageTransform,
+  ) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
 }
 
@@ -47,6 +56,7 @@ export function useElementPointerTransform({
   scrollContainerRef,
   onSelect,
   onCommitLayout,
+  onCommitImageFrame,
   onPreviewLayoutChange,
 }: ElementPointerTransformOptions) {
   const [draftLayout, setDraftLayout] = useState<ElementLayout | null>(null)
@@ -59,6 +69,18 @@ export function useElementPointerTransform({
     setDraftLayout(layout)
     onPreviewLayoutChange(layout ? { elementId: element.id, layout } : null)
   }
+
+  const getResizedImageTransform = (layout: ElementLayout) =>
+    element.kind === 'image' && element.mode === 'crop'
+      ? getImageTransformForResizedFrame(
+          element.assetMetadata,
+          initialLayout.size,
+          layout.size,
+          element.transform,
+          layout.position.x - initialLayout.position.x,
+          layout.position.y - initialLayout.position.y,
+        )
+      : null
 
   const startInteraction = (
     mode: TransformMode,
@@ -172,11 +194,22 @@ export function useElementPointerTransform({
     publishDraftLayout(null)
 
     if (
-      commit &&
-      interaction &&
-      finalLayout &&
-      !elementLayoutsEqual(interaction.initialLayout, finalLayout)
+      !commit ||
+      !interaction ||
+      !finalLayout ||
+      elementLayoutsEqual(interaction.initialLayout, finalLayout)
     ) {
+      return
+    }
+
+    const imageTransform =
+      interaction.mode === 'resize'
+        ? getResizedImageTransform(finalLayout)
+        : null
+
+    if (imageTransform) {
+      onCommitImageFrame(element.id, finalLayout, imageTransform)
+    } else {
       onCommitLayout(element.id, finalLayout)
     }
   }
@@ -206,8 +239,14 @@ export function useElementPointerTransform({
     finishInteraction(false)
   }
 
+  const imageTransform =
+    transformMode === 'resize' && draftLayout
+      ? getResizedImageTransform(draftLayout)
+      : null
+
   return {
     layout: draftLayout ?? initialLayout,
+    imageTransform,
     transformMode,
     handleMovePointerDown,
     handleResizePointerDown,
