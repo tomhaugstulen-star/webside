@@ -44,6 +44,10 @@ function getBaseCropScale(metadata: ImageAssetMetadata) {
   )
 }
 
+function getNormalizedOffset(position: number, overflow: number) {
+  return overflow > 0 ? clamp((2 * position + overflow) / overflow, -1, 1) : 0
+}
+
 export function isImageMode(value: unknown): value is ImageMode {
   return value === 'contain' || value === 'crop'
 }
@@ -167,6 +171,42 @@ export function getImageRenderLayout(
     ...size,
     left: -overflowX / 2 + (normalizedTransform.offsetX * overflowX) / 2,
     top: -overflowY / 2 + (normalizedTransform.offsetY * overflowY) / 2,
+  }
+}
+
+export function getImageTransformForResizedFrame(
+  metadata: ImageAssetMetadata,
+  initialFrameSize: ImageFrameSize,
+  nextFrameSize: ImageFrameSize,
+  initialTransform: ImageTransform,
+  framePositionDeltaX: number,
+  framePositionDeltaY: number,
+): ImageTransform {
+  const normalizedTransform =
+    normalizeImageTransformForFrame(
+      initialTransform,
+      metadata,
+      initialFrameSize,
+    ) ?? DEFAULT_IMAGE_TRANSFORM
+  const initialRenderLayout = getImageRenderLayout(
+    metadata,
+    initialFrameSize,
+    'crop',
+    normalizedTransform,
+  )
+  const overflowX = Math.max(0, initialRenderLayout.width - nextFrameSize.width)
+  const overflowY = Math.max(0, initialRenderLayout.height - nextFrameSize.height)
+
+  return {
+    ...normalizedTransform,
+    offsetX: getNormalizedOffset(
+      initialRenderLayout.left - framePositionDeltaX,
+      overflowX,
+    ),
+    offsetY: getNormalizedOffset(
+      initialRenderLayout.top - framePositionDeltaY,
+      overflowY,
+    ),
   }
 }
 
