@@ -9,6 +9,7 @@ import {
   moveElementLayout,
   resizeElementLayout,
   type ElementLayout,
+  type ResizeHandle,
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
@@ -19,6 +20,7 @@ type TransformMode = 'move' | 'resize'
 type PointerInteraction = {
   pointerId: number
   mode: TransformMode
+  resizeHandle: ResizeHandle
   startClientX: number
   startClientY: number
   startScrollLeft: number
@@ -60,6 +62,7 @@ export function useElementPointerTransform({
   const startInteraction = (
     mode: TransformMode,
     event: PointerEvent<HTMLElement>,
+    resizeHandle: ResizeHandle = 'south-east',
   ) => {
     if (event.button !== 0) {
       return
@@ -83,6 +86,7 @@ export function useElementPointerTransform({
     interactionRef.current = {
       pointerId: event.pointerId,
       mode,
+      resizeHandle,
       startClientX: event.clientX,
       startClientY: event.clientY,
       startScrollLeft: scrollContainer.scrollLeft,
@@ -99,10 +103,13 @@ export function useElementPointerTransform({
     startInteraction('move', event)
   }
 
-  const handleResizePointerDown = (event: PointerEvent<HTMLSpanElement>) => {
+  const handleResizePointerDown = (
+    handle: ResizeHandle,
+    event: PointerEvent<HTMLSpanElement>,
+  ) => {
     event.preventDefault()
     event.stopPropagation()
-    startInteraction('resize', event)
+    startInteraction('resize', event, handle)
   }
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -137,6 +144,7 @@ export function useElementPointerTransform({
             interaction.initialLayout,
             delta,
             interaction.canvasWidth,
+            interaction.resizeHandle,
           )
 
     if (
