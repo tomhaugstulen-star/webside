@@ -1,5 +1,5 @@
 import type { ButtonAssetId } from './buttonAsset'
-import type { ElementKind, ElementSize } from './elementDimensions'
+import type { ElementSize } from './elementDimensions'
 import type { ElementLink } from './elementLink'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
