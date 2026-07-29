@@ -1,53 +1,43 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet samler den historiske grunnlagsauditen og den gjeldende framtidsrettede kontrollen for videre featurearbeid.
+Dette dokumentet samler den historiske grunnlagsauditen og den framtidsrettede kontrollen som ble gjennomført før PR #21.
 
-## 1. Historisk grunnlagsaudit
+## Historisk grunnlagsaudit
 
-Editorgrunnlaget ble ryddet i:
+Editorgrunnlaget ble ryddet i `chore/editor-foundation-audit`.
 
-```text
-branch: chore/editor-foundation-audit
-```
+Viktige rettelser:
 
-Auditen fjernet ubrukt kode, delte store CSS-filer, strammet Dependency Cruiser-reglene og fastsatte arkitekturretningen som senere faser følger.
-
-Viktige historiske rettelser:
-
-- ubrukt `InspectorRail.tsx` ble fjernet
-- ubrukt `InspectorTool` ble fjernet
+- ubrukt kode ble fjernet
 - Dependency Cruiser fikk `no-unreachable-from-main`
 - intern terminologi ble standardisert til `Elementer`
-- editoren åpner med et blankt lerret
+- editoren åpner med blankt lerret
 - `npm run dev` bruker `vite --open`
 - venstremeny, ikoner og panelinnhold fikk separate ansvar
 
 Historiske modul- og avhengighetstall fra grunnlagsfasen er ikke gjeldende etter senere funksjonsutvidelser.
 
-## 2. Bekreftet arkitekturretning
+## Bekreftet arkitekturretning
 
 - `App.tsx` setter sammen applikasjonen
 - `EditorShell` eier skalltilstand og komposisjon
 - sentral prosjekt-state eier varig prosjektdata
-- reduceren er autoritativ valideringsgrense
-- verktøymeny, panelinnhold og ikoner er separert
+- reducer-/state-laget er autoritativ valideringsgrense
 - høyremenyen eier ingen separat elementmodell
 - lerretet skal ikke få tilfeldig egenskaps- eller kataloglogikk
 - responsive prosjektverdier lagres i prosjektmodellen, ikke i DOM-en
 - automatisk lagring bygges etter prosjektmodell og historikkmodell
 
-## 3. Faste filgrenser
+## Faste filgrenser
 
-- 250 linjer er aktiv terskel for ansvarstrekk i kildefiler
+- 250 linjer er aktiv terskel for ansvarstrekk
 - 300 linjer er hard unntaksgrense
 - en fil deles tidligere når den får flere tydelige ansvar
 - `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar
-- `RightPropertiesPanel.tsx` skal være komposisjon, ikke samle alle kontroller
+- `RightPropertiesPanel.tsx` skal være komposisjon
 - tilfeldig generell `features`-samlemappe skal ikke innføres
 
-## 4. State- og reducergrenser
-
-Varige prosjektendringer går gjennom typede actions.
+## State- og reducergrenser
 
 Reducerhandlinger skal avvise:
 
@@ -59,32 +49,17 @@ Reducerhandlinger skal avvise:
 - ugyldig verdi
 - uendret data
 
-Ved avvisning:
+Ved avvisning returneres samme state, prosjektet muteres ikke og `updatedAt` endres ikke.
 
-- samme state-objekt returneres
-- prosjektet muteres ikke
-- `updatedAt` endres ikke
+Transient markering, pekerinteraksjon, layout-preview, åpne paneler, drafts, validering, feedback, fokus, hover og dialogstate serialiseres ikke.
 
-Transient state serialiseres ikke:
-
-- markering
-- aktive pekerinteraksjoner
-- layout-preview
-- åpne paneler
-- tekst- og skjemadrafts
-- validering og feedback
-- fokus og hover
-- dialogmål og fokusreferanser
-
-## 5. Gjeldende audit: knappbibliotek
-
-Aktiv branch:
+## Knappbibliotekaudit
 
 ```text
-feature/button-library
-GitHub-sak #20
-base main 06307a2
-prosjektskjema 5
+GitHub-sak #20: fullført
+PR #21: merget
+mergecommit: 5e548ad
+prosjektskjema: versjon 5
 ```
 
 Kontrollert ansvarsdeling:
@@ -100,31 +75,29 @@ assets/buttons
   buttonAssetCatalog.ts
 
 state
-  oppretting
-  setButtonLabel
-  setButtonAsset
-  setElementLink
+  addElementToActivePage.ts
+  setButtonLabel.ts
+  setButtonAsset.ts
+  setElementLink.ts
 
 sidebar
-  ElementsPanel
-  ButtonLibraryPanel
+  ElementsPanel.tsx
+  ButtonLibraryPanel.tsx
 
 properties
-  ButtonPropertiesSection
-  ElementLinkPropertiesSection
+  ButtonPropertiesSection.tsx
+  ElementLinkPropertiesSection.tsx
 
 canvas
-  ButtonElementContent
+  ButtonElementContent.tsx
 ```
 
-## 6. Knappasset-audit
-
-Kontrollpunkter:
+## Asset-audit
 
 - prosjektet lagrer stabil `assetId`
 - prosjektet lagrer ikke filsti, import-URL eller rå SVG
 - modellaget importerer ikke SVG-filer
-- asset-katalogen eier mapping fra ID til bundlet fil og metadata
+- katalogen eier mapping fra ID til bundlet fil og metadata
 - publiserte ID-er er versjonerte
 - ukjent lagret ID gir fallback, ikke krasj
 - ukjent ny ID avvises ved brukerendring
@@ -133,94 +106,64 @@ SVG-kontroll:
 
 - gyldig `viewBox`
 - ingen tekst
-- ingen script
-- ingen `foreignObject`
+- ingen script eller `foreignObject`
 - ingen eksterne URL-er eller filer
 - ingen rasterbilder
 - transparent bakgrunn
 - fri bredde- og høydeskalering
 
-## 7. Knappetekst-audit
+## Knappetekst- og designaudit
 
-- label er ekte HTML-tekst
+- label er ekte HTML-tekst og tilgjengelig navn
 - SVG-en er dekorativ
-- label brukes som tilgjengelig navn
 - inputdraft er transient
 - teksten trimmes før lagring
-- tom eller whitespace-only tekst avvises
+- tom tekst avvises
 - uendret tekst gir ingen mutasjon
 - låst knapp kan ikke endres
-
-## 8. Designbytte-audit
-
-- designvelger bruker den statiske katalogen
-- valgt ID valideres i reduceren
-- ukjent ID avvises
-- uendret design gir ingen mutasjon
+- designvalget valideres mot katalogen
 - ukjent lagret design kan repareres fra høyremenyen
 - canvas-rendering bruker kontrollert fallback
 
-## 9. Lenkeaudit
+## Lenke- og høyremenyaudit
 
 - tekst og knapp bruker samme `ElementLink`
-- state-API-et er generalisert uten duplisert skjema
 - bare `http://` og `https://` godtas
 - ugyldig URL lagres ikke
 - uendret lenke gir ingen mutasjon
 - låst element kan ikke endre lenke
 - lenker aktiveres aldri i editormodus
-
-## 10. Høyremenyaudit
-
 - `RightPropertiesPanel` komponerer etter `element.kind`
-- tekstkontroller og knappkontroller ligger i separate komponenter
-- skjult panelinnhold rendres ikke uten valgt element
-- kontrollene bruker labels og tastaturnative HTML-kontroller
+- tekst- og knappkontroller ligger i separate komponenter
 - feil bruker `role="alert"`
 - lagringsfeedback bruker `role="status"`
-- låste elementer viser data, men muterende kontroller er deaktivert
-- reduceren er fortsatt autoritativ dersom UI omgås
 
-## 11. Automatiske kontroller
+## Framtidsrettet refaktor før merge
 
-Etter siste produksjonscommit `ec30b9a`:
+Auditen fant at `editorProjectReducer.ts` hadde nådd 250 linjer. Elementoppretting ble derfor trukket ut til `addElementToActivePage.ts`.
+
+Etter refaktoren:
+
+```text
+editorProjectReducer.ts: 217 linjer
+addElementToActivePage.ts: 52 linjer
+```
+
+Valideringen for aktiv side, unik element-ID og gyldig knappasset ligger fortsatt innenfor state-/reducergrensen.
+
+## Sluttkontroll
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 68 moduler, 158 avhengigheter, ingen brudd
-Vite: 77 moduler transformert
+Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
+Vite: 78 moduler transformert
 CSS: 24.43 kB, gzip 5.12 kB
-JavaScript: 239.40 kB, gzip 72.88 kB
+JavaScript: 239.41 kB, gzip 72.88 kB
 produksjonsbuild: bestått
+arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
 ```
 
-Arkitekturrapportene skal regenereres etter siste strukturendring før PR.
+Manuell kontroll ble godkjent for alle fire designvarianter, oppretting, markering, flytting, resizing, knappetekst, tomtekstvalidering, designbytte, ekstern lenke, låsing, sletting, PC, Telefon, peker og tastatur.
 
-## 12. Manuell kontroll
-
-Godkjent:
-
-- alle fire designvarianter
-- oppretting og markering
-- flytting og resizing
-- knappetekst og tomtekstvalidering
-- designbytte
-- ekstern lenke og fjerning av lenke
-- ingen lenkeaktivering i editormodus
-- låsing og opplåsing
-- sletting
-- PC- og Telefon-visning
-- peker- og tastaturflyt
-
-## 13. Gjenstår før PR
-
-- regenerere `architecture.json`
-- regenerere `docs/dependency-graph.mmd`
-- kontrollere genererte rapporter
-- kontrollere alle kildefilers linjetall
-- kontrollere full diff mot `main`
-- kjøre `git diff --check`
-- bekrefte clean og synkronisert branch
-- opprette og gjennomgå PR
-- merge bare etter eksplisitt godkjenning
+PR #21 var mergebar, hadde ingen review-tråder, ingen endringskrav og ingen ventende GitHub Actions-status. Merge ble utført med låst head-SHA.
