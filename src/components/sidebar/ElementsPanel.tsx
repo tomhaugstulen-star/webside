@@ -4,23 +4,51 @@ import type {
   StandardElementKind,
 } from '../../model/elementCreation'
 import { ButtonLibraryPanel } from './ButtonLibraryPanel'
+import { ImageImportControl } from './ImageImportControl'
 import { SidebarIcon, type SidebarIconName } from './SidebarIcon'
 
 type ElementsPanelProps = {
-  onCreateElement: (request: ElementCreationRequest) => void
+  onCreateElement: (request: ElementCreationRequest) => boolean
 }
 
 type ElementsPanelView = 'elements' | 'buttons'
 
-const standardItems: Array<{
+type StandardElementItem = {
   kind: StandardElementKind
   label: string
   icon: SidebarIconName
-}> = [
-  { kind: 'section', label: 'Seksjon', icon: 'section' },
-  { kind: 'image', label: 'Bilde', icon: 'image' },
-  { kind: 'text', label: 'Tekst', icon: 'text' },
-]
+}
+
+const sectionItem: StandardElementItem = {
+  kind: 'section',
+  label: 'Seksjon',
+  icon: 'section',
+}
+
+const textItem: StandardElementItem = {
+  kind: 'text',
+  label: 'Tekst',
+  icon: 'text',
+}
+
+function StandardElementCard({
+  item,
+  onCreateElement,
+}: {
+  item: StandardElementItem
+  onCreateElement: ElementsPanelProps['onCreateElement']
+}) {
+  return (
+    <button
+      className="element-card"
+      type="button"
+      onClick={() => onCreateElement({ kind: item.kind })}
+    >
+      <SidebarIcon name={item.icon} />
+      <span>{item.label}</span>
+    </button>
+  )
+}
 
 export function ElementsPanel({
   onCreateElement,
@@ -49,21 +77,12 @@ export function ElementsPanel({
       </p>
 
       <div className="element-grid">
-        {standardItems.map((item) => (
-          <button
-            key={item.kind}
-            className="element-card"
-            type="button"
-            onClick={() =>
-              onCreateElement({
-                kind: item.kind,
-              })
-            }
-          >
-            <SidebarIcon name={item.icon} />
-            <span>{item.label}</span>
-          </button>
-        ))}
+        <StandardElementCard
+          item={sectionItem}
+          onCreateElement={onCreateElement}
+        />
+        <ImageImportControl onCreateImage={onCreateElement} />
+        <StandardElementCard item={textItem} onCreateElement={onCreateElement} />
 
         <button
           className="element-card"
