@@ -45,11 +45,22 @@ export function getAccessibleElementLabel(element: EditorElement) {
     return `${summary} Dobbeltklikk eller trykk Enter når elementet er markert for å redigere. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
   }
 
+  if (element.kind === 'image' && element.mode === 'crop') {
+    return `${summary} Piltaster flytter rammen. Alt sammen med piltaster flytter motivet i rammen. Control eller Command sammen med piltaster endrer rammestørrelse. Delete åpner slettebekreftelse.`
+  }
+
   return `${summary} Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
 }
 
-export function getCanvasElementKeyboardShortcuts(locked: boolean) {
-  return locked
-    ? 'Enter Space'
-    : 'Enter Space Delete ArrowUp ArrowDown ArrowLeft ArrowRight Control+ArrowUp Control+ArrowDown Control+ArrowLeft Control+ArrowRight Meta+ArrowUp Meta+ArrowDown Meta+ArrowLeft Meta+ArrowRight'
+export function getCanvasElementKeyboardShortcuts(element: EditorElement) {
+  if (element.locked) {
+    return 'Enter Space'
+  }
+
+  const baseShortcuts =
+    'Enter Space Delete ArrowUp ArrowDown ArrowLeft ArrowRight Control+ArrowUp Control+ArrowDown Control+ArrowLeft Control+ArrowRight Meta+ArrowUp Meta+ArrowDown Meta+ArrowLeft Meta+ArrowRight'
+
+  return element.kind === 'image' && element.mode === 'crop'
+    ? `${baseShortcuts} Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight`
+    : baseShortcuts
 }
