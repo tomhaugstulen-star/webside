@@ -1,7 +1,7 @@
 import {
   elementLayoutsEqual,
   getElementDesktopLayout,
-  isValidElementLayout,
+  isValidElementDesktopLayout,
 } from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
@@ -121,7 +121,7 @@ function reduceEditorProjectState(
         !activePage ||
         !element ||
         element.locked ||
-        !isValidElementLayout(element.kind, action.layout) ||
+        !isValidElementDesktopLayout(element, action.layout) ||
         elementLayoutsEqual(getElementDesktopLayout(element), action.layout)
       ) {
         return state
