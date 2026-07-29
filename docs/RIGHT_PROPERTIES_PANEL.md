@@ -1,6 +1,6 @@
 # Høyremenyens grunnstruktur
 
-Dette dokumentet er autoritativ spesifikasjon og implementeringsstatus for fase 7.
+Dette dokumentet er autoritativ spesifikasjon og historisk verifikasjonslogg for fase 7.
 
 ## Branch og utgangspunkt
 
@@ -8,24 +8,19 @@ Dette dokumentet er autoritativ spesifikasjon og implementeringsstatus for fase 
 branch: feature/right-properties-panel
 base main: a35f59d
 produksjonskode og arkitekturrapporter: 2d25a542
+PR: #9 – merget
+mergecommit: 8de5f2e
 ```
 
-PR #7 leverte kontrollert tekstredigering. PR #8 låste navn og rekkefølge i venstremenyen.
+PR #7 leverte kontrollert tekstredigering. PR #8 låste navn og rekkefølge i venstremenyen. Denne fasen bygde deretter høyremenyens grunnstruktur.
 
 ## Status
 
-Høyremenyens grunnstruktur er implementert, kodeauditert, visuelt kontrollert og godkjent.
+Høyremenyens grunnstruktur er implementert, kodeauditert, visuelt kontrollert og merget til `main` gjennom PR #9.
 
-Bekreftet etter siste produksjonskodeendring:
+Tidligere formuleringer om at PR ikke var opprettet eller at dokumentasjonskontroll gjenstod beskrev branchens historiske tilstand før PR #9. De er ikke gjeldende prosjektstatus.
 
-```text
-npm run check: bestått
-Dependency Cruiser: 38 moduler, 80 avhengigheter, 0 brudd
-PC-visning: godkjent
-arbeidsområde etter arkitekturrapporter: clean
-```
-
-Det er ikke opprettet PR ennå.
+Panelet er senere utvidet i egne faser med tekstegenskaper, elementlenke og sikker sletting.
 
 ## Låst produktoppførsel
 
@@ -52,9 +47,9 @@ Detaljer:
 - åpning og lukking bruker 180 ms transform-animasjon
 - animasjonen deaktiveres ved `prefers-reduced-motion`
 
-## Visuell struktur
+## Historisk grunnleveranse
 
-Første leveranse viser bare faktisk inspeksjonsinformasjon:
+Den første panelleveransen viste bare faktisk inspeksjonsinformasjon:
 
 ```text
 Egenskaper
@@ -75,7 +70,7 @@ Knapp
 
 Status er enten `Låst` eller `Ulåst`.
 
-Det finnes ingen tomme seksjoner, falske kontroller eller deaktiverte plassholdere.
+Grunnleveransen hadde ingen tomme seksjoner, falske kontroller eller deaktiverte plassholdere.
 
 ## Implementert arkitektur
 
@@ -83,12 +78,12 @@ Ansvarsdeling:
 
 ```text
 src/components/properties/RightPropertiesPanel.tsx
-  - presenterer valgt elementtype og låsestatus
+  - presenterer egenskaper og handlinger for valgt element
   - mottar elementet som prop
-  - muterer ingen prosjektdata
+  - muterer ingen prosjektdata direkte
 
 src/state/useElementSelection.ts
-  - eksisterende autoritativ avledning av selectedElementId og selectedElement
+  - autoritativ avledning av selectedElementId og selectedElement
 
 src/components/editor/EditorShell.tsx
   - komponerer venstremeny, lerret og høyremeny
@@ -101,25 +96,23 @@ src/styles/right-properties-panel.css
 src/styles/editor-base.css
   - --properties-panel-width: 320px
   - --properties-panel-reserved-width: 0px
-
-src/styles/canvas.css og src/styles/sidebar.css
-  - egne lerretsberegninger bruker bare den sentrale reserverte breddevariabelen
 ```
 
 Panelet:
 
 - søker ikke etter valgt element i DOM-en
 - lagrer ikke en separat kopi av elementdata
-- oppretter ingen ny selector eller reducer-action
 - muterer ikke prosjektdata direkte
 - serialiseres ikke
 - inngår ikke direkte i historikk eller autolagring
+
+Varige egenskapsendringer fra senere utvidelser går gjennom typed state-API og reducer-actions.
 
 ## Betinget innhold og animasjon
 
 Paneloverflaten er montert for å kunne animere ut. Selve innholdet rendres bare når et gyldig element er valgt.
 
-Dette sikrer at fremtidige inputfelt og knapper ikke blir liggende skjult i DOM-en etter at markeringen fjernes. `aria-labelledby` brukes bare når panelet er åpent.
+Dette hindrer at framtidige inputfelt og knapper blir liggende skjult i DOM-en etter at markeringen fjernes. `aria-labelledby` brukes bare når panelet er åpent.
 
 ## Tekstredigering
 
@@ -137,18 +130,16 @@ Høyremenyen omgår eller dupliserer ikke commitgrensen.
 
 ## Låste elementer
 
-Et låst element kan fortsatt være valgt og vises i panelet. Grunnfasen viser bare status og introduserer ingen ny prosjektmutasjon.
+Et låst element kan fortsatt være valgt og vises i panelet. Egenskapskontroller og handlinger som muterer elementet skal være deaktivert, og reducerens låsegrenser er autoritative.
 
-Reducerens eksisterende låsegrenser er fortsatt autoritative.
+## Ikke del av den historiske grunnbranchen
 
-## Ikke del av denne branchen
+Følgende ble ikke implementert i selve `feature/right-properties-panel`:
 
-Følgende er ikke implementert:
-
-- fontfamilie eller fontstørrelse
-- tekstfarge, fet, kursiv eller markert tekstformatering
+- tekstegenskaper
+- tekst- eller elementlenker
 - bildevelger eller bildeegenskaper
-- knapphandlinger eller lenker
+- knappbibliotek
 - fargevelgere eller prosjektfargeregister
 - logo- eller headerbygger
 - sletting eller duplisering
@@ -156,6 +147,8 @@ Følgende er ikke implementert:
 - historikk eller lagring
 - nytt prosjekt eller prosjektimport
 - mobile geometri-overstyringer
+
+Tekstegenskaper, elementlenke og sikker sletting ble senere implementert og merget i separate faser. De øvrige punktene er fortsatt planlagt eller åpne.
 
 ## Kodeaudit
 
@@ -175,14 +168,22 @@ Den framtidsrettede auditen kontrollerte:
 
 To funn ble rettet før sluttkontrollen:
 
-1. Panelinnholdet rendres nå bare når et element finnes.
-2. Høyremenyens CSS styrer ikke lenger `.canvas-page--desktop` direkte; en sentral variabel formidler reservert bredde.
+1. Panelinnholdet rendres bare når et element finnes.
+2. Høyremenyens CSS styrer ikke `.canvas-page--desktop` direkte; en sentral variabel formidler reservert bredde.
 
-Alle nye kildefiler er under 250 linjer.
+Alle nye kildefiler var under 250 linjer.
 
-## Akseptansekriterier
+## Verifisert før merge
 
-Bekreftet:
+```text
+npm run check: bestått
+Dependency Cruiser: 38 moduler, 80 avhengigheter, 0 brudd
+PC-visning: godkjent
+arkitekturrapporter: oppdatert
+arbeidsområde: clean
+```
+
+Bekreftet oppførsel:
 
 - ingen valgt element gir ingen synlig eller reservert høyremeny
 - valgt element åpner panelet
@@ -192,15 +193,8 @@ Bekreftet:
 - aktiv tekstdraft mistes eller overskrives ikke
 - panelklikk bruker normal blur/commit
 - markeringen beholdes etter commit
-- ingen falske egenskapskontroller
 - ingen direkte DOM-søk eller direkte prosjektmutasjon
 - overlay under 1680 px
 - dokket panel fra 1680 px
 - egen scrolling
 - redusert bevegelse respekteres
-- `npm run check` består
-- arkitekturrapportene er oppdatert
-- PC-visning er godkjent
-- arbeidsområdet er rent og synkronisert
-
-Neste steg er dokumentasjonskontroll og PR-gjennomgang mot `main`.
