@@ -1,8 +1,11 @@
 import type { ButtonAssetId } from './buttonAsset'
+import type { ElementKind, ElementSize } from './elementDimensions'
 import type { ElementLink } from './elementLink'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
 import type { TextElementStyle } from './textElementStyle'
+
+export type { ElementKind, ElementSize } from './elementDimensions'
 
 export const EDITOR_PROJECT_SCHEMA_VERSION = 6 as const
 
@@ -17,13 +20,6 @@ export type CanvasPosition = {
   x: number
   y: number
 }
-
-export type ElementSize = {
-  width: number
-  height: number
-}
-
-export type ElementKind = 'section' | 'image' | 'text' | 'button'
 
 type BaseEditorElement = {
   id: string
