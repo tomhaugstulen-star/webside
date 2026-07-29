@@ -1,3 +1,4 @@
+import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
 import { createEditorElement } from '../model/createEditorElement'
 import {
   elementLayoutsEqual,
@@ -104,13 +105,18 @@ function reduceEditorProjectState(
     case 'add-element-to-active-page': {
       const activePage = state.project.pages.find((page) => page.id === state.activePageId)
 
-      if (!activePage || projectContainsElement(state, action.elementId)) {
+      if (
+        !activePage ||
+        projectContainsElement(state, action.elementId) ||
+        (action.request.kind === 'button' &&
+          findButtonAsset(action.request.assetId) === null)
+      ) {
         return state
       }
 
       const element = createEditorElement({
         id: action.elementId,
-        kind: action.kind,
+        request: action.request,
         existingElements: activePage.elements,
       })
       const pages = state.project.pages.map((page) =>

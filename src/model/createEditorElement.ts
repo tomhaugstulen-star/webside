@@ -1,7 +1,5 @@
-import {
-  DEFAULT_BUTTON_ASSET_ID,
-  DEFAULT_BUTTON_LABEL,
-} from './buttonAsset'
+import { DEFAULT_BUTTON_LABEL } from './buttonAsset'
+import type { ElementCreationRequest } from './elementCreation'
 import type { EditorElement, ElementKind, ElementSize } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
@@ -16,16 +14,16 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
 
 type CreateEditorElementInput = {
   id: string
-  kind: ElementKind
+  request: ElementCreationRequest
   existingElements: EditorElement[]
 }
 
 export function createEditorElement({
   id,
-  kind,
+  request,
   existingElements,
 }: CreateEditorElementInput): EditorElement {
-  const size = defaultElementSizes[kind]
+  const size = defaultElementSizes[request.kind]
   const position = findElementCreationPosition(size, existingElements)
   const common = {
     id,
@@ -35,15 +33,15 @@ export function createEditorElement({
     locked: false,
   }
 
-  switch (kind) {
+  switch (request.kind) {
     case 'section':
-      return { ...common, kind }
+      return { ...common, kind: 'section' }
     case 'image':
-      return { ...common, kind }
+      return { ...common, kind: 'image' }
     case 'text':
       return {
         ...common,
-        kind,
+        kind: 'text',
         content: '',
         textStyle: { ...DEFAULT_TEXT_ELEMENT_STYLE },
         link: { ...NO_ELEMENT_LINK },
@@ -51,13 +49,13 @@ export function createEditorElement({
     case 'button':
       return {
         ...common,
-        kind,
-        assetId: DEFAULT_BUTTON_ASSET_ID,
+        kind: 'button',
+        assetId: request.assetId,
         label: DEFAULT_BUTTON_LABEL,
         link: { ...NO_ELEMENT_LINK },
       }
   }
 
-  const unhandledKind: never = kind
-  return unhandledKind
+  const unhandledRequest: never = request
+  return unhandledRequest
 }

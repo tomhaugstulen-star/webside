@@ -1,5 +1,6 @@
+import type { ElementCreationRequest } from '../model/elementCreation'
 import type { ElementLayout } from '../model/elementLayout'
-import type { EditorProject, ElementKind } from '../model/editorProject'
+import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
 import type { TextElementStylePatch } from '../model/textElementStyle'
 
@@ -10,7 +11,7 @@ export type EditorProjectAction =
   | {
       type: 'add-element-to-active-page'
       elementId: string
-      kind: ElementKind
+      request: ElementCreationRequest
       updatedAt: string
     }
   | {

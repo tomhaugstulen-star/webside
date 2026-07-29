@@ -1,4 +1,4 @@
-import type { ElementKind } from '../../model/editorProject'
+import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorTool } from '../../types/editor'
 import { SidebarIcon, type SidebarIconName } from './SidebarIcon'
 import { SidebarPanel } from './SidebarPanels'
@@ -7,7 +7,7 @@ type LeftSidebarProps = {
   activeTool: EditorTool | null
   onToolChange: (tool: EditorTool) => void
   onPanelAction: () => void
-  onCreateElement: (kind: ElementKind) => void
+  onCreateElement: (request: ElementCreationRequest) => void
 }
 
 const tools: Array<{ id: EditorTool; label: string; icon: SidebarIconName }> = [

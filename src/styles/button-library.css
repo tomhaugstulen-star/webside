@@ -1,0 +1,92 @@
+.button-library-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.button-library-header h2 {
+  margin: 0;
+}
+
+.button-library-back {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #49423e;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.button-library-back:hover {
+  border-color: #c8afa2;
+  background: #fbf7f4;
+}
+
+.button-library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.button-library-card {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #35312e;
+  background: #ffffff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.button-library-card:hover {
+  border-color: #c8afa2;
+  box-shadow: 0 8px 18px rgba(80, 56, 43, 0.07);
+}
+
+.button-library-card:focus-visible,
+.button-library-back:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.button-library-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 10 / 3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.button-library-preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.button-library-preview span {
+  position: relative;
+  z-index: 1;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  color: var(--button-library-label-color);
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button-library-card strong {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
