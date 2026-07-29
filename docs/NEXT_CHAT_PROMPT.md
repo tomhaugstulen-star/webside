@@ -41,47 +41,20 @@ Det utvikles aldri direkte på `main`. Etter repoendringer skal brukeren få nø
 
 ## Git-status
 
-Siste bekreftede `main`:
-
 ```text
-f71b354
+main: f71b354
+branch: feature/element-deletion
+base: main ved f71b354
+GitHub-sak: #15 Plan: safe deletion for selected elements
+PR: #16 Add safe deletion for selected elements
+produksjonscommit: 4f59b3e
+framtidsrettede rettelser: a8c6d62 og 4611de1
+arkitekturrapporter: fbd8091
 ```
 
-Dette er mergecommit fra PR #14, som la inn frittstående lenker for hele tekstbokser. Sak #13 er lukket som fullført.
+PR #16 er åpen og mergebar. Den skal ikke merges uten eksplisitt brukergodkjenning.
 
-Gjeldende branch:
-
-```text
-feature/element-deletion
-```
-
-Branch-base:
-
-```text
-main ved f71b354
-```
-
-Sporing:
-
-```text
-GitHub-sak #15 Plan: safe deletion for selected elements
-PR: ikke opprettet
-```
-
-Viktige commits på branchen:
-
-```text
-7269cb1 docs: define safe element deletion
-338fecd docs: hand off element deletion phase
-bfaf299 docs: set element deletion as current phase
-4f59b3e feat: add safe element deletion
-4f231f9 docs: record verified element deletion
-24189f0 docs: refresh project status for deletion
-7ecaa80 docs: align editor plan with deletion phase
-6ce52e1 docs: update work plan after deletion verification
-```
-
-Denne filens dokumentasjonscommit ligger etter `6ce52e1`.
+Lokal branch var clean ved `fbd8091` før de avsluttende Markdown-statusoppdateringene ble lagt inn via GitHub-connectoren. Neste lokale handling er å pull siste branch og bekrefte clean tree.
 
 ## Ferdig og merget til `main`
 
@@ -123,19 +96,13 @@ Lerretet   = redigere tekst og transformere elementer
 
 Lenker aktiveres ikke i editormodus. `EditorCanvasElement.tsx` ligger nær aktiv filgrense og skal ikke få flere nye funksjonsansvar.
 
-## Gjeldende fase – sikker sletting
+## PR #16 – sikker sletting
 
 Autoritativ spesifikasjon:
 
 ```text
 docs/ELEMENT_DELETION.md
 GitHub-sak #15
-```
-
-Produksjonskode er implementert i:
-
-```text
-4f59b3e feat: add safe element deletion
 ```
 
 Første leveranse gjelder ett markert element:
@@ -155,13 +122,7 @@ Status: Ulåst
 Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
 ```
 
-Knappen:
-
-- har samme bredde som statusboksen
-- ligger i vanlig dokumentflyt
-- bruker rød tekst og rød ramme
-- er deaktivert når elementet er låst
-- krever ingen scrolling i dagens panel
+Knappen har samme bredde som statusboksen, ligger i vanlig dokumentflyt, bruker rød tekst og ramme og er deaktivert når elementet er låst.
 
 ### Bekreftelse
 
@@ -174,6 +135,8 @@ Avbryt    Slett
 ```
 
 Dialogen bruker native modal `<dialog>`, fokuserer `Avbryt`, støtter `Escape`, returnerer fokus ved avbrytelse og validerer nyeste elementstate før bekreftelse.
+
+Dialogens `Escape` er isolert og lukker ikke samtidig et åpent verktøypanel.
 
 ### Tastatur
 
@@ -195,8 +158,9 @@ Ved gyldig sletting:
 
 - bare målelementet fjernes
 - `project.updatedAt` oppdateres
-- `selectedElementId` settes til `null`
-- høyremenyen lukkes gjennom eksisterende selection-avledning
+- `selectedElementId` nullstilles bare når målet var markert
+- en urelatert markering bevares
+- høyremenyen lukkes når det markerte elementet slettes
 
 Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; visuelt overlappende elementer blir stående.
 
@@ -212,22 +176,11 @@ src/components/editor/useElementDeletionShortcut.ts
 src/styles/element-deletion.css
 ```
 
-Integrasjon:
-
-```text
-src/state/editorProjectAction.ts
-src/state/editorProjectReducer.ts
-src/components/editor/EditorShell.tsx
-src/components/properties/RightPropertiesPanel.tsx
-src/components/canvas/canvasElementAccessibility.ts
-src/App.css
-```
-
 `EditorCanvasElement.tsx` er urørt. Alle nye kildefiler er under 250 linjer.
 
 ## Verifisert kontroll
 
-Brukeren kjørte `npm run check` etter produksjonscommit `4f59b3e`:
+Brukeren kjørte `npm run check` etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
@@ -236,11 +189,11 @@ Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
 Vite: 64 moduler transformert
 CSS: 20.13 kB, gzip 4.60 kB
-JavaScript: 232.13 kB, gzip 71.21 kB
-bygget på 168 ms
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
 
-Working tree var clean ved denne kontrollen. Det finnes ingen GitHub Actions-run for commiten.
+Arkitekturrapportene er regenerert. Det finnes ingen GitHub Actions-run for head.
 
 ## Manuelt godkjent
 
@@ -274,24 +227,14 @@ Brukeren har godkjent:
 - farger
 - forhåndsvisning eller publisering
 
-## Kritisk gjenstående arbeid
+## Neste handling
 
-Arkitekturrapportene er ikke regenerert etter at slettefilene ble lagt til.
-
-Neste handling skal være:
-
-1. Hent siste dokumentasjonscommits på `feature/element-deletion`.
-2. Kontroller branch og clean tree.
-3. Kjør `npm run architecture:json`.
-4. Kjør `npm run architecture:diagram`.
-5. Kontroller at bare `architecture.json` og `docs/dependency-graph.mmd` er endret.
-6. Ikke kjør ny full `npm run check` bare på grunn av rapport- eller Markdown-endringer.
-7. Få rapportfilene inn på branchen gjennom kontrollert repoarbeid.
-8. Kontroller endelig diff, filstørrelser og clean tree.
-9. Opprett PR mot `main` med `Closes #15`.
-10. Kontroller mergebarhet, endrede filer, review-tråder og eventuell CI.
-11. Merge bare etter eksplisitt brukergodkjenning.
-12. Etter merge: bytt til `main`, pull og bekreft clean tree.
+1. Kjør `git pull --ff-only origin feature/element-deletion`.
+2. Bekreft `working tree clean`.
+3. Kontroller PR #16 på siste head: mergebarhet, filoversikt, review-tråder og eventuell CI.
+4. Ikke kjør `npm run check` på nytt for rene Markdown-endringer.
+5. Merge bare etter eksplisitt brukergodkjenning.
+6. Etter merge: bytt til `main`, pull og bekreft clean tree.
 
 Den parkerte `feature/button-element`-branchen skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
 
