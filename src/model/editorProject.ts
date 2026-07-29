@@ -1,7 +1,8 @@
+import type { ButtonAssetId } from './buttonAsset'
 import type { ElementLink } from './elementLink'
 import type { TextElementStyle } from './textElementStyle'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 4 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 5 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -47,6 +48,9 @@ export type TextEditorElement = BaseEditorElement & {
 
 export type ButtonEditorElement = BaseEditorElement & {
   kind: 'button'
+  assetId: ButtonAssetId
+  label: string
+  link: ElementLink
 }
 
 export type EditorElement =

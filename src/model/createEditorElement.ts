@@ -1,3 +1,7 @@
+import {
+  DEFAULT_BUTTON_ASSET_ID,
+  DEFAULT_BUTTON_LABEL,
+} from './buttonAsset'
 import type { EditorElement, ElementKind, ElementSize } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
@@ -45,7 +49,13 @@ export function createEditorElement({
         link: { ...NO_ELEMENT_LINK },
       }
     case 'button':
-      return { ...common, kind }
+      return {
+        ...common,
+        kind,
+        assetId: DEFAULT_BUTTON_ASSET_ID,
+        label: DEFAULT_BUTTON_LABEL,
+        link: { ...NO_ELEMENT_LINK },
+      }
   }
 
   const unhandledKind: never = kind
