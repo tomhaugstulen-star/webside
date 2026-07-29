@@ -6,24 +6,24 @@ Dette dokumentet fastsetter utviklingsrekkefølge og kontrollkrav. Det utvikles 
 
 For hver avgrensede del:
 
-1. Kontroller riktig branch og rent arbeidsområde.
+1. Kontroller riktig branch og clean tree.
 2. Oppdater og kontroller faktisk `origin/main`.
-3. Opprett én avgrenset feature- eller docs-branch.
+3. Bruk én avgrenset feature- eller docs-branch.
 4. Definer brukerhandlinger, varig state og transient state.
 5. Lås produkt-, validerings- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
 7. Trekk ut ansvar før en kildefil passerer 250 linjer.
 8. Gjennomfør framtidsrettet kodeaudit.
 9. Kjør automatiske kontroller etter siste produksjonsendring.
-10. Regenerer arkitekturrapporter ved strukturendringer.
-11. Test PC, Telefon, peker og tastatur der det er relevant.
-12. Oppdater nødvendig dokumentasjon.
+10. Test PC, Telefon, peker og tastatur der det er relevant.
+11. Regenerer arkitekturrapporter etter struktur- eller avhengighetsendringer.
+12. Oppdater all autoritativ dokumentasjon.
 13. Kontroller synkronisert branch og clean tree.
-14. Opprett eller oppdater PR og kontroller diff, mergebarhet, review-tråder og CI.
+14. Kontroller PR-diff, mergebarhet, reviews og CI.
 15. Merge bare etter eksplisitt brukergodkjenning.
-16. Oppdater lokal `main` og kontroller clean tree før neste fase.
+16. Oppdater lokal `main` før neste fase.
 
-Produksjonsbrancher bruker normalt:
+Normale kontroller:
 
 ```powershell
 npm run check
@@ -40,87 +40,86 @@ branch: feature/image-import-and-placement
 GitHub-sak: #25
 PR: #26 – åpen, ikke draft
 base main: 7e4c71f
-prosjektskjema i leveransen: versjon 6
+prosjektskjema: versjon 6
 implementering: ferdig
-kodeaudit: ferdig
-PC- og Telefon-test: godkjent
+manuell test: godkjent
+framtidsrettet sluttaudit: ferdig
 automatiske kontroller: godkjent
-arkitekturrapporter: regenerert og commitet
-dokumentasjon: sluttføres etter siste resize-rettelser
+dokumentasjon: oppdatert etter sluttaudit
+arkitekturrapporter etter sluttaudit: må regenereres
 merge: ikke godkjent eller utført
 ```
 
-Faktisk branch- og `main`-HEAD skal leses fra Git. Commitnumre i dokumentasjonen er historiske kontrollpunkter, ikke permanente forventede topper.
+Faktisk branch- og `main`-HEAD leses fra Git.
 
-Siste verifiserte produksjonskontroll:
+## 3. Siste verifiserte produksjonskontroll
 
 ```text
 ESLint: bestått
 TypeScript: bestått
 Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
 Vite: 100 moduler transformert
-CSS: 31.06 kB, gzip 6.06 kB
-JavaScript: 258.04 kB, gzip 77.94 kB
-produksjonsbuild: bestått
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
 PC og Telefon: godkjent
 ```
 
-## 3. Fase 11A – ferdig på feature-branchen
+## 4. Fase 11A – ferdig funksjonsomfang
 
 Leveransen omfatter:
 
 - lokal filvelger gjennom `Elementer -> Bilde`
 - PNG, JPEG og WebP
 - maksimal filstørrelse 10 MB
-- synlige feil for ugyldig type, størrelse og dekoding
+- maksimal dekodet størrelse 40 megapiksler
+- maksimal bredde eller høyde 16 384 px
+- synlige feil for type, størrelse, dimensjon og dekoding
 - avbrutt filvalg uten prosjektmutasjon
+- avbrutt behandling etter panel-unmount
 - skjemaversjon 6
 - stabil bilde-`assetId`
-- serialiserbar filmetadata
-- `altText`
-- `mode: contain | crop`
-- serialiserbar zoom og normalisert offset
-- separat transient ressursbuffer for `File` og Object URL
-- kontrollert Object URL-opprydding
+- serialiserbar metadata
+- alternativ tekst
+- `contain | crop`
+- zoom og normalisert offset
+- versjon-6-crop-grunnramme låst til 240 × 160 px
+- transient ressursbuffer for `File` og Object URL
+- kontrollert URL-opprydding
 - fallback ved manglende ressurs
-- Seksjon rendres bak Bilde, Tekst og Knapp
-- bilderamme med åtte pekergrep på innsiden
-- resizing fra topp, bunn, venstre, høyre og hjørner
-- motsatt kant står fast ved kanthåndtering
-- `Hele bildet` med proporsjonal skalering og sentrering
-- `Juster utsnitt` uten synlige tomrom
-- crop-resize klipper motivet uten automatisk skalering eller sentrering
-- motivets absolutte plassering bevares når rammekanten flyttes
-- motivflytting med peker
-- `Shift + dra` for å flytte hele rammen i utsnittsmodus
-- `Alt + piltast` for tastaturstyrt motivflytting fra editoren og relevante høyremenyfelt
-- zoom mellom 100 og 300 prosent, begrenset av rammens minimumsbehov
-- kontrollert reset av utsnitt
-- alternativ tekst, visning, zoom, metadata og sletting i høyremenyen
-- låst bilde kan inspiseres, men ikke muteres eller slettes
-- desktopgeometri arves foreløpig av Telefon
+- åtte resizegrep på innsiden
+- resizing fra alle kanter og hjørner
+- motsatt kant står fast
+- crop-resize bevarer motivets størrelse og absolutte plassering
+- ramme og transform lagres atomisk
+- `Hele bildet` og `Juster utsnitt`
+- motivflytting med peker og tastatur
+- `Shift + dra` for rammeflytting
+- zoom 100–300 prosent
+- reset av utsnitt
+- metadata og sletting i høyremenyen
+- låste bilder kan inspiseres, men ikke muteres
+- Telefon arver desktopgeometri
+- Seksjon rendres bak forgrunnsinnhold
 
-## 4. Auditutfall for fase 11A
+## 5. Sluttauditens utfall
 
-Oppryddingen før PR samlet framtidige invariantgrenser:
+Auditen bekreftet eller rettet:
 
-- elementenes standard- og minimumsstørrelser har én modellkilde
-- opprettingsvalidering deles av hook og reducer
-- crop-rammens maksimum håndheves også i reduceren
-- overgang fra `Hele bildet` til `Juster utsnitt` produserer gyldig ramme
-- bildeimport rydder opptatt-status og delvis registrerte ressurser ved feil
-- ressurslageret kontrollerer at fil og metadata samsvarer
-- tastaturlogikk for motivflytting ligger i en avgrenset editor-hook
-- `Alt + venstre/høyre` stoppes før nettleseren kan navigere historikk
-- Seksjon får deterministisk bakgrunnslagring uten å endre prosjektets elementrekkefølge
-- crop-resize beregner ny normalisert offset for å bevare motivets absolutte plassering
-- ramme og korrigert transform lagres atomisk gjennom `set-image-desktop-frame`
-- `EditorCanvasElement.tsx` er under 200 linjer
-- `useElementPointerTransform.ts` er 218 linjer
-- `imagePresentation.ts` er 240 linjer
-- alle berørte kildefiler er under 250 linjer
+- én modellkilde for standard- og minimumsstørrelser
+- delt opprettingsvalidering mellom hook og reducer
+- crop-invarianter i modell og reducer
+- atomisk ramme- og transformcommit
+- global, kontrollert `Alt + piltast`
+- trygg import ved feil og unmount
+- fil/metadata-samsvar i ressurslageret
+- dekodet dimensjonsgrense
+- stabil versjon-6-tolkning av crop-transform
+- deterministisk bakgrunnslag for Seksjon
+- ingen motstridende bildestil i `canvas.css`
+- alle berørte kildefiler under 250 linjer
 
-## 5. Ferdig og merget før fase 11A
+## 6. Ferdig og merget før fase 11A
 
 - fase 0: stabilt editorgrunnlag
 - fase 1: prosjekt- og elementmodell
@@ -136,26 +135,40 @@ Oppryddingen før PR samlet framtidige invariantgrenser:
 - fase 9: sikker sletting – PR #16
 - dokumentasjonsaudit – PR #19
 - fase 10: SVG-knappbibliotek – PR #21
-- dokumentasjonsstatus etter knappbiblioteket – PR #22 og PR #24
+- dokumentasjonsstatus – PR #22 og PR #24
 
-## 6. Neste handling
+## 7. Neste handling
 
 Ingen ny produksjonsfase startes fra denne branchen.
 
-Etter denne dokumentoppdateringen:
+Neste obligatoriske steg:
 
-1. trekk siste feature-branch lokalt
-2. kontroller `git status`, `git diff --check` og dokumentdiffen etter siste rapportcommit
-3. oppdater PR #26-beskrivelsen med siste funksjons- og kontrollstatus
-4. kontroller PR-ens mergebarhet, changed files, review-tråder og CI på nytt
-5. presenter PR #26 for eksplisitt brukergodkjenning
-6. merge først etter ordet `godkjent`
-7. oppdater lokal `main` og kontroller clean tree
-8. velg neste fase eksplisitt
+```powershell
+npm run architecture:json
+npm run architecture:diagram
+git status --short
+git diff --check
+git diff --stat
+```
 
-## 7. Senere faser
+Forventet:
 
-Ingen senere fase er aktiv før omfanget er eksplisitt valgt og godkjent.
+- bare `architecture.json` og `docs/dependency-graph.mmd` endres
+- ingen reelle `git diff --check`-feil
+
+Deretter:
+
+1. commit og push bare arkitekturrapportene
+2. trekk alle dokumentcommits lokalt
+3. kontroller clean tree og samlet diff mot `main`
+4. oppdater PR #26-body med sluttkontroll og rapportcommit
+5. kontroller mergebarhet, changed files, review-tråder, reviews og CI
+6. presenter PR #26 for eksplisitt godkjenning
+7. merge først etter ordet `godkjent`
+8. oppdater lokal `main`
+9. velg neste fase eksplisitt
+
+## 8. Senere faser
 
 ```text
 fase 12  prosjektfarger
@@ -168,13 +181,22 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-## 8. Faste tekniske grenser
+## 9. Obligatoriske framtidsgrenser
 
-- 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
-- 300 linjer er hard unntaksgrense.
-- Canvas-komponentene skal ikke samle egenskaps-, ressurs- og stateansvar.
-- `RightPropertiesPanel.tsx` skal forbli komposisjon.
-- Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
-- Ugyldige og uendrede handlinger returnerer samme state.
-- Transient markering, drafts, pekerøkter, filer, Object URL-er, fokus og feedback serialiseres ikke.
-- Ingen branch merges uten eksplisitt brukergodkjenning.
+- prosjektimport validerer hele prosjektet og skjemaversjonen før `replace-project`
+- prosjektbytte avstemmer eller tømmer bilderessursbufferen
+- historikk lagrer bare serialiserbar prosjektstate
+- mobiloverstyringer bruker viewport-spesifikke actions
+- autolagring reagerer på gyldige prosjektmutasjoner
+- endret crop-grunnmodell krever ny skjemaversjon og migrering
+
+## 10. Faste tekniske grenser
+
+- 250 linjer er aktiv terskel
+- 300 linjer er hard unntaksgrense
+- canvas samler ikke egenskaps-, fil- eller ressursansvar
+- `RightPropertiesPanel.tsx` forblir komposisjon
+- varige data endres bare gjennom validerte reducerhandlinger
+- ugyldige og uendrede handlinger returnerer samme state
+- transient editor- og ressursstate serialiseres ikke
+- ingen branch merges uten eksplisitt godkjenning
