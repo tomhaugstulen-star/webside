@@ -1,12 +1,14 @@
 # Elementmarkering
 
-Dette dokumentet beskriver markering av eksisterende elementer i `feature/element-selection`.
+Dette dokumentet beskriver den historiske markeringsfasen i `feature/element-selection` og grensene som senere funksjoner skal bevare.
 
 ## Status
 
-Branchen er utviklet, gjennomgått og visuelt godkjent 28. juli 2026.
+Fasen er utviklet, gjennomgått, kontrollert og ligger på `main`.
 
-Bekreftet av brukeren:
+Tidligere formuleringer om at `npm run check` måtte kjøres på nytt før merge og at elementoppretting var «neste fase», beskrev branchens tilstand 28. juli 2026. De er ikke gjeldende prosjektstatus.
+
+Bekreftet i fasen:
 
 - ett element kan markeres
 - markeringen flyttes når et annet element velges
@@ -14,21 +16,13 @@ Bekreftet av brukeren:
 - Tab kan flytte fokus til elementer
 - Enter og mellomrom kan markere fokusert element
 - oppførselen fungerer i desktop- og mobilvisning
-- den midlertidige test-fixturen er fjernet
-- et nytt prosjekt åpner igjen helt blankt
-
-Bekreftet ved lokal kontroll før den siste reducer-herdingen:
-
-- ESLint bestod
-- TypeScript-kontroll bestod
-- Dependency Cruiser fant ingen regelbrudd
-- produksjonsbuild bestod
-
-Etter den siste reducer-herdingen skal `npm run check` kjøres på nytt før merge.
+- den midlertidige test-fixturen ble fjernet
+- et nytt prosjekt åpner helt blankt
+- ESLint, TypeScript, Dependency Cruiser og produksjonsbuild ble kontrollert før fasen ble avsluttet
 
 ## Implementert omfang
 
-Branchen bygger bare markering av elementer som allerede finnes i prosjektmodellen:
+Branchen bygde markering av elementer som allerede finnes i prosjektmodellen:
 
 - `selectedElementId: string | null` i transient editor-state
 - valg av ett element på aktiv side
@@ -42,18 +36,18 @@ Branchen bygger bare markering av elementer som allerede finnes i prosjektmodell
 - rendering av eksisterende elementbokser fra prosjektmodellen
 - bruk av desktopverdier og mobile overstyringer ved rendering
 
-Branchen oppretter ingen elementer og legger ikke inn produksjonsinnhold.
+Branchen opprettet ingen elementer og la ikke inn produksjonsinnhold. Elementoppretting ble senere implementert i en separat fase.
 
 ## State-regler
 
-`selectedElementId` er editorens midlertidige brukergrensesnitt-state. Den er ikke en del av `EditorProject` og skal derfor ikke:
+`selectedElementId` er transient editor-state. Den er ikke en del av `EditorProject` og skal derfor ikke:
 
 - lagres i prosjektfilen
 - utløse automatisk lagring
 - inngå i prosjektets angre-/gjør om-historikk
 - eksporteres eller publiseres
 
-`EditorProject` forblir den autoritative kilden for sider og elementer.
+`EditorProject` er den autoritative kilden for sider og elementer.
 
 Reducer-invarianter:
 
@@ -62,8 +56,8 @@ Reducer-invarianter:
 - samme valgte ID gir ingen unødvendig state-endring
 - bytte til en annen side fjerner markeringen
 - prosjektbytte fjerner markeringen
-- dersom en senere prosjektendring fjerner valgt element, nullstilles markeringen automatisk
-- nye reducer-actions må håndteres eksplisitt av TypeScript
+- dersom en prosjektendring fjerner valgt element, nullstilles markeringen automatisk
+- nye reducer-actions håndteres eksplisitt av TypeScript
 
 ## Komponentansvar
 
@@ -94,7 +88,7 @@ Reducer-invarianter:
 - beskytter mot ugyldige og overflødige state-overganger
 - rydder opp markering ved side- og prosjektendringer
 
-## Bevisst ikke implementert
+## Ikke del av den historiske branchen
 
 - elementoppretting
 - sletting av elementer
@@ -109,25 +103,19 @@ Reducer-invarianter:
 - historikk
 - lagring
 
-## Før senere funksjoner bygges
+Flere av disse funksjonene ble senere implementert i separate, avgrensede faser. Listen beskriver bare omfangsgrensen for `feature/element-selection`.
 
-Følgende regler må bevares:
+## Regler som senere funksjoner skal bevare
 
-1. Elementoppretting skal bruke prosjektmodellen og ikke opprette tilfeldige DOM-objekter.
-2. Sletting og prosjektmutasjoner skal gå gjennom reduceren slik at ugyldig markering ryddes automatisk.
-3. Objektverktøy skal lese valgt element fra `useElementSelection`.
+1. Elementoppretting bruker prosjektmodellen og oppretter ikke tilfeldige DOM-objekter.
+2. Sletting og prosjektmutasjoner går gjennom reduceren slik at ugyldig markering ryddes automatisk.
+3. Objektverktøy leser valgt element fra `useElementSelection`.
 4. Klikk på objektverktøy utenfor lerretet skal ikke utilsiktet fjerne markeringen.
-5. Tekstredigeringsmodus må skille mellom å markere elementet og å redigere innholdet.
-6. Et faktisk knapp-element skal ikke aktiveres som lenke eller handling mens editoren er i vanlig markeringsmodus.
-7. Når mobilskjuling bygges, må det avklares om et element som er skjult i aktiv visning også skal miste markeringen.
-8. Tilgjengelig navn må senere bli mer spesifikt enn bare elementtype når modellen får navn eller innhold.
+5. Tekstredigeringsmodus skiller mellom å markere elementet og å redigere innholdet.
+6. Et knapp-element aktiveres ikke som lenke eller handling i vanlig editormodus.
+7. Når mobilskjuling bygges, må det avklares om et skjult valgt element også skal miste markeringen.
+8. Tilgjengelig navn skal bli mer spesifikt når modellen får navn eller innhold.
 
-## Neste fase
+## Historisk videreføring
 
-Etter kontrollert merge til `main` er neste branch:
-
-```text
-feature/element-creation
-```
-
-Den skal opprette faktiske elementer fra Elementer-panelet. Draing, størrelsesendring og tekstredigering skal fortsatt ligge i senere branches.
+Elementoppretting var den neste planlagte fasen etter markering og ble senere implementert. Drag/resize, objektlåsing, tekstredigering, høyremeny og sikker sletting er også senere fullført og ligger på `main`.
