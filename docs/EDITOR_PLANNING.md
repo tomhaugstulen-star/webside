@@ -5,14 +5,16 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 ## Gjeldende arbeidsstatus
 
 ```text
-main: 5e548ad
+main HEAD: a77a9a9
 PR #21: SVG-knappbibliotek – merget
+PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
+knappbibliotekets mergecommit: 5e548ad
 GitHub-sak #20: lukket som fullført
 prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-Sluttkontroll for knappfasen:
+Sluttkontroll for siste produksjonsfase:
 
 ```text
 ESLint: bestått
@@ -53,6 +55,7 @@ PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
 PR #19  dokumentasjonsaudit          06307a2
 PR #21  SVG-knappbibliotek           5e548ad
+PR #22  dokumentasjonsstatus         a77a9a9
 ```
 
 ## Gjeldende venstremeny
