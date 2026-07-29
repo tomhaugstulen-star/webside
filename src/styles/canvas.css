@@ -188,7 +188,6 @@
   user-select: text;
 }
 
-
 .canvas-element:hover {
   outline-color: rgba(143, 67, 47, 0.48);
 }
@@ -206,7 +205,7 @@
   outline-style: dashed;
 }
 
-.canvas-element--transforming {
+.canvas-element--transforming:not(.canvas-element--section) {
   z-index: 1;
 }
 
