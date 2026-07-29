@@ -12,6 +12,15 @@ function summarizeText(value: string) {
 }
 
 function getElementSummary(element: EditorElement) {
+  if (element.kind === 'image') {
+    const altText = summarizeText(element.altText)
+    const fileName = summarizeText(element.assetMetadata.fileName)
+
+    return altText
+      ? `Bilde. Alternativ tekst: ${altText}.`
+      : `Bilde uten alternativ tekst. Fil: ${fileName}.`
+  }
+
   if (element.kind === 'text') {
     const summary = summarizeText(element.content)
     return summary ? `Innhold: ${summary}.` : 'Tom tekstboks.'
