@@ -1,16 +1,18 @@
 # Objektlåsing
 
-Dette dokumentet beskriver låsing og opplåsing av elementer i Website-editoren.
+Dette dokumentet beskriver den historiske låsefasen og de varige grensene som fortsatt gjelder.
 
-## Omfang
-
-Branch:
+## Status og omfang
 
 ```text
-feature/object-locking
+branch: feature/object-locking
+PR: #5 – merget
+mergecommit: a3eed45
 ```
 
-Fasen bygger bare låsing av eksisterende elementer. Den bygger ikke sletting, lagpanel, tekstredigering, bildeimport, historikk, lagring eller egne mobiloverstyringer.
+Fasen er ferdig, kontrollert og merget til `main`.
+
+Fasen bygde låsing og opplåsing av eksisterende elementer. Den bygde ikke sletting, lagpanel, tekstredigering, bildeimport, historikk, lagring eller egne mobiloverstyringer. Flere av disse funksjonene ble senere levert i egne faser.
 
 ## Brukeropplevelse
 
@@ -49,7 +51,7 @@ Følgende er ikke prosjektdata:
 - hover- og pressed-tilstand
 - valgt element-ID
 
-Disse tilstandene skal ikke serialiseres, eksporteres, publiseres eller utløse autolagring direkte.
+Disse tilstandene serialiseres, eksporteres eller publiseres ikke og utløser ikke autolagring direkte.
 
 ## Transformgrenser
 
@@ -65,7 +67,7 @@ Et låst element:
 
 Både pekelogikken og reduceren håndhever låsen. Reducergrensen er autoritativ og beskytter også mot framtidige eller feilaktige UI-kall.
 
-Piltaster på et låst, fokusert element stoppes kontrollert slik at nettleseren ikke scroller editorområdet som en utilsiktet bieffekt.
+Piltaster på et låst, fokusert element stoppes kontrollert slik at nettleseren ikke scroller editorområdet utilsiktet.
 
 ## Peker og event-propagation
 
@@ -90,11 +92,11 @@ Pointer down på verktøylinjen stopper propagation. Derfor:
 
 Låsestatus er felles for PC og Telefon. Den er en elementegenskap, ikke en responsiv verdi.
 
-Dagens midlertidige deling av desktopgeometri påvirker ikke låsemodellen. Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls`.
+Dagens midlertidige deling av desktopgeometri påvirker ikke låsemodellen. Egne mobiloverstyringer bygges senere i `feature/mobile-design-controls` etter ny godkjenning.
 
 ## Arkitektur
 
-Ansvar er delt slik:
+Ansvar ble delt slik:
 
 - `src/state/toggleElementLock.ts` — ren state-overgang
 - `src/state/useElementLocking.ts` — UI-API og tidspunkt før dispatch
@@ -103,22 +105,22 @@ Ansvar er delt slik:
 - `src/components/canvas/EditorCanvasElement.tsx` — elementrendering og kobling til verktøylinjen
 - `src/styles/canvas.css` — visuell låsetilstand og verktøylinje
 
-Alle berørte kildefiler skal holdes under den aktive 250-linjersgrensen eller deles etter ansvar før videre vekst.
+Alle berørte kildefiler ble holdt under den aktive 250-linjersgrensen eller delt etter ansvar.
 
-## Akseptansekriterier
+## Historiske akseptansekriterier
 
-Fasen er ikke ferdig før dette er bekreftet:
+Følgende ble bekreftet før PR #5 ble merget:
 
 - alle fire elementtyper kan låses og låses opp
 - låst element beholder markering
 - stiplet markeringsramme vises
 - resize-håndtaket skjules og kommer tilbake ved opplåsing
-- pekerflytting og pointer-resize blokkeres når låst
-- tastaturflytting og tastatur-resize blokkeres når låst
+- pekerflytting og pointer-resize blokkeres når elementet er låst
+- tastaturflytting og tastatur-resize blokkeres når elementet er låst
 - piltaster på låst element utløser ikke utilsiktet scrolling
 - låseknappen starter ikke flytting eller fjerner markering
 - klikk på tomt lerret skjuler verktøylinjen
-- PC og Telefon er testet
-- `npm run check` er bestått etter siste kodeendring
-- arkitekturrapporter er regenerert etter strukturendringene
-- arbeidsområdet er rent og synkronisert før PR
+- PC og Telefon ble testet
+- `npm run check` ble bestått etter siste kodeendring
+- arkitekturrapporter ble regenerert etter strukturendringene
+- arbeidsområdet var rent og synkronisert før PR
