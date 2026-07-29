@@ -6,6 +6,8 @@ subgraph src["src"]
   subgraph src_components["components"]
     subgraph src_components_editor["editor"]
       src_components_editor_EditorShell_tsx["EditorShell.tsx"]
+      src_components_editor_useElementDeletionShortcut_ts["useElementDeletionShortcut.ts"]
+      src_components_editor_isElementDeletionShortcutTarget_ts["isElementDeletionShortcutTarget.ts"]
     end
     subgraph src_components_canvas["canvas"]
       src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
@@ -19,8 +21,12 @@ subgraph src["src"]
       src_components_canvas_autoScrollCanvas_ts["autoScrollCanvas.ts"]
       src_components_canvas_getCanvasContentHeight_ts["getCanvasContentHeight.ts"]
     end
+    subgraph src_components_dialogs["dialogs"]
+      src_components_dialogs_ConfirmElementDeletionDialog_tsx["ConfirmElementDeletionDialog.tsx"]
+    end
     subgraph src_components_properties["properties"]
       src_components_properties_RightPropertiesPanel_tsx["RightPropertiesPanel.tsx"]
+      src_components_properties_DeleteElementSection_tsx["DeleteElementSection.tsx"]
       src_components_properties_ElementLinkPropertiesSection_tsx["ElementLinkPropertiesSection.tsx"]
       src_components_properties_TextPropertiesSection_tsx["TextPropertiesSection.tsx"]
     end
@@ -49,6 +55,7 @@ subgraph src["src"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
     src_state_editorProjectAction_ts["editorProjectAction.ts"]
     src_state_useElementCreation_ts["useElementCreation.ts"]
+    src_state_useElementDeletion_ts["useElementDeletion.ts"]
     src_state_useElementSelection_ts["useElementSelection.ts"]
     src_state_useElementLayout_ts["useElementLayout.ts"]
     src_state_useTextElementContent_ts["useTextElementContent.ts"]
@@ -57,6 +64,7 @@ subgraph src["src"]
     src_state_useTextElementStyle_ts["useTextElementStyle.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
+    src_state_deleteElementFromActivePage_ts["deleteElementFromActivePage.ts"]
     src_state_setTextElementContent_ts["setTextElementContent.ts"]
     src_state_setTextElementLink_ts["setTextElementLink.ts"]
     src_state_setTextElementStyle_ts["setTextElementStyle.ts"]
@@ -74,12 +82,15 @@ src_App_tsx-->src_state_EditorProjectProvider_tsx
 src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementCreation_ts
+src_components_editor_EditorShell_tsx-->src_state_useElementDeletion_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementSelection_ts
 src_components_editor_EditorShell_tsx-->src_types_editor_ts
 src_components_editor_EditorShell_tsx-->src_components_canvas_EditorCanvas_tsx
+src_components_editor_EditorShell_tsx-->src_components_dialogs_ConfirmElementDeletionDialog_tsx
 src_components_editor_EditorShell_tsx-->src_components_properties_RightPropertiesPanel_tsx
 src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
 src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
+src_components_editor_EditorShell_tsx-->src_components_editor_useElementDeletionShortcut_ts
 src_model_editorProject_ts-->src_model_elementLink_ts
 src_model_editorProject_ts-->src_model_textElementStyle_ts
 src_state_useEditorProject_ts-->src_state_editorProjectContext_ts
@@ -93,6 +104,7 @@ src_model_elementLayout_ts-->src_model_editorProject_ts
 src_state_useElementCreation_ts-->src_model_createStableId_ts
 src_state_useElementCreation_ts-->src_model_editorProject_ts
 src_state_useElementCreation_ts-->src_state_useEditorProject_ts
+src_state_useElementDeletion_ts-->src_state_useEditorProject_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
 src_types_editor_ts-->src_model_editorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useEditorProject_ts
@@ -130,9 +142,12 @@ src_components_canvas_useElementPointerTransform_ts-->src_components_canvas_canv
 src_components_canvas_getCanvasContentHeight_ts-->src_model_editorProject_ts
 src_components_canvas_getCanvasContentHeight_ts-->src_model_resolveResponsiveValue_ts
 src_components_canvas_getCanvasContentHeight_ts-->src_components_canvas_canvasLayoutPreview_ts
+src_components_dialogs_ConfirmElementDeletionDialog_tsx-->src_model_editorProject_ts
 src_components_properties_RightPropertiesPanel_tsx-->src_model_editorProject_ts
+src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_DeleteElementSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ElementLinkPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_TextPropertiesSection_tsx
+src_components_properties_DeleteElementSection_tsx-->src_model_editorProject_ts
 src_components_properties_ElementLinkPropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_ElementLinkPropertiesSection_tsx-->src_model_elementLink_ts
 src_components_properties_ElementLinkPropertiesSection_tsx-->src_state_useTextElementLink_ts
@@ -151,12 +166,15 @@ src_components_sidebar_SidebarPanels_tsx-->src_model_editorProject_ts
 src_components_sidebar_SidebarPanels_tsx-->src_types_editor_ts
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
+src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
+src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorElement_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
 src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
+src_state_editorProjectReducer_ts-->src_state_deleteElementFromActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementLink_ts
@@ -169,6 +187,7 @@ src_model_createEditorElement_ts-->src_model_textElementStyle_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
 src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
 src_state_setTextElementContent_ts-->src_model_editorProject_ts
 src_state_setTextElementLink_ts-->src_model_editorProject_ts
 src_state_setTextElementLink_ts-->src_model_elementLink_ts
