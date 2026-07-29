@@ -7,6 +7,10 @@ export function setImageAltText(
   altText: string,
   updatedAt: string,
 ): EditorProjectState {
+  if (typeof altText !== 'string') {
+    return state
+  }
+
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   const element = activePage?.elements.find((candidate) => candidate.id === elementId)
   const normalizedAltText = normalizeImageAltText(altText)
