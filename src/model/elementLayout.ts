@@ -64,31 +64,52 @@ export function resizeElementLayout(
   delta: CanvasPosition,
   canvasWidth: number,
   handle: ResizeHandle = 'south-east',
+  maximumSize?: ElementSize,
 ): ElementLayout {
   const minimumSize = getElementMinimumSize(kind)
+  const maximumWidth = Math.max(
+    minimumSize.width,
+    maximumSize?.width ?? Number.POSITIVE_INFINITY,
+  )
+  const maximumHeight = Math.max(
+    minimumSize.height,
+    maximumSize?.height ?? Number.POSITIVE_INFINITY,
+  )
   let left = initialLayout.position.x
   let top = initialLayout.position.y
   let right = left + initialLayout.size.width
   let bottom = top + initialLayout.size.height
 
   if (handle.includes('west')) {
-    left = clamp(left + delta.x, 0, right - minimumSize.width)
+    left = clamp(
+      left + delta.x,
+      Math.max(0, right - maximumWidth),
+      right - minimumSize.width,
+    )
   }
 
   if (handle.includes('east')) {
     right = clamp(
       right + delta.x,
       left + minimumSize.width,
-      canvasWidth,
+      Math.min(canvasWidth, left + maximumWidth),
     )
   }
 
   if (handle.includes('north')) {
-    top = clamp(top + delta.y, 0, bottom - minimumSize.height)
+    top = clamp(
+      top + delta.y,
+      Math.max(0, bottom - maximumHeight),
+      bottom - minimumSize.height,
+    )
   }
 
   if (handle.includes('south')) {
-    bottom = Math.max(top + minimumSize.height, bottom + delta.y)
+    bottom = clamp(
+      bottom + delta.y,
+      top + minimumSize.height,
+      top + maximumHeight,
+    )
   }
 
   return {
