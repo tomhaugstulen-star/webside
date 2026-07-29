@@ -26,6 +26,7 @@ export function EditorShell() {
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
+  const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
     ? activePage.elements.find((element) => element.id === deletionRequest.elementId) ?? null
     : null
@@ -83,14 +84,14 @@ export function EditorShell() {
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !deletionDialogOpen) {
         setActiveTool(null)
       }
     }
 
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [])
+  }, [deletionDialogOpen])
 
   return (
     <div
