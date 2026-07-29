@@ -6,7 +6,7 @@ Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editore
 
 Grunnmodellen ble utviklet i `feature/element-model` og er senere utvidet kontrollert av feature-branchene som eier nye varige elementdata.
 
-Gjeldende skjemaversjon på `feature/button-library`:
+Gjeldende skjemaversjon på `main`:
 
 ```ts
 EDITOR_PROJECT_SCHEMA_VERSION = 5
@@ -76,6 +76,24 @@ type EditorElement =
   | TextEditorElement
   | ButtonEditorElement
 ```
+
+### Seksjon
+
+```ts
+type SectionEditorElement = BaseEditorElement & {
+  kind: 'section'
+}
+```
+
+### Bilde
+
+```ts
+type ImageEditorElement = BaseEditorElement & {
+  kind: 'image'
+}
+```
+
+Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressurs-ID, filmetadata, alt-tekst og skaleringsmodell er ikke implementert ennå og skal avklares i fase 11 – Bilder.
 
 ### Tekstelement
 
@@ -178,7 +196,7 @@ none
 external-url { url, openInNewTab }
 ```
 
-På `feature/button-library` støttes lenken av:
+På `main` støttes lenken av:
 
 - tekstbokser
 - knapper
@@ -308,5 +326,7 @@ Planlagte eksempler:
 - eksplisitte mobiloverstyringer i `feature/mobile-design-controls`
 - historikk i `feature/history-system`
 - lagring og migrering i senere lagringsfaser
+
+Ingen av disse utvidelsene er aktiv produksjonsfase før omfanget er eksplisitt valgt og godkjent.
 
 Se også `docs/BUTTON_LIBRARY.md` og `docs/ELEMENT_LINKS.md`.
