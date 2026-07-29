@@ -5,31 +5,32 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 ## Gjeldende arbeidsstatus
 
 ```text
-siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
-GitHub-sak: #25 – lukket som fullført
-PR: #26 – merget
-mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
-prosjektskjema: versjon 6
+aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
+branch: feature/project-colors
+GitHub-sak: #28
+prosjektskjema: versjon 7
+implementering: ferdig
 framtidsrettet sluttaudit: ferdig
-automatiske kontroller: bestått
 PC og Telefon: godkjent
-arkitekturrapporter: regenerert etter sluttaudit, ingen diff
-lokal main: synkronisert og clean
-neste produksjonsfase: ikke valgt
+rammebredde: Ingen eller 1–10 px
+automatiske kontroller etter siste 10 px-endring: gjenstår
+arkitekturrapporter: må regenereres
+PR: ikke opprettet
+merge: ikke godkjent eller utført
 ```
 
 Faktisk branch- og `main`-HEAD leses alltid fra Git.
 
-## Siste verifiserte kontroll
+## Siste komplette kontroll før 10 px-utvidelsen
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
-Vite: 100 moduler transformert
-CSS: 30.95 kB, gzip 6.04 kB
-JavaScript: 258.38 kB, gzip 78.09 kB
-produksjonsbuild: bestått på 185 ms
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 189 ms
 ```
 
 ## Implementert editorgrunnlag
@@ -47,6 +48,7 @@ produksjonsbuild: bestått på 185 ms
 - separat bilderamme og motivutsnitt
 - alternativ tekst, zoom og filmetadata
 - kontrollert fallback for manglende ressurs
+- prosjektfarger og Seksjon-rammer
 
 ## Gjeldende venstremeny
 
@@ -61,12 +63,13 @@ Innstillinger
 ```text
 Elementer -> Knapp  åpner internt SVG-designbibliotek
 Elementer -> Bilde  åpner lokal filvelger
+Farger             viser konkrete fargeegenskaper på aktiv side
 ```
 
 ## Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette elementer og velge fil eller design
+Venstremeny = opprette elementer, velge fil/design og gi prosjektoversikt
 Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere innhold og transformere elementer
 Ressurslag = eie transient fil og renderings-URL
@@ -78,9 +81,11 @@ Prosjekt   = eie serialiserbar identitet, metadata og redigeringsverdier
 Varig prosjektdata:
 
 - sider og elementer
+- sideutseende og sidebakgrunn
 - responsiv geometri og synlighet
 - låsestatus
-- tekstinnhold og tekststil
+- Seksjon-bakgrunn og ramme
+- tekstinnhold, tekststil og tekstfarge
 - elementlenke
 - knappens stabile asset-ID og label
 - bildets stabile asset-ID og metadata
@@ -96,9 +101,11 @@ Transient state:
 - `File`, Object URL og ressurskart
 - dialoger, fokus og hover
 
+Fargegruppene i `Farger` er avledet UI og lagres ikke som en egen palett.
+
 ## Prosjektmodell
 
-Gjeldende skjemaversjon er 6.
+Gjeldende skjemaversjon er 7.
 
 ```text
 versjon 1  grunnmodell
@@ -107,9 +114,32 @@ versjon 3  tekststil
 versjon 4  elementlenke
 versjon 5  knappasset, knappetekst og knappelenke
 versjon 6  bildeasset, metadata, alternativ tekst, visning og utsnitt
+versjon 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 ```
 
-Telefon arver desktopgeometri når mobiloverstyring mangler. Bildeinnhold, alt-tekst, modus og transform er foreløpig felles for PC og Telefon.
+Telefon arver desktopgeometri når mobiloverstyring mangler. Farger, innhold, lenker, låsestatus og bildeutsnitt er foreløpig felles for PC og Telefon.
+
+## Prosjektfarger
+
+`Farger` viser:
+
+- `Bakgrunn -> Sidebakgrunn`
+- `Element N -> Bakgrunn`
+- `Element N -> Ramme` når rammebredden er større enn `0`
+- `Tekst N -> Tekstfarge`
+
+Hver kontroll muterer bare én konkret egenskap. To elementer med samme farge er ikke koblet sammen.
+
+Knapper beholder ferdig SVG-fargedesign og vises ikke i `Farger`. Bilder har ingen prosjektfarge.
+
+## Seksjon-ramme
+
+```text
+Ingen = 0 px
+1–10 px = synlig solid ramme
+```
+
+Rammefargen beholdes når rammen slås av. Høyremeny og `Farger` skriver til samme lagrede verdi. Rammen ligger innenfor elementets lagrede størrelse.
 
 ## Elementstørrelser
 
@@ -127,9 +157,9 @@ Tekst    120 × 48 px
 Knapp    80 × 36 px
 ```
 
-Standard- og minimumsstørrelser har én modellkilde. Crop-grunnrammen for skjemaversjon 6 er separat låst til 240 × 160 px, slik at senere endring av standardstørrelsen ikke endrer eksisterende utsnitt.
+Standard- og minimumsstørrelser har én modellkilde. Crop-grunnrammen for skjemaversjon 6 er separat låst til 240 × 160 px.
 
-## Bildeimport
+## Bildeimport og utsnitt
 
 Støttede filer:
 
@@ -142,35 +172,7 @@ maks 40 megapiksler
 maks 16 384 px per side
 ```
 
-Importen validerer filtype, filstørrelse, navn, dekoding og dimensjoner. Den avbrytes uten prosjekt- eller ressursmutasjon dersom Elementer-panelet demonteres under lesing.
-
-## Bildevisning og utsnitt
-
-### Hele bildet
-
-- viser hele motivet proporsjonalt
-- sentrerer motivet i rammen
-- tillater tomrom ved ulikt sideforhold
-- beholder lagret crop-transform
-
-### Juster utsnitt
-
-- fyller rammen uten tomrom
-- bevarer sideforhold
-- zoom 100–300 prosent
-- normalisert offset fra -1 til 1
-- åtte resizegrep på innsiden
-- rammeresize bevarer motivets størrelse og absolutte plassering
-- aktiv kant flyttes; motsatt kant står fast
-- ramme og transform lagres atomisk
-
-```text
-vanlig dra      flytter motivet
-Shift + dra     flytter hele rammen
-Alt + piltast   flytter motivet
-piltast         flytter elementet
-Ctrl/Cmd + pil  endrer størrelse fra nedre høyre hjørne
-```
+`contain` viser hele motivet. `crop` fyller rammen, bruker zoom `1..3`, normalisert offset og åtte resizegrep. Crop-resize bevarer motivets størrelse og absolutte plassering.
 
 ## Høyremeny
 
@@ -186,30 +188,31 @@ Tomt lerret     -> høyremeny lukkes
 - egen vertikal scrolling
 - 180 ms animasjon
 - redusert bevegelse respekteres
-- selection-state er autoritativ
+- Seksjon viser egen `Ramme`-del
 
 ## Arkitekturgrenser
 
-- alle berørte kildefiler er under 250 linjer
-- `EditorCanvasElement.tsx` er under 200 linjer
-- `useElementPointerTransform.ts` er 218 linjer
-- `imagePresentation.ts` er 236 innholdslinjer
+- alle nye og berørte produksjonsfiler i fase 12 er under 250 linjer
+- `RightPropertiesPanel.tsx` forblir komposisjon
+- fargeoversikten er avledet fra aktiv side
+- reduceren er siste valideringsgrense
+- DOM og CSS er ikke varig lagring
 - ressurslager, modell, state, rendering og UI har separate ansvar
-- CSS for bilder eies av dedikert bildestilark og er ikke avhengig av motstridende regler i `canvas.css`
 
 ## Senere fasekrav
 
 - prosjektimport validerer hele skjemaet før `replace-project`
+- versjon 6 migreres eller avvises kontrollert ved framtidig import
 - prosjektbytte avstemmer eller tømmer bilderessursbufferen
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
+- responsive farger krever eksplisitt modellstøtte
 - autolagring reagerer på gyldige prosjektmutasjoner, ikke transient state
 - endret crop-grunnmodell krever ny skjemaversjon og migrering
 
 ## Planlagte senere faser
 
 ```text
-fase 12  prosjektfarger
 fase 13  logo og header
 fase 14  korrigeringslinjer
 fase 15  responsive mobiloverstyringer
@@ -219,4 +222,4 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Ingen ny produksjonsfase startes automatisk etter fase 11A. Neste fase velges og avgrenses eksplisitt sammen med brukeren før en ny branch opprettes.
+Fase 13 startes ikke før fase 12 er kontrollert, merget etter eksplisitt godkjenning og lokal `main` er oppdatert.
