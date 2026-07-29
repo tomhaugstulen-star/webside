@@ -3,7 +3,10 @@ import type { ElementCreationRequest } from './elementCreation'
 import type { EditorElement, ElementKind, ElementSize } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
-import { DEFAULT_IMAGE_FIT } from './imageAsset'
+import {
+  DEFAULT_IMAGE_MODE,
+  DEFAULT_IMAGE_TRANSFORM,
+} from './imagePresentation'
 import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
 
 const defaultElementSizes: Record<ElementKind, ElementSize> = {
@@ -44,7 +47,8 @@ export function createEditorElement({
         assetId: request.assetId,
         assetMetadata: { ...request.assetMetadata },
         altText: '',
-        fit: DEFAULT_IMAGE_FIT,
+        mode: DEFAULT_IMAGE_MODE,
+        transform: { ...DEFAULT_IMAGE_TRANSFORM },
       }
     case 'text':
       return {
