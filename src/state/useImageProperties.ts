@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import type { ImageFit } from '../model/imageAsset'
+import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import { useEditorProject } from './useEditorProject'
 
 export function useImageProperties() {
@@ -17,17 +17,33 @@ export function useImageProperties() {
     [dispatch],
   )
 
-  const updateImageFit = useCallback(
-    (elementId: string, fit: ImageFit) => {
+  const updateImageMode = useCallback(
+    (elementId: string, mode: ImageMode) => {
       dispatch({
-        type: 'set-image-fit',
+        type: 'set-image-mode',
         elementId,
-        fit,
+        mode,
         updatedAt: new Date().toISOString(),
       })
     },
     [dispatch],
   )
 
-  return { updateImageAltText, updateImageFit }
+  const updateImageTransform = useCallback(
+    (elementId: string, transform: ImageTransform) => {
+      dispatch({
+        type: 'set-image-transform',
+        elementId,
+        transform,
+        updatedAt: new Date().toISOString(),
+      })
+    },
+    [dispatch],
+  )
+
+  return {
+    updateImageAltText,
+    updateImageMode,
+    updateImageTransform,
+  }
 }
