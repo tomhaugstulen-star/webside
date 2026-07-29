@@ -5,7 +5,11 @@ import {
   type ElementLayout,
 } from '../../model/elementLayout'
 import type { CanvasPosition, EditorElement } from '../../model/editorProject'
-import { getImageCropSize } from '../../model/imagePresentation'
+import {
+  getImageCropSize,
+  getImageTransformForResizedFrame,
+  type ImageTransform,
+} from '../../model/imagePresentation'
 
 const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
   ArrowUp: { x: 0, y: -1 },
@@ -22,6 +26,11 @@ type CanvasElementKeyboardOptions = {
   onSelect: (elementId: string) => void
   onStartTextEditing: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
+  onCommitImageFrame: (
+    elementId: string,
+    layout: ElementLayout,
+    transform: ImageTransform,
+  ) => void
 }
 
 export function handleCanvasElementKeyDown(
@@ -34,6 +43,7 @@ export function handleCanvasElementKeyDown(
     onSelect,
     onStartTextEditing,
     onCommitLayout,
+    onCommitImageFrame,
   }: CanvasElementKeyboardOptions,
 ) {
   if (event.key === 'Enter') {
@@ -72,21 +82,34 @@ export function handleCanvasElementKeyDown(
     x: direction.x * step,
     y: direction.y * step,
   }
+  const resizing = event.ctrlKey || event.metaKey
   const maximumSize =
     element.kind === 'image' && element.mode === 'crop'
       ? getImageCropSize(element.assetMetadata, element.transform)
       : undefined
-  const nextLayout =
-    event.ctrlKey || event.metaKey
-      ? resizeElementLayout(
-          element.kind,
-          initialLayout,
-          delta,
-          canvasWidth,
-          'south-east',
-          maximumSize,
-        )
-      : moveElementLayout(initialLayout, delta, canvasWidth)
+  const nextLayout = resizing
+    ? resizeElementLayout(
+        element.kind,
+        initialLayout,
+        delta,
+        canvasWidth,
+        'south-east',
+        maximumSize,
+      )
+    : moveElementLayout(initialLayout, delta, canvasWidth)
+
+  if (resizing && element.kind === 'image' && element.mode === 'crop') {
+    const nextTransform = getImageTransformForResizedFrame(
+      element.assetMetadata,
+      initialLayout.size,
+      nextLayout.size,
+      element.transform,
+      nextLayout.position.x - initialLayout.position.x,
+      nextLayout.position.y - initialLayout.position.y,
+    )
+    onCommitImageFrame(element.id, nextLayout, nextTransform)
+    return
+  }
 
   onCommitLayout(element.id, nextLayout)
 }
