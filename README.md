@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt lerret for PC og Telefon. Brukeren kan opprette, markere, flytte, endre størrelse, låse og slette elementer. Tekstbokser støtter flerlinjet redigering, tekstegenskaper og ekstern lenke. Knapper opprettes fra et bundlet SVG-bibliotek. Bildeelementer støtter lokal import, separat ramme og utsnitt, zoom, alternativ tekst og kontrollert ressurslivssyklus.
+Editoren åpner med et blankt lerret for PC og Telefon. Brukeren kan opprette, markere, flytte, endre størrelse, låse og slette Seksjon, Bilde, Tekst og Knapp. Tekst har redigering, stil og ekstern lenke. Knapper bruker et bundlet SVG-bibliotek. Bilder har lokal import, separat ramme og utsnitt, zoom, alternativ tekst og kontrollert ressurslivssyklus.
 
 ## Repo og lokal mappe
 
@@ -11,27 +11,20 @@ https://github.com/tomhaugstulen-star/webside.git
 C:\Users\tomha\Desktop\website
 ```
 
-## Starte prosjektet
+## Starte og kontrollere prosjektet
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 npm install
 npm run dev
-```
-
-`npm run dev` bruker `vite --open`.
-
-## Kvalitetskontroll
-
-```powershell
 npm run check
 npm run architecture:json
 npm run architecture:diagram
 ```
 
-Arkitekturrapportene ligger i `architecture.json` og `docs/dependency-graph.mmd`.
+`npm run dev` bruker `vite --open`. Arkitekturrapportene ligger i `architecture.json` og `docs/dependency-graph.mmd`.
 
-## Branch-regel
+## Fast arbeidsregel
 
 Det utvikles aldri direkte på `main`.
 
@@ -42,115 +35,105 @@ main
   -> implementering
   -> framtidsrettet audit
   -> automatiske og manuelle kontroller
-  -> dokumentasjon og arkitekturrapporter
+  -> arkitekturrapporter og dokumentasjon
   -> PR-kontroll
   -> eksplisitt mergegodkjenning
 ```
 
-## Gjeldende leveransestatus
-
-Fase 11A er implementert og kontrollert på:
+## Gjeldende leveranse
 
 ```text
+fase: 11A – bildeimport, ramme og utsnitt
 branch: feature/image-import-and-placement
 GitHub-sak: #25
 PR: #26 – åpen, ikke draft
 base main: 7e4c71f
-prosjektskjema i leveransen: versjon 6
+prosjektskjema: versjon 6
 merge: ikke godkjent eller utført
 ```
 
-Faktisk branch- og `main`-HEAD skal alltid leses fra Git. Dokumentasjonen bruker ikke et commitnummer som permanent forventet topp-commit.
+Faktisk branch- og `main`-HEAD skal alltid leses fra Git. Commitnumre i dokumentasjonen er historiske kontrollpunkter, ikke permanente forventede topper.
 
-Siste verifiserte kontroll etter resize-rettelsene:
+## Siste verifiserte produksjonskontroll
+
+Brukerens lokale terminaloutput etter den endelige bildeauditen bekreftet:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
 Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
 Vite: 100 moduler transformert
-CSS: 31.06 kB, gzip 6.06 kB
-JavaScript: 258.04 kB, gzip 77.94 kB
-produksjonsbuild: bestått
-PC og Telefon: godkjent
-bildeimport, lagrekkefølge, ramme, utsnitt, zoom, låsing og sletting: godkjent
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
 ```
 
-Arkitekturrapportene ble regenerert etter siste produksjonsendring og commitet på feature-branchen.
+Manuelt godkjent på PC og Telefon:
+
+- bildeimport og kontrollert avbrytelse
+- Seksjon bak Bilde, Tekst og Knapp
+- `Hele bildet` og `Juster utsnitt`
+- zoom, reset, pekerdrag og `Alt + piltast`
+- resizing fra alle kanter og hjørner
+- grep innenfor bilderammen
+- crop-resize med stasjonært motiv og fast motsatt kant
+- låsing, sletting og manglende ressursfallback
+
+Arkitekturrapportene skal regenereres etter den siste produksjonsauditen før PR #26 kan godkjennes for merge.
 
 ## Implementert funksjonalitet
 
-- stabilt React/TypeScript/Vite-grunnlag
 - blankt PC- og Telefon-lerret
-- toppmeny og kontrollert venstremeny
+- kontrollert toppmeny, venstremeny og høyremeny
 - Seksjon, Bilde, Tekst og Knapp
 - prosjektmodell med stabile ID-er og sentral state
 - markering, flytting, resizing og låsing
-- Seksjon rendres som bakgrunnslag bak Bilde, Tekst og Knapp
-- kontrollert flerlinjet tekstredigering
-- høyremeny med elementspesifikke egenskaper
-- tekstegenskaper og eksterne lenker
+- Seksjon rendres deterministisk bak forgrunnselementer
+- flerlinjet tekstredigering, tekstegenskaper og eksterne lenker
 - sikker sletting via høyremeny og `Delete`
-- bundlet SVG-knappbibliotek
-- knappetekst, design og lenke
-- lokal bildeimport for PNG, JPEG og WebP, maks 10 MB
-- stabil bilde-`assetId` og serialiserbar metadata
-- separat transient ressursbuffer for `File` og Object URL
-- alternativ tekst, `Hele bildet` og `Juster utsnitt`
-- zoom og motivflytting uten synlige tomrom
-- bilderamme som kan endres fra alle kanter og hjørner
-- bilderammegrep ligger innenfor rammen
-- crop-resize klipper motivet uten å skalere eller flytte det automatisk
+- bundlet SVG-knappbibliotek med tekst, design og lenke
+- lokal bildeimport og transient ressursbuffer
+- separat bilderamme, crop-transform og zoom
+- alternativ tekst og filmetadata
 - kontrollert fallback for manglende bilderessurs
-- Dependency Cruiser og samlet `npm run check`
 
-## Gjeldende venstremeny
+## Bildeimport og ressursgrenser
 
-```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
-```
-
-`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp. `Elementer -> Knapp` åpner det interne designbiblioteket. `Elementer -> Bilde` åpner nettleserens filvelger.
-
-## Fast ansvarsdeling
+Støttede formater:
 
 ```text
-Venstremeny = opprette elementer og velge fil eller ferdig design
-Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere innhold og transformere elementer
-Ressurslag = eie transient bildefil og renderings-URL
-Prosjekt   = eie serialiserbar prosjektidentitet og metadata
+PNG
+JPEG
+WebP
 ```
 
-For bilder:
+Autoritative grenser:
 
 ```text
-Venstremeny = validere lokal fil og opprette bildeelement
-Høyremeny  = alternativ tekst, visningsmodus, zoom, reset, metadata og sletting
-Lerretet   = flytte ramme, endre ramme og flytte motiv
+maks filstørrelse: 10 MB
+maks dekodet pikselmengde: 40 megapiksler
+maks bredde eller høyde: 16 384 px
 ```
+
+Filtype, byte-størrelse, filnavn og dekodede dimensjoner valideres før elementoppretting. Importen fortsetter ikke dersom Elementer-panelet demonteres mens filen leses. Mislykket oppretting fjerner midlertidig ressurs, og Object URL tilbakekalles når ressursen fjernes eller provideren demonteres.
 
 ## Bildeinteraksjon
 
 ```text
-Hele bildet     -> hele motivet skaleres proporsjonalt og sentreres i rammen
-Juster utsnitt  -> bildet fyller rammen uten tomrom
-vanlig dra      -> flytter motivet i utsnittsmodus
+Hele bildet     -> hele motivet skaleres proporsjonalt og sentreres
+Juster utsnitt  -> motivet fyller rammen uten tomrom
+vanlig dra      -> flytter motivet
 Shift + dra     -> flytter hele rammen
 Alt + piltast   -> flytter motivet med tastaturet
 piltast         -> flytter elementet
 Ctrl/Cmd + pil  -> endrer størrelse fra nedre høyre hjørne
 ```
 
-Bilderammen har åtte pekergrep på innsiden. I `Juster utsnitt` endrer rammeresize bare klippeområdet: motivets størrelse og absolutte plassering beholdes, aktiv kant flyttes og motsatt kant står fast. Låste bilder kan inspiseres, men ikke endres, flyttes, beskjæres eller slettes.
+Bilderammen har åtte grep på innsiden. Ved crop-resize endres bare klippeområdet: motivets størrelse og absolutte plassering beholdes, aktiv kant flyttes og motsatt kant står fast. Ramme og korrigert transform lagres atomisk.
 
-## Prosjektmodell
+## Prosjektmodell og skjemagrense
 
-Gjeldende skjemaversjon i denne leveransen er 6.
+Gjeldende skjemaversjon er 6.
 
 ```text
 versjon 1  grunnmodell
@@ -161,20 +144,27 @@ versjon 5  knappasset, knappetekst og knappelenke
 versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
 ```
 
-Bildeelementet lagrer aldri lokal filsti, Object URL eller binærfil i `EditorProject`. Det lagrer stabil `assetId`, validert metadata, `altText`, `mode` og `transform`. Binærfil og Object URL er transient ressursstate.
+Bildeelementet lagrer stabil `assetId`, validert metadata, `altText`, `mode` og `transform`. Lokal fil, binærdata og Object URL er transient ressursstate.
 
-Ved crop-resize lagres bilderamme og korrigert normalisert offset i én reducerhandling. Det hindrer mellomtilstander og bevarer motivets plassering mens rammen klipper mer eller mindre.
+Crop-grunnrammen for versjon 6 er eksplisitt låst til 240 × 160 px. Senere endring av standardstørrelsen for nye bilder skal ikke endre utsnittet i eksisterende versjon-6-prosjekter. En annen crop-grunnmodell krever ny skjemaversjon og migrering.
+
+## Grenser for senere faser
+
+- Prosjektimport må validere hele prosjektet og skjemaversjonen før `replace-project`.
+- Prosjektbytte må avstemme eller tømme den transiente bilderessursbufferen.
+- Angre/gjør om skal lagre serialiserbar prosjektstate, aldri `File` eller Object URL.
+- Mobiloverstyringer må bruke eksplisitte viewport-spesifikke geometrihandlinger.
+- Autolagring skal reagere på gyldige prosjektmutasjoner, ikke transient editorstate.
 
 ## Filstørrelse og ansvar
 
-- 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
+- 250 linjer er aktiv terskel for ansvarstrekk.
 - 300 linjer er hard unntaksgrense.
-- `EditorCanvasElement.tsx` er under 200 linjer.
-- `useElementPointerTransform.ts` er 218 linjer etter siste resize-refaktor.
-- `imagePresentation.ts` er 240 linjer.
-- `RightPropertiesPanel.tsx` skal forbli komposisjon.
-- Varige prosjektendringer går gjennom validerte reducerhandlinger.
-- Ugyldige og uendrede handlinger skal returnere samme state.
+- alle berørte kildefiler er under 250 linjer
+- `EditorCanvasElement.tsx` er under 200 linjer
+- `useElementPointerTransform.ts` er 218 linjer
+- `imagePresentation.ts` er 236 innholdslinjer
+- `RightPropertiesPanel.tsx` skal forbli komposisjon
 
 ## Autoritativ dokumentrekkefølge
 
