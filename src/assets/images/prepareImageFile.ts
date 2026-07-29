@@ -83,9 +83,14 @@ export async function prepareImageFile(
     }
 
     if (!hasValidImagePixelDimensions(dimensions.width, dimensions.height)) {
+      const maxMegapixels = MAX_IMAGE_PIXEL_COUNT / 1_000_000
+      const maxSide = MAX_IMAGE_DIMENSION_PX.toLocaleString('nb-NO')
+
       return {
         ok: false,
-        message: `Bildet er for stort. Bruk maks ${MAX_IMAGE_PIXEL_COUNT / 1_000_000} megapiksler og ${MAX_IMAGE_DIMENSION_PX.toLocaleString('nb-NO')} px per side.`,
+        message:
+          `Bildet er for stort. Bruk maks ${maxMegapixels} megapiksler ` +
+          `og ${maxSide} px per side.`,
       }
     }
 
