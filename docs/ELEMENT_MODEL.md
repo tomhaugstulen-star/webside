@@ -4,13 +4,9 @@ Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editore
 
 ## 1. Gjeldende skjemaversjon
 
-Fase 11A utvider prosjektmodellen til:
-
 ```ts
 EDITOR_PROJECT_SCHEMA_VERSION = 6
 ```
-
-Skjemahistorikk:
 
 ```text
 versjon 1  grunnmodell for prosjekt, sider og elementer
@@ -21,27 +17,24 @@ versjon 5  stabilt knappasset, knappetekst og knappelenke
 versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
 ```
 
-Det finnes ennå ingen prosjektfilimport eller migreringsmotor. Migrering mellom skjemaversjoner bygges sammen med en senere lagrings- og importfase.
+Det finnes ennå ingen prosjektfilimport eller migreringsmotor. En annen bilde- eller crop-modell krever ny skjemaversjon og kontrollert migrering.
 
 ## 2. Prosjektstruktur
 
-Et `EditorProject` inneholder:
-
-- skjemaversjon
-- stabil prosjekt-ID
-- prosjektnavn
-- én eller flere sider
-- opprettet- og oppdatert-tidspunkt
+```text
+EditorProject
+  schemaVersion
+  id
+  name
+  pages: EditorPage[]
+    elements: EditorElement[]
+  createdAt
+  updatedAt
+```
 
 Et nytt prosjekt starter med én blank side kalt `Forside`.
 
-```text
-EditorProject
-  pages: EditorPage[]
-    elements: EditorElement[]
-```
-
-Prosjektmodellen er flat. En Seksjon eier ikke automatisk elementer som ligger visuelt over den. Canvas-rendereren legger Seksjon bak Bilde, Tekst og Knapp uten å endre lagret elementrekkefølge eller innføre parent-child-relasjoner.
+Prosjektmodellen er flat. En Seksjon eier ikke elementer som ligger visuelt over den. Rendering plasserer Seksjon bak Bilde, Tekst og Knapp uten å endre lagret elementrekkefølge.
 
 ## 3. Felles elementdata
 
@@ -54,8 +47,6 @@ type BaseEditorElement = {
   locked: boolean
 }
 ```
-
-`EditorElement` er en diskriminert union:
 
 ```ts
 type EditorElement =
@@ -83,7 +74,7 @@ type ImageEditorElement = BaseEditorElement & {
   assetId: ImageAssetId
   assetMetadata: ImageAssetMetadata
   altText: string
-  mode: ImageMode
+  mode: 'contain' | 'crop'
   transform: ImageTransform
 }
 ```
@@ -96,8 +87,6 @@ type ImageAssetMetadata = {
   width: number
   height: number
 }
-
-type ImageMode = 'contain' | 'crop'
 
 type ImageTransform = {
   zoom: number
@@ -116,8 +105,6 @@ offsetX: 0
 offsetY: 0
 ```
 
-`assetId`, metadata, alternativ tekst, visningsmodus og transform er varig prosjektdata. Lokal fil, binærdata og Object URL er ikke prosjektdata.
-
 ### Tekst
 
 ```ts
@@ -128,8 +115,6 @@ type TextEditorElement = BaseEditorElement & {
   link: ElementLink
 }
 ```
-
-Nye tekstbokser starter med tomt innhold, standardstil og ingen lenke. Editor-placeholder lagres aldri som innhold.
 
 ### Knapp
 
@@ -142,35 +127,22 @@ type ButtonEditorElement = BaseEditorElement & {
 }
 ```
 
-Nye knapper starter med:
-
-```text
-assetId: button.primary-rounded.v1
-label: Les mer
-link: none
-```
-
 ## 5. Stabile asset-ID-er
-
-Knapp- og bildeasset bruker stabile ID-er, men ressursmodellene er forskjellige.
 
 ### Knapp
 
-- ID-en peker til en statisk katalog som bundles av Vite.
-- Prosjektet lagrer ikke filsti, rå SVG eller Vite-generert URL.
-- Ukjent lagret ID gir kontrollert fallback.
+- peker til en statisk katalog som bundles av Vite
+- prosjektet lagrer ikke filsti, rå SVG eller Vite-URL
+- ukjent ID gir kontrollert fallback
 
 ### Bilde
 
-- ID-en er en kryptografisk UUID-basert prosjektidentitet.
-- ID-en er nøkkel til et separat transient ressurslager.
-- Prosjektet lagrer ikke lokal filsti, `File`, Blob eller Object URL.
-- Ukjent eller manglende ressurs gir kontrollert fallback.
-- Ressurslageret eier oppretting og tilbakekalling av Object URL.
+- kryptografisk UUID-basert identitet
+- nøkkel til et separat transient ressurslager
+- prosjektet lagrer ikke filsti, `File`, Blob eller Object URL
+- manglende ressurs gir kontrollert fallback
 
 ## 6. Bilderessurslager
-
-Ressurslageret inneholder transient:
 
 ```text
 ImageAssetId -> {
@@ -182,51 +154,88 @@ ImageAssetId -> {
 
 Regler:
 
-- fil og metadata må ha samme MIME-type, filstørrelse og filnavn
+- fil og metadata har samme filnavn, MIME-type og byte-størrelse
 - samme `assetId` registreres ikke to ganger
-- en Object URL tilbakekalles ved ressursfjerning
-- alle gjenværende Object URL-er tilbakekalles når provideren demonteres
-- sletting fjerner ressursen bare når ingen andre bildeelementer deler samme `assetId`
-- mislykket elementoppretting rydder den registrerte ressursen
+- Object URL tilbakekalles ved ressursfjerning
+- alle URL-er tilbakekalles ved provider-unmount
+- sletting fjerner ressursen bare når asset ikke deles
+- mislykket elementoppretting rydder registrert ressurs
+- import som avsluttes etter panel-unmount oppretter ikke ressurs eller element
 
-Ressursbufferen er foreløpig bare for aktiv nettleserøkt. Varig binærlagring hører til en senere lagringsfase.
+Ressursbufferen gjelder bare aktiv nettleserøkt. Varig binærlagring bygges senere.
 
-## 7. Bildevisning og transform
+## 7. Bildevalidering
+
+Autoritative import- og metadatagrenser:
+
+```text
+format: PNG, JPEG eller WebP
+maks filstørrelse: 10 MB
+maks dekodet pikselmengde: 40 megapiksler
+maks bredde eller høyde: 16 384 px
+```
+
+Metadata er gyldig bare når:
+
+- filnavnet er ikke tomt
+- MIME-type er støttet
+- byte-størrelse er heltall innenfor grensen
+- bredde og høyde er positive heltall
+- dimensjon og pikselmengde er innenfor modellgrensene
+
+Disse reglene gjelder både UI-import og framtidig prosjektvalidering.
+
+## 8. Bildevisning og transform
 
 ### `contain`
 
-- hele bildet vises proporsjonalt
-- bildet skaleres etter gjeldende ramme og sentreres
+- hele motivet vises proporsjonalt
+- motivet sentreres i rammen
 - tomrom er tillatt ved ulikt sideforhold
-- transformen beholdes, men brukes ikke visuelt
-- rammeresize kan derfor endre motivets viste størrelse i denne modusen
+- transform beholdes, men brukes ikke visuelt
 
 ### `crop`
 
-- bildet fyller rammen uten tomrom
+- motivet fyller rammen uten tomrom
 - sideforholdet bevares
-- zoom er begrenset til `1..3`
-- minimum zoom økes automatisk når rammen krever det
-- `offsetX` og `offsetY` er normalisert til `-1..1`
+- zoom begrenses til `1..3`
+- minimum zoom økes når rammen krever det
+- offset normaliseres til `-1..1`
 - offset begrenses slik at tomrom ikke blir synlig
-- crop-rammen kan ikke være større enn motivet ved aktiv zoom
-- overgang fra en for stor contain-ramme gir en sentrert, gyldig crop-ramme
+- rammen kan ikke være større enn motivet ved aktiv zoom
 
-Crop-resize følger en egen regel:
+## 9. Fast crop-grunnramme for versjon 6
 
-- motivets skalerte bredde og høyde beholdes
-- motivets absolutte plassering på lerretet beholdes så langt crop-grensene tillater
-- bare den aktive rammekanten flyttes
-- motsatt rammekant står fast
-- mindre ramme klipper mer av motivet i stedet for å skalere eller sentrere det på nytt
-- større ramme avslører mer av motivet uten å øke zoom automatisk
-- normalisert offset beregnes på nytt fra motivets absolutte plassering og den nye rammen
+Versjon-6-transformen er definert mot:
 
-Normalisert offset er serialiserbar og skjermuavhengig. Fordi normaliseringen avhenger av gjeldende overløp, må offset korrigeres når crop-rammen endrer størrelse. Ramme og korrigert transform lagres derfor i én atomisk reducerhandling.
+```text
+IMAGE_CROP_BASE_FRAME_SIZE_V6 = 240 × 160 px
+```
 
-## 8. Elementstørrelser
+Denne verdien er en skjemainvariant, ikke bare standardstørrelsen for nye bilder. Senere endring av bildets opprettingsstørrelse skal derfor ikke endre hvordan lagret `zoom`, `offsetX` eller `offsetY` tolkes.
 
-Standard- og minimumsstørrelser har én autoritativ modellkilde.
+Endring av crop-grunnrammen krever:
+
+1. ny skjemaversjon
+2. eksplisitt migrering av transformdata
+3. verifisering av eksisterende prosjekter
+
+## 10. Rammeresize i crop
+
+Bilderammen og motivet er separate konsepter.
+
+Ved rammeresize:
+
+- aktiv kant flyttes
+- motsatt kant står fast
+- motivets størrelse beholdes
+- motivets absolutte plassering på lerretet beholdes
+- ny normalisert offset beregnes mot den nye rammen
+- ramme og transform lagres atomisk
+
+Pekerpreview og reducercommit bruker samme modellberegning.
+
+## 11. Elementstørrelser
 
 ```text
 Standard:
@@ -242,9 +251,9 @@ Tekst    120 × 48 px
 Knapp    80 × 36 px
 ```
 
-Bildeelementets størrelse representerer den synlige rammen, ikke motivets egen størrelse.
+Bildeelementets størrelse er den synlige rammen, ikke motivets egen størrelse.
 
-## 9. Responsive verdier
+## 12. Responsive verdier
 
 ```ts
 type ResponsiveValue<T> = {
@@ -266,37 +275,21 @@ Foreløpig felles for PC og Telefon:
 - låsestatus
 - tekstinnhold og tekststil
 - elementlenke
-- knappens `assetId` og `label`
-- bildets `assetId`, metadata, alternativ tekst, visningsmodus og transform
+- knappdata
+- bildeasset, metadata, alt-tekst, modus og transform
 
-## 10. Sentral state og reducergrenser
+## 13. Sentral state og reducergrenser
 
-`EditorProjectProvider` eier prosjektmodell, aktiv side og markering.
-
-Varige mutasjoner går gjennom uttømmende reducer-actions, blant annet:
+Varige mutasjoner går gjennom typede actions for blant annet:
 
 - opprette og slette element
 - endre desktopgeometri
 - endre låsestatus
-- endre tekstinnhold og tekststil
-- endre elementlenke
-- endre knappetekst og knappdesign
+- endre tekst, stil og lenke
+- endre knappetekst og design
 - endre bildealternativ tekst
-- endre bildevisning
-- endre bildetransform
-- endre crop-bilderamme og korrigert transform atomisk
-
-`set-image-desktop-frame` brukes for crop-resize. Handlingen inneholder:
-
-```ts
-{
-  type: 'set-image-desktop-frame'
-  elementId: string
-  layout: ElementLayout
-  transform: ImageTransform
-  updatedAt: string
-}
-```
+- endre bildevisning og transform
+- endre crop-ramme og transform atomisk
 
 Reducergrensene krever:
 
@@ -304,58 +297,48 @@ Reducergrensene krever:
 - eksisterende element på aktiv side
 - riktig elementtype
 - ulåst element ved mutasjon
-- gyldig verdi
+- gyldige verdier og metadata
+- gyldig crop-geometri
 - faktisk endring
 
-Bildegrensene validerer i tillegg:
+Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
 
-- gyldig stabil `assetId`
-- gyldig serialiserbar metadata
-- kjent visningsmodus
-- finitte zoom- og offsetverdier
-- gyldig crop-ramme ved lagret zoom
-- transform normalisert mot den nye rammen ved atomisk crop-resize
-- ingen transformmutasjon når bildet står i `contain`
+## 14. Varig og transient state
 
-Ugyldige eller uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
+Varig:
 
-## 11. Varig og transient state
-
-Varig prosjektdata:
-
-- sider og elementer
-- geometri og synlighet
-- låsestatus
-- tekstinnhold og tekststil
-- elementlenke
-- knappens asset-ID og label
-- bildets asset-ID, metadata, alternativ tekst, modus og transform
+- prosjekt, sider og elementer
+- geometri, synlighet og låsestatus
+- innhold, stil, lenker og asset-ID-er
+- bildemetadata, modus og transform
 - tidsstempler
 
-Transient state:
+Transient:
 
-- `selectedElementId`
-- pekerinteraksjon og layout-preview
-- midlertidig bilderamme og korrigert preview-transform under drag
-- aktiv tekstredigeringsøkt
-- formularutkast og feedback
-- bildefil, Object URL og ressurskart
-- katalogvisning
-- slettedialogens mål og fokusreferanse
-- åpne paneler, fokus og hover
+- markering
+- pekerøkter og preview
+- redigeringsøkter og drafts
+- `File`, Object URL og ressurskart
+- paneler, dialoger, fokus og feedback
 
-Transient state skal ikke serialiseres, eksporteres eller publiseres.
+## 15. Krav til senere utvidelser
 
-## 12. Videre modellutvidelser
+### Prosjektimport
 
-Planlagte senere utvidelser:
+Hele prosjektet må valideres før `replace-project`. Kjent skjemaversjon, unike ID-er, aktive sider, elementunion, layout og bildeinvarianter må kontrolleres samlet.
 
-- prosjektfarger
-- logo og header
-- eksplisitte mobiloverstyringer
-- historikk
-- varig lokal lagring og ressursserialisering
-- prosjektimport og migrering
-- forhåndsvisning og publisering
+### Prosjektbytte
 
-Ingen senere modellutvidelse er aktiv før fase 11A er eksplisitt godkjent og merget.
+Bilderessursbufferen må avstemmes eller tømmes, og foreldede Object URL-er må tilbakekalles.
+
+### Historikk
+
+Angre/gjør om lagrer bare serialiserbar prosjektstate. `File`, Object URL og aktive interaksjoner skal aldri inngå.
+
+### Mobiloverstyringer
+
+Egne mobilgeometrier må bruke viewport-spesifikke actions og ikke overskrive desktopverdier.
+
+### Autolagring
+
+Autolagring skal trigges av gyldig prosjektstate, ikke transient editor- eller ressursstate.
