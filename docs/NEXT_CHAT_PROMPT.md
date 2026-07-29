@@ -33,22 +33,26 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 10. `docs/CODE_AUDIT.md`
 11. relevante øvrige fasedokumenter
 
-## Gjeldende repo- og arbeidsstatus
+## Repo- og arbeidsstatus
+
+Ikke stol på et hardkodet commitnummer som «gjeldende main HEAD». Kontroller alltid faktisk `origin/main` og GitHub-status før planlegging eller arbeid.
+
+Stabile historiske referanser:
 
 ```text
-main HEAD: a77a9a9 Merge pull request #22 from tomhaugstulen-star/docs/button-library-merged-status
-forrige commit: 4957fbc docs: mark button library merged
-knappbibliotekets mergecommit: 5e548ad Merge pull request #21 from tomhaugstulen-star/feature/button-library
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
+knappbibliotekets mergecommit: 5e548ad
 PR #21: Build first bundled SVG button library – merget
 PR #22: Update status after button library merge – merget
+PR #24: dokumentasjonssynkronisering; kontroller faktisk status på GitHub
 GitHub-sak #20: lukket som fullført
 prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-`5e548ad` er mergecommit for selve knappbiblioteket. Faktisk nåværende `main` er `a77a9a9` etter den påfølgende dokumentasjons-PR-en.
+`5e548ad` er mergecommit for selve knappbiblioteket. `a77a9a9` er base-commit før PR #24, ikke en permanent forventet topp-commit.
 
-Sluttverifisering for siste produksjonsfase:
+Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
 
 ```text
 ESLint: bestått
@@ -71,16 +75,16 @@ git fetch origin
 git switch main
 git pull --ff-only origin main
 git status
-git log -6 --oneline
+git log -6 --oneline --decorate
 ```
 
-Forventet øverste commit:
+Godkjent starttilstand:
 
-```text
-a77a9a9 Merge pull request #22 from tomhaugstulen-star/docs/button-library-merged-status
-```
-
-Working tree skal være clean før planlegging, sak, branch eller kodeendringer.
+- aktiv branch er `main`
+- lokal `main` følger `origin/main`
+- lokal og remote `main` peker på samme faktiske commit
+- working tree er clean
+- topp-commit vurderes mot faktisk GitHub-status, ikke mot et hardkodet nummer i dokumentasjonen
 
 ## Ferdig funksjonalitet
 
@@ -166,6 +170,8 @@ link: none
 
 `ButtonAssetId` er en validert og brandet stabil streng. Modellaget importerer ikke SVG-filer eller Vite-genererte adresser.
 
+Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressurs-ID, filmetadata, alt-tekst og skaleringsmodell er ikke implementert.
+
 ## State- og valideringsgrenser
 
 Alle varige endringer går gjennom typede reducer-actions.
@@ -174,11 +180,12 @@ Reducergrensene avviser blant annet:
 
 - manglende aktiv side
 - manglende element
+- element på feil side
 - duplisert element-ID
 - feil elementtype
 - låst element
 - ugyldig verdi
-- ukjent asset-ID
+- ukjent knappasset-ID
 - uendret data
 
 Ugyldige eller uendrede handlinger muterer ikke prosjektet eller `updatedAt`.
@@ -209,13 +216,13 @@ Markert knapp viser knappetekst, design, lenke, status og sletting.
 
 Ingen ny produksjonsfase er valgt.
 
-Den planlagte neste fasen i `docs/WORK_PLAN.md` er fase 11 – Bilder, men den er ikke aktiv eller godkjent. Før eventuell implementering må blant annet bilde-/ressursmodell, stabil asset-ID, serialisering, filtyper, maksimal størrelse, feilhåndtering, skalering, proporsjoner, mobil arv og alt-tekst avklares og låses.
+Den planlagte neste fasen i `docs/WORK_PLAN.md` er fase 11 – Bilder, men den er ikke aktiv eller godkjent. Før eventuell implementering må bilde-/ressursmodell, stabil asset-ID, serialisering, filtyper, maksimal størrelse, feilhåndtering, skalering, proporsjoner, mobil arv og alt-tekst avklares og låses.
 
 Ikke opprett produksjonssak, feature-branch eller kode før omfanget er eksplisitt valgt og godkjent.
 
 Fast videre arbeidsmåte:
 
-1. bekreft lokal `main` og clean tree
+1. bekreft faktisk lokal `main`, `origin/main` og clean tree
 2. les autoritative dokumenter og faktisk kode
 3. velg én avgrenset fase sammen med brukeren
 4. avklar varig og transient state
