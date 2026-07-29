@@ -10,6 +10,16 @@ export type ElementLayout = {
   size: ElementSize
 }
 
+export type ResizeHandle =
+  | 'north'
+  | 'north-east'
+  | 'east'
+  | 'south-east'
+  | 'south'
+  | 'south-west'
+  | 'west'
+  | 'north-west'
+
 const minimumElementSizes: Record<ElementKind, ElementSize> = {
   section: { width: 160, height: 90 },
   image: { width: 120, height: 80 },
@@ -53,15 +63,39 @@ export function resizeElementLayout(
   initialLayout: ElementLayout,
   delta: CanvasPosition,
   canvasWidth: number,
+  handle: ResizeHandle = 'south-east',
 ): ElementLayout {
   const minimumSize = getElementMinimumSize(kind)
-  const maximumWidth = Math.max(minimumSize.width, canvasWidth - initialLayout.position.x)
+  let left = initialLayout.position.x
+  let top = initialLayout.position.y
+  let right = left + initialLayout.size.width
+  let bottom = top + initialLayout.size.height
+
+  if (handle.includes('west')) {
+    left = clamp(left + delta.x, 0, right - minimumSize.width)
+  }
+
+  if (handle.includes('east')) {
+    right = clamp(
+      right + delta.x,
+      left + minimumSize.width,
+      canvasWidth,
+    )
+  }
+
+  if (handle.includes('north')) {
+    top = clamp(top + delta.y, 0, bottom - minimumSize.height)
+  }
+
+  if (handle.includes('south')) {
+    bottom = Math.max(top + minimumSize.height, bottom + delta.y)
+  }
 
   return {
-    position: initialLayout.position,
+    position: { x: left, y: top },
     size: {
-      width: clamp(initialLayout.size.width + delta.x, minimumSize.width, maximumWidth),
-      height: Math.max(minimumSize.height, initialLayout.size.height + delta.y),
+      width: right - left,
+      height: bottom - top,
     },
   }
 }
