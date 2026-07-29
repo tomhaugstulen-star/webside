@@ -4,18 +4,18 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 
 ## Implementeringsstatus
 
+Siste funksjonelle merge til `main`:
+
 ```text
-main: f71b354  PR #14 – frittstående tekstlenker
-branch: feature/element-deletion
-base main: f71b354
-GitHub-sak: #15
-PR: #16 Add safe deletion for selected elements
-produksjonscommit: 4f59b3e
-framtidsrettede rettelser: a8c6d62 og 4611de1
-arkitekturrapporter: fbd8091
+b428cac  PR #16 – sikker sletting av elementer
 ```
 
-Slettefunksjonen er implementert, auditert, kompilert, manuelt godkjent og lagt i PR #16. PR-en er åpen og mergebar, men skal ikke merges uten eksplisitt brukergodkjenning.
+```text
+GitHub-sak #15: lukket som fullført
+PR #16: merget
+prosjektskjema: versjon 4
+ingen ny produksjonsfase er valgt
+```
 
 ## Ferdig på `main`
 
@@ -28,6 +28,7 @@ Slettefunksjonen er implementert, auditert, kompilert, manuelt godkjent og lagt 
 - høyremenyens grunnstruktur
 - tekstegenskaper for hele tekstboksen
 - ekstern lenke for hele tekstboksen
+- sikker sletting via høyremeny og `Delete`
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -40,6 +41,7 @@ PR #8   navn og rekkefølge i meny    a35f59d
 PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
+PR #16  sikker elementsletting       b428cac
 ```
 
 ## Fast ansvarsdeling
@@ -168,9 +170,11 @@ Regler:
 
 Se `docs/ELEMENT_LINKS.md`.
 
-## Sikker elementsletting i PR #16
+## Sikker elementsletting
 
-PR #16 legger til sletting av ett markert element av typen Seksjon, Bilde, Tekst eller Knapp.
+Fasen er merget til `main` i PR #16 med mergecommit `b428cac`.
+
+Leveransen gjelder sletting av ett markert element av typen Seksjon, Bilde, Tekst eller Knapp.
 
 Plassering:
 
@@ -209,16 +213,16 @@ canvas      -> EditorCanvasElement.tsx urørt
 
 Se `docs/ELEMENT_DELETION.md`.
 
-## Framtidsrettet audit
+## Framtidsrettet audit for PR #16
 
-Den siste gjennomgangen fant og rettet to problemer før PR:
+Den siste gjennomgangen fant og rettet to problemer før merge:
 
 1. Sletting av et annet element enn det markerte nullstilte markeringen. Reduceren bevarer nå en urelatert markering.
 2. `Escape` i dialogen kunne også lukke et åpent verktøypanel. Dialog og panel har nå isolert Escape-håndtering.
 
-Ingen kritiske eller blokkerende kodefunn gjenstår.
+Ingen kritiske eller blokkerende kodefunn gjenstår fra denne fasen.
 
-## Verifisert kontroll
+## Verifisert kontroll for PR #16
 
 Etter de siste produksjonsrettelsene:
 
@@ -233,7 +237,7 @@ JavaScript: 232.19 kB, gzip 71.23 kB
 bygget på 225 ms
 ```
 
-Arkitekturrapportene er regenerert. Det finnes ingen GitHub Actions-run for head.
+Arkitekturrapportene ble regenerert. Det fantes ingen GitHub Actions-run for head.
 
 Manuelt godkjent:
 
@@ -285,6 +289,7 @@ Tekstfarge kobles til prosjektfargemodellen. Headertekst bygges som headerstrukt
 
 ## Åpne beslutninger
 
+- hvilken produksjonsfase som skal startes neste
 - knappbibliotekets lagringsplass og filformat
 - statisk lesing kontra skrivbar lokal mappe
 - SVG kontra PNG som anbefalt knappformat

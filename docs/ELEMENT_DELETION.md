@@ -5,21 +5,23 @@ Dette dokumentet er autoritativ spesifikasjon og verifikasjonslogg for den avgre
 ```text
 branch: feature/element-deletion
 base main: f71b354
-GitHub-sak: #15
-PR: #16 Add safe deletion for selected elements
+GitHub-sak: #15 – lukket som fullført
+PR: #16 Add safe deletion for selected elements – merget
+mergecommit: b428cac
 produksjonscommit: 4f59b3e
+framtidsrettede rettelser: a8c6d62 og 4611de1
 arkitekturrapporter: fbd8091
 ```
 
 ## Status
 
-Slettefunksjonen er implementert, framtidsauditert, kompilert, manuelt godkjent og lagt i PR #16.
+Slettefunksjonen er implementert, framtidsauditert, kompilert, manuelt godkjent og merget til `main` gjennom PR #16.
 
-PR #16 er åpen og mergebar. Det finnes ingen uløste kjente kodefunn. Merge skal bare skje etter eksplisitt brukergodkjenning.
+Alle funksjonelle, tekniske og prosessuelle kriterier for fasen er oppfylt. Sak #15 ble automatisk lukket ved merge.
 
 ## Omfang
 
-Første leveranse gjelder ett markert element av typen:
+Leveransen gjelder ett markert element av typen:
 
 - Seksjon
 - Bilde
@@ -225,7 +227,7 @@ bygget på 225 ms
 
 Arkitekturrapportene ble regenerert og committed i `fbd8091`.
 
-Ingen GitHub Actions-run er knyttet til head. Den brukerbekreftede lokale kontrollen er derfor verifikasjonsgrunnlaget.
+Ingen GitHub Actions-run var knyttet til head. Den brukerbekreftede lokale kontrollen er derfor verifikasjonsgrunnlaget.
 
 ## Manuelt godkjent
 
@@ -246,11 +248,6 @@ Brukeren har godkjent:
 
 ## Akseptansestatus
 
-Alle funksjonelle og tekniske kriterier er oppfylt.
+Fasen er fullført og merget til `main` i mergecommit `b428cac`.
 
-Gjenstår:
-
-1. hente siste statusdokumentasjon lokalt
-2. bekrefte clean working tree
-3. kontrollere PR #16 på siste head
-4. merge bare etter eksplisitt godkjenning
+Det finnes ingen åpne kriterier eller kjente blokkerende kodefunn knyttet til denne fasen.
