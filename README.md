@@ -54,28 +54,29 @@ Fase 11A er implementert og kontrollert på:
 ```text
 branch: feature/image-import-and-placement
 GitHub-sak: #25
+PR: #26 – åpen, ikke draft
 base main: 7e4c71f
 prosjektskjema i leveransen: versjon 6
-status: klar for dokumentkontroll og PR; ikke merget
+merge: ikke godkjent eller utført
 ```
 
 Faktisk branch- og `main`-HEAD skal alltid leses fra Git. Dokumentasjonen bruker ikke et commitnummer som permanent forventet topp-commit.
 
-Siste verifiserte kontroll etter kodeaudit:
+Siste verifiserte kontroll etter resize-rettelsene:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 89 moduler, 228 avhengigheter, ingen brudd
-Vite: 98 moduler transformert
-CSS: 31.07 kB, gzip 6.07 kB
-JavaScript: 255.44 kB, gzip 77.18 kB
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 31.06 kB, gzip 6.06 kB
+JavaScript: 258.04 kB, gzip 77.94 kB
 produksjonsbuild: bestått
 PC og Telefon: godkjent
-bildeimport, ramme, utsnitt, zoom, låsing og sletting: godkjent
+bildeimport, lagrekkefølge, ramme, utsnitt, zoom, låsing og sletting: godkjent
 ```
 
-Arkitekturrapportene ble regenerert etter siste kodeaudit og commitet på feature-branchen.
+Arkitekturrapportene ble regenerert etter siste produksjonsendring og commitet på feature-branchen.
 
 ## Implementert funksjonalitet
 
@@ -85,6 +86,7 @@ Arkitekturrapportene ble regenerert etter siste kodeaudit og commitet på featur
 - Seksjon, Bilde, Tekst og Knapp
 - prosjektmodell med stabile ID-er og sentral state
 - markering, flytting, resizing og låsing
+- Seksjon rendres som bakgrunnslag bak Bilde, Tekst og Knapp
 - kontrollert flerlinjet tekstredigering
 - høyremeny med elementspesifikke egenskaper
 - tekstegenskaper og eksterne lenker
@@ -97,6 +99,8 @@ Arkitekturrapportene ble regenerert etter siste kodeaudit og commitet på featur
 - alternativ tekst, `Hele bildet` og `Juster utsnitt`
 - zoom og motivflytting uten synlige tomrom
 - bilderamme som kan endres fra alle kanter og hjørner
+- bilderammegrep ligger innenfor rammen
+- crop-resize klipper motivet uten å skalere eller flytte det automatisk
 - kontrollert fallback for manglende bilderessurs
 - Dependency Cruiser og samlet `npm run check`
 
@@ -133,7 +137,7 @@ Lerretet   = flytte ramme, endre ramme og flytte motiv
 ## Bildeinteraksjon
 
 ```text
-Hele bildet     -> hele motivet vises proporsjonalt og sentrert
+Hele bildet     -> hele motivet skaleres proporsjonalt og sentreres i rammen
 Juster utsnitt  -> bildet fyller rammen uten tomrom
 vanlig dra      -> flytter motivet i utsnittsmodus
 Shift + dra     -> flytter hele rammen
@@ -142,7 +146,7 @@ piltast         -> flytter elementet
 Ctrl/Cmd + pil  -> endrer størrelse fra nedre høyre hjørne
 ```
 
-Bilderammen har åtte pekergrep. Låste bilder kan inspiseres, men ikke endres, flyttes, beskjæres eller slettes.
+Bilderammen har åtte pekergrep på innsiden. I `Juster utsnitt` endrer rammeresize bare klippeområdet: motivets størrelse og absolutte plassering beholdes, aktiv kant flyttes og motsatt kant står fast. Låste bilder kan inspiseres, men ikke endres, flyttes, beskjæres eller slettes.
 
 ## Prosjektmodell
 
@@ -159,11 +163,15 @@ versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
 
 Bildeelementet lagrer aldri lokal filsti, Object URL eller binærfil i `EditorProject`. Det lagrer stabil `assetId`, validert metadata, `altText`, `mode` og `transform`. Binærfil og Object URL er transient ressursstate.
 
+Ved crop-resize lagres bilderamme og korrigert normalisert offset i én reducerhandling. Det hindrer mellomtilstander og bevarer motivets plassering mens rammen klipper mer eller mindre.
+
 ## Filstørrelse og ansvar
 
 - 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
 - 300 linjer er hard unntaksgrense.
-- `EditorCanvasElement.tsx` er redusert til 189 linjer etter fase-11A-auditen.
+- `EditorCanvasElement.tsx` er under 200 linjer.
+- `useElementPointerTransform.ts` er 218 linjer etter siste resize-refaktor.
+- `imagePresentation.ts` er 240 linjer.
 - `RightPropertiesPanel.tsx` skal forbli komposisjon.
 - Varige prosjektendringer går gjennom validerte reducerhandlinger.
 - Ugyldige og uendrede handlinger skal returnere samme state.
