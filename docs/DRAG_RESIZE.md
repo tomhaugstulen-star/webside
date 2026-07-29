@@ -1,10 +1,19 @@
 # Flytting og størrelsesendring
 
-Dette dokumentet beskriver implementasjonen i `feature/drag-resize` og grensene som senere funksjoner må bevare.
+Dette dokumentet beskriver den historiske implementasjonen i `feature/drag-resize` og grensene som senere funksjoner må bevare.
 
-## Omfang
+## Status
 
-Branchen bygger:
+```text
+branch: feature/drag-resize
+PR: #4 – merget
+```
+
+Fasen er ferdig og merget til `main`.
+
+## Historisk omfang
+
+Branchen bygde:
 
 - flytting av elementer med peker
 - størrelsesendring fra ett firkantet håndtak nederst til høyre
@@ -15,17 +24,19 @@ Branchen bygger:
 - tastaturalternativ for flytting og størrelsesendring
 - varig geometri gjennom prosjekt-reduceren
 
-Branchen bygger ikke:
+Branchen bygde ikke:
 
 - automatisk kollisjonsunngåelse
 - automatisk flytting av andre elementer
 - korrigeringslinjer
-- låseknapp eller låsegrensesnitt
+- låsegrensesnitt
 - direkte tekstredigering
 - bildebeskjæring
 - historikk
 - autolagring
 - egne mobiloverstyringer
+
+Låsegrensesnitt og tekstredigering ble senere implementert i separate faser. Avgrensningen over beskriver bare leveransen i `feature/drag-resize`.
 
 ## Geometri
 
@@ -47,8 +58,8 @@ Minimumsmål:
 
 Regler:
 
-- `x` kan ikke være negativ.
-- `y` kan ikke være negativ.
+- `x` kan ikke være negativ
+- `y` kan ikke være negativ
 - høyre elementkant holdes innenfor lerretsbredden
 - det finnes ingen fast nedre grense
 - lerretshøyden avledes fra nederste synlige element
@@ -65,7 +76,7 @@ Under aktiv pekerinteraksjon:
 
 - geometri ligger som lokal transient draft i `useElementPointerTransform`
 - aktiv preview løftes bare nok til at lerretshøyden kan beregnes korrekt
-- preview skal ikke serialiseres, lagres, eksporteres eller inngå i historikk
+- preview serialiseres, lagres, eksporteres eller inngår ikke i historikk
 
 Ved normal `pointerup`:
 
@@ -108,16 +119,14 @@ Auto-scroll ligger i `autoScrollCanvas.ts`, separat fra transform-hooken.
 
 ## Låste elementer
 
-Låsegrensesnitt er ikke bygget ennå, men modellen har allerede `locked`.
+Låsegrensesnittet var ikke del av denne historiske branchen, men modellen hadde allerede `locked` og følgende varige regel:
 
-Varig regel:
+- et låst element kan fortsatt markeres
+- det kan ikke flyttes eller endre størrelse
+- resize-håndtaket vises ikke
+- reduceren avviser layoutmutasjon av et låst element
 
-- et låst element skal fortsatt kunne markeres
-- det skal ikke kunne flyttes eller endre størrelse
-- resize-håndtaket skal ikke vises
-- reduceren skal avvise layoutmutasjon av et låst element
-
-Dette gjør det mulig å bygge opplåsing senere uten å måtte endre markeringsgrunnlaget.
+Objektlåsing ble senere implementert og merget som PR #5. Se `docs/OBJECT_LOCKING.md`.
 
 ## Tastatur
 
@@ -143,16 +152,16 @@ Når historikk bygges, må det vurderes om gjentatte tastetrykk skal slås samme
 
 ## Desktop og mobil
 
-Prosjektmodellen støtter mobiloverstyringer, men ingen kan opprettes fra dagens UI.
+Prosjektmodellen støtter mobiloverstyringer, men dagens UI kan ikke opprette dem.
 
-I denne fasen:
+Gjeldende midlertidige oppførsel:
 
 - nye elementer har bare desktopgeometri
 - mobil arver desktopgeometrien
 - både PC- og Telefon-visningen kan brukes til å flytte og endre den delte geometrien
 - varig commit går til desktopverdien
 
-Når `feature/mobile-design-controls` bygges, må layout-action og transform-API gjøres viewport-bevisste. Mobiloverstyringer skal ikke introduseres skjult eller tilfeldig.
+Når `feature/mobile-design-controls` bygges etter ny godkjenning, må layout-action og transform-API gjøres viewport-bevisste. Mobiloverstyringer skal ikke introduseres skjult eller tilfeldig.
 
 ## Filansvar
 
@@ -165,4 +174,4 @@ Når `feature/mobile-design-controls` bygges, må layout-action og transform-API
 - `EditorCanvas.tsx`: refs og preview for avledet lerretshøyde
 - `editorProjectReducer.ts`: validert varig prosjektmutasjon
 
-Ingen av de nye kildefilene skal bli en generell samlefil når snapping, låsing, historikk eller mobilkontroller bygges senere.
+Ingen av filene skal bli en generell samlefil når snapping, historikk eller mobilkontroller bygges senere.
