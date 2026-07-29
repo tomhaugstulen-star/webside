@@ -35,15 +35,16 @@ git diff --check
 ## 2. Gjeldende status
 
 ```text
-main: 5e548ad
-fase 10: første bundlede SVG-knappbibliotek – fullført
+main HEAD: a77a9a9
+PR #21: første bundlede SVG-knappbibliotek – merget
+PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
+knappbibliotekets mergecommit: 5e548ad
 GitHub-sak #20: lukket som fullført
-PR #21: merget
 prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-Sluttverifisering:
+Sluttverifisering for siste produksjonsfase:
 
 ```text
 ESLint: bestått
@@ -87,6 +88,7 @@ Se `docs/BUTTON_LIBRARY.md`.
 - fase 9: sikker sletting – PR #16
 - dokumentasjonsaudit – PR #19
 - fase 10: SVG-knappbibliotek – PR #21, mergecommit `5e548ad`
+- dokumentasjonsstatus etter knappbiblioteket – PR #22, mergecommit `a77a9a9`
 
 ## 5. Senere faser
 
