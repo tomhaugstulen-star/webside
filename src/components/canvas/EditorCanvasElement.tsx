@@ -11,6 +11,7 @@ import {
   type ElementLayout,
 } from '../../model/elementLayout'
 import type { CanvasPosition, EditorElement } from '../../model/editorProject'
+import { getImageCropSize } from '../../model/imagePresentation'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
 import { useTextElementContent } from '../../state/useTextElementContent'
@@ -144,6 +145,10 @@ export function EditorCanvasElement({
       x: direction.x * step,
       y: direction.y * step,
     }
+    const maximumSize =
+      element.kind === 'image' && element.mode === 'crop'
+        ? getImageCropSize(element.assetMetadata, element.transform)
+        : undefined
     const nextLayout =
       event.ctrlKey || event.metaKey
         ? resizeElementLayout(
@@ -151,6 +156,8 @@ export function EditorCanvasElement({
             initialLayout,
             delta,
             canvas.clientWidth,
+            'south-east',
+            maximumSize,
           )
         : moveElementLayout(initialLayout, delta, canvas.clientWidth)
 
