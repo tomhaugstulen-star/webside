@@ -1,4 +1,4 @@
-import type { EditorElement } from '../../model/editorProject'
+import type { ElementSize, EditorElement } from '../../model/editorProject'
 import { ButtonElementContent } from './ButtonElementContent'
 import { ImageElementContent } from './ImageElementContent'
 import { TextElementEditor, type TextEditFinishReason } from './TextElementEditor'
@@ -6,6 +6,9 @@ import { TextElementEditor, type TextEditFinishReason } from './TextElementEdito
 type EditorCanvasElementContentProps = {
   element: EditorElement
   editing: boolean
+  selected: boolean
+  frameSize: ElementSize
+  onSelect: (elementId: string) => void
   onCommitText: (content: string) => void
   onFinishTextEditing: (reason: TextEditFinishReason) => void
 }
@@ -13,6 +16,9 @@ type EditorCanvasElementContentProps = {
 export function EditorCanvasElementContent({
   element,
   editing,
+  selected,
+  frameSize,
+  onSelect,
   onCommitText,
   onFinishTextEditing,
 }: EditorCanvasElementContentProps) {
@@ -24,7 +30,14 @@ export function EditorCanvasElementContent({
         </span>
       )
     case 'image':
-      return <ImageElementContent element={element} />
+      return (
+        <ImageElementContent
+          element={element}
+          frameSize={frameSize}
+          selected={selected}
+          onSelect={onSelect}
+        />
+      )
     case 'text':
       return editing ? (
         <TextElementEditor
