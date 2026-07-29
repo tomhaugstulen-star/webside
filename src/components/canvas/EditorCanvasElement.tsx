@@ -19,6 +19,7 @@ import {
 import { handleCanvasElementKeyDown } from './canvasElementKeyboard'
 import { EditorCanvasElementContent } from './EditorCanvasElementContent'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
+import { getElementAppearanceCssStyle } from './getElementAppearanceCssStyle'
 import { getTextElementCssStyle } from './getTextElementCssStyle'
 import { ImageResizeHandles } from './ImageResizeHandles'
 import type { TextEditFinishReason } from './TextElementEditor'
@@ -93,6 +94,7 @@ export function EditorCanvasElement({
     top: layout.position.y,
     width: layout.size.width,
     height: layout.size.height,
+    ...getElementAppearanceCssStyle(element),
     ...(element.kind === 'text' ? getTextElementCssStyle(element.textStyle) : {}),
   }
   const transformClass = transformMode
