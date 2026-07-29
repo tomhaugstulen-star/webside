@@ -1,5 +1,3 @@
-import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
-import { createEditorElement } from '../model/createEditorElement'
 import {
   elementLayoutsEqual,
   getElementDesktopLayout,
@@ -7,6 +5,7 @@ import {
 } from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
+import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { setButtonAsset } from './setButtonAsset'
@@ -23,12 +22,6 @@ export function getInitialEditorProjectState() {
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   return activePage?.elements.some((element) => element.id === elementId) ?? false
-}
-
-function projectContainsElement(state: EditorProjectState, elementId: string) {
-  return state.project.pages.some((page) =>
-    page.elements.some((element) => element.id === elementId),
-  )
 }
 
 function selectedElementExists(state: EditorProjectState) {
@@ -104,39 +97,13 @@ function reduceEditorProjectState(
       }
     }
 
-    case 'add-element-to-active-page': {
-      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
-
-      if (
-        !activePage ||
-        projectContainsElement(state, action.elementId) ||
-        (action.request.kind === 'button' &&
-          findButtonAsset(action.request.assetId) === null)
-      ) {
-        return state
-      }
-
-      const element = createEditorElement({
-        id: action.elementId,
-        request: action.request,
-        existingElements: activePage.elements,
-      })
-      const pages = state.project.pages.map((page) =>
-        page.id === state.activePageId
-          ? { ...page, elements: [...page.elements, element] }
-          : page,
+    case 'add-element-to-active-page':
+      return addElementToActivePage(
+        state,
+        action.elementId,
+        action.request,
+        action.updatedAt,
       )
-
-      return {
-        ...state,
-        project: {
-          ...state.project,
-          pages,
-          updatedAt: action.updatedAt,
-        },
-        selectedElementId: element.id,
-      }
-    }
 
     case 'delete-element-from-active-page':
       return deleteElementFromActivePage(
