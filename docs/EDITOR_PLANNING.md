@@ -4,23 +4,18 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 
 ## Implementeringsstatus
 
-Siste bekreftede `main`:
-
 ```text
-f71b354  PR #14 – frittstående tekstlenker
-```
-
-Gjeldende fase:
-
-```text
+main: f71b354  PR #14 – frittstående tekstlenker
 branch: feature/element-deletion
 base main: f71b354
 GitHub-sak: #15
+PR: #16 Add safe deletion for selected elements
 produksjonscommit: 4f59b3e
-PR: ikke opprettet
+framtidsrettede rettelser: a8c6d62 og 4611de1
+arkitekturrapporter: fbd8091
 ```
 
-Slettefunksjonen er implementert, auditert, kompilert og manuelt godkjent. Arkitekturrapportene må regenereres før PR.
+Slettefunksjonen er implementert, auditert, kompilert, manuelt godkjent og lagt i PR #16. PR-en er åpen og mergebar, men skal ikke merges uten eksplisitt brukergodkjenning.
 
 ## Ferdig på `main`
 
@@ -173,9 +168,9 @@ Regler:
 
 Se `docs/ELEMENT_LINKS.md`.
 
-## Sikker elementsletting
+## Sikker elementsletting i PR #16
 
-Gjeldende branch legger til sletting av ett markert element av typen Seksjon, Bilde, Tekst eller Knapp.
+PR #16 legger til sletting av ett markert element av typen Seksjon, Bilde, Tekst eller Knapp.
 
 Plassering:
 
@@ -195,9 +190,11 @@ Regler:
 - Delete blokkeres i tekst- og skjemaredigering
 - reduceren validerer nyeste elementstate
 - bekreftet sletting fjerner bare målelementet
-- markeringen nullstilles og høyremenyen lukkes
+- markeringen nullstilles bare når målet var markert
+- en urelatert markering bevares
 - Seksjon eier ikke visuelt overlappende elementer
 - prosjektskjemaet forblir versjon 4
+- dialogens `Escape` påvirker ikke et åpent verktøypanel
 
 Arkitektur:
 
@@ -205,16 +202,25 @@ Arkitektur:
 state       -> deleteElementFromActivePage.ts, useElementDeletion.ts
 properties  -> DeleteElementSection.tsx
 dialog      -> ConfirmElementDeletionDialog.tsx
-keyboard    -> useElementDeletionShortcut.ts
+keyboard    -> isElementDeletionShortcutTarget.ts, useElementDeletionShortcut.ts
 composition -> EditorShell.tsx, RightPropertiesPanel.tsx
 canvas      -> EditorCanvasElement.tsx urørt
 ```
 
 Se `docs/ELEMENT_DELETION.md`.
 
+## Framtidsrettet audit
+
+Den siste gjennomgangen fant og rettet to problemer før PR:
+
+1. Sletting av et annet element enn det markerte nullstilte markeringen. Reduceren bevarer nå en urelatert markering.
+2. `Escape` i dialogen kunne også lukke et åpent verktøypanel. Dialog og panel har nå isolert Escape-håndtering.
+
+Ingen kritiske eller blokkerende kodefunn gjenstår.
+
 ## Verifisert kontroll
 
-Etter produksjonscommit `4f59b3e`:
+Etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
@@ -222,7 +228,12 @@ TypeScript: bestått
 Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
 Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
+
+Arkitekturrapportene er regenerert. Det finnes ingen GitHub Actions-run for head.
 
 Manuelt godkjent:
 
@@ -233,8 +244,6 @@ Manuelt godkjent:
 - tekstredigeringsgrensen
 - låsegrensen
 - flat Seksjon-modell
-
-Arkitekturrapportene er ikke regenerert etter sletteimplementasjonen ennå.
 
 ## Senere knappbibliotek
 
