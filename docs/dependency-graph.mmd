@@ -39,6 +39,7 @@ subgraph src["src"]
       src_components_editor_EditorShell_tsx["EditorShell.tsx"]
       src_components_editor_useElementDeletionShortcut_ts["useElementDeletionShortcut.ts"]
       src_components_editor_isElementDeletionShortcutTarget_ts["isElementDeletionShortcutTarget.ts"]
+      src_components_editor_useSelectedImageCropKeyboard_ts["useSelectedImageCropKeyboard.ts"]
     end
     subgraph src_components_canvas["canvas"]
       src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
@@ -89,8 +90,8 @@ subgraph src["src"]
     src_state_isValidElementCreationRequest_ts["isValidElementCreationRequest.ts"]
     src_state_useElementDeletion_ts["useElementDeletion.ts"]
     src_state_useElementSelection_ts["useElementSelection.ts"]
-    src_state_useElementLayout_ts["useElementLayout.ts"]
     src_state_useImageProperties_ts["useImageProperties.ts"]
+    src_state_useElementLayout_ts["useElementLayout.ts"]
     src_state_useTextElementContent_ts["useTextElementContent.ts"]
     src_state_useElementLocking_ts["useElementLocking.ts"]
     src_state_useButtonProperties_ts["useButtonProperties.ts"]
@@ -102,6 +103,7 @@ subgraph src["src"]
     src_state_deleteElementFromActivePage_ts["deleteElementFromActivePage.ts"]
     src_state_reduceImageProjectAction_ts["reduceImageProjectAction.ts"]
     src_state_setImageAltText_ts["setImageAltText.ts"]
+    src_state_setImageDesktopFrame_ts["setImageDesktopFrame.ts"]
     src_state_setImageMode_ts["setImageMode.ts"]
     src_state_setImageTransform_ts["setImageTransform.ts"]
     src_state_setButtonAsset_ts["setButtonAsset.ts"]
@@ -132,6 +134,7 @@ src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementCreation_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementDeletion_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementSelection_ts
+src_components_editor_EditorShell_tsx-->src_state_useImageProperties_ts
 src_components_editor_EditorShell_tsx-->src_types_editor_ts
 src_components_editor_EditorShell_tsx-->src_components_canvas_EditorCanvas_tsx
 src_components_editor_EditorShell_tsx-->src_components_dialogs_ConfirmElementDeletionDialog_tsx
@@ -139,6 +142,7 @@ src_components_editor_EditorShell_tsx-->src_components_properties_RightPropertie
 src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
 src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
 src_components_editor_EditorShell_tsx-->src_components_editor_useElementDeletionShortcut_ts
+src_components_editor_EditorShell_tsx-->src_components_editor_useSelectedImageCropKeyboard_ts
 src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
 src_model_editorProject_ts-->src_model_buttonAsset_ts
 src_model_editorProject_ts-->src_model_elementDimensions_ts
@@ -178,7 +182,10 @@ src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_primary_rounded_sv
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_secondary_rounded_svg
 src_state_useElementDeletion_ts-->src_state_useEditorProject_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
+src_state_useImageProperties_ts-->src_model_imagePresentation_ts
+src_state_useImageProperties_ts-->src_state_useEditorProject_ts
 src_types_editor_ts-->src_model_editorProject_ts
+src_components_canvas_EditorCanvas_tsx-->src_model_editorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useEditorProject_ts
 src_components_canvas_EditorCanvas_tsx-->src_state_useElementSelection_ts
 src_components_canvas_EditorCanvas_tsx-->src_types_editor_ts
@@ -190,7 +197,6 @@ src_components_canvas_EditorCanvasElement_tsx-->src_model_editorProject_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_elementLayout_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_model_resolveResponsiveValue_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_state_useElementLayout_ts
-src_components_canvas_EditorCanvasElement_tsx-->src_state_useImageProperties_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_state_useTextElementContent_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasElementAccessibility_ts
@@ -204,9 +210,8 @@ src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_TextElemen
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_useElementPointerTransform_ts
 src_model_resolveResponsiveValue_ts-->src_model_editorProject_ts
 src_state_useElementLayout_ts-->src_model_elementLayout_ts
+src_state_useElementLayout_ts-->src_model_imagePresentation_ts
 src_state_useElementLayout_ts-->src_state_useEditorProject_ts
-src_state_useImageProperties_ts-->src_model_imagePresentation_ts
-src_state_useImageProperties_ts-->src_state_useEditorProject_ts
 src_state_useTextElementContent_ts-->src_state_useEditorProject_ts
 src_components_canvas_canvasElementAccessibility_ts-->src_model_editorProject_ts
 src_components_canvas_canvasElementKeyboard_ts-->src_model_editorProject_ts
@@ -290,6 +295,8 @@ src_assets_images_prepareImageFile_ts-->src_model_imageAsset_ts
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts
+src_components_editor_useSelectedImageCropKeyboard_ts-->src_model_editorProject_ts
+src_components_editor_useSelectedImageCropKeyboard_ts-->src_model_imagePresentation_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
@@ -324,10 +331,14 @@ src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
 src_state_reduceImageProjectAction_ts-->src_model_editorProject_ts
 src_state_reduceImageProjectAction_ts-->src_state_editorProjectAction_ts
 src_state_reduceImageProjectAction_ts-->src_state_setImageAltText_ts
+src_state_reduceImageProjectAction_ts-->src_state_setImageDesktopFrame_ts
 src_state_reduceImageProjectAction_ts-->src_state_setImageMode_ts
 src_state_reduceImageProjectAction_ts-->src_state_setImageTransform_ts
 src_state_setImageAltText_ts-->src_model_editorProject_ts
 src_state_setImageAltText_ts-->src_model_imageAsset_ts
+src_state_setImageDesktopFrame_ts-->src_model_editorProject_ts
+src_state_setImageDesktopFrame_ts-->src_model_elementLayout_ts
+src_state_setImageDesktopFrame_ts-->src_model_imagePresentation_ts
 src_state_setImageMode_ts-->src_model_editorProject_ts
 src_state_setImageMode_ts-->src_model_imagePresentation_ts
 src_state_setImageTransform_ts-->src_model_editorProject_ts

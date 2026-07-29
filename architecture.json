@@ -383,6 +383,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../state/useImageProperties",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useImageProperties.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../types/editor",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -494,6 +511,23 @@
             "import"
           ],
           "resolved": "src/components/editor/useElementDeletionShortcut.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useSelectedImageCropKeyboard",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/editor/useSelectedImageCropKeyboard.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -671,6 +705,7 @@
         "src/state/editorProjectAction.ts",
         "src/model/elementLayout.ts",
         "src/types/editor.ts",
+        "src/components/canvas/EditorCanvas.tsx",
         "src/components/canvas/EditorCanvasElement.tsx",
         "src/model/resolveResponsiveValue.ts",
         "src/components/canvas/canvasElementAccessibility.ts",
@@ -689,6 +724,7 @@
         "src/components/properties/ImagePropertiesSection.tsx",
         "src/components/properties/TextPropertiesSection.tsx",
         "src/components/editor/useElementDeletionShortcut.ts",
+        "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/state/editorProjectReducer.ts",
         "src/model/createEditorProject.ts",
         "src/state/addElementToActivePage.ts",
@@ -697,6 +733,7 @@
         "src/state/deleteElementFromActivePage.ts",
         "src/state/reduceImageProjectAction.ts",
         "src/state/setImageAltText.ts",
+        "src/state/setImageDesktopFrame.ts",
         "src/state/setImageMode.ts",
         "src/state/setImageTransform.ts",
         "src/state/setButtonAsset.ts",
@@ -825,12 +862,15 @@
         "src/state/editorProjectAction.ts",
         "src/model/elementLayout.ts",
         "src/state/useImageProperties.ts",
+        "src/state/useElementLayout.ts",
         "src/components/canvas/canvasElementKeyboard.ts",
         "src/components/canvas/ImageElementContent.tsx",
         "src/components/canvas/useImageCropTransform.ts",
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/properties/ImagePropertiesSection.tsx",
+        "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/model/createEditorElement.ts",
+        "src/state/setImageDesktopFrame.ts",
         "src/state/setImageMode.ts",
         "src/state/setImageTransform.ts"
       ],
@@ -972,9 +1012,9 @@
         "src/state/useElementCreation.ts",
         "src/state/useElementDeletion.ts",
         "src/state/useElementSelection.ts",
+        "src/state/useImageProperties.ts",
         "src/components/canvas/EditorCanvas.tsx",
         "src/state/useElementLayout.ts",
-        "src/state/useImageProperties.ts",
         "src/state/useTextElementContent.ts",
         "src/state/useElementLocking.ts",
         "src/state/useButtonProperties.ts",
@@ -1255,7 +1295,8 @@
         "src/components/canvas/ElementSelectionToolbar.tsx",
         "src/components/canvas/ImageResizeHandles.tsx",
         "src/components/canvas/useElementPointerTransform.ts",
-        "src/state/editorProjectReducer.ts"
+        "src/state/editorProjectReducer.ts",
+        "src/state/setImageDesktopFrame.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -1695,6 +1736,60 @@
       "valid": true
     },
     {
+      "source": "src/state/useImageProperties.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/imagePresentation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imagePresentation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx",
+        "src/components/canvas/useImageCropTransform.ts",
+        "src/components/properties/ImagePropertiesSection.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/types/editor.ts",
       "dependencies": [
         {
@@ -1737,6 +1832,24 @@
     {
       "source": "src/components/canvas/EditorCanvas.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../../state/useEditorProject",
@@ -1959,23 +2072,6 @@
             "import"
           ],
           "resolved": "src/state/useElementLayout.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../state/useImageProperties",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/state/useImageProperties.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2246,40 +2342,6 @@
         },
         {
           "dynamic": false,
-          "module": "./useEditorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/state/useEditorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/components/canvas/EditorCanvasElement.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/state/useImageProperties.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
           "module": "../model/imagePresentation",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -2315,9 +2377,7 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvasElement.tsx",
-        "src/components/canvas/useImageCropTransform.ts",
-        "src/components/properties/ImagePropertiesSection.tsx"
+        "src/components/canvas/EditorCanvasElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -4368,6 +4428,58 @@
       "valid": true
     },
     {
+      "source": "src/components/editor/useSelectedImageCropKeyboard.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/imagePresentation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/imagePresentation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/state/EditorProjectProvider.tsx",
       "dependencies": [
         {
@@ -5079,6 +5191,23 @@
         },
         {
           "dynamic": false,
+          "module": "./setImageDesktopFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/setImageDesktopFrame.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./setImageMode",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -5156,6 +5285,75 @@
             "import"
           ],
           "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/reduceImageProjectAction.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/setImageDesktopFrame.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imagePresentation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/imagePresentation.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -5650,8 +5848,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 89,
-    "totalDependenciesCruised": 228,
+    "totalCruised": 91,
+    "totalDependenciesCruised": 237,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
