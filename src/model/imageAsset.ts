@@ -9,7 +9,6 @@ export const supportedImageMimeTypes = [
 ] as const
 
 export type SupportedImageMimeType = (typeof supportedImageMimeTypes)[number]
-export type ImageFit = 'contain' | 'cover'
 export type ImageAssetId = string & { readonly __imageAssetId: unique symbol }
 
 export type ImageAssetMetadata = {
@@ -19,8 +18,6 @@ export type ImageAssetMetadata = {
   width: number
   height: number
 }
-
-export const DEFAULT_IMAGE_FIT: ImageFit = 'contain'
 
 const stableIdPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -37,10 +34,6 @@ export function isSupportedImageMimeType(
   value: unknown,
 ): value is SupportedImageMimeType {
   return supportedImageMimeTypes.some((mimeType) => mimeType === value)
-}
-
-export function isImageFit(value: unknown): value is ImageFit {
-  return value === 'contain' || value === 'cover'
 }
 
 export function isValidImageAssetMetadata(
