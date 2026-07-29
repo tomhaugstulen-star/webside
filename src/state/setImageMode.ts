@@ -1,5 +1,9 @@
 import type { EditorProjectState } from '../model/editorProject'
-import { isImageMode, type ImageMode } from '../model/imagePresentation'
+import {
+  isImageMode,
+  normalizeImageTransformForFrame,
+  type ImageMode,
+} from '../model/imagePresentation'
 
 export function setImageMode(
   state: EditorProjectState,
@@ -21,13 +25,21 @@ export function setImageMode(
     return state
   }
 
+  const transform =
+    mode === 'crop'
+      ? normalizeImageTransformForFrame(
+          element.transform,
+          element.assetMetadata,
+          element.size.desktop,
+        ) ?? element.transform
+      : element.transform
   const pages = state.project.pages.map((page) =>
     page.id === state.activePageId
       ? {
           ...page,
           elements: page.elements.map((candidate) =>
             candidate.id === elementId && candidate.kind === 'image'
-              ? { ...candidate, mode }
+              ? { ...candidate, mode, transform }
               : candidate,
           ),
         }
