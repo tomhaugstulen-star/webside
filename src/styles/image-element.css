@@ -80,55 +80,51 @@
 .image-frame-handle--north-west {
   top: 0;
   left: 0;
-  transform: translate(-35%, -35%);
   cursor: nwse-resize;
 }
 
 .image-frame-handle--north {
   top: 0;
   left: 50%;
-  transform: translate(-50%, -35%);
+  transform: translateX(-50%);
   cursor: ns-resize;
 }
 
 .image-frame-handle--north-east {
   top: 0;
   right: 0;
-  transform: translate(35%, -35%);
   cursor: nesw-resize;
 }
 
 .image-frame-handle--east {
   top: 50%;
   right: 0;
-  transform: translate(35%, -50%);
+  transform: translateY(-50%);
   cursor: ew-resize;
 }
 
 .image-frame-handle--south-east {
   right: 0;
   bottom: 0;
-  transform: translate(35%, 35%);
   cursor: nwse-resize;
 }
 
 .image-frame-handle--south {
   bottom: 0;
   left: 50%;
-  transform: translate(-50%, 35%);
+  transform: translateX(-50%);
   cursor: ns-resize;
 }
 
 .image-frame-handle--south-west {
   bottom: 0;
   left: 0;
-  transform: translate(-35%, 35%);
   cursor: nesw-resize;
 }
 
 .image-frame-handle--west {
   top: 50%;
   left: 0;
-  transform: translate(-35%, -50%);
+  transform: translateY(-50%);
   cursor: ew-resize;
 }
