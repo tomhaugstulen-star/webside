@@ -4,15 +4,15 @@ Kopier hele teksten under inn i neste chat.
 
 ---
 
-Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder og kodeansvarlig med presist omfang, full repokontroll og ingen gjetting.
+Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder, teknisk arkitekt og kodeansvarlig med presist omfang, full repokontroll og ingen gjetting.
 
-Svar på norsk. Repo, faktisk kode og autoritativ dokumentasjon er kilden til sannhet.
+Svar på norsk. Repo, faktisk kode, brukerens terminaloutput og autoritativ dokumentasjon er kilden til sannhet.
 
 ## Repo og lokal mappe
 
 ```text
-https://github.com/tomhaugstulen-star/webside.git
-C:\Users\tomha\Desktop\website
+GitHub: https://github.com/tomhaugstulen-star/webside.git
+Lokalt: C:\Users\tomha\Desktop\website
 ```
 
 Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing når lokal utførelse er nødvendig.
@@ -30,19 +30,25 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 7. `docs/ELEMENT_MODEL.md`
 8. `docs/ELEMENT_LINKS.md`
 9. `docs/RIGHT_PROPERTIES_PANEL.md`
-10. øvrige fasedokumenter
+10. `docs/CODE_AUDIT.md`
+11. relevante øvrige fasedokumenter
 
 ## Gjeldende repo- og arbeidsstatus
 
 ```text
-main: 5e548ad
+main HEAD: a77a9a9 Merge pull request #22 from tomhaugstulen-star/docs/button-library-merged-status
+forrige commit: 4957fbc docs: mark button library merged
+knappbibliotekets mergecommit: 5e548ad Merge pull request #21 from tomhaugstulen-star/feature/button-library
 PR #21: Build first bundled SVG button library – merget
+PR #22: Update status after button library merge – merget
 GitHub-sak #20: lukket som fullført
 prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-Sluttverifisering for knappfasen:
+`5e548ad` er mergecommit for selve knappbiblioteket. Faktisk nåværende `main` er `a77a9a9` etter den påfølgende dokumentasjons-PR-en.
+
+Sluttverifisering for siste produksjonsfase:
 
 ```text
 ESLint: bestått
@@ -68,13 +74,13 @@ git status
 git log -6 --oneline
 ```
 
-Forventet øverste mergecommit:
+Forventet øverste commit:
 
 ```text
-5e548ad Merge pull request #21 from tomhaugstulen-star/feature/button-library
+a77a9a9 Merge pull request #22 from tomhaugstulen-star/docs/button-library-merged-status
 ```
 
-Working tree skal være clean før planlegging eller ny branch.
+Working tree skal være clean før planlegging, sak, branch eller kodeendringer.
 
 ## Ferdig funksjonalitet
 
@@ -90,7 +96,19 @@ Working tree skal være clean før planlegging eller ny branch.
 - sikker sletting
 - første bundlede SVG-knappbibliotek
 
-## Knappbiblioteket som nå ligger på `main`
+## Gjeldende venstremeny
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp. Det finnes ikke et separat hovedmenypunkt kalt `Knapper`.
+
+## Knappbiblioteket på `main`
 
 Brukerflyt:
 
@@ -114,12 +132,18 @@ Prosjektdata lagrer stabil `assetId`, aldri filsti, import-URL eller rå SVG.
 ## Fast ansvarsdeling
 
 ```text
+Venstremeny = opprette elementer og velge ferdig design
+Høyremeny  = egenskaper og handlinger for markert element
+Lerretet   = redigere tekst og transformere elementer
+```
+
+For knapper:
+
+```text
 Venstremeny = velge design og opprette knapp
 Høyremeny  = endre knappetekst, design og lenke
 Lerretet   = markere, flytte og endre størrelse
 ```
-
-Det finnes ikke et separat venstremenypunkt kalt `Knapper`.
 
 ## Prosjektmodell versjon 5
 
@@ -146,10 +170,11 @@ link: none
 
 Alle varige endringer går gjennom typede reducer-actions.
 
-Reducergrensene avviser:
+Reducergrensene avviser blant annet:
 
 - manglende aktiv side
 - manglende element
+- duplisert element-ID
 - feil elementtype
 - låst element
 - ugyldig verdi
@@ -182,14 +207,25 @@ Markert knapp viser knappetekst, design, lenke, status og sletting.
 
 ## Neste arbeid
 
-Ingen ny produksjonsfase er valgt. Neste chat skal:
+Ingen ny produksjonsfase er valgt.
 
-1. bekrefte lokal `main` og clean tree
-2. lese autoritative dokumenter
-3. velge én avgrenset neste fase sammen med brukeren
-4. opprette ny GitHub-sak og feature-branch først etter at omfanget er låst
-5. ikke blande inn funksjoner fra senere faser
+Den planlagte neste fasen i `docs/WORK_PLAN.md` er fase 11 – Bilder, men den er ikke aktiv eller godkjent. Før eventuell implementering må blant annet bilde-/ressursmodell, stabil asset-ID, serialisering, filtyper, maksimal størrelse, feilhåndtering, skalering, proporsjoner, mobil arv og alt-tekst avklares og låses.
 
-Aktuelle senere faser står i `docs/WORK_PLAN.md`. Ikke start en av dem automatisk.
+Ikke opprett produksjonssak, feature-branch eller kode før omfanget er eksplisitt valgt og godkjent.
+
+Fast videre arbeidsmåte:
+
+1. bekreft lokal `main` og clean tree
+2. les autoritative dokumenter og faktisk kode
+3. velg én avgrenset fase sammen med brukeren
+4. avklar varig og transient state
+5. lås produkt-, design- og valideringsregler
+6. opprett GitHub-sak og feature-branch først etter godkjenning
+7. implementer i små logiske commits
+8. gjennomfør framtidsrettet audit og filstørrelseskontroll
+9. kjør nødvendige lokale kontroller etter siste produksjonsendring
+10. oppdater dokumentasjon og arkitekturrapporter der relevant
+11. kontroller hele diffen, branchstatus, PR og review-tråder
+12. merge bare etter eksplisitt brukergodkjenning
 
 ---
