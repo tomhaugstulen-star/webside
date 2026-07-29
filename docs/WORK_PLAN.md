@@ -146,109 +146,33 @@ Vite: 58 moduler transformert
 
 Se `docs/ELEMENT_LINKS.md`.
 
-## 3. Gjeldende fase – Sikker sletting av elementer
+### Fase 9 – Sikker sletting av elementer
+
+Branch: `feature/element-deletion`
+
+Status: merget som PR #16 med mergecommit `b428cac`. Sak #15 er lukket som fullført.
 
 ```text
-branch: feature/element-deletion
-base main: f71b354
-GitHub-sak: #15
-PR: #16 Add safe deletion for selected elements
 produksjonscommit: 4f59b3e
 framtidsrettede rettelser: a8c6d62 og 4611de1
 arkitekturrapporter: fbd8091
-sporing: docs/ELEMENT_DELETION.md
 ```
 
-Status:
+Omfang:
 
-- produksjonskode implementert
-- framtidsrettet kodeaudit gjennomført
-- to funn rettet før PR
-- `npm run check` bestått etter siste produksjonsrettelser
-- alle manuelle akseptansetester godkjent
-- arkitekturrapporter regenerert
-- dokumentasjon oppdatert
-- PR #16 åpen og mergebar
-- ingen GitHub Actions-run for head
-
-### Omfang
-
-Sletting av ett markert element:
-
-- Seksjon
-- Bilde
-- Tekst
-- Knapp
-
-### Fast plassering
-
-Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
-
-```text
-Element
-Status: Ulåst
-Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
-```
-
-Regler:
-
-- samme bredde som statusboksen
-- vanlig dokumentflyt, ikke festet nederst
-- rød tekst og rød ramme
-- deaktivert når elementet er låst
-- krever ingen scrolling i dagens panel
-
-### Bekreftelse og tastatur
-
-- sletting krever alltid dialog
-- `Avbryt`, bakgrunnsklikk og `Escape` muterer ikke prosjektet
-- dialogens `Escape` påvirker ikke et åpent verktøypanel
+- sletting av ett markert Seksjon-, Bilde-, Tekst- eller Knapp-element
+- sletteknapp rett under statusboksen i høyremenyen
+- alltid bekreftelsesdialog
 - `Delete` åpner samme dialog
+- låste elementer kan ikke slettes
 - Delete blokkeres i tekst- og skjemaredigering
-- `Backspace` brukes ikke globalt
-- dialogen kontrollerer nyeste state før bekreftelse
-
-### Modell og state
-
-Prosjektskjemaet forblir versjon 4.
-
-```text
-delete-element-from-active-page { elementId, updatedAt }
-```
-
-Reducergrensen avviser:
-
-- manglende aktiv side
-- manglende element
-- feil side
-- låst element
-- utdatert mål
-- no-op
-
-Ved gyldig sletting:
-
 - bare målelementet fjernes
-- `project.updatedAt` oppdateres
-- `selectedElementId` nullstilles bare når målet var markert
-- en urelatert markering bevares
-- høyremenyen lukkes når det markerte elementet slettes
+- urelatert markering bevares
+- Seksjonssletting fjerner ikke visuelt overlappende elementer
+- dialogens `Escape` påvirker ikke venstremenyens aktive panel
+- prosjektskjemaet forblir versjon 4
 
-Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen.
-
-### Implementert arkitektur
-
-```text
-state       -> deleteElementFromActivePage.ts, useElementDeletion.ts
-properties  -> DeleteElementSection.tsx
-dialog      -> ConfirmElementDeletionDialog.tsx
-keyboard    -> isElementDeletionShortcutTarget.ts, useElementDeletionShortcut.ts
-composition -> EditorShell.tsx, RightPropertiesPanel.tsx
-canvas      -> EditorCanvasElement.tsx urørt
-```
-
-Alle nye kildefiler er under 250 linjer.
-
-### Verifisert kontroll
+Verifisert før merge:
 
 ```text
 ESLint: bestått
@@ -261,39 +185,13 @@ JavaScript: 232.19 kB, gzip 71.23 kB
 bygget på 225 ms
 ```
 
-Manuelt godkjent:
+Alle manuelle akseptansetester ble godkjent. Se `docs/ELEMENT_DELETION.md`.
 
-- alle fire etiketter
-- plassering og disabled-tilstand
-- avbrytelse og Escape
-- sletting via knapp og Delete
-- låste elementer kan ikke slettes
-- Delete under tekstredigering sletter bare tekst
-- Seksjonssletting lar andre elementer bli stående
+## 3. Gjeldende produksjonsstatus
 
-### Gjenstår
+Ingen ny produksjonsfase er valgt.
 
-1. Hent siste statusdokumentasjon lokalt.
-2. Bekreft clean working tree.
-3. Kontroller PR #16 på siste head.
-4. Merge bare etter eksplisitt godkjenning.
-5. Etter merge: oppdater lokal `main` og kontroller clean tree.
-
-### Ikke del av fasen
-
-- angre/gjør om
-- papirkurv eller gjenoppretting
-- multisletting
-- dra til papirkurv
-- sletting av side eller prosjekt
-- automatisk sletting av visuelt overlappende elementer
-- foreldre-/barnemodell for Seksjon
-- duplisering
-- historikk eller lagring
-- bildeimport
-- knappbibliotek
-- farger
-- forhåndsvisning eller publisering
+Før neste branch opprettes skal brukeren velge og godkjenne én avgrenset fase. Det skal ikke blandes inn funksjoner fra senere faser.
 
 ## 4. Senere faser
 
