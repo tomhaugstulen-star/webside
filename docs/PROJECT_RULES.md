@@ -22,18 +22,16 @@ Regler:
 - merge krever eksplisitt brukergodkjenning
 - ny produksjonsbranch starter først etter godkjent merge og oppdatert lokal `main`
 
-Gjeldende leveranse:
+Gjeldende status:
 
 ```text
-fase: 11A – bildeimport, ramme og utsnitt
-branch: feature/image-import-and-placement
-GitHub-sak: #25
-PR: #26 – åpen, ikke draft
-base main: 7e4c71f
+siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
+GitHub-sak: #25 – lukket som fullført
+PR: #26 – merget
+mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
 prosjektskjema: versjon 6
-sluttaudit: ferdig
-arkitekturrapporter etter sluttaudit: må regenereres
-merge: ikke godkjent eller utført
+lokal main: synkronisert og clean
+neste produksjonsfase: ikke valgt
 ```
 
 ## 2. Filstørrelser og ansvar
@@ -49,7 +47,7 @@ merge: ikke godkjent eller utført
 - motstridende regler for samme komponent skal ikke fordeles mellom generelle og spesifikke stilark
 - tilfeldig generell `features`-mappe eller samlefil skal ikke innføres
 
-Etter sluttauditen:
+Etter fase-11A-auditen:
 
 ```text
 alle berørte kildefiler: under 250 linjer
@@ -62,7 +60,7 @@ ImageImportControl.tsx: 133 linjer
 ## 3. Autoritativ prosjektmodell
 
 - `EditorProject` eier alle varige prosjektdata
-- prosjektskjemaet i leveransen er versjon 6
+- gjeldende prosjektskjema er versjon 6
 - DOM-en er ikke permanent lagring
 - Object URL er ikke prosjektdata
 - ID-er er stabile og kryptografisk generert
@@ -299,4 +297,4 @@ JavaScript: 258.38 kB, gzip 78.09 kB
 produksjonsbuild: bestått på 185 ms
 ```
 
-Arkitekturrapportene skal regenereres etter sluttauditen. Ingen merge før clean tree, oppdatert PR-kontroll og eksplisitt godkjenning.
+Arkitekturrapportene ble regenerert etter sluttauditen og ga ingen diff. Fase 11A ble deretter merget etter eksplisitt godkjenning. Neste produksjonsfase krever ny branch fra oppdatert `main` og nytt låst omfang.
