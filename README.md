@@ -38,18 +38,19 @@ main
   -> arkitekturrapporter og dokumentasjon
   -> PR-kontroll
   -> eksplisitt mergegodkjenning
+  -> oppdatert lokal main
 ```
 
-## Gjeldende leveranse
+## Gjeldende prosjektstatus
 
 ```text
-fase: 11A – bildeimport, ramme og utsnitt
-branch: feature/image-import-and-placement
-GitHub-sak: #25
-PR: #26 – åpen, ikke draft
-base main: 7e4c71f
+siste fullførte fase: 11A – bildeimport, ramme og utsnitt
+GitHub-sak: #25 – lukket som fullført
+PR: #26 – merget
+mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
 prosjektskjema: versjon 6
-merge: ikke godkjent eller utført
+lokal main: synkronisert og clean
+neste produksjonsfase: ikke valgt
 ```
 
 Faktisk branch- og `main`-HEAD skal alltid leses fra Git. Commitnumre i dokumentasjonen er historiske kontrollpunkter, ikke permanente forventede topper.
@@ -79,7 +80,7 @@ Manuelt godkjent på PC og Telefon:
 - crop-resize med stasjonært motiv og fast motsatt kant
 - låsing, sletting og manglende ressursfallback
 
-Arkitekturrapportene skal regenereres etter den siste produksjonsauditen før PR #26 kan godkjennes for merge.
+Arkitekturrapportene ble regenerert etter sluttauditen og ga ingen diff. De var dermed allerede synkronisert med produksjonskoden som ble merget.
 
 ## Implementert funksjonalitet
 
