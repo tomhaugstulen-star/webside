@@ -39,7 +39,7 @@ export function useImageCropTransform({
   }
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (!enabled || event.button !== 0) {
+    if (!enabled || event.button !== 0 || event.shiftKey) {
       return
     }
 
