@@ -6,23 +6,16 @@ Dette dokumentet er autoritativ spesifikasjon og verifikasjonslogg for den avgre
 branch: feature/element-deletion
 base main: f71b354
 GitHub-sak: #15
-produksjonscommit: 4f59b3e feat: add safe element deletion
-PR: ikke opprettet
+PR: #16 Add safe deletion for selected elements
+produksjonscommit: 4f59b3e
+arkitekturrapporter: fbd8091
 ```
 
 ## Status
 
-Slettefunksjonen er implementert, statisk auditert, kompilert og manuelt godkjent.
+Slettefunksjonen er implementert, framtidsauditert, kompilert, manuelt godkjent og lagt i PR #16.
 
-Gjenstår før PR:
-
-1. regenerere `architecture.json`
-2. regenerere `docs/dependency-graph.mmd`
-3. kontrollere den endelige branch-diffen
-4. bekrefte clean working tree
-5. opprette og kontrollere PR
-
-Det skal ikke merges uten eksplisitt brukergodkjenning.
+PR #16 er åpen og mergebar. Det finnes ingen uløste kjente kodefunn. Merge skal bare skje etter eksplisitt brukergodkjenning.
 
 ## Omfang
 
@@ -57,9 +50,7 @@ Slettehandlingen ligger i høyremenyens eksisterende `Element`-seksjon, rett und
 
 ```text
 Element
-
 Status: Ulåst
-
 Slett seksjon
 ```
 
@@ -81,7 +72,7 @@ Knappen:
 - bruker rød tekst og rød ramme
 - har hover-, focus-visible- og disabled-tilstand
 - er deaktivert når elementet er låst
-- viser en forklaring om at elementet må låses opp
+- forklarer at låste elementer må låses opp
 
 ## Bekreftelsesdialog
 
@@ -89,9 +80,7 @@ Sletting krever alltid eksplisitt bekreftelse fordi angre/gjør om ikke finnes e
 
 ```text
 Slett tekstboksen?
-
 Dette kan ikke angres.
-
 Avbryt    Slett
 ```
 
@@ -107,6 +96,7 @@ Dialogen:
 - kontrollerer nyeste state før bekreftelse
 - deaktiverer `Slett` dersom elementet er blitt låst eller fjernet
 - lukker etter godkjent sletting
+- isolerer `Escape` slik at et åpent verktøypanel ikke lukkes samtidig
 
 ## Tastatur
 
@@ -174,8 +164,9 @@ Ved gyldig sletting:
 - bare målelementet fjernes fra aktiv sides `elements`
 - øvrige sider og elementer bevares
 - `project.updatedAt` settes fra handlingen
-- `selectedElementId` settes til `null` når målet var markert
-- høyremenyen lukkes gjennom eksisterende selection-avledning
+- `selectedElementId` settes til `null` bare når målet var markert
+- en eventuell markering av et annet element bevares
+- høyremenyen lukkes gjennom eksisterende selection-avledning når det markerte elementet slettes
 
 Dialogstate, mål-ID og fokusreferanse er transient editor-state og lagres ikke i prosjektet.
 
@@ -208,9 +199,18 @@ src/App.css
 
 Alle nye kildefiler er under aktiv 250-linjersgrense. Den største nye TSX-filen er 113 linjer.
 
+## Framtidsrettet kodeaudit
+
+Den avsluttende gjennomgangen fant og rettet to problemer før PR:
+
+1. Sletting av et annet element enn det markerte nullstilte tidligere markeringen. Reduceren bevarer nå en urelatert markering.
+2. `Escape` i dialogen kunne tidligere også lukke venstremenyens aktive verktøypanel. Dialog og panel har nå isolert Escape-håndtering.
+
+Etter rettelsene ble hele `npm run check` kjørt på nytt, og arkitekturrapportene ble regenerert.
+
 ## Verifisert kvalitetskontroll
 
-Brukeren kjørte `npm run check` etter produksjonscommit `4f59b3e`.
+Brukeren kjørte `npm run check` etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
@@ -219,11 +219,13 @@ Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
 Vite: 64 moduler transformert
 CSS: 20.13 kB, gzip 4.60 kB
-JavaScript: 232.13 kB, gzip 71.21 kB
-bygget på 168 ms
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
 
-Ingen GitHub Actions-run var knyttet til commiten. Den brukerbekreftede lokale kontrollen er derfor verifikasjonsgrunnlaget.
+Arkitekturrapportene ble regenerert og committed i `fbd8091`.
+
+Ingen GitHub Actions-run er knyttet til head. Den brukerbekreftede lokale kontrollen er derfor verifikasjonsgrunnlaget.
 
 ## Manuelt godkjent
 
@@ -244,12 +246,11 @@ Brukeren har godkjent:
 
 ## Akseptansestatus
 
-Alle funksjonelle akseptansekriterier er oppfylt.
+Alle funksjonelle og tekniske kriterier er oppfylt.
 
-Følgende prosesskriterier gjenstår:
+Gjenstår:
 
-- arkitekturrapportene regenereres
-- dokumentasjonsendringene hentes lokalt
-- working tree bekreftes clean etter rapportene
-- PR opprettes og kontrolleres
-- merge skjer bare etter eksplisitt godkjenning
+1. hente siste statusdokumentasjon lokalt
+2. bekrefte clean working tree
+3. kontrollere PR #16 på siste head
+4. merge bare etter eksplisitt godkjenning
