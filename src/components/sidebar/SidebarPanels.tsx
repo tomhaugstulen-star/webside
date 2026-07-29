@@ -1,5 +1,6 @@
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorTool } from '../../types/editor'
+import { ColorsPanel } from './ColorsPanel'
 import { ElementsPanel } from './ElementsPanel'
 import { SidebarIcon } from './SidebarIcon'
 
@@ -13,39 +14,6 @@ type ElementsPanelProps = {
 
 type SidebarPanelProps = PanelProps & ElementsPanelProps & {
   activeTool: EditorTool
-}
-
-function ColorsPanel({ onSelect }: PanelProps) {
-  return (
-    <>
-      <h2>Farger</h2>
-      <p className="panel-intro">
-        Velg en del av siden for å endre utseende og oppsett.
-      </p>
-      <div className="setting-group">
-        <h3>Sidestil</h3>
-        <button className="setting-row" type="button" onClick={onSelect}>
-          <span>Bakgrunn</span>
-          <span>›</span>
-        </button>
-        <button className="setting-row" type="button" onClick={onSelect}>
-          <span>Typografi</span>
-          <span>›</span>
-        </button>
-        <button className="setting-row" type="button" onClick={onSelect}>
-          <span>Avstander</span>
-          <span>›</span>
-        </button>
-      </div>
-      <div className="panel-tip">
-        <span className="panel-tip__icon">✦</span>
-        <p>
-          Velg et element på den blanke siden for å åpne relevante
-          innstillinger.
-        </p>
-      </div>
-    </>
-  )
 }
 
 function LogoHeaderPanel({ onSelect }: PanelProps) {
@@ -119,7 +87,7 @@ export function SidebarPanel({
 }: SidebarPanelProps) {
   switch (activeTool) {
     case 'design':
-      return <ColorsPanel onSelect={onSelect} />
+      return <ColorsPanel />
     case 'media':
       return <LogoHeaderPanel onSelect={onSelect} />
     case 'elements':
