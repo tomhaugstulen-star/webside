@@ -4,33 +4,31 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 
 ## Gjeldende arbeidsstatus
 
-Faktisk `main`-HEAD skal alltid kontrolleres mot `origin/main`. Et commitnummer lagres bare som historisk milepæl eller eksplisitt branch-base, aldri som permanent «gjeldende HEAD».
-
-Stabile referanser:
-
 ```text
-base main før dokumentasjonssynkronisering i PR #24: a77a9a9
-PR #21: SVG-knappbibliotek – merget
-PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
-knappbibliotekets mergecommit: 5e548ad
-GitHub-sak #20: lukket som fullført
-prosjektskjema: versjon 5
-neste produksjonsfase: ikke valgt
+aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
+branch: feature/image-import-and-placement
+GitHub-sak: #25
+base main: 7e4c71f
+prosjektskjema i leveransen: versjon 6
+status: implementert, auditert, testet og klar for PR-kontroll
 ```
 
-Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
+Faktisk branch- og `main`-HEAD skal alltid leses fra Git. Historiske commitnumre brukes bare som kontrollpunkter.
+
+Siste verifiserte kontroll:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
-Vite: 78 moduler transformert
+Dependency Cruiser: 89 moduler, 228 avhengigheter, ingen brudd
+Vite: 98 moduler transformert
+CSS: 31.07 kB, gzip 6.07 kB
+JavaScript: 255.44 kB, gzip 77.18 kB
 produksjonsbuild: bestått
-arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
 PC og Telefon: godkjent
 ```
 
-## Ferdig på `main`
+## Implementert editorgrunnlag
 
 - blankt PC- og Telefon-lerret
 - kontrollert topp- og venstremeny
@@ -39,30 +37,15 @@ PC og Telefon: godkjent
 - markering, flytting, resizing og låsing
 - kontrollert flerlinjet tekstredigering
 - høyremenyens grunnstruktur
-- tekstegenskaper for hele tekstboksen
-- eksterne lenker for tekstbokser og knapper
-- sikker sletting via høyremeny og `Delete`
-- første bundlede SVG-knappbibliotek
-- kontrollert fallback for ukjent knappasset
+- tekstegenskaper
+- eksterne lenker for tekst og knapp
+- sikker sletting
+- bundlet SVG-knappbibliotek
+- lokal bildeimport og transient ressursbuffer
+- separat bilderamme og motivutsnitt
+- alternativ tekst, zoom og bildefilmetadata
+- kontrollert fallback for manglende knapp- og bilderessurs
 - Dependency Cruiser og samlet `npm run check`
-
-Viktige historiske merges:
-
-```text
-PR #4   drag og resize
-PR #5   objektlåsing                 a3eed45
-PR #7   ren tekstredigering          c729d33
-PR #8   navn og rekkefølge i meny    a35f59d
-PR #9   høyremenyens grunnstruktur   8de5f2e
-PR #11  tekstegenskaper              452b491
-PR #14  elementlenker                f71b354
-PR #16  sikker elementsletting       b428cac
-PR #19  dokumentasjonsaudit          06307a2
-PR #21  SVG-knappbibliotek           5e548ad
-PR #22  dokumentasjonsstatus         a77a9a9
-```
-
-Disse commitnumrene beskriver historiske leveranser og skal ikke brukes som forventet topp-commit etter senere merges.
 
 ## Gjeldende venstremeny
 
@@ -74,22 +57,29 @@ Elementer
 Innstillinger
 ```
 
-`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp. `Knapp` åpner et internt designbibliotek. Det finnes ikke et separat venstremenypunkt kalt `Knapper`.
+`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp.
+
+```text
+Elementer -> Knapp  åpner internt SVG-designbibliotek
+Elementer -> Bilde  åpner nettleserens lokale filvelger
+```
 
 ## Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette elementer og velge ferdig design
+Venstremeny = opprette elementer og velge fil eller ferdig design
 Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere tekst og transformere elementer
+Lerretet   = redigere innhold og transformere elementer
+Ressurslag = eie transient fil og renderings-URL
+Prosjekt   = eie serialiserbar identitet, metadata og redigeringsverdier
 ```
 
-For knapper:
+For bilder:
 
 ```text
-Venstremeny = velge SVG-design og opprette knapp
-Høyremeny  = endre label, design og lenke
-Lerretet   = markere, flytte og endre størrelse
+Venstremeny = velge og validere PNG, JPEG eller WebP
+Høyremeny  = alt-tekst, visning, zoom, reset, metadata og sletting
+Lerretet   = markere, flytte ramme, endre ramme og flytte motiv
 ```
 
 ## Autoritativ state
@@ -97,28 +87,32 @@ Lerretet   = markere, flytte og endre størrelse
 Varig prosjektdata:
 
 - sider og elementer
-- geometri og synlighet
+- responsiv geometri og synlighet
 - låsestatus
 - tekstinnhold og tekststil
 - lenke for tekstbokser og knapper
-- knappens `assetId` og `label`
+- knappens stabile `assetId` og `label`
+- bildets stabile `assetId`
+- bildets serialiserbare metadata
+- bildets `altText`, `mode` og `transform`
 - `updatedAt`
 
-Transient editor-state:
+Transient editor- og ressursstate:
 
 - `selectedElementId`
 - pekerinteraksjon og layout-preview
-- tekst-, knappetekst- og lenkedrafts
-- validering og lagringsfeedback
+- tekst-, knappetekst-, lenke- og alttekstdrafts
+- filvelger og valideringsfeedback
+- `File`, Object URL og ressurskart
 - intern bibliotekvisning
 - slettedialogens mål og fokusreferanse
 - panel-, fokus-, hover- og trykkstate
 
-DOM-en er rendering, ikke permanent lagring. Gyldige prosjektendringer går gjennom reduceren.
+DOM-en og Object URL-er er rendering, ikke permanent prosjektlagring. Gyldige prosjektendringer går gjennom reduceren.
 
 ## Prosjektmodell
 
-Gjeldende skjemaversjon er 5.
+Gjeldende skjemaversjon i leveransen er 6.
 
 ```text
 versjon 1  grunnmodell
@@ -126,20 +120,25 @@ versjon 2  tekstinnhold
 versjon 3  tekststil
 versjon 4  elementlenke
 versjon 5  knappasset, knappetekst og knappelenke
+versjon 6  bildeasset, metadata, alternativ tekst, visning og utsnitt
 ```
 
 ```ts
-type ButtonEditorElement = BaseEditorElement & {
-  kind: 'button'
-  assetId: ButtonAssetId
-  label: string
-  link: ElementLink
+type ImageEditorElement = BaseEditorElement & {
+  kind: 'image'
+  assetId: ImageAssetId
+  assetMetadata: ImageAssetMetadata
+  altText: string
+  mode: 'contain' | 'crop'
+  transform: {
+    zoom: number
+    offsetX: number
+    offsetY: number
+  }
 }
 ```
 
-`assetId`, `label` og `link` er foreløpig felles for PC og Telefon.
-
-Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressursreferanse, filmetadata, alt-tekst og skaleringsmodell er ikke implementert.
+Bildeelementet lagrer ikke lokal filsti, binærfil eller Object URL. PC og Telefon bruker foreløpig samme bildeinnhold, alt-tekst, visning og utsnitt. Telefon arver desktopgeometrien når mobiloverstyring mangler.
 
 ## Elementregler
 
@@ -161,7 +160,38 @@ Tekst    120 × 48 px
 Knapp    80 × 36 px
 ```
 
-Flytting og resizing bruker transient preview og én commit ved normalt slipp. Låste elementer kan markeres, men ikke transformeres, redigeres eller slettes.
+Standard- og minimumsstørrelser har én autoritativ kilde i modellen. Flytting og resizing bruker transient preview og én commit ved normalt slipp. Låste elementer kan markeres, men ikke transformeres, redigeres eller slettes.
+
+## Bildevisning og utsnitt
+
+### Hele bildet
+
+- hele bildet vises proporsjonalt
+- bildet sentreres i rammen
+- tomrom er tillatt når sideforholdene er ulike
+- lagret utsnitt beholdes for senere retur til crop-modus
+
+### Juster utsnitt
+
+- motivet fyller rammen uten tomrom
+- originalt sideforhold bevares
+- zoom er begrenset til 100–300 prosent og minst nødvendig fyllingszoom
+- offset er normalisert og begrenset
+- bilderammen kan ikke bli større enn motivet ved aktiv zoom
+- overgang fra en stor contain-ramme gir automatisk gyldig crop-ramme
+- reset sentrerer motivet og bruker minimum gyldig zoom
+
+Interaksjon:
+
+```text
+vanlig dra      flytter motivet
+Shift + dra     flytter hele rammen
+Alt + piltast   flytter motivet med tastaturet
+piltast         flytter elementet
+Ctrl/Cmd + pil  endrer størrelse fra nedre høyre hjørne
+```
+
+Bilderammen har åtte pekergrep for alle kanter og hjørner.
 
 ## Høyremeny
 
@@ -185,43 +215,31 @@ Betinget innhold:
 ```text
 Tekst   -> tekstutseende + lenke + elementhandlinger
 Knapp   -> knappetekst + design + lenke + elementhandlinger
-Bilde   -> elementstatus og sletting
-Seksjon -> elementstatus og sletting
+Bilde   -> alternativ tekst + visning + zoom + metadata + elementhandlinger
+Seksjon -> elementstatus + sletting
 ```
 
-## Første knappbibliotek
+## Arkitekturgrenser etter fase-11A-audit
 
-```text
-button.primary-rounded.v1
-button.secondary-rounded.v1
-button.outline-rounded.v1
-button.dark-rounded.v1
-```
-
-- assets bundles statisk av Vite
-- prosjektdata lagrer stabil ID, ikke filsti eller rå SVG
-- SVG-en er dekorativ og inneholder ikke tekst
-- `label` er ekte HTML-tekst og tilgjengelig navn
-- tom knappetekst avvises
-- designbytte valideres mot katalogen
-- ukjent lagret ID gir fallback og varsel
-- lenken aktiveres aldri i editormodus
-
-Se `docs/BUTTON_LIBRARY.md`.
+- `EditorCanvasElement.tsx` er redusert til 189 linjer.
+- Tastaturtransform ligger i en egen canvasmodul.
+- Bilderendering og motivdrag ligger i egne avgrensede moduler.
+- Opprettingsvalidering deles av hook og reducer.
+- Crop-invarianter håndheves i modell og reducer, ikke bare i UI.
+- Ressurslageret eier Object URL-oppretting og opprydding.
+- Alle berørte kildefiler er under 250 linjer.
 
 ## Planlagte senere faser
 
-```text
-feature/image-import-and-placement
-feature/project-colors
-feature/logo-header
-feature/alignment-guides
-feature/mobile-design-controls
-feature/history-system
-feature/local-project-autosave
-feature/project-open-import
-feature/preview-mode
-feature/publishing
-```
+Ingen ny fase startes før fase 11A er kontrollert i PR og eksplisitt godkjent for merge.
 
-Neste fase skal velges og avgrenses eksplisitt. Ingen produksjonssak eller produksjonsbranch startes automatisk.
+```text
+fase 12  prosjektfarger
+fase 13  logo og header
+fase 14  korrigeringslinjer
+fase 15  responsive mobiloverstyringer
+fase 16  angre og gjør om
+fase 17  lokal automatisk lagring
+fase 18  åpne og importere prosjekt
+fase 19  forhåndsvisning og publisering
+```
