@@ -3,11 +3,13 @@ import type { ElementSize } from './elementDimensions'
 import type { ElementLink } from './elementLink'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
+import type { PageAppearance } from './pageAppearance'
+import type { SectionAppearance } from './sectionAppearance'
 import type { TextElementStyle } from './textElementStyle'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 6 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 7 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -31,6 +33,7 @@ type BaseEditorElement = {
 
 export type SectionEditorElement = BaseEditorElement & {
   kind: 'section'
+  appearance: SectionAppearance
 }
 
 export type ImageEditorElement = BaseEditorElement & {
@@ -66,6 +69,7 @@ export type EditorPage = {
   id: string
   name: string
   slug: string
+  appearance: PageAppearance
   elements: EditorElement[]
 }
 
