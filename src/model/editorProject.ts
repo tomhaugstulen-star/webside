@@ -1,8 +1,13 @@
 import type { ButtonAssetId } from './buttonAsset'
 import type { ElementLink } from './elementLink'
+import type {
+  ImageAssetId,
+  ImageAssetMetadata,
+  ImageFit,
+} from './imageAsset'
 import type { TextElementStyle } from './textElementStyle'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 5 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 6 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -37,6 +42,10 @@ export type SectionEditorElement = BaseEditorElement & {
 
 export type ImageEditorElement = BaseEditorElement & {
   kind: 'image'
+  assetId: ImageAssetId
+  assetMetadata: ImageAssetMetadata
+  altText: string
+  fit: ImageFit
 }
 
 export type TextEditorElement = BaseEditorElement & {
