@@ -152,19 +152,24 @@ Se `docs/ELEMENT_LINKS.md`.
 branch: feature/element-deletion
 base main: f71b354
 GitHub-sak: #15
+PR: #16 Add safe deletion for selected elements
 produksjonscommit: 4f59b3e
-PR: ikke opprettet
+framtidsrettede rettelser: a8c6d62 og 4611de1
+arkitekturrapporter: fbd8091
 sporing: docs/ELEMENT_DELETION.md
 ```
 
 Status:
 
 - produksjonskode implementert
-- statisk audit gjennomført
-- `npm run check` bestått
+- framtidsrettet kodeaudit gjennomført
+- to funn rettet før PR
+- `npm run check` bestått etter siste produksjonsrettelser
 - alle manuelle akseptansetester godkjent
+- arkitekturrapporter regenerert
 - dokumentasjon oppdatert
-- arkitekturrapporter ikke regenerert ennå
+- PR #16 åpen og mergebar
+- ingen GitHub Actions-run for head
 
 ### Omfang
 
@@ -197,6 +202,7 @@ Regler:
 
 - sletting krever alltid dialog
 - `Avbryt`, bakgrunnsklikk og `Escape` muterer ikke prosjektet
+- dialogens `Escape` påvirker ikke et åpent verktøypanel
 - `Delete` åpner samme dialog
 - Delete blokkeres i tekst- og skjemaredigering
 - `Backspace` brukes ikke globalt
@@ -223,8 +229,9 @@ Ved gyldig sletting:
 
 - bare målelementet fjernes
 - `project.updatedAt` oppdateres
-- `selectedElementId` settes til `null`
-- høyremenyen lukkes gjennom eksisterende selection-avledning
+- `selectedElementId` nullstilles bare når målet var markert
+- en urelatert markering bevares
+- høyremenyen lukkes når det markerte elementet slettes
 
 Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen.
 
@@ -249,6 +256,9 @@ TypeScript: bestått
 Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
 produksjonsbuild: bestått
 Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.19 kB, gzip 71.23 kB
+bygget på 225 ms
 ```
 
 Manuelt godkjent:
@@ -261,16 +271,13 @@ Manuelt godkjent:
 - Delete under tekstredigering sletter bare tekst
 - Seksjonssletting lar andre elementer bli stående
 
-### Gjenstår før PR
+### Gjenstår
 
-1. Regenerer `architecture.json`.
-2. Regenerer `docs/dependency-graph.mmd`.
-3. Kontroller at bare forventede rapportfiler endres.
-4. Oppdater branch med rapportene gjennom kontrollert repoarbeid.
-5. Kontroller endelig diff og filstørrelser.
-6. Bekreft clean tree.
-7. Opprett og gjennomgå PR.
-8. Merge bare etter eksplisitt godkjenning.
+1. Hent siste statusdokumentasjon lokalt.
+2. Bekreft clean working tree.
+3. Kontroller PR #16 på siste head.
+4. Merge bare etter eksplisitt godkjenning.
+5. Etter merge: oppdater lokal `main` og kontroller clean tree.
 
 ### Ikke del av fasen
 
