@@ -5,15 +5,11 @@ import {
   type MouseEvent,
   type RefObject,
 } from 'react'
-import {
-  moveElementLayout,
-  resizeElementLayout,
-  type ElementLayout,
-} from '../../model/elementLayout'
-import type { CanvasPosition, EditorElement } from '../../model/editorProject'
-import { getImageCropSize } from '../../model/imagePresentation'
+import type { ElementLayout } from '../../model/elementLayout'
+import type { EditorElement } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
+import { useImageProperties } from '../../state/useImageProperties'
 import { useTextElementContent } from '../../state/useTextElementContent'
 import type { ViewportMode } from '../../types/editor'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
@@ -21,19 +17,13 @@ import {
   getAccessibleElementLabel,
   getCanvasElementKeyboardShortcuts,
 } from './canvasElementAccessibility'
+import { handleCanvasElementKeyDown } from './canvasElementKeyboard'
 import { EditorCanvasElementContent } from './EditorCanvasElementContent'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import { getTextElementCssStyle } from './getTextElementCssStyle'
 import { ImageResizeHandles } from './ImageResizeHandles'
 import type { TextEditFinishReason } from './TextElementEditor'
 import { useElementPointerTransform } from './useElementPointerTransform'
-
-const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
-  ArrowUp: { x: 0, y: -1 },
-  ArrowDown: { x: 0, y: 1 },
-  ArrowLeft: { x: -1, y: 0 },
-  ArrowRight: { x: 1, y: 0 },
-}
 
 type EditorCanvasElementProps = {
   element: EditorElement
@@ -62,6 +52,7 @@ export function EditorCanvasElement({
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
   const { commitElementDesktopLayout } = useElementLayout()
+  const { updateImageTransform } = useImageProperties()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
   const initialLayout: ElementLayout = {
@@ -107,61 +98,16 @@ export function EditorCanvasElement({
   const accessibleLabel = getAccessibleElementLabel(element)
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-
-      if (element.kind === 'text' && selected && !element.locked) {
-        onStartTextEditing(element.id)
-      } else {
-        onSelect(element.id)
-      }
-
-      return
-    }
-
-    if (event.key === ' ') {
-      event.preventDefault()
-      onSelect(element.id)
-      return
-    }
-
-    const direction = keyboardDirections[event.key]
-
-    if (!direction) {
-      return
-    }
-
-    event.preventDefault()
-    onSelect(element.id)
-
-    const canvas = canvasRef.current
-
-    if (element.locked || !canvas || canvas.clientWidth <= 0) {
-      return
-    }
-
-    const step = event.shiftKey ? 10 : 1
-    const delta = {
-      x: direction.x * step,
-      y: direction.y * step,
-    }
-    const maximumSize =
-      element.kind === 'image' && element.mode === 'crop'
-        ? getImageCropSize(element.assetMetadata, element.transform)
-        : undefined
-    const nextLayout =
-      event.ctrlKey || event.metaKey
-        ? resizeElementLayout(
-            element.kind,
-            initialLayout,
-            delta,
-            canvas.clientWidth,
-            'south-east',
-            maximumSize,
-          )
-        : moveElementLayout(initialLayout, delta, canvas.clientWidth)
-
-    commitElementDesktopLayout(element.id, nextLayout)
+    handleCanvasElementKeyDown(event, {
+      element,
+      selected,
+      initialLayout,
+      canvasWidth: canvasRef.current?.clientWidth ?? 0,
+      onSelect,
+      onStartTextEditing,
+      onCommitLayout: commitElementDesktopLayout,
+      onCommitImageTransform: updateImageTransform,
+    })
   }
 
   const handleDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -194,7 +140,7 @@ export function EditorCanvasElement({
         aria-keyshortcuts={
           isTextEditing
             ? undefined
-            : getCanvasElementKeyboardShortcuts(element.locked)
+            : getCanvasElementKeyboardShortcuts(element)
         }
         aria-pressed={isTextEditing ? undefined : selected}
         data-element-id={element.id}
