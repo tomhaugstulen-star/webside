@@ -44,32 +44,31 @@ Det utvikles aldri direkte på `main`.
 
 ```text
 main
-  -> avgrenset feature-branch
+  -> avgrenset feature- eller docs-branch
   -> låst omfang og design
-  -> implementering
-  -> framtidsrettet kodeaudit
-  -> npm run check
-  -> arkitekturrapporter
-  -> manuell kontroll
+  -> implementering eller dokumentendring
+  -> framtidsrettet audit
+  -> relevante kontroller
   -> dokumentasjon
   -> PR-kontroll
   -> eksplisitt mergegodkjenning
 ```
 
+Produksjonsbrancher følger normalt `npm run check` og oppdaterte arkitekturrapporter. Rene Markdown-brancher bruker normalt dokumentkontroll, `git diff --check` og bekreftet clean tree når ingen kode, konfigurasjon eller arkitekturrapporter er endret.
+
 ## Gjeldende status
 
-Siste funksjonelle merge til `main`:
-
 ```text
-b428cac  PR #16 – sikker sletting av elementer
-```
-
-```text
-GitHub-sak #15: lukket som fullført
-PR #16: merget
+base main for dokumentasjonsaudit: 56e2af7
+GitHub-sak: #18 Audit and synchronize project documentation
+branch: docs/project-documentation-audit
+siste funksjonelle merge: b428cac, PR #16
 prosjektskjema: versjon 4
-ingen ny produksjonsfase er valgt
+produksjonskode i auditfasen: uendret
+ny produksjonsfase: ikke valgt
 ```
+
+Dokumentasjonsauditen skal fullføres og merges før en ny produksjonsfase velges.
 
 ## Ferdig og merget til `main`
 
@@ -104,6 +103,20 @@ PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
 ```
 
+## Gjeldende venstremeny
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+Dette er dagens implementerte og gjeldende struktur.
+
+Alternative navn som `Filer`, `Alle farger`, `Fonts` og separat `Knapper` er ikke implementert eller vedtatt. De kan bare behandles som åpne framtidige produktbeslutninger.
+
 ## Fast ansvarsdeling
 
 ```text
@@ -116,13 +129,51 @@ Lerretet   = redigere tekst og transformere elementer
 
 `Logo og header` skal senere eie strukturelle headerdeler som logo, hovedtekst, undertittel og header-oppsett.
 
-## Frittstående tekstlenker
+## Høyremeny
 
-Tekstelementer bruker prosjektskjema versjon 4 og har obligatorisk lenkedata:
+Gjeldende oppførsel:
+
+```text
+Ingenting valgt -> ingen høyremeny
+Element valgt   -> høyremeny åpnes
+Tomt lerret     -> høyremeny lukkes
+```
+
+```text
+bredde: 320 px
+fra 1680 px: dokket
+under 1680 px: overlay fra høyre
+egen vertikal scrolling
+animasjon: 180 ms
+prefers-reduced-motion: animasjon deaktivert
+```
+
+Panelet leser valgt element fra autoritativ selection-state. Det eier ingen separat elementkopi og muterer ikke prosjektet direkte.
+
+## Prosjektmodell
+
+Gjeldende prosjektskjema er versjon 4.
+
+Historiske skjematrinn:
+
+```text
+versjon 2  tekstinnhold
+versjon 3  tekststil
+versjon 4  elementlenke, gjeldende
+```
+
+Tekstelementer har obligatorisk:
+
+```text
+content
+textStyle
+link
+```
+
+Lenken er enten:
 
 ```text
 none
-eller
 external-url { url, openInNewTab }
 ```
 
@@ -135,7 +186,7 @@ Regler:
 - lenken åpnes aldri i editormodus
 - enkeltord får ikke egne lenker
 
-Se `docs/ELEMENT_LINKS.md`.
+Se `docs/ELEMENT_MODEL.md`, `docs/TEXT_PROPERTIES.md` og `docs/ELEMENT_LINKS.md`.
 
 ## Sikker sletting
 
@@ -158,39 +209,10 @@ Regler:
 - Delete under tekstredigering påvirker bare teksten
 - bekreftet sletting fjerner bare målelementet
 - markeringen nullstilles bare når det slettede elementet var markert
-- høyremenyen lukkes etter sletting av det markerte elementet
 - sletting av Seksjon fjerner ikke visuelt overlappende elementer
 - dialogens `Escape` påvirker ikke et åpent verktøypanel
-- prosjektskjemaet forblir versjon 4
 
 Se `docs/ELEMENT_DELETION.md`.
-
-## Verifisert status for PR #16
-
-Brukeren kjørte kontroll etter de siste produksjonsrettelsene:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
-produksjonsbuild: bestått
-Vite: 64 moduler transformert
-CSS: 20.13 kB, gzip 4.60 kB
-JavaScript: 232.19 kB, gzip 71.23 kB
-bygget på 225 ms
-```
-
-Arkitekturrapportene ble regenerert fra den endelige produksjonskoden. Det fantes ingen GitHub Actions-run; den brukerbekreftede lokale kontrollen er verifikasjonsgrunnlaget.
-
-Manuelt godkjent:
-
-- alle fire sletteetiketter
-- plassering og disabled-tilstand
-- avbrytelse og Escape
-- sletting via knapp og Delete
-- tekstredigeringsgrensen
-- låsegrensen
-- flat Seksjon-modell
 
 ## State-grenser
 
@@ -207,8 +229,7 @@ Varig prosjektdata:
 Transient editor-state:
 
 - `selectedElementId`
-- aktiv pekerinteraksjon
-- layout-preview
+- aktiv pekerinteraksjon og layout-preview
 - aktiv tekstredigering og draft
 - lenkeskjemaets draft og status
 - slettedialogens mål og fokusreferanse
@@ -224,23 +245,24 @@ Transient state serialiseres ikke.
 - En fil deles tidligere når den får flere tydelige ansvar.
 - `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar.
 
-## Dokumentasjon
-
-Les i denne rekkefølgen:
+## Autoritativ dokumentrekkefølge
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/ELEMENT_DELETION.md`
-4. `docs/ELEMENT_LINKS.md`
-5. `docs/TEXT_PROPERTIES.md`
-6. `docs/RIGHT_PROPERTIES_PANEL.md`
-7. `docs/EDITOR_PLANNING.md`
-8. `docs/PROJECT_RULES.md`
-9. `docs/ELEMENT_MODEL.md`
-10. `docs/TEXT_BOX_EDITING.md`
-11. `docs/OBJECT_LOCKING.md`
-12. `docs/DRAG_RESIZE.md`
-13. `docs/ELEMENT_SELECTION.md`
-14. `docs/ELEMENT_CREATION.md`
-15. `docs/MOBILE_DESIGN_CONTROLS.md`
-16. `docs/CODE_AUDIT.md`
+3. `docs/EDITOR_PLANNING.md`
+4. `docs/PROJECT_RULES.md`
+5. `README.md`
+6. `docs/ELEMENT_DELETION.md`
+7. `docs/ELEMENT_LINKS.md`
+8. `docs/TEXT_PROPERTIES.md`
+9. `docs/RIGHT_PROPERTIES_PANEL.md`
+10. `docs/ELEMENT_MODEL.md`
+11. `docs/TEXT_BOX_EDITING.md`
+12. `docs/OBJECT_LOCKING.md`
+13. `docs/DRAG_RESIZE.md`
+14. `docs/ELEMENT_SELECTION.md`
+15. `docs/ELEMENT_CREATION.md`
+16. `docs/MOBILE_DESIGN_CONTROLS.md`
+17. `docs/CODE_AUDIT.md`
+
+Hoveddokumentene er autoritative for gjeldende prosjektstatus. Fasedokumentene er autoritative for den historiske implementeringsgrensen og de tekniske beslutningene i sin fase.
