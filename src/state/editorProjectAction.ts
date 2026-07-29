@@ -80,3 +80,10 @@ export type EditorProjectAction =
       transform: ImageTransform
       updatedAt: string
     }
+  | {
+      type: 'set-image-desktop-frame'
+      elementId: string
+      layout: ElementLayout
+      transform: ImageTransform
+      updatedAt: string
+    }
