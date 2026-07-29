@@ -1,37 +1,57 @@
 # Sikker sletting av elementer
 
-Dette dokumentet er autoritativ spesifikasjon for den avgrensede slettefasen.
-
-Branch:
+Dette dokumentet er autoritativ spesifikasjon og verifikasjonslogg for den avgrensede slettefasen.
 
 ```text
-feature/element-deletion
+branch: feature/element-deletion
+base main: f71b354
+GitHub-sak: #15
+produksjonscommit: 4f59b3e feat: add safe element deletion
+PR: ikke opprettet
 ```
 
-Sporing:
+## Status
 
-```text
-GitHub-sak #15
-```
+Slettefunksjonen er implementert, statisk auditert, kompilert og manuelt godkjent.
 
-Base:
+Gjenstår før PR:
 
-```text
-main ved mergecommit f71b354
-```
+1. regenerere `architecture.json`
+2. regenerere `docs/dependency-graph.mmd`
+3. kontrollere den endelige branch-diffen
+4. bekrefte clean working tree
+5. opprette og kontrollere PR
 
-## Mål
+Det skal ikke merges uten eksplisitt brukergodkjenning.
 
-Gjør det mulig å slette ett markert element på en kontrollert måte uten å blande inn angre/gjør om, papirkurv, multisletting eller andre editorfunksjoner.
+## Omfang
 
-Første leveranse gjelder alle eksisterende elementtyper:
+Første leveranse gjelder ett markert element av typen:
 
 - Seksjon
 - Bilde
 - Tekst
 - Knapp
 
-## Fast plassering i høyremenyen
+Følgende er ikke del av fasen:
+
+- angre/gjør om
+- papirkurv eller gjenoppretting
+- multisletting
+- dra til papirkurv
+- sletting av side eller prosjekt
+- automatisk sletting av visuelt overlappende elementer
+- foreldre-/barnemodell for Seksjon
+- duplisering
+- historikk eller lagring
+- bildeimport
+- knappbibliotek
+- farger
+- forhåndsvisning eller publisering
+
+Prosjektskjemaet forblir versjon 4.
+
+## Plassering i høyremenyen
 
 Slettehandlingen ligger i høyremenyens eksisterende `Element`-seksjon, rett under statusboksen.
 
@@ -43,7 +63,7 @@ Status: Ulåst
 Slett seksjon
 ```
 
-Etikettnavn følger elementtypen:
+Etiketten følger elementtypen:
 
 ```text
 Slett seksjon
@@ -52,22 +72,20 @@ Slett tekstboks
 Slett knapp
 ```
 
-Knappen skal:
+Knappen:
 
-- ligge i vanlig dokumentflyt
-- ikke være festet nederst i panelet
-- ha samme bredde som statusboksen
-- kreve ingen scrolling i dagens panel
-- bruke rød tekst og rød ramme
-- ikke bruke helrød bakgrunn i normaltilstand
-- ha tydelig hover-, focus-visible- og disabled-tilstand
-- være deaktivert når elementet er låst
+- ligger i vanlig dokumentflyt
+- er ikke festet nederst i panelet
+- har samme bredde som statusboksen
+- krever ingen scrolling i dagens panel
+- bruker rød tekst og rød ramme
+- har hover-, focus-visible- og disabled-tilstand
+- er deaktivert når elementet er låst
+- viser en forklaring om at elementet må låses opp
 
 ## Bekreftelsesdialog
 
-Sletting skal alltid kreve eksplisitt bekreftelse fordi angre/gjør om ikke finnes ennå.
-
-Eksempel:
+Sletting krever alltid eksplisitt bekreftelse fordi angre/gjør om ikke finnes ennå.
 
 ```text
 Slett tekstboksen?
@@ -77,162 +95,161 @@ Dette kan ikke angres.
 Avbryt    Slett
 ```
 
-Dialogen skal:
+Dialogen:
 
-- bruke riktig elementnavn
-- ha tydelig tittel og konsekvensmelding
-- ha `Avbryt` som trygg handling
-- ha `Slett` som destruktiv handling
-- støtte `Escape` for avbrytelse
-- holde tastaturfokus innenfor dialogen mens den er åpen
-- returnere fokus til utløseren ved avbrytelse når den fortsatt finnes
-- lukke etter vellykket sletting
-- ikke mutere prosjektet ved avbrytelse
-- kontrollere nyeste state ved bekreftelse
-
-Dersom elementet er blitt låst, fjernet eller ikke lenger ligger på aktiv side mens dialogen er åpen, skal bekreftelsen avvises uten prosjektmutasjon.
+- bruker riktig elementnavn
+- bruker native modal `<dialog>`
+- fokuserer `Avbryt` først
+- støtter `Escape`
+- lukker ved klikk på bakgrunnen
+- returnerer fokus til utløseren ved avbrytelse når den fortsatt finnes
+- muterer ikke prosjektet ved avbrytelse
+- kontrollerer nyeste state før bekreftelse
+- deaktiverer `Slett` dersom elementet er blitt låst eller fjernet
+- lukker etter godkjent sletting
 
 ## Tastatur
 
-`Delete` skal åpne den samme bekreftelsesdialogen for markert element.
+`Delete` åpner den samme bekreftelsesdialogen for markert, ulåst element.
 
-Global tastatursletting skal ikke aktiveres når fokus er i eller på:
+Global tastatursletting blokkeres når fokus er i eller på:
 
 - `input`
 - `textarea`
 - `select`
 - `button`
-- dialogkontroller
-- innhold med `contenteditable`
-- aktiv tekstredigering på lerretet
-- andre interaktive skjemaelementer
+- aktiv lenke
+- `dialog`
+- `role="dialog"`
+- `contenteditable`
+- områder merket med `data-prevent-element-deletion-shortcut`
 
-`Backspace` skal ikke være en global slettehandling i første leveranse.
+Ytterligere grenser:
 
-Når dialogen er åpen, håndterer dialogen tastaturet. En ny global `Delete` skal ikke åpne flere dialoger.
+- gjentatte keydown-hendelser ignoreres
+- IME-komposisjon ignoreres
+- modifikatortaster sammen med `Delete` ignoreres
+- `Backspace` brukes ikke som global slettehandling
+- Delete under tekstredigering sletter tekst, ikke elementet
 
 ## Elementmodell og Seksjon
 
-Prosjektmodellen er foreløpig flat:
+Prosjektmodellen er flat:
 
 ```text
 page.elements: EditorElement[]
 ```
 
-En `Seksjon` eier derfor ikke tekst, bilde eller andre elementer som ligger visuelt over den.
+En Seksjon eier derfor ikke elementer som ligger visuelt over den.
 
-Konsekvens:
+Sletting av Seksjon:
 
-- sletting av Seksjon fjerner bare seksjonselementet
-- andre elementer blir stående
-- ingen geometrisk trefftesting brukes for å finne «innhold i seksjonen»
-- foreldre-/barnemodell bygges ikke i denne fasen
+- fjerner bare seksjonselementet
+- lar tekst, bilde, knapp og andre elementer bli stående
+- bruker ikke geometrisk trefftesting
+- innfører ikke foreldre-/barnemodell
 
 ## State og reducer
 
-Legg til én eksplisitt prosjekt-handling for sletting av element fra aktiv side.
-
-Forventet handlingsdata:
+Prosjekthandlingen er:
 
 ```text
-type: delete-element-from-active-page
-elementId
-updatedAt
+delete-element-from-active-page {
+  elementId
+  updatedAt
+}
 ```
 
-Reducergrensen skal avvise:
+Reducergrensen avviser:
 
 - manglende aktiv side
 - manglende element
-- element som ikke ligger på aktiv side
+- element utenfor aktiv side
 - låst element
-- ugyldig eller utdatert handling
+- ugyldig eller utdatert mål
 - no-op-overgang
 
 Ved gyldig sletting:
 
 - bare målelementet fjernes fra aktiv sides `elements`
-- andre sider og elementer bevares referensielt der det er mulig
-- `project.updatedAt` settes til handlingens tidsstempel
-- `selectedElementId` settes til `null` når det slettede elementet var markert
+- øvrige sider og elementer bevares
+- `project.updatedAt` settes fra handlingen
+- `selectedElementId` settes til `null` når målet var markert
 - høyremenyen lukkes gjennom eksisterende selection-avledning
 
-Sletting skal ikke endre prosjektskjemaet. Skjemaversjon 4 beholdes.
+Dialogstate, mål-ID og fokusreferanse er transient editor-state og lagres ikke i prosjektet.
 
-## UI-state
+## Implementert arkitektur
 
-Følgende er transient editor-state og skal ikke lagres i prosjektet:
+Nye avgrensede ansvar:
 
-- om dialogen er åpen
-- hvilket element som venter på bekreftelse
-- utløserens fokusreferanse
-- dialogens feil- eller statusmelding
+```text
+src/state/deleteElementFromActivePage.ts
+src/state/useElementDeletion.ts
+src/components/properties/DeleteElementSection.tsx
+src/components/dialogs/ConfirmElementDeletionDialog.tsx
+src/components/editor/isElementDeletionShortcutTarget.ts
+src/components/editor/useElementDeletionShortcut.ts
+src/styles/element-deletion.css
+```
 
-Prosjektet muteres først når brukeren bekrefter og reduceren godtar nyeste state.
+Integrasjon:
 
-## Arkitektur
+```text
+src/state/editorProjectAction.ts
+src/state/editorProjectReducer.ts
+src/components/editor/EditorShell.tsx
+src/components/properties/RightPropertiesPanel.tsx
+src/components/canvas/canvasElementAccessibility.ts
+src/App.css
+```
 
-Forventet ansvarsdeling:
+`EditorCanvasElement.tsx` er urørt av sletteimplementasjonen.
 
-- `state` — egen reducerhjelper for sletting
-- `state` — egen dispatch-hook
-- `properties` — liten sletteseksjon under elementstatus
-- `dialog` — avgrenset bekreftelsesdialog
-- `keyboard` — global Delete-grense uten å forstyrre redigering
-- `RightPropertiesPanel` — komposisjon, ikke sletteregler
+Alle nye kildefiler er under aktiv 250-linjersgrense. Den største nye TSX-filen er 113 linjer.
 
-`EditorCanvasElement.tsx` skal ikke få sletteansvaret. Filen ligger nær aktiv størrelsesgrense og skal ikke få flere nye ansvarsområder.
+## Verifisert kvalitetskontroll
 
-Alle nye kildefiler skal være under aktiv 250-linjersgrense og ha ett tydelig ansvar.
+Brukeren kjørte `npm run check` etter produksjonscommit `4f59b3e`.
 
-## Tilgjengelighet
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.13 kB, gzip 71.21 kB
+bygget på 168 ms
+```
 
-- sletteknappen skal være en ekte `button`
-- disabled-tilstand skal være semantisk og visuelt tydelig
-- dialogen skal ha tilgjengelig navn og beskrivelse
-- focus-visible skal være tydelig
-- `Escape` avbryter
-- tastaturrekkefølgen skal være forutsigbar
-- destruktiv handling skal ikke være eneste eller første ufrivillige fokusmål
-- skjermleser skal få riktig elementnavn i dialogen
+Ingen GitHub Actions-run var knyttet til commiten. Den brukerbekreftede lokale kontrollen er derfor verifikasjonsgrunnlaget.
 
-## Ikke del av denne branchen
+## Manuelt godkjent
 
-- angre/gjør om
-- papirkurv eller gjenoppretting
-- multisletting
-- dra til papirkurv
-- sletting av side eller prosjekt
-- automatisk sletting av visuelt overlappende elementer
-- foreldre-/barnemodell for Seksjon
-- duplisering
-- historikksystem
-- lokal lagring eller autosave
-- bildeimport
-- knappbibliotek
-- fargesystem
-- forhåndsvisning eller publisering
+Brukeren har godkjent:
 
-## Akseptansekriterier
-
-- markert ulåst Seksjon, Bilde, Tekst eller Knapp viser korrekt sletteknapp
-- knappen ligger rett under statusboksen
-- låst element kan inspiseres, men sletteknappen er deaktivert
-- klikk åpner riktig bekreftelsesdialog
-- `Delete` åpner samme dialog
-- `Delete` forstyrrer ikke tekst- eller skjemaredigering
-- `Backspace` gjør ingenting globalt
-- `Avbryt` muterer ikke prosjektet
-- bekreftet sletting fjerner bare målelementet
-- Seksjonssletting fjerner ikke andre elementer
-- markering nullstilles når valgt element slettes
+- riktig sletteetikett for alle fire elementtyper
+- riktig plassering rett under statusboksen
+- avbrytelse uten mutasjon
+- `Escape` uten mutasjon
+- bekreftet sletting via høyremenyen
 - høyremenyen lukkes etter sletting
-- låste, manglende og utdaterte mål avvises i reduceren
-- `updatedAt` endres bare ved faktisk sletting
-- prosjektskjemaet forblir versjon 4
-- eksisterende oppretting, flytting, resizing, låsing, tekst, stil og lenker fungerer som før
-- alle nye kildefiler følger ansvars- og størrelsesreglene
-- `npm run check` består
+- ingen andre elementer slettes
+- `Delete` åpner samme dialog
+- låst element viser deaktivert knapp
+- `Delete` gjør ingenting på låst element
+- `Delete` under tekstredigering påvirker bare teksten
+- sletting av Seksjon lar visuelt overlappende elementer bli stående
+
+## Akseptansestatus
+
+Alle funksjonelle akseptansekriterier er oppfylt.
+
+Følgende prosesskriterier gjenstår:
+
 - arkitekturrapportene regenereres
-- PC, Telefon, peker og tastatur kontrolleres
-- working tree er clean før PR
+- dokumentasjonsendringene hentes lokalt
+- working tree bekreftes clean etter rapportene
+- PR opprettes og kontrolleres
+- merge skjer bare etter eksplisitt godkjenning
