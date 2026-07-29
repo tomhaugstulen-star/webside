@@ -2,7 +2,20 @@
 
 Dette dokumentet beskriver den framtidsrettede auditen av fase 11A og grensene som skal beskytte senere lagring, import, historikk og responsive utvidelser.
 
-## 1. Arkitekturretning
+## 1. Leveransestatus
+
+```text
+fase: 11A – bildeimport, ramme og utsnitt
+GitHub-sak: #25 – lukket som fullført
+PR: #26 – merget
+mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
+prosjektskjema: versjon 6
+sluttaudit: ferdig
+arkitekturrapporter: regenerert etter sluttaudit, ingen diff
+lokal main: synkronisert og clean
+```
+
+## 2. Arkitekturretning
 
 - `App.tsx` setter sammen providers og editorskall.
 - `EditorShell` eier skalltilstand og hovedkomposisjon.
@@ -13,7 +26,7 @@ Dette dokumentet beskriver den framtidsrettede auditen av fase 11A og grensene s
 - responsive verdier lagres i prosjektmodellen, ikke i DOM-en.
 - generelle samlemapper og samlefiler skal ikke innføres.
 
-## 2. Filgrenser etter sluttaudit
+## 3. Filgrenser etter sluttaudit
 
 ```text
 EditorCanvasElement.tsx: under 200 linjer
@@ -27,9 +40,9 @@ alle berørte kildefiler: under 250 linjer
 
 250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense.
 
-## 3. State- og reducergrenser
+## 4. State- og reducergrenser
 
-Prosjektskjemaet i leveransen er versjon 6.
+Prosjektskjemaet er versjon 6.
 
 Reducerhandlinger avviser:
 
@@ -51,7 +64,7 @@ Ved avvisning returneres samme state. Prosjektet og `updatedAt` endres ikke.
 
 Transient markering, pekerøkter, preview, drafts, panelstate, filvelger, `File`, Object URL, fokus, hover, feedback og dialogstate serialiseres ikke.
 
-## 4. Auditfunn og rettelser
+## 5. Auditfunn og rettelser
 
 ### Funn 1: dupliserte størrelseskonstanter
 
@@ -108,13 +121,13 @@ Alle åtte grep og treffområder ligger innenfor rammen. Selection-outline ligge
 
 ### Funn 11: crop-geometri var koblet til en senere endringsbar standardstørrelse
 
-Crop-grunnrammen for skjemaversjon 6 er nå eksplisitt låst til 240 × 160 px. Senere endring av standardstørrelsen for nye bilder kan derfor ikke endre utsnitt i eksisterende versjon-6-prosjekter.
+Crop-grunnrammen for skjemaversjon 6 er eksplisitt låst til 240 × 160 px. Senere endring av standardstørrelsen for nye bilder kan derfor ikke endre utsnitt i eksisterende versjon-6-prosjekter.
 
 En annen crop-grunnmodell krever ny skjemaversjon og migrering.
 
 ### Funn 12: filstørrelse begrenset ikke dekodet minnebruk
 
-Import avviser nå bilder som overstiger:
+Import avviser bilder som overstiger:
 
 ```text
 10 MB filstørrelse
@@ -128,7 +141,7 @@ Samme dimensjonsregler inngår i metadata-valideringen i modellaget.
 
 `ImageImportControl` bruker en monteringsreferanse. Etter unmount opprettes ingen ressurs, intet element og ingen lokal state-oppdatering.
 
-## 5. Ressurslivssyklus
+## 6. Ressurslivssyklus
 
 Prosjektmodell:
 
@@ -146,7 +159,7 @@ Ressurslager:
 - fjerner ressurs ved mislykket elementoppretting
 - fjerner ressurs ved sletting når asset ikke deles
 
-## 6. Bildegeometri
+## 7. Bildegeometri
 
 - `contain` skalerer hele motivet proporsjonalt og sentrerer det.
 - `crop` bruker fast versjon-6-grunnskala, zoom og normalisert offset.
@@ -159,7 +172,7 @@ Ressurslager:
 - pekertransform bruker transient preview og én commit.
 - `pointercancel` og tapt capture forkaster draft.
 
-## 7. Tilgjengelighet
+## 8. Tilgjengelighet
 
 - eksplisitt label og hjelpetekst for alt-tekst
 - tom alt-tekst er gyldig for dekorative bilder
@@ -172,7 +185,7 @@ Ressurslager:
 - canvas-label beskriver relevante snarveier
 - `prefers-reduced-motion` respekteres
 
-## 8. Verifisert sluttkontroll
+## 9. Verifisert sluttkontroll
 
 Brukerens lokale terminaloutput etter siste produksjonsendring:
 
@@ -186,9 +199,11 @@ JavaScript: 258.38 kB, gzip 78.09 kB
 produksjonsbuild: bestått på 185 ms
 ```
 
-Manuell kontroll er godkjent for import, validering, lagrekkefølge, ramme, crop, zoom, tastatur, låsing, sletting, fallback, PC og Telefon.
+Manuell kontroll ble godkjent for import, validering, lagrekkefølge, ramme, crop, zoom, tastatur, låsing, sletting, fallback, PC og Telefon.
 
-## 9. Obligatoriske grenser for senere faser
+Arkitekturrapportene ble regenerert etter sluttauditen. `architecture.json` og `docs/dependency-graph.mmd` fikk ingen diff, fordi de siste sikkerhetsrettelsene ikke endret modul- eller avhengighetsstrukturen.
+
+## 10. Obligatoriske grenser for senere faser
 
 ### Prosjektimport
 
@@ -217,11 +232,17 @@ Manuell kontroll er godkjent for import, validering, lagrekkefølge, ramme, crop
 - reager bare på gyldige prosjektmutasjoner
 - ikke lagre transient editor- eller ressursstate direkte
 
-## 10. Gjenstående før merge
+## 11. Auditkonklusjon
 
-- regenerer `architecture.json` og `docs/dependency-graph.mmd`
-- kontroller at bare rapportene endres
-- commit og push rapportene
-- trekk og kontroller alle dokumentendringer lokalt
-- kontroller `git diff --check`, clean tree, PR-head, mergebarhet, reviews og CI
-- merge bare etter eksplisitt brukergodkjenning
+Fase 11A ble merget etter:
+
+- framtidsrettet statisk audit av alle endrede produksjonsfiler
+- bestått `npm run check`
+- godkjent manuell PC- og Telefon-test
+- clean og synkronisert feature-branch
+- kontrollerte arkitekturrapporter
+- oppdatert autoritativ dokumentasjon
+- kontrollert PR-head, mergebarhet, changed files, reviews og CI-status
+- eksplisitt brukergodkjenning
+
+Ingen kjent statisk blokkerer gjenstår fra fase 11A. Neste produksjonsfase skal starte på en ny branch fra oppdatert `main` og følge grensene i dette dokumentet.
