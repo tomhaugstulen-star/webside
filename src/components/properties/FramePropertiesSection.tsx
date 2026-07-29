@@ -11,13 +11,9 @@ type FramePropertiesSectionProps = {
   element: SectionEditorElement
 }
 
-const frameWidthLabels = {
-  0: 'Ingen',
-  1: '1 px',
-  2: '2 px',
-  3: '3 px',
-  4: '4 px',
-} as const
+function getFrameWidthLabel(width: number) {
+  return width === 0 ? 'Ingen' : `${width} px`
+}
 
 export function FramePropertiesSection({
   element,
@@ -50,7 +46,7 @@ export function FramePropertiesSection({
           >
             {sectionFrameWidths.map((width) => (
               <option key={width} value={width}>
-                {frameWidthLabels[width]}
+                {getFrameWidthLabel(width)}
               </option>
             ))}
           </select>
