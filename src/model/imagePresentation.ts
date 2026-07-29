@@ -1,5 +1,5 @@
 import {
-  getDefaultElementSize,
+  IMAGE_CROP_BASE_FRAME_SIZE_V6,
   type ElementSize,
 } from './elementDimensions'
 import type { ImageAssetMetadata } from './imageAsset'
@@ -24,8 +24,6 @@ export type ImageRenderLayout = {
   height: number
 }
 
-const DEFAULT_IMAGE_FRAME_SIZE = getDefaultElementSize('image')
-
 export const DEFAULT_IMAGE_MODE: ImageMode = 'contain'
 export const DEFAULT_IMAGE_TRANSFORM: ImageTransform = {
   zoom: MIN_IMAGE_ZOOM,
@@ -39,8 +37,8 @@ function clamp(value: number, minimum: number, maximum: number) {
 
 function getBaseCropScale(metadata: ImageAssetMetadata) {
   return Math.max(
-    DEFAULT_IMAGE_FRAME_SIZE.width / metadata.width,
-    DEFAULT_IMAGE_FRAME_SIZE.height / metadata.height,
+    IMAGE_CROP_BASE_FRAME_SIZE_V6.width / metadata.width,
+    IMAGE_CROP_BASE_FRAME_SIZE_V6.height / metadata.height,
   )
 }
 
