@@ -5,9 +5,14 @@ export type ElementSize = {
   height: number
 }
 
+export const IMAGE_CROP_BASE_FRAME_SIZE_V6 = {
+  width: 240,
+  height: 160,
+} as const satisfies ElementSize
+
 const defaultElementSizes: Record<ElementKind, ElementSize> = {
   section: { width: 320, height: 180 },
-  image: { width: 240, height: 160 },
+  image: { ...IMAGE_CROP_BASE_FRAME_SIZE_V6 },
   text: { width: 240, height: 96 },
   button: { width: 160, height: 48 },
 }
