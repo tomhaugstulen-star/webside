@@ -1,32 +1,31 @@
 # Ren tekstredigering
 
-Dette dokumentet beskriver første stabile tekstredigering i Website-editoren.
+Dette dokumentet beskriver den første stabile tekstredigeringsfasen i Website-editoren.
 
 ## Status
 
-Branch:
-
 ```text
-feature/text-box-editing
+branch: feature/text-box-editing
+PR: #7 – merget
+mergecommit: c729d33
+skjemaversjon innført i fasen: 2
 ```
 
-Merget som PR #7 med merge-commit:
+Fasen er ferdig, kodeauditert, kontrollert på PC og Telefon og merget til `main`.
 
-```text
-c729d33
-```
+Skjemaversjon 2 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 4.
 
-Fasen er ferdig, kodeauditert, kontrollert på PC og Telefon og ligger på `main`.
+## Historisk omfang
 
-## Omfang
+Fasen bygde ren flerlinjet tekst i tekstbokser. Den bygde ikke fontvelger, fontstørrelse, farge, fet, kursiv, markert tekstformatering, høyremeny, historikk, lagring eller mobile overstyringer.
 
-Fasen bygger bare ren flerlinjet tekst i tekstbokser. Den bygger ikke fontvelger, fontstørrelse, farge, fet, kursiv, markert tekstformatering, høyremeny, historikk, lagring eller mobile overstyringer.
+Flere av disse funksjonene ble senere implementert i egne avgrensede faser. Avgrensningen over beskriver bare hva `feature/text-box-editing` leverte.
 
 ## Prosjektmodell
 
-Prosjektskjemaet er økt fra versjon 1 til versjon 2 fordi den serialiserbare elementformen er endret.
+Fasen økte prosjektskjemaet fra versjon 1 til versjon 2 fordi den serialiserbare elementformen fikk tekstinnhold.
 
-`EditorElement` er en diskriminert union. Bare tekstobjekter har:
+`EditorElement` ble en diskriminert union. Bare tekstobjekter fikk:
 
 ```ts
 kind: 'text'
@@ -41,7 +40,7 @@ content: ''
 
 Tom tekst er gyldig prosjektdata. Teksten **Dobbeltklikk for å skrive** er bare en editor-placeholder og lagres aldri som innhold.
 
-Det finnes foreløpig ingen lagring eller import. Skjemamigrering bygges derfor først sammen med prosjektåpning og import.
+Prosjektskjemaet ble senere utvidet med `textStyle` i versjon 3 og `link` i gjeldende versjon 4.
 
 ## Objektmarkering og redigeringsmodus
 
@@ -76,7 +75,7 @@ Vanlig `Enter` lager en ny linje. Linjeskift normaliseres til `\n` ved prosjektc
 
 Etter eksplisitt commit eller avbryt går fokus tilbake til tekstobjektet. Etter blur beholdes fokuset på kontrollen brukeren klikket på.
 
-Denne blurregelen skal gjenbrukes av høyremenyen: klikk i panelet committer aktiv tekstdraft uten å opprette en separat draft eller miste markeringen.
+Blurregelen gjenbrukes av den senere implementerte høyremenyen: klikk i panelet committer aktiv tekstdraft uten å opprette en separat draft eller miste markeringen.
 
 ## Prosjektcommit
 
@@ -109,19 +108,19 @@ Mens tekst redigeres:
 - piltaster brukes av tekstfeltet
 - vanlig `Enter` lager ny linje
 
-Teksten klippes av tekstboksens eksisterende elementgrense. Boksen vokser ikke automatisk med innholdet i denne fasen.
+Teksten klippes av tekstboksens elementgrense. Boksen vokser ikke automatisk med innholdet.
 
 ## PC og Telefon
 
 Tekstinnhold er felles elementdata for PC og Telefon. Det er ikke en responsiv verdi.
 
-Begge visninger viser samme tekst. Geometrien følger fortsatt den midlertidige desktop-arven som er dokumentert i `docs/MOBILE_DESIGN_CONTROLS.md`.
+Begge visninger viser samme tekst. Geometrien følger den midlertidige desktop-arven som er dokumentert i `docs/MOBILE_DESIGN_CONTROLS.md`.
 
 ## Arkitektur
 
-Ansvar er delt slik:
+Ansvar ble delt slik:
 
-- `src/model/editorProject.ts` — diskriminert elementunion og skjema versjon 2
+- `src/model/editorProject.ts` — diskriminert elementunion og historisk skjema versjon 2
 - `src/model/createEditorElement.ts` — tomt standardinnhold for nye tekstbokser
 - `src/state/setTextElementContent.ts` — ren validert state-overgang
 - `src/state/useTextElementContent.ts` — UI-API og tidspunkt
@@ -132,11 +131,11 @@ Ansvar er delt slik:
 - `src/components/canvas/canvasElementAccessibility.ts` — tilgjengelige navn og snarveier
 - `src/styles/canvas.css` — ren tekstvisning og editorstil
 
-Alle berørte TypeScript- og TSX-filer er under den aktive 250-linjersgrensen.
+Alle berørte TypeScript- og TSX-filer var under den aktive 250-linjersgrensen i denne fasen.
 
-## Bekreftet test
+## Verifisert før merge
 
-Brukeren har bekreftet:
+Brukeren bekreftet:
 
 - `npm run check` bestått
 - flerlinjet tekst beholdes etter blur og ny redigeringsøkt
@@ -151,14 +150,8 @@ Brukeren har bekreftet:
 
 Arkitekturrapportene ble regenerert og inkludert før PR #7 ble merget.
 
-## Neste fase
+## Historisk videreføring
 
-Gjeldende fase er høyremenyens grunnstruktur:
+Den neste planlagte fasen etter tekstredigering var høyremenyens grunnstruktur i `feature/right-properties-panel`. Denne fasen ble senere implementert og merget som PR #9.
 
-```text
-feature/right-properties-panel
-```
-
-Denne branchen skal bare bygge et stabilt inspeksjonspanel basert på valgt element. Font- og riktekstkontroller bygges deretter i en egen branch.
-
-Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+Tekstegenskaper og elementlenker ble deretter implementert i egne faser. Se `docs/RIGHT_PROPERTIES_PANEL.md`, `docs/TEXT_PROPERTIES.md` og `docs/ELEMENT_LINKS.md`.

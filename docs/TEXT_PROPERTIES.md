@@ -1,12 +1,23 @@
 # Tekstegenskaper for vanlige tekstbokser
 
-Dette dokumentet er autoritativ spesifikasjon og implementasjonsstatus for fase 8.
+Dette dokumentet er autoritativ spesifikasjon og historisk verifikasjonslogg for fase 8.
 
 ```text
 branch: feature/text-properties
 base main: 8de5f2e
 GitHub-sak: #10
+PR: #11 – merget
+mergecommit: 452b491
+skjemaversjon innført i fasen: 3
 ```
+
+## Status
+
+Fasen er implementert, auditert, kontrollert og merget til `main` gjennom PR #11.
+
+Skjemaversjon 3 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 4.
+
+Tidligere «Status før PR»-formuleringer beskrev branchens tilstand før PR #11 og er ikke gjeldende prosjektstatus.
 
 ## Fast UX-regel
 
@@ -16,7 +27,7 @@ Høyremeny  = egenskaper for markert element
 Lerretet   = redigere selve teksten
 ```
 
-`Elementer -> Tekst` oppretter en vanlig fri tekstboks og markerer den automatisk. Selve tekstinnholdet redigeres bare direkte på lerretet. Høyremenyen har ikke et ekstra tekstfelt.
+`Elementer -> Tekst` oppretter en vanlig fri tekstboks og markerer den automatisk. Tekstinnholdet redigeres bare direkte på lerretet. Høyremenyen har ikke et ekstra tekstfelt.
 
 ## Implementert høyremeny
 
@@ -38,7 +49,7 @@ Element
 Status: Ulåst
 ```
 
-Formateringen gjelder hele tekstboksen. Det finnes ikke riktekst eller tegnbasert formatering. Andre elementtyper åpner fortsatt høyremenyen, men viser ikke `Tekstutseende`.
+Formateringen gjelder hele tekstboksen. Det finnes ikke riktekst eller tegnbasert formatering. Andre elementtyper åpner høyremenyen uten `Tekstutseende`.
 
 ## Kontrollerte verdier
 
@@ -90,9 +101,9 @@ linjehøyde: 1.45
 
 ## Prosjektmodell
 
-Prosjektskjemaet er økt fra versjon 2 til versjon 3.
+Denne fasen økte prosjektskjemaet fra versjon 2 til versjon 3.
 
-Bare `kind: 'text'` har obligatorisk `textStyle`:
+Bare `kind: 'text'` fikk obligatorisk `textStyle`:
 
 ```text
 fontFamily
@@ -105,6 +116,8 @@ lineHeight
 
 Tekststil er varig prosjektdata og er foreløpig felles for PC og Telefon. Nye tekstbokser får en egen kopi av standardstilen.
 
+Prosjektskjemaet ble senere økt til gjeldende versjon 4 i lenkefasen.
+
 ## Reducer og validering
 
 Hver brukerhandling sender én avgrenset stilpatch. Reduceren bruker nyeste autoritative state og avviser:
@@ -114,29 +127,24 @@ Hver brukerhandling sender én avgrenset stilpatch. Reduceren bruker nyeste auto
 - andre elementtyper enn `text`
 - låst tekstelement
 - ugyldige eller ukjente stilverdier
-- patch med null, array, ukjent nøkkel eller flere egenskaper
+- patch med `null`, array, ukjent nøkkel eller flere egenskaper
 - patch som ikke gir en reell endring
 
 `project.updatedAt` endres bare ved en gyldig, faktisk stilendring.
 
-Runtime-validatoren er trygg mot utypede data og bruker et uttømmende validatorregister. TypeScript krever derfor at framtidige felt i `TextElementStyle` også får validering.
+Runtime-validatoren er trygg mot utypede data og bruker et uttømmende validatorregister.
 
 ## Låste elementer
 
 Et låst tekstelement kan markeres og inspiseres. Tekstkontrollene viser gjeldende verdier, men er deaktivert. Reduceren håndhever låsen uavhengig av UI-et.
 
-Opplåsing skjer fortsatt gjennom det eksisterende objektverktøyet.
-
 ## Tekstredigering og rendering
 
 Klikk på en kontroll under aktiv tekstredigering bruker eksisterende blur/commit før stilendringen. Høyremenyen har ingen separat tekstdraft eller tekststilkopi.
 
-Samme avledede stil legges på tekstelementets overordnede DOM-element og arves av:
+Samme avledede stil legges på tekstelementets overordnede DOM-element og arves av vanlig tekstvisning og aktivt `textarea`.
 
-- vanlig tekstvisning
-- aktivt `textarea`
-
-Det finnes ikke separate hardkodede fontstørrelser eller linjehøyder som gir hopp mellom visning og redigering. Placeholder er editor-UI og lagres ikke.
+Placeholder er editor-UI og lagres ikke.
 
 ## Godkjent fokusoppførsel
 
@@ -146,36 +154,25 @@ Når fokus flyttes fra lerretet til høyremenyen:
 - høyremenyen fortsetter å vise og endre samme element
 - den blå markeringsrammen på lerretet kan forsvinne visuelt
 
-Denne oppførselen er eksplisitt godkjent og skal ikke rettes i denne branchen.
+Denne oppførselen er eksplisitt godkjent.
 
 ## Arkitektur
 
-Ansvarsdelingen er implementert slik:
+Implementert ansvarsdeling:
 
 - `src/model/textElementStyle.ts` — tokens, typer, standardverdier og runtime-validering
 - `src/state/setTextElementStyle.ts` — validert prosjektmutasjon
 - `src/state/useTextElementStyle.ts` — liten dispatch-hook
-- `src/state/editorProjectAction.ts` — uttømmende action-union uten å blåse opp reducerfilen
+- `src/state/editorProjectAction.ts` — uttømmende action-union
 - `src/components/properties/TextPropertiesSection.tsx` — presentasjonskontroller
 - `src/components/canvas/getTextElementCssStyle.ts` — fonttoken og stil til CSS
 - `RightPropertiesPanel` — komposisjon, ikke egen tekststate
 
-Alle nye kildefiler er under 250 linjer. `EditorCanvasElement.tsx` er 244 linjer og skal ikke få flere nye ansvarsområder; senere canvaslogikk må trekkes ut.
+Alle nye kildefiler var under 250 linjer. `EditorCanvasElement.tsx` var 244 linjer og skal ikke få nye funksjonsansvar.
 
 ## Framtidsrettet kodeaudit
 
-Auditen kontrollerte:
-
-- delt eller muterbar standardstil
-- stale state og parallell stilstate
-- ugyldige, uendrede og låste reduceroverganger
-- utypede eller ødelagte framtidige importdata
-- uttømmende validering ved senere modellutvidelser
-- identisk rendering i visning og `textarea`
-- fonttoken kontra rå CSS i prosjektdata
-- samspill med blur/commit
-- tilgjengelige labels, toggles, disabled-state og fokusstil
-- filstørrelser, modulgrenser og CSS-importrekkefølge
+Auditen kontrollerte blant annet delt standardstil, stale state, ugyldige reduceroverganger, runtime-validering, identisk rendering, blur/commit, tilgjengelighet, filstørrelser og CSS-importrekkefølge.
 
 Rettede auditfunn:
 
@@ -184,9 +181,7 @@ Rettede auditfunn:
 3d01336  refactor: make text style validation exhaustive
 ```
 
-## Sluttkontroll
-
-Brukeren kjørte sluttkontroll etter siste produksjonskodeendring:
+## Verifisert før merge
 
 ```text
 ESLint: bestått
@@ -196,15 +191,15 @@ produksjonsbuild: bestått
 Vite: 54 moduler transformert, bygget på 164 ms
 ```
 
-Arkitekturrapportene ble regenerert og committet i:
+Arkitekturrapportene ble regenerert i:
 
 ```text
 a267ca3  chore: refresh architecture reports for text properties
 ```
 
-`git diff --check` viste bare LF/CRLF-varsler, ikke whitespace-feil. Lokal branch er synkronisert med `origin/feature/text-properties`, og working tree er clean.
+Lokal branch var synkronisert og clean før PR #11 ble merget.
 
-## Ikke del av branchen
+## Ikke del av den historiske branchen
 
 - tekstfarge eller prosjektfargemodell
 - bredde, høyde eller plassering i høyremenyen
@@ -214,7 +209,3 @@ a267ca3  chore: refresh architecture reports for text properties
 - sletting eller duplisering
 - historikk eller lagring
 - mobile tekststiloverstyringer
-
-## Status før PR
-
-Implementasjon, audit, sluttkontroll, arkitekturrapporter og visuell godkjenning er ferdig. Dokumentasjonen oppdateres nå. PR skal først opprettes etter at dokumentasjonscommitene er hentet lokalt og clean tree er bekreftet på nytt.

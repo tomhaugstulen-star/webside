@@ -1,10 +1,14 @@
 # Elementoppretting
 
-Dette dokumentet beskriver implementasjonen og de varige grensene for `feature/element-creation`.
+Dette dokumentet beskriver den historiske implementasjonen i `feature/element-creation` og de varige grensene som senere funksjoner skal bevare.
 
 ## Status
 
-Implementert og visuelt kontrollert på desktop og mobil:
+Fasen er implementert, auditert, kontrollert på desktop og mobil og ligger på `main`.
+
+Tidligere formuleringer om at audit-refaktoreringer måtte gjennom `npm run check` og nye arkitekturrapporter før merge beskrev branchens historiske tilstand før fasen ble avsluttet. De er ikke gjeldende prosjektstatus.
+
+Implementert i fasen:
 
 - opprette Seksjon, Bilde, Tekst og Knapp fra Elementer-panelet
 - legge elementet til aktiv side i prosjektmodellen
@@ -14,8 +18,6 @@ Implementert og visuelt kontrollert på desktop og mobil:
 - lukking av Elementer-panelet etter oppretting
 - automatisk utvidelse av lerretshøyden
 - blank side før brukeren oppretter noe
-
-De siste audit-refaktoreringene må gjennom `npm run check` og nye arkitekturrapporter før branchen kan godkjennes for merge.
 
 ## Brukerflyt
 
@@ -34,7 +36,7 @@ De siste audit-refaktoreringene må gjennom `npm run check` og nye arkitekturrap
 
 State-avhengig oppretting skjer inne i reducerens state-overgang.
 
-Hooken skal ikke beregne plassering fra et React-snapshot. Flere raske eller batchede opprettinger må alltid bruke den nyeste elementlisten når hver action behandles.
+Hooken skal ikke beregne plassering fra et React-snapshot. Flere raske eller batchede opprettinger bruker den nyeste elementlisten når hver action behandles.
 
 Hooken har bare ansvar for:
 
@@ -53,14 +55,14 @@ Reduceren har ansvar for:
 
 ## Standardstørrelser
 
-Første versjon bruker:
+```text
+Seksjon  320 × 180 px
+Bilde    240 × 160 px
+Tekst    240 × 96 px
+Knapp    160 × 48 px
+```
 
-- Seksjon: 320 × 180 px
-- Bilde: 240 × 160 px
-- Tekst: 240 × 96 px
-- Knapp: 160 × 48 px
-
-Størrelsene er startverdier, ikke endelige designbegrensninger. Minimumsstørrelser fastsettes i `feature/drag-resize`.
+Størrelsene er startverdier, ikke endelige designbegrensninger. Minimumsstørrelser ble senere fastsatt i drag/resize-fasen.
 
 ## Startplassering
 
@@ -74,11 +76,7 @@ Nye elementer opprettes i en mobiltrygg venstrekolonne:
 
 Dette er bare en regel for fødestedet til nye elementer. Det er ikke et generelt kollisjons- eller layoutsystem.
 
-Når draing bygges, skal brukeren fortsatt kunne:
-
-- flytte elementer fritt
-- overlappe elementer
-- plassere elementer uten automatisk korrigering
+Brukeren kan senere flytte elementer fritt, overlappe elementer og plassere dem uten automatisk korrigering.
 
 `findElementCreationPosition` skal ikke gjenbrukes til å blokkere eller korrigere draing.
 
@@ -90,7 +88,7 @@ Oppretting er foreløpig desktop-autoritativ:
 - mobil arver desktopverdien når mobilverdi mangler
 - standardbreddene passer innenfor 390 px mobilvisning med startpunkt x 24 px
 
-Når full mobilredigering bygges, må dette vurderes på nytt:
+Når full mobilredigering bygges, må følgende vurderes på nytt:
 
 - oppretting i aktiv viewport
 - eksisterende mobiloverstyringer
@@ -101,7 +99,7 @@ Viewport-unionen har én autoritativ type i prosjektmodellen. UI-typen er bare e
 
 ## Lerretshøyde
 
-Lerretet beholder sin tidligere minimumshøyde, men vokser etter nederste synlige element i aktiv viewport.
+Lerretet beholder sin minimumshøyde, men vokser etter nederste synlige element i aktiv viewport.
 
 Beregningen:
 
@@ -110,7 +108,7 @@ Beregningen:
 - ignorerer elementer som er skjult i aktiv viewport
 - legger til 48 px luft under nederste element
 
-Høyden er avledet visning og skal ikke lagres som prosjektdata.
+Høyden er avledet visning og lagres ikke som prosjektdata.
 
 ## ID og prosjektdata
 
@@ -118,9 +116,9 @@ Høyden er avledet visning og skal ikke lagres som prosjektdata.
 - duplikat-ID avvises på tvers av hele prosjektet
 - elementet lagres i `EditorProject.pages[].elements`
 - `updatedAt` endres ved vellykket oppretting
-- `selectedElementId` er fortsatt transient editor-state
+- `selectedElementId` er transient editor-state
 
-Markering skal ikke lagres, eksporteres, publiseres eller inngå i prosjektets historikk.
+Markering lagres, eksporteres eller publiseres ikke og inngår ikke direkte i prosjektets historikk.
 
 ## Ansvarsdeling
 
@@ -134,9 +132,9 @@ Markering skal ikke lagres, eksporteres, publiseres eller inngå i prosjektets h
 - `getCanvasContentHeight.ts`: avledet lerretshøyde
 - `resolveResponsiveValue.ts`: delt responsiv verdioppløsning
 
-Ingen berørt kildefil er nær 250-linjersgrensen. `sidebar.css` ble delt etter ansvar før videre utvikling.
+Ingen berørt kildefil var nær 250-linjersgrensen. `sidebar.css` ble delt etter ansvar før videre utvikling.
 
-## Ikke implementert i denne branchen
+## Ikke del av den historiske branchen
 
 - draing
 - størrelsesendring
@@ -149,12 +147,14 @@ Ingen berørt kildefil er nær 250-linjersgrensen. `sidebar.css` ble delt etter 
 - historikk
 - lagring mellom omlastinger
 
-## Framtidsregler
+Flere av disse funksjonene ble senere implementert i separate faser. Listen beskriver bare omfanget i `feature/element-creation`.
 
-- Drag og resize skal oppdatere prosjektmodellen gjennom reducer-actions.
-- Opprettingsplassering må ikke bli et automatisk kollisjonssystem.
-- Nye state-avhengige beregninger skal bruke reducerens nyeste state, ikke et gammelt UI-snapshot.
-- Nye `EditorTool`-verdier skal håndteres uttømmende; TypeScript skal stoppe bygget dersom et panel mangler.
+## Regler som senere funksjoner skal bevare
+
+- Drag og resize oppdaterer prosjektmodellen gjennom reducer-actions.
+- Opprettingsplassering skal ikke bli et automatisk kollisjonssystem.
+- Nye state-avhengige beregninger bruker reducerens nyeste state, ikke et gammelt UI-snapshot.
+- Nye `EditorTool`-verdier håndteres uttømmende; TypeScript skal stoppe bygget dersom et panel mangler.
 - Responsiv oppretting må avklares før mobile overstyringer innføres.
 - Når historikk bygges, skal oppretting være én prosjektendring, mens markering forblir transient.
-- Når lagring bygges, skal elementet og `updatedAt` lagres, men ikke `selectedElementId`.
+- Når lagring bygges, lagres elementet og `updatedAt`, men ikke `selectedElementId`.

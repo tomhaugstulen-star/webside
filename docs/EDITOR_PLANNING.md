@@ -2,7 +2,16 @@
 
 Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlagte utvidelser.
 
-## Implementeringsstatus
+## Gjeldende arbeidsstatus
+
+```text
+base main for dokumentasjonsaudit: 56e2af7
+GitHub-sak: #18 Audit and synchronize project documentation
+branch: docs/project-documentation-audit
+produksjonskode: uendret
+prosjektskjema: versjon 4
+ny produksjonsfase: ikke valgt
+```
 
 Siste funksjonelle merge til `main`:
 
@@ -10,12 +19,7 @@ Siste funksjonelle merge til `main`:
 b428cac  PR #16 – sikker sletting av elementer
 ```
 
-```text
-GitHub-sak #15: lukket som fullført
-PR #16: merget
-prosjektskjema: versjon 4
-ingen ny produksjonsfase er valgt
-```
+Dokumentasjonsauditen skal fullføres og merges før en ny produksjonsfase velges.
 
 ## Ferdig på `main`
 
@@ -42,7 +46,22 @@ PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
+PR #17  status etter slettemerge      56e2af7
 ```
+
+## Gjeldende venstremeny
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+Dette er dagens implementerte og gjeldende struktur.
+
+`Filer`, `Alle farger`, `Fonts` og separat `Knapper` er ikke implementert eller vedtatt. Slike navn kan bare behandles som åpne framtidige produktbeslutninger.
 
 ## Fast ansvarsdeling
 
@@ -78,6 +97,28 @@ Transient editor-state:
 - panel-, fokus-, hover- og trykkstate
 
 DOM-en er rendering, ikke permanent lagring. Gyldige prosjektendringer går gjennom reduceren.
+
+## Prosjektmodell
+
+Gjeldende prosjektskjema er versjon 4.
+
+Historiske skjematrinn:
+
+```text
+versjon 2  tekstinnhold
+versjon 3  tekststil
+versjon 4  elementlenke, gjeldende
+```
+
+Bare tekstelementet har obligatorisk:
+
+```text
+content
+textStyle
+link
+```
+
+Historiske fasedokumenter kan beskrive versjon 2 eller 3 som versjonen som ble innført i den aktuelle fasen. Det skal ikke leses som gjeldende prosjektstatus.
 
 ## Elementregler
 
@@ -120,6 +161,8 @@ Tomt lerret     -> høyremeny lukkes
 - selection-state er autoritativ
 - ingen separat elementkopi eller direkte prosjektmutasjon
 
+Høyremenyens grunnstruktur er implementert og merget som PR #9. Den er senere utvidet med tekstegenskaper, elementlenke og sikker sletting.
+
 Se `docs/RIGHT_PROPERTIES_PANEL.md`.
 
 ## Tekstegenskaper
@@ -150,8 +193,6 @@ Regler:
 Se `docs/TEXT_PROPERTIES.md`.
 
 ## Frittstående tekstlenker
-
-Prosjektskjemaet er versjon 4.
 
 ```text
 none
@@ -197,34 +238,11 @@ Regler:
 - markeringen nullstilles bare når målet var markert
 - en urelatert markering bevares
 - Seksjon eier ikke visuelt overlappende elementer
-- prosjektskjemaet forblir versjon 4
 - dialogens `Escape` påvirker ikke et åpent verktøypanel
-
-Arkitektur:
-
-```text
-state       -> deleteElementFromActivePage.ts, useElementDeletion.ts
-properties  -> DeleteElementSection.tsx
-dialog      -> ConfirmElementDeletionDialog.tsx
-keyboard    -> isElementDeletionShortcutTarget.ts, useElementDeletionShortcut.ts
-composition -> EditorShell.tsx, RightPropertiesPanel.tsx
-canvas      -> EditorCanvasElement.tsx urørt
-```
 
 Se `docs/ELEMENT_DELETION.md`.
 
-## Framtidsrettet audit for PR #16
-
-Den siste gjennomgangen fant og rettet to problemer før merge:
-
-1. Sletting av et annet element enn det markerte nullstilte markeringen. Reduceren bevarer nå en urelatert markering.
-2. `Escape` i dialogen kunne også lukke et åpent verktøypanel. Dialog og panel har nå isolert Escape-håndtering.
-
-Ingen kritiske eller blokkerende kodefunn gjenstår fra denne fasen.
-
 ## Verifisert kontroll for PR #16
-
-Etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
@@ -237,17 +255,7 @@ JavaScript: 232.19 kB, gzip 71.23 kB
 bygget på 225 ms
 ```
 
-Arkitekturrapportene ble regenerert. Det fantes ingen GitHub Actions-run for head.
-
-Manuelt godkjent:
-
-- alle sletteetiketter
-- plassering og disabled-tilstand
-- avbrytelse og Escape
-- sletting via knapp og Delete
-- tekstredigeringsgrensen
-- låsegrensen
-- flat Seksjon-modell
+Arkitekturrapportene ble regenerert. Det fantes ingen GitHub Actions-run for head. Den brukerbekreftede lokale kontrollen er verifikasjonsgrunnlaget.
 
 ## Senere knappbibliotek
 
@@ -289,7 +297,7 @@ Tekstfarge kobles til prosjektfargemodellen. Headertekst bygges som headerstrukt
 
 ## Åpne beslutninger
 
-- hvilken produksjonsfase som skal startes neste
+- hvilken produksjonsfase som skal startes etter dokumentasjonsauditen
 - knappbibliotekets lagringsplass og filformat
 - statisk lesing kontra skrivbar lokal mappe
 - SVG kontra PNG som anbefalt knappformat

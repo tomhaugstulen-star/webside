@@ -6,7 +6,7 @@ Kopier hele teksten under inn i neste chat.
 
 Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder og kodeansvarlig med presist omfang og ingen gjetting.
 
-Svar på norsk. Repo og dokumentasjon er kilden til sannhet.
+Svar på norsk. Repo, faktisk kode og autoritativ dokumentasjon er kilden til sannhet.
 
 ## Repo og lokal mappe
 
@@ -39,7 +39,18 @@ Det utvikles aldri direkte på `main`. Etter repoendringer skal brukeren få nø
 16. `docs/MOBILE_DESIGN_CONTROLS.md`
 17. `docs/CODE_AUDIT.md`
 
-## Gjeldende repo-status
+Hoveddokumentene er autoritative for gjeldende status. Fasedokumentene beskriver den historiske implementeringsgrensen og de tekniske beslutningene i sin fase.
+
+## Gjeldende repo- og arbeidsstatus
+
+```text
+base main for dokumentasjonsaudit: 56e2af7
+GitHub-sak: #18 Audit and synchronize project documentation
+branch: docs/project-documentation-audit
+produksjonskode: uendret
+prosjektskjema: versjon 4
+ny produksjonsfase: ikke valgt
+```
 
 Siste funksjonelle merge til `main`:
 
@@ -52,22 +63,46 @@ Fullført sporing:
 ```text
 GitHub-sak #15: lukket som fullført
 PR #16: merget
-prosjektskjema: versjon 4
-ingen ny produksjonsfase er valgt
+PR #17: merget dokumentasjonsstatus
 ```
 
-Start alltid med:
+Start alltid med å kontrollere faktisk lokal status. Når dokumentasjonsauditen fortsatt er aktiv:
+
+```powershell
+cd C:\Users\tomha\Desktop\website
+git fetch origin
+git switch docs/project-documentation-audit
+git pull --ff-only origin docs/project-documentation-audit
+git status
+git log -5 --oneline
+```
+
+Når audit-PR-en senere er merget, skal lokal `main` oppdateres og kontrolleres før videre arbeid:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 git switch main
 git pull --ff-only origin main
 git status
+git log -5 --oneline
 ```
 
-Working tree skal være clean før ny planlegging eller branchopprettelse.
+Working tree skal være clean før ny planlegging, branchopprettelse eller PR.
 
-## Ferdig og merget til `main`
+## Gjeldende dokumentasjonsfase
+
+Dokumentasjonsauditen er ren Markdown-arbeid og skal:
+
+- dokumentere prosjektskjema versjon 4 som gjeldende
+- rette foreldet `main`- og høyremenystatus
+- skille historiske faseopplysninger fra gjeldende status
+- merke gamle «før PR», «gjenstår» og «neste fase»-formuleringer som historikk eller oppdatere dem
+- fastslå dagens implementerte venstremeny
+- la alternative framtidige menynavn stå som åpne produktbeslutninger
+
+Ikke endre React-, TypeScript- eller CSS-kode. Ikke endre konfigurasjon, avhengigheter, `architecture.json` eller `docs/dependency-graph.mmd` i denne fasen.
+
+## Ferdig og merget funksjonalitet
 
 - stabilt React/TypeScript/Vite-grunnlag
 - blankt PC- og Telefon-lerret
@@ -97,7 +132,22 @@ PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
+PR #17  status etter slettemerge      56e2af7
 ```
+
+## Gjeldende venstremeny
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+Dette er implementert og gjeldende.
+
+`Filer`, `Alle farger`, `Fonts` og separat `Knapper` er eldre produktplanlegging. De er ikke implementert eller vedtatt og skal ikke behandles som krav uten en ny eksplisitt produktbeslutning.
 
 ## Fast UX-regel
 
@@ -107,7 +157,46 @@ Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere tekst og transformere elementer
 ```
 
-Lenker aktiveres ikke i editormodus. `EditorCanvasElement.tsx` ligger nær aktiv filgrense og skal ikke få flere nye funksjonsansvar.
+## Høyremeny
+
+Høyremenyen er implementert og merget.
+
+```text
+Ingenting valgt -> ingen høyremeny
+Element valgt   -> høyremeny åpnes
+Tomt lerret     -> høyremeny lukkes
+```
+
+```text
+bredde: 320 px
+fra 1680 px: dokket
+under 1680 px: overlay fra høyre
+egen vertikal scrolling
+animasjon: 180 ms
+prefers-reduced-motion: animasjon deaktivert
+```
+
+Panelet følger `selectedElementId`, leser autoritative elementdata og eier ingen separat elementkopi.
+
+## Prosjektmodell
+
+Gjeldende skjemaversjon er 4.
+
+```text
+versjon 2  historisk: tekstinnhold
+versjon 3  historisk: tekststil
+versjon 4  gjeldende: elementlenke
+```
+
+Bare tekstelementet har obligatorisk:
+
+```text
+content
+textStyle
+link
+```
+
+Lenker aktiveres ikke i editormodus.
 
 ## Sikker sletting – ferdig fase
 
@@ -120,21 +209,6 @@ PR #16
 mergecommit b428cac
 ```
 
-Leveransen gjelder ett markert element:
-
-- Seksjon
-- Bilde
-- Tekst
-- Knapp
-
-Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
-
-```text
-Element
-Status: Ulåst
-Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
-```
-
 Regler:
 
 - låst element kan ikke slettes
@@ -142,70 +216,25 @@ Regler:
 - `Delete` åpner samme dialog
 - Delete blokkeres i tekstredigering og skjemakontroller
 - `Backspace` brukes ikke globalt
-- dialogen validerer nyeste elementstate før bekreftelse
 - bare målelementet fjernes
 - `selectedElementId` nullstilles bare når målet var markert
 - en urelatert markering bevares
 - Seksjon eier ikke visuelt overlappende elementer
 - dialogens `Escape` påvirker ikke et åpent verktøypanel
-- prosjektskjemaet forblir versjon 4
-
-Implementert arkitektur:
-
-```text
-src/state/deleteElementFromActivePage.ts
-src/state/useElementDeletion.ts
-src/components/properties/DeleteElementSection.tsx
-src/components/dialogs/ConfirmElementDeletionDialog.tsx
-src/components/editor/isElementDeletionShortcutTarget.ts
-src/components/editor/useElementDeletionShortcut.ts
-src/styles/element-deletion.css
-```
-
-`EditorCanvasElement.tsx` er urørt. Alle nye kildefiler er under 250 linjer.
-
-## Verifisert kontroll for PR #16
-
-Brukeren kjørte `npm run check` etter de siste produksjonsrettelsene:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
-produksjonsbuild: bestått
-Vite: 64 moduler transformert
-CSS: 20.13 kB, gzip 4.60 kB
-JavaScript: 232.19 kB, gzip 71.23 kB
-bygget på 225 ms
-```
-
-Arkitekturrapportene ble regenerert i `fbd8091`. Det fantes ingen GitHub Actions-run for head.
-
-Manuelt godkjent:
-
-- alle fire sletteetiketter
-- plassering rett under statusboksen
-- deaktivert knapp og ingen Delete-dialog for låst element
-- avbrytelse uten mutasjon
-- `Escape` uten mutasjon
-- sletting via høyremeny og `Delete`
-- høyremenyen lukkes etter sletting
-- ingen andre elementer slettes
-- Delete under tekstredigering sletter bare tekst
-- sletting av Seksjon lar visuelt overlappende elementer bli stående
-
-## Neste produksjonsfase
-
-Ingen ny produksjonsfase er valgt. Ikke opprett kodebranch før brukeren har valgt og godkjent neste avgrensede fase.
-
-Planlagte senere faser finnes i `docs/WORK_PLAN.md`. Den parkerte `feature/button-element`-branchen skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
 
 ## Faste tekniske grenser
 
 - 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
 - 300 linjer er hard unntaksgrense.
+- `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar.
 - Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
 - Transient markering, dialogstate, drafts, fokus, hover og statusmeldinger serialiseres ikke.
-- Ingen feature-branch merges uten eksplisitt brukergodkjenning.
+- Ingen branch merges uten eksplisitt brukergodkjenning.
+
+## Neste arbeid
+
+Fullfør dokumentasjonsauditen på `docs/project-documentation-audit`. Kontroller hele Markdown-diffen og kjør `git diff --check`. `npm run check` og nye arkitekturrapporter er ikke påkrevd dersom branchen fortsatt bare endrer Markdown.
+
+Ingen ny produksjonsfase eller kodebranch skal velges før auditfasen er kontrollert, merget og lokal `main` er clean.
 
 ---

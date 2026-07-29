@@ -1,6 +1,18 @@
 # Kodegjennomgang av editorgrunnlaget
 
-Denne gjennomgangen gjelder editorgrunnlaget før videre funksjonsutvikling.
+Dette dokumentet beskriver den historiske kodegjennomgangen av editorgrunnlaget før videre funksjonsutvikling.
+
+## Status
+
+Kodeoppryddingen ble utført i:
+
+```text
+chore/editor-foundation-audit
+```
+
+Editorgrunnlaget og den tekniske oppryddingen er ferdig, kontrollert og merget til `main`.
+
+Den tidligere formuleringen om at `feature/element-selection` var «neste planlagte fase» beskrev prosjektets historiske rekkefølge etter grunnlagsauditen. Markering og flere senere faser er nå implementert.
 
 ## 1. Omfang
 
@@ -16,12 +28,6 @@ Kontrollert:
 - Dependency Cruiser-regler
 - ubrukte kildekodemoduler
 - risiko for navne- og ansvarsblanding
-
-Kodeoppryddingen ble utført i:
-
-```text
-chore/editor-foundation-audit
-```
 
 ## 2. Funn som ble rettet
 
@@ -58,13 +64,23 @@ Den tidligere samlefilen på 669 linjer ble delt i:
 - `sidebar.css`
 - `canvas.css`
 
-Alle filene er under prosjektets kontrollgrense på 300 linjer.
+Filene ble holdt under prosjektets daværende kontrollgrense. Gjeldende regel er aktiv ansvarstrekk ved 250 linjer og hard unntaksgrense ved 300 linjer.
 
 ### Venstremeny
 
 - `LeftSidebar.tsx` håndterer navigasjon og panelbeholder
 - `SidebarIcon.tsx` håndterer ikoner
 - `SidebarPanels.tsx` håndterer panelinnhold
+
+Dagens implementerte venstremeny er:
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
 
 ### Hovedmeny
 
@@ -81,11 +97,13 @@ Alle filene er under prosjektets kontrollgrense på 300 linjer.
 
 - `App.tsx` setter bare sammen applikasjonen
 - editorshellet eier bare skalltilstand
-- prosjektdata skal eies av sentral prosjekt-state
+- prosjektdata eies av sentral prosjekt-state
 - verktøymeny, panelinnhold og ikoner er separert
 - lerretet skal ikke få tilfeldig objektlogikk
 - responsive prosjektverdier lagres i prosjektmodellen, ikke i DOM-en
 - automatisk lagring bygges etter prosjektmodell og historikkmodell
+
+Disse retningene er senere videreført i prosjektmodellen, reduceren, elementmarkering, elementoppretting, transform, låsing, tekstredigering og høyremeny.
 
 ## 4. Midlertidige kontroller
 
@@ -93,7 +111,7 @@ Flere knapper er fortsatt visuelle skallkontroller uten ferdig funksjon, blant a
 
 Hver kontroll kobles til reell funksjonalitet i sin planlagte feature-branch. Tilfeldig midlertidig logikk skal ikke legges inn.
 
-## 5. Automatisert lokal kontroll
+## 5. Historisk automatisert kontroll
 
 Bekreftet 28. juli 2026:
 
@@ -105,7 +123,9 @@ Bekreftet 28. juli 2026:
 - produksjonsbuild: bestått
 - arkitekturrapporter regenerert
 
-## 6. Visuell kontroll
+Tallene beskriver editorgrunnlaget på kontrolltidspunktet og er ikke gjeldende modul- eller avhengighetstall etter senere funksjonsfaser.
+
+## 6. Historisk visuell kontroll
 
 Godkjent:
 
@@ -117,8 +137,8 @@ Godkjent:
 - desktop og mobil endrer lerretsbredde
 - nettleseren åpnes automatisk ved `npm run dev`
 
-## 7. Godkjenningsstatus
+## 7. Videreføring
 
-Editorgrunnlaget og teknisk opprydding er ferdig, lokalt kontrollert, visuelt godkjent og merget til `main`.
+Prosjekt- og elementmodellen, elementmarkering, elementoppretting, drag/resize, objektlåsing, tekstredigering, høyremeny, tekstegenskaper, elementlenker og sikker sletting er senere implementert og ligger på `main`.
 
-Videre utvikling skal følge `docs/WORK_PLAN.md`. Prosjekt- og elementmodellen er ferdig i `feature/element-model`, og neste planlagte fase etter merge er `feature/element-selection`.
+Videre utvikling følger gjeldende status og rekkefølge i `docs/NEXT_CHAT_PROMPT.md`, `docs/WORK_PLAN.md`, `docs/EDITOR_PLANNING.md` og `docs/PROJECT_RULES.md`.
