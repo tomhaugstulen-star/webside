@@ -1,5 +1,8 @@
 import {
+  MAX_IMAGE_DIMENSION_PX,
   MAX_IMAGE_FILE_BYTES,
+  MAX_IMAGE_PIXEL_COUNT,
+  hasValidImagePixelDimensions,
   isSupportedImageMimeType,
   type ImageAssetMetadata,
 } from '../../model/imageAsset'
@@ -77,6 +80,13 @@ export async function prepareImageFile(
 
     if (dimensions.width <= 0 || dimensions.height <= 0) {
       return { ok: false, message: 'Bildet har ugyldige dimensjoner.' }
+    }
+
+    if (!hasValidImagePixelDimensions(dimensions.width, dimensions.height)) {
+      return {
+        ok: false,
+        message: `Bildet er for stort. Bruk maks ${MAX_IMAGE_PIXEL_COUNT / 1_000_000} megapiksler og ${MAX_IMAGE_DIMENSION_PX.toLocaleString('nb-NO')} px per side.`,
+      }
     }
 
     return {
