@@ -206,6 +206,7 @@ function reduceEditorProjectState(
     case 'set-image-alt-text':
     case 'set-image-mode':
     case 'set-image-transform':
+    case 'set-image-desktop-frame':
       return reduceImageProjectAction(state, action)
   }
 
