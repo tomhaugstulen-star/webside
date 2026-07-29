@@ -5,6 +5,7 @@ import type { ElementCreationRequest } from '../../model/elementCreation'
 import {
   createImageAssetId,
   supportedImageMimeTypes,
+  type ImageAssetId,
 } from '../../model/imageAsset'
 import { SidebarIcon } from './SidebarIcon'
 
@@ -33,33 +34,44 @@ export function ImageImportControl({
 
     setBusy(true)
     setErrorMessage(null)
-    const result = await prepareImageFile(file)
+    let registeredAssetId: ImageAssetId | null = null
 
-    if (!result.ok) {
-      setErrorMessage(result.message)
-      setBusy(false)
-      return
-    }
+    try {
+      const result = await prepareImageFile(file)
 
-    const assetId = createImageAssetId()
+      if (!result.ok) {
+        setErrorMessage(result.message)
+        return
+      }
 
-    if (
-      !registerImageAsset(assetId, result.value.file, result.value.metadata)
-    ) {
-      setErrorMessage('Bildet kunne ikke registreres i prosjektet.')
-      setBusy(false)
-      return
-    }
+      const assetId = createImageAssetId()
 
-    const created = onCreateImage({
-      kind: 'image',
-      assetId,
-      assetMetadata: result.value.metadata,
-    })
+      if (
+        !registerImageAsset(assetId, result.value.file, result.value.metadata)
+      ) {
+        setErrorMessage('Bildet kunne ikke registreres i prosjektet.')
+        return
+      }
 
-    if (!created) {
-      removeImageAsset(assetId)
-      setErrorMessage('Bildet kunne ikke legges til på siden.')
+      registeredAssetId = assetId
+      const created = onCreateImage({
+        kind: 'image',
+        assetId,
+        assetMetadata: result.value.metadata,
+      })
+
+      if (!created) {
+        removeImageAsset(assetId)
+        registeredAssetId = null
+        setErrorMessage('Bildet kunne ikke legges til på siden.')
+      }
+    } catch {
+      if (registeredAssetId) {
+        removeImageAsset(registeredAssetId)
+      }
+
+      setErrorMessage('Bildet kunne ikke behandles. Prøv en annen fil.')
+    } finally {
       setBusy(false)
     }
   }
