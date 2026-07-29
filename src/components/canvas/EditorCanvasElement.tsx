@@ -17,17 +17,13 @@ import { useTextElementContent } from '../../state/useTextElementContent'
 import type { ViewportMode } from '../../types/editor'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
 import {
-  elementKindLabels,
   getAccessibleElementLabel,
   getCanvasElementKeyboardShortcuts,
 } from './canvasElementAccessibility'
-import { ButtonElementContent } from './ButtonElementContent'
+import { EditorCanvasElementContent } from './EditorCanvasElementContent'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import { getTextElementCssStyle } from './getTextElementCssStyle'
-import {
-  TextElementEditor,
-  type TextEditFinishReason,
-} from './TextElementEditor'
+import type { TextEditFinishReason } from './TextElementEditor'
 import { useElementPointerTransform } from './useElementPointerTransform'
 
 const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
@@ -94,7 +90,6 @@ export function EditorCanvasElement({
   }
 
   const isTextEditing = editing && element.kind === 'text'
-  const label = elementKindLabels[element.kind]
   const style: CSSProperties = {
     left: layout.position.x,
     top: layout.position.y,
@@ -203,28 +198,12 @@ export function EditorCanvasElement({
         onDoubleClick={isTextEditing ? undefined : handleDoubleClick}
         onKeyDown={isTextEditing ? undefined : handleKeyDown}
       >
-        {element.kind === 'text' ? (
-          isTextEditing ? (
-            <TextElementEditor
-              initialContent={element.content}
-              onCommit={(content) => commitTextElementContent(element.id, content)}
-              onFinish={finishTextEditing}
-            />
-          ) : (
-            <span
-              className={`canvas-element__text-content ${element.content ? '' : 'canvas-element__text-content--empty'}`}
-              aria-hidden="true"
-            >
-              {element.content || 'Dobbeltklikk for å skrive'}
-            </span>
-          )
-        ) : element.kind === 'button' ? (
-          <ButtonElementContent element={element} />
-        ) : (
-          <span className="canvas-element__placeholder" aria-hidden="true">
-            {label}
-          </span>
-        )}
+        <EditorCanvasElementContent
+          element={element}
+          editing={isTextEditing}
+          onCommitText={(content) => commitTextElementContent(element.id, content)}
+          onFinishTextEditing={finishTextEditing}
+        />
         {selected && !element.locked && !isTextEditing && (
           <span
             className="canvas-element__resize-handle"
