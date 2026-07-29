@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { useElementCreation } from '../../state/useElementCreation'
@@ -23,10 +24,11 @@ export function EditorShell() {
   const [activeTool, setActiveTool] = useState<EditorTool | null>(null)
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
-  const { activePage } = useEditorProject()
+  const { state, activePage } = useEditorProject()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
+  const { removeImageAsset } = useImageAssetStore()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
     ? activePage.elements.find((element) => element.id === deletionRequest.elementId) ?? null
@@ -40,12 +42,14 @@ export function EditorShell() {
     setActiveTool(null)
   }
 
-  const createElementAndClosePanel = (
-    request: ElementCreationRequest,
-  ) => {
-    if (createElement(request)) {
+  const createElementAndClosePanel = (request: ElementCreationRequest) => {
+    const created = createElement(request)
+
+    if (created) {
       closeToolPanel()
     }
+
+    return created
   }
 
   const requestElementDeletion = useCallback(
@@ -77,7 +81,25 @@ export function EditorShell() {
       return
     }
 
+    const imageAssetId =
+      deletionTarget.kind === 'image' ? deletionTarget.assetId : null
+    const imageAssetIsShared = imageAssetId
+      ? state.project.pages.some((page) =>
+          page.elements.some(
+            (element) =>
+              element.id !== deletionTarget.id &&
+              element.kind === 'image' &&
+              element.assetId === imageAssetId,
+          ),
+        )
+      : false
+
     deleteElement(deletionRequest.elementId)
+
+    if (imageAssetId && !imageAssetIsShared) {
+      removeImageAsset(imageAssetId)
+    }
+
     setDeletionRequest(null)
   }
 
