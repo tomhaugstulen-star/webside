@@ -4,8 +4,12 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 
 ## Gjeldende arbeidsstatus
 
+Faktisk `main`-HEAD skal alltid kontrolleres mot `origin/main`. Et commitnummer lagres bare som historisk milepæl eller eksplisitt branch-base, aldri som permanent «gjeldende HEAD».
+
+Stabile referanser:
+
 ```text
-main HEAD: a77a9a9
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
 PR #21: SVG-knappbibliotek – merget
 PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
 knappbibliotekets mergecommit: 5e548ad
@@ -14,7 +18,7 @@ prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-Sluttkontroll for siste produksjonsfase:
+Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
 
 ```text
 ESLint: bestått
@@ -42,7 +46,7 @@ PC og Telefon: godkjent
 - kontrollert fallback for ukjent knappasset
 - Dependency Cruiser og samlet `npm run check`
 
-Viktige merges:
+Viktige historiske merges:
 
 ```text
 PR #4   drag og resize
@@ -57,6 +61,8 @@ PR #19  dokumentasjonsaudit          06307a2
 PR #21  SVG-knappbibliotek           5e548ad
 PR #22  dokumentasjonsstatus         a77a9a9
 ```
+
+Disse commitnumrene beskriver historiske leveranser og skal ikke brukes som forventet topp-commit etter senere merges.
 
 ## Gjeldende venstremeny
 
@@ -90,6 +96,7 @@ Lerretet   = markere, flytte og endre størrelse
 
 Varig prosjektdata:
 
+- sider og elementer
 - geometri og synlighet
 - låsestatus
 - tekstinnhold og tekststil
@@ -131,6 +138,8 @@ type ButtonEditorElement = BaseEditorElement & {
 ```
 
 `assetId`, `label` og `link` er foreløpig felles for PC og Telefon.
+
+Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressursreferanse, filmetadata, alt-tekst og skaleringsmodell er ikke implementert.
 
 ## Elementregler
 
@@ -200,7 +209,7 @@ button.dark-rounded.v1
 
 Se `docs/BUTTON_LIBRARY.md`.
 
-## Senere faser
+## Planlagte senere faser
 
 ```text
 feature/image-import-and-placement
@@ -215,4 +224,4 @@ feature/preview-mode
 feature/publishing
 ```
 
-Neste fase skal velges og avgrenses eksplisitt. Ingen produksjonsbranch startes automatisk.
+Neste fase skal velges og avgrenses eksplisitt. Ingen produksjonssak eller produksjonsbranch startes automatisk.
