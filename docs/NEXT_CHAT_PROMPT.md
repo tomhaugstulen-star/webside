@@ -15,7 +15,7 @@ GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing når lokal utførelse er nødvendig.
+Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing.
 
 Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. Ikke påstå at lokale tester eller clean tree er godkjent uten faktisk terminaloutput.
 
@@ -31,213 +31,174 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 8. `docs/CODE_AUDIT.md`
 9. relevante øvrige fasedokumenter
 
-## Gjeldende repo- og arbeidsstatus
+## Gjeldende status
 
 ```text
 aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
 branch: feature/image-import-and-placement
-GitHub-sak: #25 – Implement image import, frame resizing, and crop editing
+GitHub-sak: #25
 PR: #26 – åpen, ikke draft
 base main: 7e4c71fed4a26dfb829cc19ae81df95215c42a64
-prosjektskjema i leveransen: versjon 6
+prosjektskjema: versjon 6
 implementering: ferdig
-framtidsrettet kodeaudit: ferdig
-automatiske kontroller: bestått
-PC- og Telefon-test: godkjent
-arkitekturrapporter: regenerert og commitet
-dokumentasjon: oppdatert etter siste resize-rettelser
+manuell PC- og Telefon-test: godkjent
+framtidsrettet sluttaudit: ferdig
+siste produksjonskontroll: bestått
+arkitekturrapporter etter sluttaudit: må regenereres
 merge: ikke godkjent eller utført
 ```
 
-Faktisk branch-, PR- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Ikke bruk et hardkodet commitnummer som permanent forventet topp-commit.
+Faktisk feature- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Ikke bruk et hardkodet commitnummer som permanent forventet topp-commit.
 
 Historiske kontrollpunkter:
 
 ```text
 main-base for fase 11A: 7e4c71f
-arkitekturrapporter etter første audit: 4b3d0cb
-PR #26 opprettet fra feature-branchen
-arkitekturrapporter etter siste resize-rettelser: 94ed2fb
+arkitekturrapporter før sluttaudit: 94ed2fb
+første fullførte dokumentstatus: 9c92fb1
+siste verifiserte produksjonscommit ved kontrollen: 7378e24
 ```
 
-Dokumentoppdateringene kommer etter `94ed2fb`, så faktisk feature-head er nyere og må leses fra Git.
+Dokumentcommits ligger etter `7378e24`. Faktisk feature-head må leses fra Git.
 
 ## Siste verifiserte kvalitetskontroll
 
-Brukerens lokale terminaloutput bekreftet etter siste produksjonsendring:
+Brukerens lokale terminaloutput bekreftet etter den endelige kodeauditen:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
 Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
 Vite: 100 moduler transformert
-CSS: 31.06 kB, gzip 6.06 kB
-JavaScript: 258.04 kB, gzip 77.94 kB
-produksjonsbuild: bestått
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
 ```
-
-Manuell kontroll er godkjent for PC og Telefon, inkludert:
-
-- import, validering og avbrytelse
-- Seksjon som bakgrunnslag bak Bilde, Tekst og Knapp
-- ramme fra alle sider og hjørner
-- grep på innsiden av bilderammen
-- `Hele bildet` og `Juster utsnitt`
-- zoom, reset og motivflytting
-- `Alt + piltast`, også etter bruk av zoomkontrollen
-- crop-resize der motivets størrelse og absolutte plassering beholdes
-- fast motsatt rammekant
-- låsing, sletting og fallback
-
-Arkitekturrapportene ble regenerert etter siste state- og resize-endring og commitet i `94ed2fb`. Senere endringer er bare dokumentasjon og krever ikke ny `npm run check` med mindre kode, konfigurasjon eller rapporter endres igjen.
 
 ## Implementert funksjonalitet
 
 - blankt PC- og Telefon-lerret
-- kontrollert topp- og venstremeny
+- kontrollert toppmeny, venstremeny og høyremeny
 - Seksjon, Bilde, Tekst og Knapp
-- prosjektmodell og sentral state
+- sentral prosjektmodell og state
 - markering, flytting, resizing og låsing
-- kontrollert flerlinjet tekstredigering
-- høyremenyens grunnstruktur
-- tekstegenskaper og eksterne lenker
+- flerlinjet tekstredigering
+- tekststil og eksterne lenker
 - sikker sletting
 - bundlet SVG-knappbibliotek
-- lokal bildeimport for PNG, JPEG og WebP, maks 10 MB
+- lokal bildeimport for PNG, JPEG og WebP
+- transient ressursbuffer for `File` og Object URL
 - stabil bilde-`assetId` og serialiserbar metadata
-- separat transient ressursbuffer for `File` og Object URL
-- alternativ tekst
-- `Hele bildet` og `Juster utsnitt`
-- zoom og normalisert motivoffset
-- åtte bilderammegrep på innsiden
-- deterministisk bakgrunnslagring for Seksjon
+- alt-tekst, `Hele bildet` og `Juster utsnitt`
+- zoom, reset, pekerdrag og tastaturstyrt motivflytting
+- åtte resizegrep innenfor bilderammen
+- Seksjon rendret bak Bilde, Tekst og Knapp
+- crop-resize med stasjonært motiv og fast motsatt kant
 - kontrollert fallback ved manglende ressurs
 
-## Bilde- og ressursmodell
-
-```ts
-type ImageEditorElement = BaseEditorElement & {
-  kind: 'image'
-  assetId: ImageAssetId
-  assetMetadata: ImageAssetMetadata
-  altText: string
-  mode: 'contain' | 'crop'
-  transform: {
-    zoom: number
-    offsetX: number
-    offsetY: number
-  }
-}
-```
-
-Prosjektet lagrer aldri lokal filsti, `File`, Blob eller Object URL. Ressurslageret eier transient fil og Object URL, validerer samsvar med metadata og tilbakekaller URL-er ved fjerning og unmount.
-
-## Bilderamme og utsnitt
-
-### Hele bildet
-
-- viser hele bildet proporsjonalt
-- skalerer motivet etter rammen
-- sentrerer motivet
-- tillater tomrom ved ulikt sideforhold
-- beholder lagret crop-transform for senere retur
-
-### Juster utsnitt
-
-- fyller rammen uten tomrom
-- beholder originalt sideforhold
-- zoom begrenses til 100–300 prosent og minst nødvendig fyllingszoom
-- offset lagres normalisert fra `-1` til `1`
-- crop-rammen kan ikke være større enn motivet ved aktiv zoom
-- overgang fra en for stor contain-ramme gir en sentrert, gyldig crop-ramme
-- reset sentrerer og bruker minimum gyldig zoom
-
-Crop-resize:
-
-- motivets skalerte størrelse beholdes
-- motivets absolutte plassering beholdes så langt crop-grensene tillater
-- aktiv rammekant flyttes
-- motsatt kant står fast
-- mindre ramme klipper mer i stedet for å skalere eller sentrere motivet
-- ny normalisert offset beregnes mot den nye rammen
-- ramme og transform lagres atomisk gjennom `set-image-desktop-frame`
-
-Interaksjon:
+## Autoritative bildegrenser
 
 ```text
+maks filstørrelse: 10 MB
+maks dekodet pikselmengde: 40 megapiksler
+maks bredde eller høyde: 16 384 px
+crop-grunnramme for skjemaversjon 6: 240 × 160 px
+zoom: 1..3
+offsetX og offsetY: -1..1
+```
+
+Crop-grunnrammen er en skjemainvariant. Senere endring av standardstørrelsen for nye bilder skal ikke endre versjon-6-transformer. En annen grunnmodell krever ny skjemaversjon og migrering.
+
+## Bildeinteraksjon
+
+```text
+Hele bildet     viser hele motivet proporsjonalt og sentrert
+Juster utsnitt  fyller rammen uten tomrom
 vanlig dra      flytter motivet
 Shift + dra     flytter hele rammen
-Alt + piltast   flytter motivet med tastaturet
+Alt + piltast   flytter motivet 4 px
+Shift+Alt+pil   flytter motivet 20 px
 piltast         flytter elementet
 Ctrl/Cmd + pil  endrer størrelse fra nedre høyre hjørne
 ```
 
-Bilderammen kan endres fra topp, bunn, venstre, høyre og alle hjørner. Grepene ligger innenfor rammen.
+Ved crop-resize:
 
-## Viktige auditrettelser
+- motivets størrelse og absolutte plassering beholdes
+- bare den aktive rammekanten flyttes
+- motsatt kant står fast
+- ny normalisert offset beregnes mot ny ramme
+- ramme og transform lagres atomisk
 
-- elementenes standard- og minimumsstørrelser har én modellkilde
-- opprettingsvalidering deles av hook og reducer
-- crop-invarianter håndheves i modell og reducer, ikke bare i UI
-- ugyldige transformobjekter avvises kontrollert
-- transform muteres ikke skjult i `contain`
-- bildeimport bruker `try/catch/finally` og rydder delvis registrert ressurs
-- ressurslageret krysskontrollerer filnavn, MIME-type og størrelse
-- motivets tastatursnarvei ligger i `useSelectedImageCropKeyboard.ts`
-- Seksjon rendres bak forgrunnselementene uten modellnesting
-- grep og selection-outline ligger direkte på innsiden av bilderammen
-- crop-resize bevarer motivets absolutte plassering
-- ramme og korrigert transform committes atomisk
-- `EditorCanvasElement.tsx` er under 200 linjer
-- `useElementPointerTransform.ts` er 218 linjer
-- `imagePresentation.ts` er 240 linjer
+## Sluttauditens viktigste rettelser
+
+- crop-invarianter håndheves i modell og reducer
+- `Alt + piltast` fungerer etter bruk av zoomkontrollen
+- nettleserhistorikk stoppes for `Alt + venstre/høyre`
+- Seksjon rendres deterministisk bak forgrunnsinnhold
+- bilderammen har ingen motstridende regel i `canvas.css`
+- grep og treffområder ligger innenfor bilderammen
+- import avsluttes sikkert ved feil og panel-unmount
+- metadata kontrolleres mot faktisk fil
+- dekodet bildestørrelse er begrenset
+- crop-grunnskala er låst til skjemaversjon 6
 - alle berørte kildefiler er under 250 linjer
 
-## Fast ansvarsdeling
+## Obligatoriske grenser for senere arbeid
 
-```text
-Venstremeny = opprette elementer og velge fil eller design
-Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere innhold og transformere elementer
-Ressurslag = eie transient bildefil og renderings-URL
-Prosjekt   = eie serialiserbar identitet, metadata og redigeringsverdier
-```
+### Prosjektimport
+
+Valider hele prosjektobjektet og skjemaversjonen før `replace-project`. Ikke stol på TypeScript-typen for eksterne data.
+
+### Prosjektbytte
+
+Avstem eller tøm den transiente bilderessursbufferen og tilbakekall foreldede Object URL-er.
+
+### Angre/gjør om
+
+Historikk inneholder bare serialiserbar prosjektstate. `File`, Object URL og aktive interaksjoner skal ikke inngå.
+
+### Mobiloverstyringer
+
+Bruk viewport-spesifikke geometrihandlinger. Ikke skriv mobilendringer inn i desktopfeltet.
+
+### Autolagring
+
+Lagre gyldige prosjektmutasjoner, ikke transient editor- eller ressursstate.
 
 ## Første oppgave i neste chat
 
-Fase 11A skal ikke implementeres på nytt. Ikke start fase 12. Ikke opprett en ny PR.
+Fase 11A skal ikke implementeres på nytt. Ikke start fase 12.
 
-Trekk og kontroller den ferdige feature-branchen:
+Trekk siste feature-branch og regenerer arkitekturrapportene etter sluttauditen:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
-git fetch origin
-git switch feature/image-import-and-placement
 git pull --ff-only origin feature/image-import-and-placement
 git status
-git log -6 --oneline --decorate
-git diff --check 94ed2fb..HEAD
-git diff --name-only 94ed2fb..HEAD
-git diff --stat 94ed2fb..HEAD
+git log -10 --oneline --decorate
+npm run architecture:json
+npm run architecture:diagram
+git status --short
+git diff --check
+git diff --stat
 ```
 
-Godkjent tilstand:
+Forventet:
 
-- aktiv branch er `feature/image-import-and-placement`
-- lokal branch følger remote feature-branch
-- working tree er clean
+- working tree var clean før rapportgenerering
+- bare `architecture.json` og `docs/dependency-graph.mmd` endres
 - `git diff --check` har ingen reelle feil
-- diffen etter `94ed2fb` inneholder bare nødvendig dokumentasjon
-- branchen er ikke bak `main`
 
-Deretter:
+Etter lokal rapportkontroll:
 
-1. oppdater PR #26-beskrivelsen med siste kontrolltall og resize-regler hvis det ikke allerede er gjort
-2. kontroller samlet GitHub-diff mot `main`
-3. kontroller at PR #26 ikke er draft og er mergebar
-4. kontroller changed files, review-tråder, reviews og eventuell CI
-5. presenter PR-nummer, base/head, commitantall og diffstatistikk
-6. ikke merge før brukeren eksplisitt skriver `godkjent`
+1. commit og push bare de to rapportene
+2. trekk og kontroller alle dokumentcommits lokalt
+3. kontroller samlet PR #26 mot `main`
+4. kontroller PR-head, mergebarhet, changed files, review-tråder, reviews og CI
+5. oppdater PR-body med siste kontroll og rapportcommit
+6. presenter PR #26 for eksplisitt brukergodkjenning
+7. ikke merge før brukeren skriver `godkjent`
 
 Etter eventuell godkjent merge:
 
