@@ -50,8 +50,10 @@ main
 ## Gjeldende status
 
 ```text
-main: 5e548ad
+main HEAD: a77a9a9
 PR #21: Build first bundled SVG button library – merget
+PR #22: Update status after button library merge – merget
+knappbibliotekets mergecommit: 5e548ad
 GitHub-sak #20: lukket som fullført
 prosjektskjema: versjon 5
 siste verifisering:
@@ -62,6 +64,7 @@ siste verifisering:
   produksjonsbuild: bestått
   arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
   PC- og Telefon-test: godkjent
+neste produksjonsfase: ikke valgt
 ```
 
 ## Ferdig og merget til `main`
@@ -94,6 +97,7 @@ PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
 PR #19  dokumentasjonsaudit          06307a2
 PR #21  SVG-knappbibliotek           5e548ad
+PR #22  dokumentasjonsstatus         a77a9a9
 ```
 
 ## Gjeldende venstremeny
