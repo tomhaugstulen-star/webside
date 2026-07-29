@@ -1,6 +1,6 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet samler gjeldende arkitekturretning og den framtidsrettede auditen som ble gjennomført før PR for fase 11A.
+Dette dokumentet samler gjeldende arkitekturretning og den framtidsrettede auditen som ble gjennomført og utvidet under kontrollen av PR #26 for fase 11A.
 
 ## 1. Bekreftet arkitekturretning
 
@@ -22,13 +22,14 @@ Dette dokumentet samler gjeldende arkitekturretning og den framtidsrettede audit
 - `RightPropertiesPanel.tsx` skal være komposisjon.
 - tilfeldig generell `features`-samlemappe skal ikke innføres.
 
-Etter fase-11A-auditen:
+Etter de siste fase-11A-rettelsene:
 
 ```text
-EditorCanvasElement.tsx: 189 linjer
+EditorCanvasElement.tsx: under 200 linjer
 ImagePropertiesSection.tsx: 199 linjer
-imagePresentation.ts: 198 linjer
-useElementPointerTransform.ts: 221 linjer
+imagePresentation.ts: 240 linjer
+useElementPointerTransform.ts: 218 linjer
+setImageDesktopFrame.ts: 88 linjer
 alle berørte kildefiler: under 250 linjer
 ```
 
@@ -49,15 +50,16 @@ Reducerhandlinger skal avvise:
 - ugyldig bildeasset eller metadata
 - ugyldig visningsmodus eller bildetransform
 - crop-geometri som ikke kan fylles ved lagret zoom
+- ramme og transform som ikke er konsistente
 - uendret data
 
 Ved avvisning returneres samme state, prosjektet muteres ikke og `updatedAt` endres ikke.
 
-Transient markering, pekerinteraksjon, layout-preview, åpne paneler, drafts, filvelger, bildefil, Object URL, validering, feedback, fokus, hover og dialogstate serialiseres ikke.
+Transient markering, pekerinteraksjon, layout-preview, preview-transform, åpne paneler, drafts, filvelger, bildefil, Object URL, validering, feedback, fokus, hover og dialogstate serialiseres ikke.
 
 ## 4. Fase-11A-audit
 
-Auditen ble gjennomført etter at bildeimport, rammeresize og utsnittsredigering fungerte manuelt. Formålet var å finne kode som kunne skape inkonsistens i senere lagrings-, historikk- og responsivfaser.
+Auditen ble gjennomført etter at bildeimport, rammeresize og utsnittsredigering fungerte manuelt. Den ble utvidet da PR-testen avdekket interaksjonsfeil som automatiske kontroller ikke kunne finne.
 
 ### Funn 1: dupliserte størrelseskonstanter
 
@@ -72,7 +74,7 @@ Rettelse:
 src/model/elementDimensions.ts
 ```
 
-Denne modulen eier nå autoritative standard- og minimumsstørrelser. Oppretting, layout og bildegrunnramme bruker samme kilde.
+Denne modulen eier autoritative standard- og minimumsstørrelser. Oppretting, layout og bildegrunnramme bruker samme kilde.
 
 ### Funn 2: duplisert opprettingsvalidering
 
@@ -87,7 +89,7 @@ Rettelse:
 src/state/isValidElementCreationRequest.ts
 ```
 
-Hook og reducer bruker nå samme valideringsfunksjon. Reduceren er fortsatt siste autoritative grense.
+Hook og reducer bruker samme valideringsfunksjon. Reduceren er fortsatt siste autoritative grense.
 
 ### Funn 3: crop-invarianter bare i UI
 
@@ -98,7 +100,7 @@ Risiko:
 
 Rettelser:
 
-- `isValidElementLayoutForElement` validerer bildegeometri mot aktuell crop-størrelse
+- `isValidElementDesktopLayout` validerer bildegeometri mot aktuell crop-størrelse
 - `setImageMode` tilpasser en for stor ramme til en sentrert, gyldig crop-ramme
 - `setImageTransform` normaliserer transform mot faktisk ramme
 - ugyldig transform avvises
@@ -108,21 +110,23 @@ Resultat:
 
 Crop-reglene håndheves i modell og reducer, ikke bare av pekerkoden eller høyremenyen.
 
-### Funn 4: manglende tastaturalternativ for motivflytting
+### Funn 4: motivets tastatursnarvei var fokusavhengig
 
 Risiko:
 
-- motivflytting var avhengig av draing
-- senere tilgjengelighetsarbeid ville måtte bryte opp canvas-komponenten på nytt
+- `Alt + piltast` fungerte bare når canvas-elementet hadde fokus
+- bruk av høyremeny eller zoom-slider gjorde snarveien utilgjengelig
+- `Alt + venstre/høyre` kunne aktivere nettleserhistorikk
 
 Rettelse:
 
 ```text
-src/components/canvas/canvasElementKeyboard.ts
-Alt + piltast = flytt motiv i crop-modus
+src/components/editor/useSelectedImageCropKeyboard.ts
 ```
 
-Tastaturlogikken ble trukket ut av `EditorCanvasElement.tsx`. Komponentens ansvar og linjetall ble redusert.
+Den valgte bildeutsnittssnarveien håndteres på editornivå. Den virker fra canvas og relevante høyremenyfelt, men blokkeres i tekstredigering og dialoger. Nettleserens standardnavigasjon stoppes. Vanlig steg er 4 px; `Shift + Alt + piltast` bruker 20 px.
+
+Vanlige piltaster på canvas-elementet beholder ansvar for elementflytting og `Ctrl/Cmd + piltast` for størrelse.
 
 ### Funn 5: importflyt kunne bli stående som opptatt
 
@@ -147,11 +151,59 @@ Risiko:
 
 Rettelse:
 
-Ressurslageret krever nå samsvar mellom `File` og metadata for:
+Ressurslageret krever samsvar mellom `File` og metadata for:
 
 - filnavn
 - MIME-type
 - byte-størrelse
+
+### Funn 7: Seksjon kunne dekke et senere opprettet bilde
+
+Risiko:
+
+- visuelt innhold kunne forsvinne bak en Seksjon avhengig av opprettingsrekkefølge
+- brukerens oppfatning av Seksjon som bakgrunn ble brutt
+
+Rettelse:
+
+Canvas-rendering deler elementene i Seksjon og forgrunnselementer. Seksjon rendres først, mens Bilde, Tekst og Knapp rendres over. Prosjektets flate elementrekkefølge og datamodell endres ikke.
+
+### Funn 8: bilderammens grep skapte en ekstra utvendig kant
+
+Risiko:
+
+- grep og outline gjorde det vanskelig å se den faktiske klippekanten
+- presis plassering helt inntil motivet ble visuelt uklar
+
+Rettelse:
+
+- bildeelementets interne border ble fjernet
+- selection-outline ligger direkte mot bilderammen
+- alle åtte synlige grep og treffområder ligger innenfor rammen
+- resize-retninger og hitbox-størrelse er beholdt
+
+### Funn 9: crop-resize sentrerte motivet på nytt
+
+Risiko:
+
+- samme normaliserte offset ble tolket mot et nytt overløp
+- side- og toppresize flyttet eller sentrerte motivet automatisk
+- rammen kunne bli mindre uten at brukeren opplevde reell klipping
+- layout og transform kunne bli commitet som separate mellomtilstander
+
+Rettelser:
+
+```text
+src/model/imagePresentation.ts
+  getImageTransformForResizedFrame
+
+src/state/setImageDesktopFrame.ts
+  set-image-desktop-frame
+```
+
+Ved crop-resize beregnes motivets absolutte posisjon fra den opprinnelige rammen. Ny normalisert offset avledes mot den nye rammen. Zoom og motivstørrelse beholdes. Aktiv kant flyttes, motsatt kant står fast og rammen klipper mer eller mindre av et stasjonært motiv.
+
+Ramme og korrigert transform lagres atomisk i én reducerhandling. Preview bruker samme beregning som committen.
 
 ## 5. Bilde- og ressursaudit
 
@@ -176,20 +228,25 @@ Rendering:
 
 - bruker kontrollert fallback ved manglende ressurs
 - bruker eksplisitt beregnet layout for contain og crop
+- rendrer Seksjon deterministisk bak forgrunnselementer
 - leser ikke prosjektdata fra DOM-en
 
 ## 6. Bilderamme- og utsnittsaudit
 
 - ramme og motiv har separate beregninger
-- `contain` bruker proporsjonal sentrering
+- `contain` bruker proporsjonal skalering og sentrering etter rammen
 - `crop` bruker fast grunnskala, zoom og normalisert offset
 - zoom normaliseres til `1..3`
 - minimum crop-zoom avledes fra rammen
 - offset begrenses til `-1..1`
 - tomrom blir ikke synlig i crop-modus
 - rammen kan endres fra åtte retninger
-- motsatt kant står fast ved topp-/venstre-resize
+- grepene ligger innenfor rammen
+- motsatt kant står fast ved alle kanthåndtak
+- crop-resize bevarer motivets størrelse og absolutte plassering
+- crop-resize skalerer eller sentrerer ikke motivet automatisk
 - pekertransform bruker transient preview og én commit
+- ramme og transform committes atomisk
 - motivdrag bruker transient transform og én commit
 - `pointercancel` og tapt capture forkaster draft
 
@@ -202,21 +259,22 @@ Rendering:
 - radiofelt grupperer visningsmodus
 - zoom har tilgjengelig label og prosentverdi
 - hjelpetekst beskriver peker og `Alt + piltast`
+- `Alt + piltast` fungerer etter bruk av zoomkontrollen
 - låste kontroller er deaktivert
 - tilgjengelig canvas-label beskriver relevante snarveier
 - `prefers-reduced-motion` respekteres
 
-## 8. Sluttkontroll etter audit
+## 8. Sluttkontroll etter siste produksjonsendring
 
 Brukerens lokale terminaloutput bekreftet:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 89 moduler, 228 avhengigheter, ingen brudd
-Vite: 98 moduler transformert
-CSS: 31.07 kB, gzip 6.07 kB
-JavaScript: 255.44 kB, gzip 77.18 kB
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 31.06 kB, gzip 6.06 kB
+JavaScript: 258.04 kB, gzip 77.94 kB
 produksjonsbuild: bestått
 ```
 
@@ -225,20 +283,24 @@ Manuell kontroll ble godkjent for:
 - PNG-, JPEG- og WebP-import
 - avbrytelse og feilvalidering
 - markering, flytting og låsing
+- Seksjon bak bilde og øvrig innhold
 - rammeresize fra alle kanter og hjørner
+- grep på innsiden av bilderammen
 - `Hele bildet` og `Juster utsnitt`
 - zoom, reset og motivflytting
+- `Alt + piltast`
+- crop-resize med stasjonært motiv og fast motsatt kant
 - sletting og ressursopprydding
 - manglende ressursfallback
 - PC og Telefon
 
-Arkitekturrapportene ble regenerert etter siste audit og commitet på feature-branchen.
+Arkitekturrapportene ble regenerert etter siste resize- og state-endring og commitet på feature-branchen i `94ed2fb`.
 
 ## 9. Gjenstående før merge
 
-- sluttfør og kontroller dokumentasjonsdiffen
-- trekk feature-branchen lokalt
-- kontroller `git diff --check` og clean tree
-- opprett PR med `Closes #25`
-- kontroller mergebarhet, changed files, review-tråder og CI
+- trekk siste dokumentcommits lokalt
+- kontroller dokumentdiffen etter `94ed2fb` med `git diff --check`
+- kontroller clean og synkronisert feature-branch
+- oppdater PR #26-beskrivelsen med siste funksjons- og kontrollstatus
+- kontroller PR-ens mergebarhet, changed files, review-tråder og CI på nytt
 - merge bare etter eksplisitt brukergodkjenning
