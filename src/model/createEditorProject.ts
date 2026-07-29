@@ -5,12 +5,14 @@ import {
   type EditorProjectState,
 } from './editorProject'
 import { createStableId } from './createStableId'
+import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
 
 export function createBlankPage(name = 'Forside', slug = '/'): EditorPage {
   return {
     id: createStableId(),
     name,
     slug,
+    appearance: { ...DEFAULT_PAGE_APPEARANCE },
     elements: [],
   }
 }
