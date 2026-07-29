@@ -1,3 +1,7 @@
+import {
+  getDefaultElementSize,
+  type ElementSize,
+} from './elementDimensions'
 import type { ImageAssetMetadata } from './imageAsset'
 
 export const MIN_IMAGE_ZOOM = 1
@@ -11,10 +15,7 @@ export type ImageTransform = {
   offsetY: number
 }
 
-export type ImageFrameSize = {
-  width: number
-  height: number
-}
+export type ImageFrameSize = ElementSize
 
 export type ImageRenderLayout = {
   left: number
@@ -23,10 +24,7 @@ export type ImageRenderLayout = {
   height: number
 }
 
-export const DEFAULT_IMAGE_FRAME_SIZE: ImageFrameSize = {
-  width: 240,
-  height: 160,
-}
+const DEFAULT_IMAGE_FRAME_SIZE = getDefaultElementSize('image')
 
 export const DEFAULT_IMAGE_MODE: ImageMode = 'contain'
 export const DEFAULT_IMAGE_TRANSFORM: ImageTransform = {
@@ -50,17 +48,29 @@ export function isImageMode(value: unknown): value is ImageMode {
   return value === 'contain' || value === 'crop'
 }
 
-export function normalizeImageTransform(
-  value: ImageTransform,
-): ImageTransform | null {
-  if (![value.zoom, value.offsetX, value.offsetY].every(Number.isFinite)) {
+export function normalizeImageTransform(value: unknown): ImageTransform | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const candidate = value as Partial<ImageTransform>
+  const { zoom, offsetX, offsetY } = candidate
+
+  if (
+    typeof zoom !== 'number' ||
+    !Number.isFinite(zoom) ||
+    typeof offsetX !== 'number' ||
+    !Number.isFinite(offsetX) ||
+    typeof offsetY !== 'number' ||
+    !Number.isFinite(offsetY)
+  ) {
     return null
   }
 
   return {
-    zoom: clamp(value.zoom, MIN_IMAGE_ZOOM, MAX_IMAGE_ZOOM),
-    offsetX: clamp(value.offsetX, -1, 1),
-    offsetY: clamp(value.offsetY, -1, 1),
+    zoom: clamp(zoom, MIN_IMAGE_ZOOM, MAX_IMAGE_ZOOM),
+    offsetX: clamp(offsetX, -1, 1),
+    offsetY: clamp(offsetY, -1, 1),
   }
 }
 
@@ -80,7 +90,7 @@ export function getMinimumImageZoomForFrame(
 }
 
 export function normalizeImageTransformForFrame(
-  value: ImageTransform,
+  value: unknown,
   metadata: ImageAssetMetadata,
   frameSize: ImageFrameSize,
 ): ImageTransform | null {
