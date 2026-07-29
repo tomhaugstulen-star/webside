@@ -52,9 +52,9 @@ subgraph src["src"]
     src_model_elementLayout_ts["elementLayout.ts"]
     src_model_createStableId_ts["createStableId.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
+    src_model_createEditorProject_ts["createEditorProject.ts"]
     src_model_createEditorElement_ts["createEditorElement.ts"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
-    src_model_createEditorProject_ts["createEditorProject.ts"]
   end
   subgraph src_state["state"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
@@ -71,6 +71,7 @@ subgraph src["src"]
     src_state_useTextElementStyle_ts["useTextElementStyle.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
+    src_state_addElementToActivePage_ts["addElementToActivePage.ts"]
     src_state_deleteElementFromActivePage_ts["deleteElementFromActivePage.ts"]
     src_state_setButtonAsset_ts["setButtonAsset.ts"]
     src_state_setButtonLabel_ts["setButtonLabel.ts"]
@@ -216,11 +217,10 @@ src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
-src_state_editorProjectReducer_ts-->src_assets_buttons_buttonAssetCatalog_ts
-src_state_editorProjectReducer_ts-->src_model_createEditorElement_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
 src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
+src_state_editorProjectReducer_ts-->src_state_addElementToActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_deleteElementFromActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_setButtonAsset_ts
@@ -229,6 +229,12 @@ src_state_editorProjectReducer_ts-->src_state_setElementLink_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
 src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
+src_model_createEditorProject_ts-->src_model_createStableId_ts
+src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_state_addElementToActivePage_ts-->src_assets_buttons_buttonAssetCatalog_ts
+src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
+src_state_addElementToActivePage_ts-->src_model_editorProject_ts
+src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
 src_model_createEditorElement_ts-->src_model_buttonAsset_ts
 src_model_createEditorElement_ts-->src_model_editorProject_ts
 src_model_createEditorElement_ts-->src_model_elementCreation_ts
@@ -236,8 +242,6 @@ src_model_createEditorElement_ts-->src_model_elementLink_ts
 src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_textElementStyle_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
-src_model_createEditorProject_ts-->src_model_createStableId_ts
-src_model_createEditorProject_ts-->src_model_editorProject_ts
 src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
 src_state_setButtonAsset_ts-->src_assets_buttons_buttonAssetCatalog_ts
 src_state_setButtonAsset_ts-->src_model_buttonAsset_ts
