@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editore
 ## 1. Gjeldende skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 6
+EDITOR_PROJECT_SCHEMA_VERSION = 7
 ```
 
 ```text
@@ -15,9 +15,10 @@ versjon 3  varig tekststil
 versjon 4  varig elementlenke
 versjon 5  stabilt knappasset, knappetekst og knappelenke
 versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
+versjon 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 ```
 
-Det finnes ennå ingen prosjektfilimport eller migreringsmotor. En annen bilde- eller crop-modell krever ny skjemaversjon og kontrollert migrering.
+Det finnes ennå ingen prosjektfilimport eller migreringsmotor. Framtidig import må migrere eller avvise versjon 6 kontrollert før `replace-project`.
 
 ## 2. Prosjektstruktur
 
@@ -27,6 +28,10 @@ EditorProject
   id
   name
   pages: EditorPage[]
+    id
+    name
+    slug
+    appearance
     elements: EditorElement[]
   createdAt
   updatedAt
@@ -36,7 +41,30 @@ Et nytt prosjekt starter med én blank side kalt `Forside`.
 
 Prosjektmodellen er flat. En Seksjon eier ikke elementer som ligger visuelt over den. Rendering plasserer Seksjon bak Bilde, Tekst og Knapp uten å endre lagret elementrekkefølge.
 
-## 3. Felles elementdata
+## 3. Farger
+
+```ts
+type EditorColor = string // kanonisk #RRGGBB
+```
+
+Gyldige farger:
+
+- seks heksadesimale sifre
+- ledende `#`
+- normalisert til store bokstaver
+- ingen alpha
+- ingen gradient
+- ingen vilkårlig CSS-streng
+
+```ts
+type PageAppearance = {
+  backgroundColor: EditorColor
+}
+```
+
+Standard sidebakgrunn er `#FFFFFF`.
+
+## 4. Felles elementdata
 
 ```ts
 type BaseEditorElement = {
@@ -56,15 +84,39 @@ type EditorElement =
   | ButtonEditorElement
 ```
 
-## 4. Elementtyper
+## 5. Elementtyper
 
 ### Seksjon
 
 ```ts
+type SectionFrameWidth =
+  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+
+type SectionFrame = {
+  width: SectionFrameWidth
+  color: EditorColor
+}
+
+type SectionAppearance = {
+  backgroundColor: EditorColor
+  frame: SectionFrame
+}
+
 type SectionEditorElement = BaseEditorElement & {
   kind: 'section'
+  appearance: SectionAppearance
 }
 ```
+
+Standard:
+
+```text
+bakgrunn: #FFFDFB
+rammebredde: 0
+rammefarge: #D8CEC8
+```
+
+`0` betyr `Ingen`. Rammefargen beholdes selv om bredden er `0`. Rammen ligger innenfor elementets lagrede størrelse.
 
 ### Bilde
 
@@ -95,19 +147,21 @@ type ImageTransform = {
 }
 ```
 
-Nye bilder starter med:
-
-```text
-altText: ''
-mode: contain
-zoom: 1
-offsetX: 0
-offsetY: 0
-```
+Nye bilder starter med tom alternativ tekst, `contain`, zoom `1` og sentrert offset.
 
 ### Tekst
 
 ```ts
+type TextElementStyle = {
+  fontFamily: TextFontFamily
+  fontSize: TextFontSize
+  fontWeight: TextFontWeight
+  fontStyle: TextFontStyle
+  textAlign: TextAlignment
+  lineHeight: TextLineHeight
+  color: EditorColor
+}
+
 type TextEditorElement = BaseEditorElement & {
   kind: 'text'
   content: string
@@ -115,6 +169,8 @@ type TextEditorElement = BaseEditorElement & {
   link: ElementLink
 }
 ```
+
+Standard tekstfarge er `#625C58`.
 
 ### Knapp
 
@@ -127,7 +183,29 @@ type ButtonEditorElement = BaseEditorElement & {
 }
 ```
 
-## 5. Stabile asset-ID-er
+Knapper bruker ferdig SVG-fargedesign. Fargene er del av det valgte assetet og overstyres ikke av prosjektfargemodellen.
+
+## 6. Prosjektfargeoversikt
+
+`Farger` er avledet UI og lagres ikke i prosjektet.
+
+Oversikten avledes fra aktiv side:
+
+```text
+Bakgrunn
+  Sidebakgrunn
+Element N
+  Bakgrunn
+  Ramme      bare når width > 0
+Tekst N
+  Tekstfarge
+```
+
+Bilde og Knapp oppretter ingen fargeoppføring. Nummerering avledes fra elementrekkefølgen og lagres ikke.
+
+Hver oppføring peker til stabil side- eller element-ID og én konkret egenskap. Like fargeverdier kobler ikke elementer sammen.
+
+## 7. Stabile asset-ID-er
 
 ### Knapp
 
@@ -142,7 +220,7 @@ type ButtonEditorElement = BaseEditorElement & {
 - prosjektet lagrer ikke filsti, `File`, Blob eller Object URL
 - manglende ressurs gir kontrollert fallback
 
-## 6. Bilderessurslager
+## 8. Bilderessurslager
 
 ```text
 ImageAssetId -> {
@@ -160,51 +238,22 @@ Regler:
 - alle URL-er tilbakekalles ved provider-unmount
 - sletting fjerner ressursen bare når asset ikke deles
 - mislykket elementoppretting rydder registrert ressurs
-- import som avsluttes etter panel-unmount oppretter ikke ressurs eller element
+- import etter panel-unmount oppretter ikke ressurs eller element
 
-Ressursbufferen gjelder bare aktiv nettleserøkt. Varig binærlagring bygges senere.
+Ressursbufferen gjelder bare aktiv nettleserøkt.
 
-## 7. Bildevalidering
-
-Autoritative import- og metadatagrenser:
+## 9. Bildevalidering og transform
 
 ```text
 format: PNG, JPEG eller WebP
 maks filstørrelse: 10 MB
 maks dekodet pikselmengde: 40 megapiksler
 maks bredde eller høyde: 16 384 px
+zoom: 1..3
+offsetX og offsetY: -1..1
 ```
 
-Metadata er gyldig bare når:
-
-- filnavnet er ikke tomt
-- MIME-type er støttet
-- byte-størrelse er heltall innenfor grensen
-- bredde og høyde er positive heltall
-- dimensjon og pikselmengde er innenfor modellgrensene
-
-Disse reglene gjelder både UI-import og framtidig prosjektvalidering.
-
-## 8. Bildevisning og transform
-
-### `contain`
-
-- hele motivet vises proporsjonalt
-- motivet sentreres i rammen
-- tomrom er tillatt ved ulikt sideforhold
-- transform beholdes, men brukes ikke visuelt
-
-### `crop`
-
-- motivet fyller rammen uten tomrom
-- sideforholdet bevares
-- zoom begrenses til `1..3`
-- minimum zoom økes når rammen krever det
-- offset normaliseres til `-1..1`
-- offset begrenses slik at tomrom ikke blir synlig
-- rammen kan ikke være større enn motivet ved aktiv zoom
-
-## 9. Fast crop-grunnramme for versjon 6
+`contain` viser hele motivet proporsjonalt. `crop` fyller rammen uten tomrom og bevarer sideforhold.
 
 Versjon-6-transformen er definert mot:
 
@@ -212,30 +261,11 @@ Versjon-6-transformen er definert mot:
 IMAGE_CROP_BASE_FRAME_SIZE_V6 = 240 × 160 px
 ```
 
-Denne verdien er en skjemainvariant, ikke bare standardstørrelsen for nye bilder. Senere endring av bildets opprettingsstørrelse skal derfor ikke endre hvordan lagret `zoom`, `offsetX` eller `offsetY` tolkes.
+Denne verdien forblir en skjemainvariant også i versjon 7. Endring krever ny skjemaversjon og migrering.
 
-Endring av crop-grunnrammen krever:
+Ved crop-rammeresize flyttes aktiv kant, motsatt kant står fast, motivets størrelse og absolutte plassering beholdes, og ramme og transform lagres atomisk.
 
-1. ny skjemaversjon
-2. eksplisitt migrering av transformdata
-3. verifisering av eksisterende prosjekter
-
-## 10. Rammeresize i crop
-
-Bilderammen og motivet er separate konsepter.
-
-Ved rammeresize:
-
-- aktiv kant flyttes
-- motsatt kant står fast
-- motivets størrelse beholdes
-- motivets absolutte plassering på lerretet beholdes
-- ny normalisert offset beregnes mot den nye rammen
-- ramme og transform lagres atomisk
-
-Pekerpreview og reducercommit bruker samme modellberegning.
-
-## 11. Elementstørrelser
+## 10. Elementstørrelser
 
 ```text
 Standard:
@@ -251,9 +281,7 @@ Tekst    120 × 48 px
 Knapp    80 × 36 px
 ```
 
-Bildeelementets størrelse er den synlige rammen, ikke motivets egen størrelse.
-
-## 12. Responsive verdier
+## 11. Responsive verdier
 
 ```ts
 type ResponsiveValue<T> = {
@@ -272,23 +300,28 @@ Responsive verdier:
 
 Foreløpig felles for PC og Telefon:
 
+- side- og elementfarger
+- Seksjon-ramme
 - låsestatus
 - tekstinnhold og tekststil
 - elementlenke
 - knappdata
 - bildeasset, metadata, alt-tekst, modus og transform
 
-## 13. Sentral state og reducergrenser
+Responsive farger krever eksplisitt senere modellstøtte.
+
+## 12. Sentral state og reducergrenser
 
 Varige mutasjoner går gjennom typede actions for blant annet:
 
 - opprette og slette element
 - endre desktopgeometri
 - endre låsestatus
-- endre tekst, stil og lenke
+- endre sidebakgrunn
+- endre Seksjon-bakgrunn, rammebredde og rammefarge
+- endre tekst, stil, tekstfarge og lenke
 - endre knappetekst og design
-- endre bildealternativ tekst
-- endre bildevisning og transform
+- endre bildealternativ tekst, visning og transform
 - endre crop-ramme og transform atomisk
 
 Reducergrensene krever:
@@ -297,18 +330,20 @@ Reducergrensene krever:
 - eksisterende element på aktiv side
 - riktig elementtype
 - ulåst element ved mutasjon
-- gyldige verdier og metadata
-- gyldig crop-geometri
+- gyldig kanonisk farge
+- rammebredde innenfor `0–10`
+- gyldige øvrige verdier og metadata
 - faktisk endring
 
 Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
 
-## 14. Varig og transient state
+## 13. Varig og transient state
 
 Varig:
 
 - prosjekt, sider og elementer
 - geometri, synlighet og låsestatus
+- sideutseende, Seksjon-utseende og tekstfarge
 - innhold, stil, lenker og asset-ID-er
 - bildemetadata, modus og transform
 - tidsstempler
@@ -318,14 +353,15 @@ Transient:
 - markering
 - pekerøkter og preview
 - redigeringsøkter og drafts
+- avledede fargegrupper
 - `File`, Object URL og ressurskart
 - paneler, dialoger, fokus og feedback
 
-## 15. Krav til senere utvidelser
+## 14. Krav til senere utvidelser
 
 ### Prosjektimport
 
-Hele prosjektet må valideres før `replace-project`. Kjent skjemaversjon, unike ID-er, aktive sider, elementunion, layout og bildeinvarianter må kontrolleres samlet.
+Hele prosjektet må valideres før `replace-project`. Kjent skjemaversjon, unike ID-er, sider, farger, elementunion, layout og bildeinvarianter må kontrolleres samlet. Versjon 6 må migreres eller avvises kontrollert.
 
 ### Prosjektbytte
 
@@ -337,7 +373,7 @@ Angre/gjør om lagrer bare serialiserbar prosjektstate. `File`, Object URL og ak
 
 ### Mobiloverstyringer
 
-Egne mobilgeometrier må bruke viewport-spesifikke actions og ikke overskrive desktopverdier.
+Egne mobilgeometrier og eventuelle framtidige mobilfarger må bruke viewport-spesifikke actions.
 
 ### Autolagring
 
