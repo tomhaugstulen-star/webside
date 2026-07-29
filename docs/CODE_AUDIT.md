@@ -1,306 +1,227 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet samler gjeldende arkitekturretning og den framtidsrettede auditen som ble gjennomført og utvidet under kontrollen av PR #26 for fase 11A.
+Dette dokumentet beskriver den framtidsrettede auditen av fase 11A og grensene som skal beskytte senere lagring, import, historikk og responsive utvidelser.
 
-## 1. Bekreftet arkitekturretning
+## 1. Arkitekturretning
 
-- `App.tsx` setter sammen applikasjonens providers og skall.
-- `EditorShell` eier skalltilstand og komposisjon.
-- sentral prosjekt-state eier varige prosjektdata.
-- reducer-/state-laget er autoritativ valideringsgrense.
-- høyremenyen eier ingen separat elementmodell.
-- canvas-komponentene eier ikke filvalg eller ressurslagring.
-- bildefiler og Object URL-er ligger utenfor `EditorProject`.
-- responsive prosjektverdier lagres i prosjektmodellen, ikke i DOM-en.
-- automatisk lagring og prosjektimport bygges senere mot den serialiserbare modellen.
+- `App.tsx` setter sammen providers og editorskall.
+- `EditorShell` eier skalltilstand og hovedkomposisjon.
+- `EditorProject` er autoritativ kilde for varige prosjektdata.
+- reducer-/state-laget er siste valideringsgrense.
+- lerret og høyremeny muterer ikke prosjektdata direkte.
+- bildefil og Object URL ligger utenfor `EditorProject`.
+- responsive verdier lagres i prosjektmodellen, ikke i DOM-en.
+- generelle samlemapper og samlefiler skal ikke innføres.
 
-## 2. Faste filgrenser
-
-- 250 linjer er aktiv terskel for ansvarstrekk.
-- 300 linjer er hard unntaksgrense.
-- en fil deles tidligere når den får flere tydelige ansvar.
-- `RightPropertiesPanel.tsx` skal være komposisjon.
-- tilfeldig generell `features`-samlemappe skal ikke innføres.
-
-Etter de siste fase-11A-rettelsene:
+## 2. Filgrenser etter sluttaudit
 
 ```text
 EditorCanvasElement.tsx: under 200 linjer
 ImagePropertiesSection.tsx: 199 linjer
-imagePresentation.ts: 240 linjer
+imagePresentation.ts: 236 innholdslinjer
 useElementPointerTransform.ts: 218 linjer
-setImageDesktopFrame.ts: 88 linjer
+ImageImportControl.tsx: 133 linjer
+setImageDesktopFrame.ts: under 100 linjer
 alle berørte kildefiler: under 250 linjer
 ```
 
-## 3. Gjeldende prosjekt- og stategrenser
+250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense.
+
+## 3. State- og reducergrenser
 
 Prosjektskjemaet i leveransen er versjon 6.
 
-Reducerhandlinger skal avvise:
+Reducerhandlinger avviser:
 
-- manglende aktiv side
-- manglende element
+- manglende aktiv side eller element
 - element på feil side
 - duplisert element-ID
 - feil elementtype
 - låst element
-- ugyldig verdi
+- ugyldige eller ikke-finite verdier
 - ukjent knappasset-ID
 - ugyldig bildeasset eller metadata
-- ugyldig visningsmodus eller bildetransform
+- ukjent bildevisningsmodus
+- ugyldig bildetransform
 - crop-geometri som ikke kan fylles ved lagret zoom
-- ramme og transform som ikke er konsistente
+- inkonsistent bilderamme og transform
 - uendret data
 
-Ved avvisning returneres samme state, prosjektet muteres ikke og `updatedAt` endres ikke.
+Ved avvisning returneres samme state. Prosjektet og `updatedAt` endres ikke.
 
-Transient markering, pekerinteraksjon, layout-preview, preview-transform, åpne paneler, drafts, filvelger, bildefil, Object URL, validering, feedback, fokus, hover og dialogstate serialiseres ikke.
+Transient markering, pekerøkter, preview, drafts, panelstate, filvelger, `File`, Object URL, fokus, hover, feedback og dialogstate serialiseres ikke.
 
-## 4. Fase-11A-audit
-
-Auditen ble gjennomført etter at bildeimport, rammeresize og utsnittsredigering fungerte manuelt. Den ble utvidet da PR-testen avdekket interaksjonsfeil som automatiske kontroller ikke kunne finne.
+## 4. Auditfunn og rettelser
 
 ### Funn 1: dupliserte størrelseskonstanter
 
-Risiko:
-
-- oppretting, minimumsstørrelse og bildeutsnitt kunne utvikle ulike tall
-- framtidige elementtyper måtte oppdateres flere steder
-
-Rettelse:
-
-```text
-src/model/elementDimensions.ts
-```
-
-Denne modulen eier autoritative standard- og minimumsstørrelser. Oppretting, layout og bildegrunnramme bruker samme kilde.
+Standard- og minimumsstørrelser ble samlet i `src/model/elementDimensions.ts`. Oppretting og layout bruker samme modellkilde.
 
 ### Funn 2: duplisert opprettingsvalidering
 
-Risiko:
+`src/state/isValidElementCreationRequest.ts` brukes av både UI-hook og reducer. Reduceren er fortsatt autoritativ.
 
-- hook og reducer kunne godta ulike opprettingsforespørsler
-- UI-validering kunne bli sterkere enn stategrensen
+### Funn 3: crop-invarianter lå bare i UI
 
-Rettelse:
+Modell og reducer håndhever nå:
 
-```text
-src/state/isValidElementCreationRequest.ts
-```
+- maksimal crop-ramme ved aktuell zoom
+- gyldig overgang fra contain til crop
+- transformnormalisering mot faktisk ramme
+- ingen skjult transformmutasjon i contain
+- atomisk lagring av ramme og korrigert transform
 
-Hook og reducer bruker samme valideringsfunksjon. Reduceren er fortsatt siste autoritative grense.
+### Funn 4: `Alt + piltast` var fokusavhengig
 
-### Funn 3: crop-invarianter bare i UI
-
-Risiko:
-
-- en direkte action eller framtidig prosjektimport kunne lagre en ramme større enn motivet
-- overgang fra en stor contain-ramme kunne gi ugyldig crop-state
-
-Rettelser:
-
-- `isValidElementDesktopLayout` validerer bildegeometri mot aktuell crop-størrelse
-- `setImageMode` tilpasser en for stor ramme til en sentrert, gyldig crop-ramme
-- `setImageTransform` normaliserer transform mot faktisk ramme
-- ugyldig transform avvises
-- transform muteres ikke når bildet står i `contain`
-
-Resultat:
-
-Crop-reglene håndheves i modell og reducer, ikke bare av pekerkoden eller høyremenyen.
-
-### Funn 4: motivets tastatursnarvei var fokusavhengig
-
-Risiko:
-
-- `Alt + piltast` fungerte bare når canvas-elementet hadde fokus
-- bruk av høyremeny eller zoom-slider gjorde snarveien utilgjengelig
-- `Alt + venstre/høyre` kunne aktivere nettleserhistorikk
-
-Rettelse:
+`useSelectedImageCropKeyboard.ts` håndterer snarveien på editornivå. Den fungerer etter bruk av zoomkontrollen, blokkeres i tekstfelter og dialoger, og stopper nettleserhistorikk på `Alt + venstre/høyre`.
 
 ```text
-src/components/editor/useSelectedImageCropKeyboard.ts
+Alt + piltast          4 px
+Shift + Alt + piltast 20 px
 ```
 
-Den valgte bildeutsnittssnarveien håndteres på editornivå. Den virker fra canvas og relevante høyremenyfelt, men blokkeres i tekstredigering og dialoger. Nettleserens standardnavigasjon stoppes. Vanlig steg er 4 px; `Shift + Alt + piltast` bruker 20 px.
+### Funn 5: import kunne bli stående opptatt eller fortsette etter panelbytte
 
-Vanlige piltaster på canvas-elementet beholder ansvar for elementflytting og `Ctrl/Cmd + piltast` for størrelse.
+Importflyten bruker `try/catch/finally`, rydder delvis registrert ressurs og oppdaterer ikke UI eller prosjekt etter at Elementer-panelet er demontert.
 
-### Funn 5: importflyt kunne bli stående som opptatt
+### Funn 6: ressursmetadata kunne avvike fra faktisk fil
 
-Risiko:
+Ressurslageret krever samsvar for filnavn, MIME-type og byte-størrelse. Duplisert `assetId` avvises.
 
-- en framtidig uventet feil etter filvalidering kunne la knappen stå deaktivert
-- en delvis registrert ressurs kunne bli liggende igjen
+### Funn 7: Seksjon kunne dekke forgrunnsinnhold
 
-Rettelse:
+Seksjon rendres først som bakgrunnslag. Bilde, Tekst og Knapp rendres over uten at lagret elementrekkefølge eller den flate prosjektmodellen endres.
 
-- importflyten bruker `try/catch/finally`
-- `busy` avsluttes alltid
-- delvis registrert ressurs fjernes ved feil
-- brukeren får en kontrollert feilmelding
+### Funn 8: bilderammen hadde motstridende CSS
 
-### Funn 6: ressursmetadata var ikke fullt krysskontrollert
+Bildets interne border og bakgrunn eies bare av `image-element.css`. Den gamle regelen i `canvas.css` er fjernet, slik at korrekt rendering ikke avhenger av CSS-importrekkefølgen.
 
-Risiko:
+### Funn 9: grep og outline skapte ekstra utvendig kant
 
-- filnavn i prosjektmetadata kunne avvike fra faktisk fil
-- senere lagring kunne få uklar ressursidentitet
+Alle åtte grep og treffområder ligger innenfor rammen. Selection-outline ligger direkte mot bilderammen.
 
-Rettelse:
+### Funn 10: crop-resize sentrerte motivet på nytt
 
-Ressurslageret krever samsvar mellom `File` og metadata for:
+`getImageTransformForResizedFrame` bevarer motivets absolutte plassering. Zoom og motivstørrelse endres ikke. Aktiv kant flyttes, motsatt kant står fast, og ny normalisert offset beregnes mot den nye rammen.
 
-- filnavn
-- MIME-type
-- byte-størrelse
+`set-image-desktop-frame` lagrer ramme og transform atomisk.
 
-### Funn 7: Seksjon kunne dekke et senere opprettet bilde
+### Funn 11: crop-geometri var koblet til en senere endringsbar standardstørrelse
 
-Risiko:
+Crop-grunnrammen for skjemaversjon 6 er nå eksplisitt låst til 240 × 160 px. Senere endring av standardstørrelsen for nye bilder kan derfor ikke endre utsnitt i eksisterende versjon-6-prosjekter.
 
-- visuelt innhold kunne forsvinne bak en Seksjon avhengig av opprettingsrekkefølge
-- brukerens oppfatning av Seksjon som bakgrunn ble brutt
+En annen crop-grunnmodell krever ny skjemaversjon og migrering.
 
-Rettelse:
+### Funn 12: filstørrelse begrenset ikke dekodet minnebruk
 
-Canvas-rendering deler elementene i Seksjon og forgrunnselementer. Seksjon rendres først, mens Bilde, Tekst og Knapp rendres over. Prosjektets flate elementrekkefølge og datamodell endres ikke.
-
-### Funn 8: bilderammens grep skapte en ekstra utvendig kant
-
-Risiko:
-
-- grep og outline gjorde det vanskelig å se den faktiske klippekanten
-- presis plassering helt inntil motivet ble visuelt uklar
-
-Rettelse:
-
-- bildeelementets interne border ble fjernet
-- selection-outline ligger direkte mot bilderammen
-- alle åtte synlige grep og treffområder ligger innenfor rammen
-- resize-retninger og hitbox-størrelse er beholdt
-
-### Funn 9: crop-resize sentrerte motivet på nytt
-
-Risiko:
-
-- samme normaliserte offset ble tolket mot et nytt overløp
-- side- og toppresize flyttet eller sentrerte motivet automatisk
-- rammen kunne bli mindre uten at brukeren opplevde reell klipping
-- layout og transform kunne bli commitet som separate mellomtilstander
-
-Rettelser:
+Import avviser nå bilder som overstiger:
 
 ```text
-src/model/imagePresentation.ts
-  getImageTransformForResizedFrame
-
-src/state/setImageDesktopFrame.ts
-  set-image-desktop-frame
+10 MB filstørrelse
+40 megapiksler
+16 384 px bredde eller høyde
 ```
 
-Ved crop-resize beregnes motivets absolutte posisjon fra den opprinnelige rammen. Ny normalisert offset avledes mot den nye rammen. Zoom og motivstørrelse beholdes. Aktiv kant flyttes, motsatt kant står fast og rammen klipper mer eller mindre av et stasjonært motiv.
+Samme dimensjonsregler inngår i metadata-valideringen i modellaget.
 
-Ramme og korrigert transform lagres atomisk i én reducerhandling. Preview bruker samme beregning som committen.
+### Funn 13: import kunne fullføre etter at kontrollen var demontert
 
-## 5. Bilde- og ressursaudit
+`ImageImportControl` bruker en monteringsreferanse. Etter unmount opprettes ingen ressurs, intet element og ingen lokal state-oppdatering.
+
+## 5. Ressurslivssyklus
 
 Prosjektmodell:
 
 - lagrer stabil `assetId`
 - lagrer validert serialiserbar metadata
-- lagrer alternativ tekst, visningsmodus og transform
-- lagrer aldri lokal filsti, rå binærfil eller Object URL
+- lagrer alt-tekst, modus og transform
+- lagrer aldri filsti, `File`, Blob eller Object URL
 
 Ressurslager:
 
 - eier `File` og Object URL
-- avviser duplisert ID
-- avviser fil/metadata-mismatch
-- tilbakekaller Object URL ved fjerning
-- tilbakekaller gjenværende URL-er ved provider-unmount
+- avviser duplisert ID og metadataavvik
+- tilbakekaller URL ved ressursfjerning
+- tilbakekaller alle gjenværende URL-er ved provider-unmount
 - fjerner ressurs ved mislykket elementoppretting
-- fjerner ressurs ved sletting når den ikke deles
+- fjerner ressurs ved sletting når asset ikke deles
 
-Rendering:
+## 6. Bildegeometri
 
-- bruker kontrollert fallback ved manglende ressurs
-- bruker eksplisitt beregnet layout for contain og crop
-- rendrer Seksjon deterministisk bak forgrunnselementer
-- leser ikke prosjektdata fra DOM-en
+- `contain` skalerer hele motivet proporsjonalt og sentrerer det.
+- `crop` bruker fast versjon-6-grunnskala, zoom og normalisert offset.
+- zoom normaliseres til `1..3`.
+- minimum zoom avledes fra rammen.
+- offset begrenses til `-1..1`.
+- tomrom kan ikke bli synlig i crop.
+- rammen kan endres fra åtte retninger.
+- rammeresize bevarer motivets størrelse og absolutte plassering.
+- pekertransform bruker transient preview og én commit.
+- `pointercancel` og tapt capture forkaster draft.
 
-## 6. Bilderamme- og utsnittsaudit
+## 7. Tilgjengelighet
 
-- ramme og motiv har separate beregninger
-- `contain` bruker proporsjonal skalering og sentrering etter rammen
-- `crop` bruker fast grunnskala, zoom og normalisert offset
-- zoom normaliseres til `1..3`
-- minimum crop-zoom avledes fra rammen
-- offset begrenses til `-1..1`
-- tomrom blir ikke synlig i crop-modus
-- rammen kan endres fra åtte retninger
-- grepene ligger innenfor rammen
-- motsatt kant står fast ved alle kanthåndtak
-- crop-resize bevarer motivets størrelse og absolutte plassering
-- crop-resize skalerer eller sentrerer ikke motivet automatisk
-- pekertransform bruker transient preview og én commit
-- ramme og transform committes atomisk
-- motivdrag bruker transient transform og én commit
-- `pointercancel` og tapt capture forkaster draft
-
-## 7. Tilgjengelighetsaudit
-
-- bildealternativ tekst har eksplisitt label og hjelpetekst
-- tom alt-tekst er tillatt for dekorative bilder
+- eksplisitt label og hjelpetekst for alt-tekst
+- tom alt-tekst er gyldig for dekorative bilder
 - feil bruker `role="alert"`
 - lagringsfeedback bruker `role="status"`
-- radiofelt grupperer visningsmodus
-- zoom har tilgjengelig label og prosentverdi
-- hjelpetekst beskriver peker og `Alt + piltast`
-- `Alt + piltast` fungerer etter bruk av zoomkontrollen
+- radiofelt grupperes med fieldset og legend
+- zoom har label og synlig prosentverdi
+- tastatur- og pekerhjelp er dokumentert i UI
 - låste kontroller er deaktivert
-- tilgjengelig canvas-label beskriver relevante snarveier
+- canvas-label beskriver relevante snarveier
 - `prefers-reduced-motion` respekteres
 
-## 8. Sluttkontroll etter siste produksjonsendring
+## 8. Verifisert sluttkontroll
 
-Brukerens lokale terminaloutput bekreftet:
+Brukerens lokale terminaloutput etter siste produksjonsendring:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
 Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
 Vite: 100 moduler transformert
-CSS: 31.06 kB, gzip 6.06 kB
-JavaScript: 258.04 kB, gzip 77.94 kB
-produksjonsbuild: bestått
+CSS: 30.95 kB, gzip 6.04 kB
+JavaScript: 258.38 kB, gzip 78.09 kB
+produksjonsbuild: bestått på 185 ms
 ```
 
-Manuell kontroll ble godkjent for:
+Manuell kontroll er godkjent for import, validering, lagrekkefølge, ramme, crop, zoom, tastatur, låsing, sletting, fallback, PC og Telefon.
 
-- PNG-, JPEG- og WebP-import
-- avbrytelse og feilvalidering
-- markering, flytting og låsing
-- Seksjon bak bilde og øvrig innhold
-- rammeresize fra alle kanter og hjørner
-- grep på innsiden av bilderammen
-- `Hele bildet` og `Juster utsnitt`
-- zoom, reset og motivflytting
-- `Alt + piltast`
-- crop-resize med stasjonært motiv og fast motsatt kant
-- sletting og ressursopprydding
-- manglende ressursfallback
-- PC og Telefon
+## 9. Obligatoriske grenser for senere faser
 
-Arkitekturrapportene ble regenerert etter siste resize- og state-endring og commitet på feature-branchen i `94ed2fb`.
+### Prosjektimport
 
-## 9. Gjenstående før merge
+- valider hele prosjektobjektet før `replace-project`
+- krev kjent skjemaversjon
+- avvis eller migrer eldre og nyere skjema kontrollert
+- ikke la importert metadata opprette Object URL uten en faktisk validert fil
 
-- trekk siste dokumentcommits lokalt
-- kontroller dokumentdiffen etter `94ed2fb` med `git diff --check`
-- kontroller clean og synkronisert feature-branch
-- oppdater PR #26-beskrivelsen med siste funksjons- og kontrollstatus
-- kontroller PR-ens mergebarhet, changed files, review-tråder og CI på nytt
+### Prosjektbytte
+
+- avstem eller tøm bilderessursbufferen
+- tilbakekall URL-er som ikke lenger tilhører aktivt prosjekt
+
+### Angre og gjør om
+
+- historikk inneholder bare serialiserbar prosjektstate
+- `File`, Object URL og aktive pekerøkter skal aldri inngå
+
+### Mobiloverstyringer
+
+- bruk viewport-spesifikke geometrihandlinger
+- ikke skriv mobilendringer inn i desktopfeltet
+
+### Autolagring
+
+- reager bare på gyldige prosjektmutasjoner
+- ikke lagre transient editor- eller ressursstate direkte
+
+## 10. Gjenstående før merge
+
+- regenerer `architecture.json` og `docs/dependency-graph.mmd`
+- kontroller at bare rapportene endres
+- commit og push rapportene
+- trekk og kontroller alle dokumentendringer lokalt
+- kontroller `git diff --check`, clean tree, PR-head, mergebarhet, reviews og CI
 - merge bare etter eksplisitt brukergodkjenning
