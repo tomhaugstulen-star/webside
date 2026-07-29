@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt lerret. Brukeren kan opprette, markere, flytte, endre størrelse, låse og slette elementer. Tekstbokser støtter kontrollert flerlinjet redigering, tekstegenskaper og ekstern lenke. Knapper opprettes fra et bundlet SVG-bibliotek og har redigerbar tekst, design og lenke.
+Editoren åpner med et blankt lerret for PC og Telefon. Brukeren kan opprette, markere, flytte, endre størrelse, låse og slette elementer. Tekstbokser støtter flerlinjet redigering, tekstegenskaper og ekstern lenke. Knapper opprettes fra et bundlet SVG-bibliotek. Bildeelementer støtter lokal import, separat ramme og utsnitt, zoom, alternativ tekst og kontrollert ressurslivssyklus.
 
 ## Repo og lokal mappe
 
@@ -47,42 +47,37 @@ main
   -> eksplisitt mergegodkjenning
 ```
 
-## Gjeldende prosjektstatus
+## Gjeldende leveransestatus
 
-Faktisk `main`-HEAD skal alltid kontrolleres mot `origin/main`. Dokumentasjonen hardkoder ikke et commitnummer som «gjeldende HEAD», fordi en slik verdi blir foreldet ved neste merge.
-
-```powershell
-git fetch origin
-git switch main
-git pull --ff-only origin main
-git status
-git log -6 --oneline --decorate
-```
-
-Stabile historiske referanser:
+Fase 11A er implementert og kontrollert på:
 
 ```text
-base main før dokumentasjonssynkronisering i PR #24: a77a9a9
-PR #21: Build first bundled SVG button library – merget
-PR #22: Update status after button library merge – merget
-knappbibliotekets mergecommit: 5e548ad
-prosjektskjema: versjon 5
-neste produksjonsfase: ikke valgt
+branch: feature/image-import-and-placement
+GitHub-sak: #25
+base main: 7e4c71f
+prosjektskjema i leveransen: versjon 6
+status: klar for dokumentkontroll og PR; ikke merget
 ```
 
-Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
+Faktisk branch- og `main`-HEAD skal alltid leses fra Git. Dokumentasjonen bruker ikke et commitnummer som permanent forventet topp-commit.
+
+Siste verifiserte kontroll etter kodeaudit:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
-Vite: 78 moduler transformert
+Dependency Cruiser: 89 moduler, 228 avhengigheter, ingen brudd
+Vite: 98 moduler transformert
+CSS: 31.07 kB, gzip 6.07 kB
+JavaScript: 255.44 kB, gzip 77.18 kB
 produksjonsbuild: bestått
-arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
-PC- og Telefon-test: godkjent
+PC og Telefon: godkjent
+bildeimport, ramme, utsnitt, zoom, låsing og sletting: godkjent
 ```
 
-## Ferdig og merget til `main`
+Arkitekturrapportene ble regenerert etter siste kodeaudit og commitet på feature-branchen.
+
+## Implementert funksjonalitet
 
 - stabilt React/TypeScript/Vite-grunnlag
 - blankt PC- og Telefon-lerret
@@ -91,29 +86,19 @@ PC- og Telefon-test: godkjent
 - prosjektmodell med stabile ID-er og sentral state
 - markering, flytting, resizing og låsing
 - kontrollert flerlinjet tekstredigering
-- høyremenyens grunnstruktur
+- høyremeny med elementspesifikke egenskaper
 - tekstegenskaper og eksterne lenker
 - sikker sletting via høyremeny og `Delete`
-- første bundlede SVG-knappbibliotek
-- knappetekst, design og lenke i høyremenyen
-- kontrollert fallback for ukjent knappasset
+- bundlet SVG-knappbibliotek
+- knappetekst, design og lenke
+- lokal bildeimport for PNG, JPEG og WebP, maks 10 MB
+- stabil bilde-`assetId` og serialiserbar metadata
+- separat transient ressursbuffer for `File` og Object URL
+- alternativ tekst, `Hele bildet` og `Juster utsnitt`
+- zoom og motivflytting uten synlige tomrom
+- bilderamme som kan endres fra alle kanter og hjørner
+- kontrollert fallback for manglende bilderessurs
 - Dependency Cruiser og samlet `npm run check`
-
-Viktige merges:
-
-```text
-PR #4   drag og resize
-PR #5   objektlåsing                 a3eed45
-PR #7   ren tekstredigering          c729d33
-PR #8   navn og rekkefølge i meny    a35f59d
-PR #9   høyremenyens grunnstruktur   8de5f2e
-PR #11  tekstegenskaper              452b491
-PR #14  elementlenker                f71b354
-PR #16  sikker elementsletting       b428cac
-PR #19  dokumentasjonsaudit          06307a2
-PR #21  SVG-knappbibliotek           5e548ad
-PR #22  dokumentasjonsstatus         a77a9a9
-```
 
 ## Gjeldende venstremeny
 
@@ -125,42 +110,43 @@ Elementer
 Innstillinger
 ```
 
-`Elementer -> Knapp` åpner det interne designbiblioteket. Det finnes ikke et separat venstremenypunkt kalt `Knapper`.
+`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp. `Elementer -> Knapp` åpner det interne designbiblioteket. `Elementer -> Bilde` åpner nettleserens filvelger.
 
 ## Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette elementer og velge ferdig design
+Venstremeny = opprette elementer og velge fil eller ferdig design
 Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere tekst og transformere elementer
+Lerretet   = redigere innhold og transformere elementer
+Ressurslag = eie transient bildefil og renderings-URL
+Prosjekt   = eie serialiserbar prosjektidentitet og metadata
 ```
 
-For knapper:
+For bilder:
 
 ```text
-Venstremeny = velge design og opprette
-Høyremeny  = endre tekst, design og lenke
-Lerretet   = markere, flytte og endre størrelse
+Venstremeny = validere lokal fil og opprette bildeelement
+Høyremeny  = alternativ tekst, visningsmodus, zoom, reset, metadata og sletting
+Lerretet   = flytte ramme, endre ramme og flytte motiv
 ```
 
-## Knappbibliotek
-
-Stabile asset-ID-er:
+## Bildeinteraksjon
 
 ```text
-button.primary-rounded.v1
-button.secondary-rounded.v1
-button.outline-rounded.v1
-button.dark-rounded.v1
+Hele bildet     -> hele motivet vises proporsjonalt og sentrert
+Juster utsnitt  -> bildet fyller rammen uten tomrom
+vanlig dra      -> flytter motivet i utsnittsmodus
+Shift + dra     -> flytter hele rammen
+Alt + piltast   -> flytter motivet med tastaturet
+piltast         -> flytter elementet
+Ctrl/Cmd + pil  -> endrer størrelse fra nedre høyre hjørne
 ```
 
-Prosjektdata lagrer stabil `assetId`, ikke filsti, import-URL eller rå SVG. Knappens synlige tekst er ekte HTML-tekst. Lenker aktiveres aldri i editormodus.
-
-Se `docs/BUTTON_LIBRARY.md`.
+Bilderammen har åtte pekergrep. Låste bilder kan inspiseres, men ikke endres, flyttes, beskjæres eller slettes.
 
 ## Prosjektmodell
 
-Gjeldende skjemaversjon er 5.
+Gjeldende skjemaversjon i denne leveransen er 6.
 
 ```text
 versjon 1  grunnmodell
@@ -168,15 +154,17 @@ versjon 2  tekstinnhold
 versjon 3  tekststil
 versjon 4  elementlenke
 versjon 5  knappasset, knappetekst og knappelenke
+versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
 ```
 
-Tekstelementer har `content`, `textStyle` og `link`. Knappelementer har `assetId`, `label` og `link`.
+Bildeelementet lagrer aldri lokal filsti, Object URL eller binærfil i `EditorProject`. Det lagrer stabil `assetId`, validert metadata, `altText`, `mode` og `transform`. Binærfil og Object URL er transient ressursstate.
 
 ## Filstørrelse og ansvar
 
 - 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
 - 300 linjer er hard unntaksgrense.
-- `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar.
+- `EditorCanvasElement.tsx` er redusert til 189 linjer etter fase-11A-auditen.
+- `RightPropertiesPanel.tsx` skal forbli komposisjon.
 - Varige prosjektendringer går gjennom validerte reducerhandlinger.
 - Ugyldige og uendrede handlinger skal returnere samme state.
 
@@ -187,9 +175,7 @@ Tekstelementer har `content`, `textStyle` og `link`. Knappelementer har `assetId
 3. `docs/EDITOR_PLANNING.md`
 4. `docs/PROJECT_RULES.md`
 5. `README.md`
-6. `docs/BUTTON_LIBRARY.md`
-7. `docs/ELEMENT_MODEL.md`
-8. `docs/ELEMENT_LINKS.md`
-9. `docs/RIGHT_PROPERTIES_PANEL.md`
-10. `docs/CODE_AUDIT.md`
-11. relevante øvrige fasedokumenter
+6. `docs/ELEMENT_MODEL.md`
+7. `docs/RIGHT_PROPERTIES_PANEL.md`
+8. `docs/CODE_AUDIT.md`
+9. relevante fasedokumenter
