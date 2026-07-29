@@ -1,8 +1,13 @@
 .canvas-element--image {
   overflow: visible;
   padding: 0;
-  border-style: solid;
-  background: #f4f0ed;
+  border: 0;
+  background: transparent;
+}
+
+.canvas-element--image.canvas-element--selected,
+.canvas-element--image:focus-visible {
+  outline-offset: 0;
 }
 
 .image-element__content {
