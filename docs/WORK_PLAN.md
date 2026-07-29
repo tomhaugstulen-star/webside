@@ -19,7 +19,7 @@ For hver avgrensede del:
 11. Test PC, Telefon, peker og tastatur der det er relevant.
 12. Oppdater nødvendig dokumentasjon.
 13. Kontroller synkronisert branch og clean tree.
-14. Opprett PR og kontroller diff, mergebarhet, review-tråder og CI.
+14. Opprett eller oppdater PR og kontroller diff, mergebarhet, review-tråder og CI.
 15. Merge bare etter eksplisitt brukergodkjenning.
 16. Oppdater lokal `main` og kontroller clean tree før neste fase.
 
@@ -38,6 +38,7 @@ git diff --check
 aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
 branch: feature/image-import-and-placement
 GitHub-sak: #25
+PR: #26 – åpen, ikke draft
 base main: 7e4c71f
 prosjektskjema i leveransen: versjon 6
 implementering: ferdig
@@ -45,8 +46,7 @@ kodeaudit: ferdig
 PC- og Telefon-test: godkjent
 automatiske kontroller: godkjent
 arkitekturrapporter: regenerert og commitet
-dokumentasjon: under sluttføring
-PR: ikke opprettet
+dokumentasjon: sluttføres etter siste resize-rettelser
 merge: ikke godkjent eller utført
 ```
 
@@ -57,10 +57,10 @@ Siste verifiserte produksjonskontroll:
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 89 moduler, 228 avhengigheter, ingen brudd
-Vite: 98 moduler transformert
-CSS: 31.07 kB, gzip 6.07 kB
-JavaScript: 255.44 kB, gzip 77.18 kB
+Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
+Vite: 100 moduler transformert
+CSS: 31.06 kB, gzip 6.06 kB
+JavaScript: 258.04 kB, gzip 77.94 kB
 produksjonsbuild: bestått
 PC og Telefon: godkjent
 ```
@@ -83,14 +83,17 @@ Leveransen omfatter:
 - separat transient ressursbuffer for `File` og Object URL
 - kontrollert Object URL-opprydding
 - fallback ved manglende ressurs
-- bilderamme med åtte pekergrep
+- Seksjon rendres bak Bilde, Tekst og Knapp
+- bilderamme med åtte pekergrep på innsiden
 - resizing fra topp, bunn, venstre, høyre og hjørner
 - motsatt kant står fast ved kanthåndtering
-- `Hele bildet` med proporsjonal sentrering
+- `Hele bildet` med proporsjonal skalering og sentrering
 - `Juster utsnitt` uten synlige tomrom
+- crop-resize klipper motivet uten automatisk skalering eller sentrering
+- motivets absolutte plassering bevares når rammekanten flyttes
 - motivflytting med peker
 - `Shift + dra` for å flytte hele rammen i utsnittsmodus
-- `Alt + piltast` for tastaturstyrt motivflytting
+- `Alt + piltast` for tastaturstyrt motivflytting fra editoren og relevante høyremenyfelt
 - zoom mellom 100 og 300 prosent, begrenset av rammens minimumsbehov
 - kontrollert reset av utsnitt
 - alternativ tekst, visning, zoom, metadata og sletting i høyremenyen
@@ -107,8 +110,14 @@ Oppryddingen før PR samlet framtidige invariantgrenser:
 - overgang fra `Hele bildet` til `Juster utsnitt` produserer gyldig ramme
 - bildeimport rydder opptatt-status og delvis registrerte ressurser ved feil
 - ressurslageret kontrollerer at fil og metadata samsvarer
-- tastaturlogikk er trukket ut av `EditorCanvasElement.tsx`
-- `EditorCanvasElement.tsx` er redusert til 189 linjer
+- tastaturlogikk for motivflytting ligger i en avgrenset editor-hook
+- `Alt + venstre/høyre` stoppes før nettleseren kan navigere historikk
+- Seksjon får deterministisk bakgrunnslagring uten å endre prosjektets elementrekkefølge
+- crop-resize beregner ny normalisert offset for å bevare motivets absolutte plassering
+- ramme og korrigert transform lagres atomisk gjennom `set-image-desktop-frame`
+- `EditorCanvasElement.tsx` er under 200 linjer
+- `useElementPointerTransform.ts` er 218 linjer
+- `imagePresentation.ts` er 240 linjer
 - alle berørte kildefiler er under 250 linjer
 
 ## 5. Ferdig og merget før fase 11A
@@ -133,13 +142,13 @@ Oppryddingen før PR samlet framtidige invariantgrenser:
 
 Ingen ny produksjonsfase startes fra denne branchen.
 
-Etter dokumentkontroll:
+Etter denne dokumentoppdateringen:
 
 1. trekk siste feature-branch lokalt
-2. kontroller `git status`, `git diff --check` og samlet diff mot `main`
-3. opprett PR med `Closes #25`
-4. kontroller mergebarhet, changed files, review-tråder og CI
-5. presenter PR-en for eksplisitt brukergodkjenning
+2. kontroller `git status`, `git diff --check` og dokumentdiffen etter siste rapportcommit
+3. oppdater PR #26-beskrivelsen med siste funksjons- og kontrollstatus
+4. kontroller PR-ens mergebarhet, changed files, review-tråder og CI på nytt
+5. presenter PR #26 for eksplisitt brukergodkjenning
 6. merge først etter ordet `godkjent`
 7. oppdater lokal `main` og kontroller clean tree
 8. velg neste fase eksplisitt
