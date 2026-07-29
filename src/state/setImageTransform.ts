@@ -14,7 +14,7 @@ export function setImageTransform(
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   const element = activePage?.elements.find((candidate) => candidate.id === elementId)
   const normalizedTransform =
-    element?.kind === 'image'
+    element?.kind === 'image' && element.mode === 'crop'
       ? normalizeImageTransformForFrame(
           transform,
           element.assetMetadata,
@@ -26,6 +26,7 @@ export function setImageTransform(
     !activePage ||
     !element ||
     element.kind !== 'image' ||
+    element.mode !== 'crop' ||
     element.locked ||
     !normalizedTransform ||
     imageTransformsEqual(normalizedTransform, element.transform)
