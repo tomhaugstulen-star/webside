@@ -146,8 +146,8 @@ export function ImagePropertiesSection({
             />
           </label>
           <p id={cropHelpId} className="image-properties__help">
-            Dra motivet for å justere utsnittet. Hold Shift mens du drar for å
-            flytte hele rammen.
+            Dra motivet for å justere utsnittet. Alt + piltast flytter motivet med
+            tastaturet. Hold Shift mens du drar for å flytte hele rammen.
           </p>
           <button
             className="image-properties__reset"
