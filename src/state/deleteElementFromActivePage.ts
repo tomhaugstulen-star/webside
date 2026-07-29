@@ -28,6 +28,7 @@ export function deleteElementFromActivePage(
       pages,
       updatedAt,
     },
-    selectedElementId: null,
+    selectedElementId:
+      state.selectedElementId === elementId ? null : state.selectedElementId,
   }
 }
