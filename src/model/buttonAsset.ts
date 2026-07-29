@@ -9,6 +9,11 @@ export type ButtonAssetId = string & {
 
 export const DEFAULT_BUTTON_LABEL = 'Les mer'
 
+export function normalizeButtonLabel(value: string): string | null {
+  const normalized = value.trim()
+  return normalized.length > 0 ? normalized : null
+}
+
 export function isButtonAssetId(value: unknown): value is ButtonAssetId {
   return (
     typeof value === 'string' &&

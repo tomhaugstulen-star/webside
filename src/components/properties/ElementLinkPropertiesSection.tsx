@@ -1,16 +1,20 @@
 import { useId, useState, type FormEvent } from 'react'
-import type { TextEditorElement } from '../../model/editorProject'
+import type {
+  ButtonEditorElement,
+  TextEditorElement,
+} from '../../model/editorProject'
 import {
   NO_ELEMENT_LINK,
   normalizeExternalUrl,
   type ElementLink,
 } from '../../model/elementLink'
-import { useTextElementLink } from '../../state/useTextElementLink'
+import { useElementLink } from '../../state/useElementLink'
 
 const invalidUrlMessage =
   'Skriv inn en fullstendig adresse som starter med http:// eller https://.'
 
 type LinkType = ElementLink['type']
+type LinkableEditorElement = TextEditorElement | ButtonEditorElement
 
 type LinkDraft = {
   type: LinkType
@@ -28,14 +32,14 @@ function createDraft(link: ElementLink): LinkDraft {
       }
 }
 
-function createFormKey(element: TextEditorElement) {
+function createFormKey(element: LinkableEditorElement) {
   return element.link.type === 'none'
     ? `${element.id}:none`
     : `${element.id}:external-url:${element.link.url}:${element.link.openInNewTab}`
 }
 
 type ElementLinkPropertiesSectionProps = {
-  element: TextEditorElement
+  element: LinkableEditorElement
 }
 
 export function ElementLinkPropertiesSection({
@@ -45,7 +49,7 @@ export function ElementLinkPropertiesSection({
 }
 
 function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
-  const { updateTextElementLink } = useTextElementLink()
+  const { updateElementLink } = useElementLink()
   const initialDraft = createDraft(element.link)
   const [draftType, setDraftType] = useState<LinkType>(initialDraft.type)
   const [urlDraft, setUrlDraft] = useState(initialDraft.url)
@@ -58,6 +62,7 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
   const helpId = `${idPrefix}-help`
   const errorId = `${idPrefix}-error`
   const disabled = element.locked
+  const targetLabel = element.kind === 'button' ? 'knappen' : 'tekstboksen'
   const hasPendingChanges =
     draftType !== element.link.type ||
     (draftType === 'external-url' &&
@@ -82,7 +87,7 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
 
     if (draftType === 'none') {
       setValidationMessage(null)
-      updateTextElementLink(element.id, { ...NO_ELEMENT_LINK })
+      updateElementLink(element.id, { ...NO_ELEMENT_LINK })
       return
     }
 
@@ -95,7 +100,7 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
 
     setUrlDraft(normalizedUrl)
     setValidationMessage(null)
-    updateTextElementLink(element.id, {
+    updateElementLink(element.id, {
       type: 'external-url',
       url: normalizedUrl,
       openInNewTab,
@@ -191,14 +196,14 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
 
         {linkSaved && (
           <p className="element-link-properties__saved" role="status">
-            Lenken er lagret på tekstboksen.
+            Lenken er lagret på {targetLabel}.
           </p>
         )}
       </form>
 
       {disabled && (
         <p className="element-link-properties__locked-note">
-          Lås opp elementet for å endre lenken.
+          Lås opp {targetLabel} for å endre lenken.
         </p>
       )}
     </section>

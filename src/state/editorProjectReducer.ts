@@ -9,8 +9,10 @@ import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { setButtonAsset } from './setButtonAsset'
+import { setButtonLabel } from './setButtonLabel'
+import { setElementLink } from './setElementLink'
 import { setTextElementContent } from './setTextElementContent'
-import { setTextElementLink } from './setTextElementLink'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
 
@@ -209,11 +211,27 @@ function reduceEditorProjectState(
         action.updatedAt,
       )
 
-    case 'set-text-element-link':
-      return setTextElementLink(
+    case 'set-element-link':
+      return setElementLink(
         state,
         action.elementId,
         action.link,
+        action.updatedAt,
+      )
+
+    case 'set-button-label':
+      return setButtonLabel(
+        state,
+        action.elementId,
+        action.label,
+        action.updatedAt,
+      )
+
+    case 'set-button-asset':
+      return setButtonAsset(
+        state,
+        action.elementId,
+        action.assetId,
         action.updatedAt,
       )
   }
