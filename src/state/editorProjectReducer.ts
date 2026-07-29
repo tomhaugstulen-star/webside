@@ -8,11 +8,10 @@ import type { EditorProjectState } from '../model/editorProject'
 import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementLink } from './setElementLink'
-import { setImageAltText } from './setImageAltText'
-import { setImageFit } from './setImageFit'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
@@ -205,20 +204,9 @@ function reduceEditorProjectState(
       )
 
     case 'set-image-alt-text':
-      return setImageAltText(
-        state,
-        action.elementId,
-        action.altText,
-        action.updatedAt,
-      )
-
-    case 'set-image-fit':
-      return setImageFit(
-        state,
-        action.elementId,
-        action.fit,
-        action.updatedAt,
-      )
+    case 'set-image-mode':
+    case 'set-image-transform':
+      return reduceImageProjectAction(state, action)
   }
 
   const unhandledAction: never = action
