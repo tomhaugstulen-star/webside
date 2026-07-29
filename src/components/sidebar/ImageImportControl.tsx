@@ -1,6 +1,6 @@
-import { useRef, useState, type ChangeEvent } from 'react'
-import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
+import { useId, useRef, useState, type ChangeEvent } from 'react'
 import { prepareImageFile } from '../../assets/images/prepareImageFile'
+import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import {
   createImageAssetId,
@@ -18,6 +18,7 @@ export function ImageImportControl({
   onCreateImage,
 }: ImageImportControlProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const errorId = useId()
   const [busy, setBusy] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const { registerImageAsset, removeImageAsset } = useImageAssetStore()
@@ -42,7 +43,9 @@ export function ImageImportControl({
 
     const assetId = createImageAssetId()
 
-    if (!registerImageAsset(assetId, result.value.file, result.value.metadata)) {
+    if (
+      !registerImageAsset(assetId, result.value.file, result.value.metadata)
+    ) {
       setErrorMessage('Bildet kunne ikke registreres i prosjektet.')
       setBusy(false)
       return
@@ -69,14 +72,15 @@ export function ImageImportControl({
         type="file"
         accept={supportedImageMimeTypes.join(',')}
         disabled={busy}
-        aria-label="Velg bildefil"
+        tabIndex={-1}
+        aria-hidden="true"
         onChange={handleFileChange}
       />
       <button
         className="element-card"
         type="button"
         disabled={busy}
-        aria-describedby={errorMessage ? 'image-import-error' : undefined}
+        aria-describedby={errorMessage ? errorId : undefined}
         onClick={() => {
           setErrorMessage(null)
           inputRef.current?.click()
@@ -86,7 +90,7 @@ export function ImageImportControl({
         <span>{busy ? 'Leser bilde…' : 'Bilde'}</span>
       </button>
       {errorMessage && (
-        <p id="image-import-error" className="image-import-control__error" role="alert">
+        <p id={errorId} className="image-import-control__error" role="alert">
           {errorMessage}
         </p>
       )}
