@@ -5,7 +5,7 @@ import {
   type ElementLink,
 } from '../model/elementLink'
 
-export function setTextElementLink(
+export function setElementLink(
   state: EditorProjectState,
   elementId: string,
   link: ElementLink,
@@ -17,7 +17,7 @@ export function setTextElementLink(
   if (
     !activePage ||
     !element ||
-    element.kind !== 'text' ||
+    (element.kind !== 'text' && element.kind !== 'button') ||
     element.locked ||
     !isValidElementLink(link) ||
     elementLinksEqual(element.link, link)
@@ -39,7 +39,8 @@ export function setTextElementLink(
       ? {
           ...page,
           elements: page.elements.map((candidate) =>
-            candidate.id === elementId && candidate.kind === 'text'
+            candidate.id === elementId &&
+            (candidate.kind === 'text' || candidate.kind === 'button')
               ? { ...candidate, link: nextLink }
               : candidate,
           ),

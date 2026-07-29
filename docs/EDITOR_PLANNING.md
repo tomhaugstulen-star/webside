@@ -5,27 +5,36 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 ## Gjeldende arbeidsstatus
 
 ```text
-base main for dokumentasjonsaudit: 56e2af7
-GitHub-sak: #18 Audit and synchronize project documentation
-branch: docs/project-documentation-audit
-produksjonskode: uendret
-prosjektskjema: versjon 4
-ny produksjonsfase: ikke valgt
+base main: 06307a2
+GitHub-sak: #20 Build first bundled SVG button library
+branch: feature/button-library
+prosjektskjema på branchen: versjon 5
+produksjonskode: ferdig implementert
+manuell test: godkjent på PC og Telefon
+PR: ikke opprettet ennå
 ```
 
-Siste funksjonelle merge til `main`:
+Produksjonscommits:
 
 ```text
-b428cac  PR #16 – sikker sletting av elementer
+a8017d4  knappemodell
+7fe89f2  bundlede SVG-assets
+1b80890  designbibliotek i venstremenyen
+ec30b9a  knappetekst, design og lenke i høyremenyen
 ```
 
-Dokumentasjonsauditen skal fullføres og merges før en ny produksjonsfase velges.
+Gjenstår før PR:
+
+- regenerere arkitekturrapporter
+- kontrollere hele diffen og filgrensene
+- kjøre `git diff --check`
+- bekrefte clean og synkronisert branch
 
 ## Ferdig på `main`
 
 - blankt PC- og Telefon-lerret
 - kontrollert topp- og venstremeny
-- Seksjon, Bilde, Tekst og Knapp
+- Seksjon, Bilde, Tekst og grunnleggende Knapp
 - prosjektmodell, stabile ID-er og sentral state
 - markering, flytting, resizing og låsing
 - kontrollert flerlinjet tekstredigering
@@ -46,7 +55,7 @@ PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
-PR #17  status etter slettemerge      56e2af7
+PR #19  dokumentasjonsaudit          06307a2
 ```
 
 ## Gjeldende venstremeny
@@ -59,32 +68,44 @@ Elementer
 Innstillinger
 ```
 
-Dette er dagens implementerte og gjeldende struktur.
+Dette er implementert og gjeldende.
 
-`Filer`, `Alle farger`, `Fonts` og separat `Knapper` er ikke implementert eller vedtatt. Slike navn kan bare behandles som åpne framtidige produktbeslutninger.
+`Elementer` inneholder:
+
+```text
+Seksjon
+Bilde
+Tekst
+Knapp
+```
+
+`Knapp` åpner et internt designbibliotek. Det finnes ikke et separat venstremenypunkt kalt `Knapper`.
 
 ## Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette og velge struktur
+Venstremeny = opprette elementer og velge ferdig design
 Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere tekst og transformere elementer
 ```
 
-`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Tekstinnhold redigeres på lerretet. Font, størrelse, lenke og sletting ligger i høyremenyen.
+For knappelementet:
 
-`Logo og header` skal senere eie strukturelle headerdeler som ikke er vanlige frie tekstbokser.
+```text
+Venstremeny = velge SVG-design og opprette knapp
+Høyremeny  = endre label, design og lenke
+Lerretet   = markere, flytte og endre størrelse
+```
 
 ## Autoritativ state
 
 Varig prosjektdata:
 
-- geometri
-- synlighet
+- geometri og synlighet
 - låsestatus
-- tekstinnhold
-- tekststil
-- elementlenke for støttede elementtyper
+- tekstinnhold og tekststil
+- lenke for støttede elementtyper
+- knappens `assetId` og `label`
 - `updatedAt`
 
 Transient editor-state:
@@ -92,7 +113,9 @@ Transient editor-state:
 - `selectedElementId`
 - pekerinteraksjon og layout-preview
 - aktiv tekstredigering og lokal draft
-- lenkeskjemaets draft og feedback
+- knappetekstdraft og lagringsfeedback
+- lenkeskjemaets draft og validering
+- intern bibliotekvisning
 - slettedialogens mål-ID og fokusreferanse
 - panel-, fokus-, hover- og trykkstate
 
@@ -100,25 +123,39 @@ DOM-en er rendering, ikke permanent lagring. Gyldige prosjektendringer går gjen
 
 ## Prosjektmodell
 
-Gjeldende prosjektskjema er versjon 4.
-
-Historiske skjematrinn:
+Gjeldende skjemaversjon på feature-branchen er versjon 5.
 
 ```text
+versjon 1  grunnmodell
 versjon 2  tekstinnhold
 versjon 3  tekststil
-versjon 4  elementlenke, gjeldende
+versjon 4  elementlenke
+versjon 5  knappasset, knappetekst og knappelenke
 ```
 
-Bare tekstelementet har obligatorisk:
+Tekstelement:
 
-```text
-content
-textStyle
-link
+```ts
+type TextEditorElement = BaseEditorElement & {
+  kind: 'text'
+  content: string
+  textStyle: TextElementStyle
+  link: ElementLink
+}
 ```
 
-Historiske fasedokumenter kan beskrive versjon 2 eller 3 som versjonen som ble innført i den aktuelle fasen. Det skal ikke leses som gjeldende prosjektstatus.
+Knappelement:
+
+```ts
+type ButtonEditorElement = BaseEditorElement & {
+  kind: 'button'
+  assetId: ButtonAssetId
+  label: string
+  link: ElementLink
+}
+```
+
+`assetId`, `label` og `link` er foreløpig felles for PC og Telefon.
 
 ## Elementregler
 
@@ -142,8 +179,6 @@ Knapp    80 × 36 px
 
 Flytting og resizing bruker transient preview og én commit ved normalt slipp. Låste elementer kan markeres, men ikke transformeres, redigeres eller slettes.
 
-Tekstinnhold redigeres med kontrollert `textarea`. Blur og `Ctrl`/`Cmd` + `Enter` committer, mens `Escape` forkaster draften.
-
 ## Høyremeny
 
 ```text
@@ -161,38 +196,55 @@ Tomt lerret     -> høyremeny lukkes
 - selection-state er autoritativ
 - ingen separat elementkopi eller direkte prosjektmutasjon
 
-Høyremenyens grunnstruktur er implementert og merget som PR #9. Den er senere utvidet med tekstegenskaper, elementlenke og sikker sletting.
+Betinget innhold:
 
-Se `docs/RIGHT_PROPERTIES_PANEL.md`.
+```text
+Tekst  -> tekstutseende + lenke + elementhandlinger
+Knapp  -> knappetekst + design + lenke + elementhandlinger
+Bilde  -> elementstatus og sletting
+Seksjon -> elementstatus og sletting
+```
 
 ## Tekstegenskaper
 
-For markert vanlig tekstboks:
+For markert tekstboks:
+
+- font
+- størrelse
+- fet
+- kursiv
+- justering
+- linjehøyde
+- ekstern lenke
+
+Tekstinnhold redigeres fortsatt på lerretet.
+
+## Første knappbibliotek
+
+Første stabile asset-ID-er:
 
 ```text
-Tekstutseende
-Font
-Størrelse
-Fet
-Kursiv
-Justering
-Linjehøyde
+button.primary-rounded.v1
+button.secondary-rounded.v1
+button.outline-rounded.v1
+button.dark-rounded.v1
 ```
 
 Regler:
 
-- formateringen gjelder hele tekstboksen
-- åtte nettsikre fontvalg
-- størrelse 12–96 px
-- fet og kursiv er uavhengige
-- venstre, midtstilt og høyre justering
-- standard: System, 16 px, normal, venstre, 1.45
-- låst tekst kan inspiseres, men ikke endres
-- tekstfarge bygges senere sammen med prosjektfargene
+- assetene bundles statisk av Vite
+- prosjektdata lagrer stabil ID, ikke filsti eller rå SVG
+- SVG-en er dekorativ og inneholder ikke tekst
+- `label` er ekte HTML-tekst og tilgjengelig navn
+- tom knappetekst avvises
+- designbytte valideres mot katalogen
+- ukjent lagret ID gir fallback og varsel
+- knappen bruker samme `ElementLink` som tekstboksen
+- lenken aktiveres aldri i editormodus
 
-Se `docs/TEXT_PROPERTIES.md`.
+Se `docs/BUTTON_LIBRARY.md`.
 
-## Frittstående tekstlenker
+## Elementlenker
 
 ```text
 none
@@ -201,86 +253,16 @@ external-url { url, openInNewTab }
 
 Regler:
 
-- hele tekstboksen får lenken
+- støttes av tekstbokser og knapper på feature-branchen
 - bare `http://` og `https://` godtas
 - ugyldig URL lagres ikke
-- låst tekst viser verdiene, men kontrollene er deaktivert
+- låste elementer viser verdiene, men kontrollene er deaktivert
 - lenken aktiveres aldri i editormodus
-- enkeltord og tekstsegmenter får ikke egne lenker
 - forhåndsvisning og publisering bygges senere
-
-Se `docs/ELEMENT_LINKS.md`.
-
-## Sikker elementsletting
-
-Fasen er merget til `main` i PR #16 med mergecommit `b428cac`.
-
-Leveransen gjelder sletting av ett markert element av typen Seksjon, Bilde, Tekst eller Knapp.
-
-Plassering:
-
-```text
-Element
-Status: Ulåst
-Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
-```
-
-Regler:
-
-- sletteknappen ligger rett under statusboksen
-- låst element viser deaktivert sletteknapp
-- sletting krever alltid bekreftelsesdialog
-- `Avbryt`, bakgrunnsklikk og `Escape` lukker uten mutasjon
-- `Delete` åpner samme dialog
-- Delete blokkeres i tekst- og skjemaredigering
-- reduceren validerer nyeste elementstate
-- bekreftet sletting fjerner bare målelementet
-- markeringen nullstilles bare når målet var markert
-- en urelatert markering bevares
-- Seksjon eier ikke visuelt overlappende elementer
-- dialogens `Escape` påvirker ikke et åpent verktøypanel
-
-Se `docs/ELEMENT_DELETION.md`.
-
-## Verifisert kontroll for PR #16
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
-produksjonsbuild: bestått
-Vite: 64 moduler transformert
-CSS: 20.13 kB, gzip 4.60 kB
-JavaScript: 232.19 kB, gzip 71.23 kB
-bygget på 225 ms
-```
-
-Arkitekturrapportene ble regenerert. Det fantes ingen GitHub Actions-run for head. Den brukerbekreftede lokale kontrollen er verifikasjonsgrunnlaget.
-
-## Senere knappbibliotek
-
-Bekreftet retning:
-
-- knapper designes i Canva eller Figma
-- eksporteres som SVG eller PNG
-- `Elementer -> Knapp` åpner et internt bibliotek
-- valgt knapp settes inn på lerretet
-- samme lenkemodell gjenbrukes
-- grafiske knapper får tilgjengelig navn
-- lenken aktiveres ikke i editormodus
-
-Foreløpig branch:
-
-```text
-feature/button-library
-```
-
-Den parkerte `feature/button-element`-branchen skal ikke merges. Sak #12 er lukket som `not_planned`.
 
 ## Senere faser
 
 ```text
-feature/button-library
 feature/image-import-and-placement
 feature/project-colors
 feature/logo-header
@@ -293,16 +275,14 @@ feature/preview-mode
 feature/publishing
 ```
 
-Tekstfarge kobles til prosjektfargemodellen. Headertekst bygges som headerstruktur. Forhåndsvisning og publisering skal tolke semantiske lenkedata og rendre aktive, tilgjengelige ankere.
+Tekstfarge og eventuelle redigerbare knappfarger kobles senere til prosjektfargemodellen. Forhåndsvisning og publisering skal tolke semantiske lenkedata og rendre aktive, tilgjengelige ankere.
 
 ## Åpne beslutninger
 
-- hvilken produksjonsfase som skal startes etter dokumentasjonsauditen
-- knappbibliotekets lagringsplass og filformat
-- statisk lesing kontra skrivbar lokal mappe
-- SVG kontra PNG som anbefalt knappformat
+- bildeimportens lagringsmodell
 - endelig mobilbrytepunkt
-- mobile tekststiloverstyringer
-- flere lenketyper utover ekstern URL
-- prosjektfilformat, migrering og lagringsintervall
+- mobile tekst- og designtilpasninger
+- flere lenketyper enn ekstern URL
+- prosjektfilformat og migrering
+- historikk- og autolagringsgrenser
 - publiseringsarkitektur

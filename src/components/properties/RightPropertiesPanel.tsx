@@ -1,4 +1,5 @@
 import type { EditorElement, ElementKind } from '../../model/editorProject'
+import { ButtonPropertiesSection } from './ButtonPropertiesSection'
 import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
@@ -39,10 +40,15 @@ export function RightPropertiesPanel({
             </p>
 
             {element.kind === 'text' && (
-              <>
-                <TextPropertiesSection element={element} />
-                <ElementLinkPropertiesSection element={element} />
-              </>
+              <TextPropertiesSection element={element} />
+            )}
+
+            {element.kind === 'button' && (
+              <ButtonPropertiesSection key={element.id} element={element} />
+            )}
+
+            {(element.kind === 'text' || element.kind === 'button') && (
+              <ElementLinkPropertiesSection element={element} />
             )}
 
             <section aria-labelledby="right-properties-panel-element-title">

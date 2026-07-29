@@ -1,6 +1,10 @@
 # Frittstående lenker for elementer
 
-Dette dokumentet er autoritativ spesifikasjon og historisk verifikasjonslogg for den isolerte lenkefasen.
+Dette dokumentet beskriver den autoritative lenkemodellen og dens nåværende bruk i editoren.
+
+## Historikk og gjeldende status
+
+Lenkemodellen ble innført i:
 
 ```text
 branch: feature/element-links
@@ -10,17 +14,7 @@ mergecommit: f71b354
 skjemaversjon innført i fasen: 4
 ```
 
-## Status
-
-Fasen er implementert, kontrollert og merget til `main` gjennom PR #14.
-
-Tidligere formuleringer om arbeid som «gjenstår før PR» beskrev branchens tilstand før PR #14. De er ikke gjeldende prosjektstatus.
-
-## Mål og avgrensning
-
-Fasen bygde én liten og gjenbrukbar lenkemodell som først ble koblet til hele tekstbokser og senere kan gjenbrukes av ferdigdesignede knappfiler.
-
-Fasen bygde ikke knappbibliotek, knappdesign, prosjektfarger eller riktekst.
+Den historiske fasen koblet lenken til tekstbokser. `feature/button-library` gjenbruker nå samme modell og samme høyremenyskjema for knapper og øker prosjektskjemaet til versjon 5.
 
 ## Fast UX-regel
 
@@ -30,26 +24,42 @@ Høyremeny  = legge til, endre eller fjerne lenken
 Forhåndsvisning/publisering = aktivere lenken
 ```
 
-Vanlig klikk i editoren markerer fortsatt elementet. Lenken åpnes aldri mens brukeren arbeider i editormodus.
+Vanlig klikk i editoren markerer elementet. Lenken åpnes aldri i editormodus.
 
-## Implementert leveranse
+## Støttede elementtyper
 
-Leveransen gjelder vanlige tekstbokser.
+På `main` før knappbiblioteket:
 
-Når en tekstboks er markert, viser høyremenyen:
+- tekstboks
+
+På `feature/button-library`:
+
+- tekstboks
+- knapp
+
+Seksjon og Bilde har ikke lenkedata i gjeldende modell.
+
+## Høyremeny
+
+Når et lenkbart element er markert, viser høyremenyen:
 
 ```text
 Lenke
+Type
 Ingen
 Ekstern lenke
-
 Nettadresse
 Åpne i ny fane
 ```
 
 `Nettadresse` og `Åpne i ny fane` vises bare når lenketypen er `Ekstern lenke`.
 
-Hele tekstboksen får lenken. Markerte enkeltord, tegn eller tekstsegmenter får ikke egne lenker.
+Skjemaet tilpasses elementtypen i feedback og låsemelding:
+
+```text
+tekstboksen
+knappen
+```
 
 ## Tillatte lenker
 
@@ -60,7 +70,7 @@ http://
 https://
 ```
 
-Ikke støttet i denne fasen:
+Ikke støttet:
 
 - interne sidelenker
 - e-postlenker
@@ -69,47 +79,74 @@ Ikke støttet i denne fasen:
 - fragmentlenker
 - relative adresser
 
-URL-en valideres som data før prosjektet muteres. Ugyldig URL lagres ikke.
+URL-en trimmes, normaliseres og valideres som data før prosjektet muteres. Ugyldig URL lagres ikke.
 
 ## Lenkemodell
 
 Lenken er varig prosjektdata og representeres som en diskriminert union:
 
-```text
-none
-external-url { url, openInNewTab }
+```ts
+type ElementLink =
+  | { type: 'none' }
+  | {
+      type: 'external-url'
+      url: string
+      openInNewTab: boolean
+    }
 ```
 
 Modellen:
 
-- lagrer semantiske data, ikke rå DOM- eller ankerattributter
-- er gjenbrukbar for senere knappfiler
-- har runtime-validering som tåler `unknown`, `null`, arrays og ukjente nøkler
-- er uttømmende ved framtidige modellutvidelser
+- lagrer semantiske data, ikke DOM- eller ankerattributter
+- brukes av tekstbokser og knapper
+- har runtime-validering for ukjent input
+- krever eksakt nøkkelsett
+- er uttømmende ved framtidige utvidelser
 
-Transient inputdraft og valideringsmeldinger lagres ikke i prosjektet.
+Transient inputdraft, valideringsmeldinger og lagringsfeedback lagres ikke i prosjektet.
 
 ## Prosjektmodell
 
-Fasen økte prosjektskjemaet fra versjon 3 til gjeldende versjon 4.
+Tekstelement:
 
-- bare `kind: 'text'` fikk obligatorisk `link`
-- nye tekstbokser fikk standarden `none`
-- eksisterende tekststil og tekstinnhold ble beholdt
-- lenken er felles for PC og Telefon
+```ts
+type TextEditorElement = BaseEditorElement & {
+  kind: 'text'
+  content: string
+  textStyle: TextElementStyle
+  link: ElementLink
+}
+```
 
-Når knappbiblioteket senere bygges, kan knappens elementmodell bruke samme lenketype uten å endre tekstlenkemodellen.
+Knappelement:
+
+```ts
+type ButtonEditorElement = BaseEditorElement & {
+  kind: 'button'
+  assetId: ButtonAssetId
+  label: string
+  link: ElementLink
+}
+```
+
+Lenken er felles for PC og Telefon.
 
 ## Reducer og state
 
-Hver gyldig lenkeendring går gjennom en avgrenset reducerhandling.
+Den tidligere tekstspesifikke handlingen er generalisert til:
+
+```text
+set-element-link
+```
+
+State-hooken er tilsvarende generalisert til lenkbare elementer.
 
 Reducergrensen avviser:
 
 - manglende aktiv side
 - manglende element
 - element på feil side
-- feil elementtype
+- Seksjon eller Bilde
 - låst element
 - ugyldig lenketype
 - ugyldig URL
@@ -117,11 +154,11 @@ Reducergrensen avviser:
 
 `project.updatedAt` endres bare ved en reell prosjektendring.
 
-Høyremenyen eier ingen separat permanent kopi av lenken. Inputdraft og valideringsfeedback er transient lokal UI-state.
+Høyremenyen eier ingen permanent kopi av lenken. Inputdraft og valideringsfeedback er transient lokal UI-state.
 
 ## Låste elementer
 
-En låst tekstboks kan markeres og inspiseres.
+En låst tekstboks eller knapp kan markeres og inspiseres.
 
 Lenkekontrollene:
 
@@ -129,60 +166,55 @@ Lenkekontrollene:
 - er deaktivert når elementet er låst
 - muterer ikke prosjektet
 
+Reducerens låsegrense er autoritativ selv om UI-kontrollen omgås.
+
 ## Samspill med tekstredigering
 
 Tekstinnhold redigeres fortsatt bare på lerretet.
 
-Klikk i høyremenyen under aktiv tekstredigering bruker eksisterende blur/commit-grense før lenkeendringen gjennomføres.
+Klikk i høyremenyen under aktiv tekstredigering bruker eksisterende blur/commit-grense før lenkeendringen gjennomføres. Markeringen beholdes.
 
-Lenkefasen endret ikke `textarea`-modellen, opprettet ikke riktekst og la ikke inn et ekstra tekstinnholdsfelt i høyremenyen.
+Lenkeskjemaet:
+
+- oppretter ikke riktekst
+- legger ikke tekstinnhold i høyremenyen
+- endrer ikke tekstens redigeringsmodell
+
+Knappetekst redigeres separat i knappeseksjonen i høyremenyen.
 
 ## Rendering
 
-Editormodus renderer ikke et aktivt navigerbart anker rundt elementet.
+Editormodus renderer ikke et aktivt navigerbart anker rundt tekstboksen eller knappen.
 
-Forhåndsvisning og publisering skal senere tolke lenkedata og opprette faktisk navigasjon.
+Forhåndsvisning og publisering skal senere tolke lenkedata og opprette faktisk navigasjon med korrekt tilgjengelig navn.
 
 ## Arkitektur
 
-Implementert ansvarsdeling:
+Ansvarsdeling:
 
 - `model` — lenketyper, standardverdi, equality og runtime-validering
-- `state` — reducerhjelper og dispatch-hook
+- `state` — generell reducerhjelper og dispatch-hook
 - `properties` — kontrollert lenkeseksjon
 - `RightPropertiesPanel` — komposisjon basert på elementtype
 - canvas — ingen aktiv lenkehandling i editormodus
 
-Ingen ny lenkelogikk ble lagt inn i `EditorCanvasElement.tsx`. Filen ligger nær aktiv størrelsesgrense og skal ikke få nye funksjonsansvar.
+Ingen lenkelogikk skal legges inn i `EditorCanvasElement.tsx`.
 
-## Ikke del av den historiske branchen
+## Verifisering
 
-- knappbibliotek eller filimport
-- knappdesign eller redigerbar knappetikett
-- farger, rammer, skygger eller typografi
-- riktekst eller lenker på markerte enkeltord
-- forhåndsvisning eller publisering
-- intern sidenavigasjon
-- sletting eller duplisering
-- historikk eller lagring
-- mobile lenkeoverstyringer
+Historisk tekstlenketest før PR #14:
 
-## Verifisert før merge
-
-Manuell funksjonstest ble godkjent:
-
-- gyldig `https://`-adresse lagres på hele tekstboksen
-- adressen vises igjen når tekstboksen velges på nytt
-- lagreknappen gir bekreftelse og teksten `Lenke lagret`
+- gyldig `https://`-adresse lagres
+- adressen vises igjen ved ny markering
+- lagreknappen gir feedback
 - lenken åpnes ikke i editormodus
 
-Automatisk kontroll ble godkjent med `npm run check`:
+Knappbibliotekets manuelle test bekreftet i tillegg:
 
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
-Vite-produksjonsbuild: bestått med 58 transformerte moduler
-```
+- ekstern lenke kan legges til og fjernes på knapp
+- `openInNewTab` lagres
+- lenken åpnes ikke i editormodus
+- låst knapp kan ikke endre lenke
+- samme skjema fungerer på PC og Telefon
 
-Arkitekturrapportene, PC-, Telefon- og tastaturkontroll samt clean tree ble fullført før PR #14 ble merget.
+Se `docs/BUTTON_LIBRARY.md`.

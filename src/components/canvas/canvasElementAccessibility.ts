@@ -7,20 +7,36 @@ export const elementKindLabels: Record<EditorElement['kind'], string> = {
   button: 'Knapp',
 }
 
+function summarizeText(value: string) {
+  return value.trim().replace(/\s+/g, ' ').slice(0, 80)
+}
+
+function getElementSummary(element: EditorElement) {
+  if (element.kind === 'text') {
+    const summary = summarizeText(element.content)
+    return summary ? `Innhold: ${summary}.` : 'Tom tekstboks.'
+  }
+
+  if (element.kind === 'button') {
+    const summary = summarizeText(element.label)
+    return summary ? `Knappetekst: ${summary}.` : 'Knapp uten tekst.'
+  }
+
+  return `${elementKindLabels[element.kind]}.`
+}
+
 export function getAccessibleElementLabel(element: EditorElement) {
-  const kindLabel = elementKindLabels[element.kind]
+  const summary = getElementSummary(element)
 
   if (element.locked) {
-    return `${kindLabel}, låst. Bruk objektverktøyet for å låse opp.`
+    return `${summary} Låst. Bruk objektverktøyet for å låse opp.`
   }
 
   if (element.kind === 'text') {
-    const summary = element.content.trim().replace(/\s+/g, ' ').slice(0, 80)
-    const contentLabel = summary ? `Innhold: ${summary}.` : 'Tom tekstboks.'
-    return `${contentLabel} Dobbeltklikk eller trykk Enter når elementet er markert for å redigere. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
+    return `${summary} Dobbeltklikk eller trykk Enter når elementet er markert for å redigere. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
   }
 
-  return `${kindLabel}. Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
+  return `${summary} Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
 }
 
 export function getCanvasElementKeyboardShortcuts(locked: boolean) {

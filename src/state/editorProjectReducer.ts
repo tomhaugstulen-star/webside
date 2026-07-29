@@ -1,4 +1,3 @@
-import { createEditorElement } from '../model/createEditorElement'
 import {
   elementLayoutsEqual,
   getElementDesktopLayout,
@@ -6,10 +5,13 @@ import {
 } from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
+import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { setButtonAsset } from './setButtonAsset'
+import { setButtonLabel } from './setButtonLabel'
+import { setElementLink } from './setElementLink'
 import { setTextElementContent } from './setTextElementContent'
-import { setTextElementLink } from './setTextElementLink'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
 
@@ -20,12 +22,6 @@ export function getInitialEditorProjectState() {
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
   return activePage?.elements.some((element) => element.id === elementId) ?? false
-}
-
-function projectContainsElement(state: EditorProjectState, elementId: string) {
-  return state.project.pages.some((page) =>
-    page.elements.some((element) => element.id === elementId),
-  )
 }
 
 function selectedElementExists(state: EditorProjectState) {
@@ -101,34 +97,13 @@ function reduceEditorProjectState(
       }
     }
 
-    case 'add-element-to-active-page': {
-      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
-
-      if (!activePage || projectContainsElement(state, action.elementId)) {
-        return state
-      }
-
-      const element = createEditorElement({
-        id: action.elementId,
-        kind: action.kind,
-        existingElements: activePage.elements,
-      })
-      const pages = state.project.pages.map((page) =>
-        page.id === state.activePageId
-          ? { ...page, elements: [...page.elements, element] }
-          : page,
+    case 'add-element-to-active-page':
+      return addElementToActivePage(
+        state,
+        action.elementId,
+        action.request,
+        action.updatedAt,
       )
-
-      return {
-        ...state,
-        project: {
-          ...state.project,
-          pages,
-          updatedAt: action.updatedAt,
-        },
-        selectedElementId: element.id,
-      }
-    }
 
     case 'delete-element-from-active-page':
       return deleteElementFromActivePage(
@@ -203,11 +178,27 @@ function reduceEditorProjectState(
         action.updatedAt,
       )
 
-    case 'set-text-element-link':
-      return setTextElementLink(
+    case 'set-element-link':
+      return setElementLink(
         state,
         action.elementId,
         action.link,
+        action.updatedAt,
+      )
+
+    case 'set-button-label':
+      return setButtonLabel(
+        state,
+        action.elementId,
+        action.label,
+        action.updatedAt,
+      )
+
+    case 'set-button-asset':
+      return setButtonAsset(
+        state,
+        action.elementId,
+        action.assetId,
         action.updatedAt,
       )
   }

@@ -21,6 +21,7 @@ import {
   getAccessibleElementLabel,
   getCanvasElementKeyboardShortcuts,
 } from './canvasElementAccessibility'
+import { ButtonElementContent } from './ButtonElementContent'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import { getTextElementCssStyle } from './getTextElementCssStyle'
 import {
@@ -217,6 +218,8 @@ export function EditorCanvasElement({
               {element.content || 'Dobbeltklikk for å skrive'}
             </span>
           )
+        ) : element.kind === 'button' ? (
+          <ButtonElementContent element={element} />
         ) : (
           <span className="canvas-element__placeholder" aria-hidden="true">
             {label}

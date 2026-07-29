@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { useElementCreation } from '../../state/useElementCreation'
 import { useElementDeletion } from '../../state/useElementDeletion'
@@ -39,9 +40,12 @@ export function EditorShell() {
     setActiveTool(null)
   }
 
-  const createElementAndClosePanel = (kind: ElementKind) => {
-    createElement(kind)
-    closeToolPanel()
+  const createElementAndClosePanel = (
+    request: ElementCreationRequest,
+  ) => {
+    if (createElement(request)) {
+      closeToolPanel()
+    }
   }
 
   const requestElementDeletion = useCallback(

@@ -13,6 +13,7 @@ subgraph src["src"]
       src_components_canvas_EditorCanvas_tsx["EditorCanvas.tsx"]
       src_components_canvas_canvasLayoutPreview_ts["canvasLayoutPreview.ts"]
       src_components_canvas_EditorCanvasElement_tsx["EditorCanvasElement.tsx"]
+      src_components_canvas_ButtonElementContent_tsx["ButtonElementContent.tsx"]
       src_components_canvas_canvasElementAccessibility_ts["canvasElementAccessibility.ts"]
       src_components_canvas_ElementSelectionToolbar_tsx["ElementSelectionToolbar.tsx"]
       src_components_canvas_getTextElementCssStyle_ts["getTextElementCssStyle.ts"]
@@ -26,6 +27,7 @@ subgraph src["src"]
     end
     subgraph src_components_properties["properties"]
       src_components_properties_RightPropertiesPanel_tsx["RightPropertiesPanel.tsx"]
+      src_components_properties_ButtonPropertiesSection_tsx["ButtonPropertiesSection.tsx"]
       src_components_properties_DeleteElementSection_tsx["DeleteElementSection.tsx"]
       src_components_properties_ElementLinkPropertiesSection_tsx["ElementLinkPropertiesSection.tsx"]
       src_components_properties_TextPropertiesSection_tsx["TextPropertiesSection.tsx"]
@@ -34,6 +36,8 @@ subgraph src["src"]
       src_components_sidebar_LeftSidebar_tsx["LeftSidebar.tsx"]
       src_components_sidebar_SidebarIcon_tsx["SidebarIcon.tsx"]
       src_components_sidebar_SidebarPanels_tsx["SidebarPanels.tsx"]
+      src_components_sidebar_ElementsPanel_tsx["ElementsPanel.tsx"]
+      src_components_sidebar_ButtonLibraryPanel_tsx["ButtonLibraryPanel.tsx"]
     end
     subgraph src_components_toolbar["toolbar"]
       src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
@@ -41,14 +45,16 @@ subgraph src["src"]
   end
   subgraph src_model["model"]
     src_model_editorProject_ts["editorProject.ts"]
+    src_model_buttonAsset_ts["buttonAsset.ts"]
     src_model_elementLink_ts["elementLink.ts"]
     src_model_textElementStyle_ts["textElementStyle.ts"]
+    src_model_elementCreation_ts["elementCreation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
     src_model_createStableId_ts["createStableId.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
+    src_model_createEditorProject_ts["createEditorProject.ts"]
     src_model_createEditorElement_ts["createEditorElement.ts"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
-    src_model_createEditorProject_ts["createEditorProject.ts"]
   end
   subgraph src_state["state"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
@@ -60,15 +66,28 @@ subgraph src["src"]
     src_state_useElementLayout_ts["useElementLayout.ts"]
     src_state_useTextElementContent_ts["useTextElementContent.ts"]
     src_state_useElementLocking_ts["useElementLocking.ts"]
-    src_state_useTextElementLink_ts["useTextElementLink.ts"]
+    src_state_useButtonProperties_ts["useButtonProperties.ts"]
+    src_state_useElementLink_ts["useElementLink.ts"]
     src_state_useTextElementStyle_ts["useTextElementStyle.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
+    src_state_addElementToActivePage_ts["addElementToActivePage.ts"]
     src_state_deleteElementFromActivePage_ts["deleteElementFromActivePage.ts"]
+    src_state_setButtonAsset_ts["setButtonAsset.ts"]
+    src_state_setButtonLabel_ts["setButtonLabel.ts"]
+    src_state_setElementLink_ts["setElementLink.ts"]
     src_state_setTextElementContent_ts["setTextElementContent.ts"]
-    src_state_setTextElementLink_ts["setTextElementLink.ts"]
     src_state_setTextElementStyle_ts["setTextElementStyle.ts"]
     src_state_toggleElementLock_ts["toggleElementLock.ts"]
+  end
+  subgraph src_assets["assets"]
+    subgraph src_assets_buttons["buttons"]
+      src_assets_buttons_buttonAssetCatalog_ts["buttonAssetCatalog.ts"]
+      src_assets_buttons_dark_rounded_svg["dark-rounded.svg"]
+      src_assets_buttons_outline_rounded_svg["outline-rounded.svg"]
+      src_assets_buttons_primary_rounded_svg["primary-rounded.svg"]
+      src_assets_buttons_secondary_rounded_svg["secondary-rounded.svg"]
+    end
   end
   subgraph src_types["types"]
     src_types_editor_ts["editor.ts"]
@@ -80,6 +99,7 @@ src_App_tsx-->src_App_css
 src_App_tsx-->src_components_editor_EditorShell_tsx
 src_App_tsx-->src_state_EditorProjectProvider_tsx
 src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
+src_components_editor_EditorShell_tsx-->src_model_elementCreation_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementCreation_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementDeletion_ts
@@ -91,19 +111,30 @@ src_components_editor_EditorShell_tsx-->src_components_properties_RightPropertie
 src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
 src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
 src_components_editor_EditorShell_tsx-->src_components_editor_useElementDeletionShortcut_ts
+src_model_editorProject_ts-->src_model_buttonAsset_ts
 src_model_editorProject_ts-->src_model_elementLink_ts
 src_model_editorProject_ts-->src_model_textElementStyle_ts
+src_model_elementCreation_ts-->src_model_buttonAsset_ts
+src_model_elementCreation_ts-->src_model_editorProject_ts
 src_state_useEditorProject_ts-->src_state_editorProjectContext_ts
 src_state_editorProjectContext_ts-->src_model_editorProject_ts
 src_state_editorProjectContext_ts-->src_state_editorProjectAction_ts
+src_state_editorProjectAction_ts-->src_model_buttonAsset_ts
 src_state_editorProjectAction_ts-->src_model_editorProject_ts
+src_state_editorProjectAction_ts-->src_model_elementCreation_ts
 src_state_editorProjectAction_ts-->src_model_elementLayout_ts
 src_state_editorProjectAction_ts-->src_model_elementLink_ts
 src_state_editorProjectAction_ts-->src_model_textElementStyle_ts
 src_model_elementLayout_ts-->src_model_editorProject_ts
+src_state_useElementCreation_ts-->src_assets_buttons_buttonAssetCatalog_ts
 src_state_useElementCreation_ts-->src_model_createStableId_ts
-src_state_useElementCreation_ts-->src_model_editorProject_ts
+src_state_useElementCreation_ts-->src_model_elementCreation_ts
 src_state_useElementCreation_ts-->src_state_useEditorProject_ts
+src_assets_buttons_buttonAssetCatalog_ts-->src_model_buttonAsset_ts
+src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_dark_rounded_svg
+src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_outline_rounded_svg
+src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_primary_rounded_svg
+src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_secondary_rounded_svg
 src_state_useElementDeletion_ts-->src_state_useEditorProject_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
 src_types_editor_ts-->src_model_editorProject_ts
@@ -120,6 +151,7 @@ src_components_canvas_EditorCanvasElement_tsx-->src_model_resolveResponsiveValue
 src_components_canvas_EditorCanvasElement_tsx-->src_state_useElementLayout_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_state_useTextElementContent_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_types_editor_ts
+src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_ButtonElementContent_tsx
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasElementAccessibility_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasLayoutPreview_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_ElementSelectionToolbar_tsx
@@ -130,6 +162,8 @@ src_model_resolveResponsiveValue_ts-->src_model_editorProject_ts
 src_state_useElementLayout_ts-->src_model_elementLayout_ts
 src_state_useElementLayout_ts-->src_state_useEditorProject_ts
 src_state_useTextElementContent_ts-->src_state_useEditorProject_ts
+src_components_canvas_ButtonElementContent_tsx-->src_assets_buttons_buttonAssetCatalog_ts
+src_components_canvas_ButtonElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_canvasElementAccessibility_ts-->src_model_editorProject_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_model_elementLayout_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_state_useElementLocking_ts
@@ -144,53 +178,79 @@ src_components_canvas_getCanvasContentHeight_ts-->src_model_resolveResponsiveVal
 src_components_canvas_getCanvasContentHeight_ts-->src_components_canvas_canvasLayoutPreview_ts
 src_components_dialogs_ConfirmElementDeletionDialog_tsx-->src_model_editorProject_ts
 src_components_properties_RightPropertiesPanel_tsx-->src_model_editorProject_ts
+src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ButtonPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_DeleteElementSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ElementLinkPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_TextPropertiesSection_tsx
+src_components_properties_ButtonPropertiesSection_tsx-->src_assets_buttons_buttonAssetCatalog_ts
+src_components_properties_ButtonPropertiesSection_tsx-->src_model_buttonAsset_ts
+src_components_properties_ButtonPropertiesSection_tsx-->src_model_editorProject_ts
+src_components_properties_ButtonPropertiesSection_tsx-->src_state_useButtonProperties_ts
+src_state_useButtonProperties_ts-->src_model_buttonAsset_ts
+src_state_useButtonProperties_ts-->src_state_useEditorProject_ts
 src_components_properties_DeleteElementSection_tsx-->src_model_editorProject_ts
 src_components_properties_ElementLinkPropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_ElementLinkPropertiesSection_tsx-->src_model_elementLink_ts
-src_components_properties_ElementLinkPropertiesSection_tsx-->src_state_useTextElementLink_ts
-src_state_useTextElementLink_ts-->src_model_elementLink_ts
-src_state_useTextElementLink_ts-->src_state_useEditorProject_ts
+src_components_properties_ElementLinkPropertiesSection_tsx-->src_state_useElementLink_ts
+src_state_useElementLink_ts-->src_model_elementLink_ts
+src_state_useElementLink_ts-->src_state_useEditorProject_ts
 src_components_properties_TextPropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_TextPropertiesSection_tsx-->src_model_textElementStyle_ts
 src_components_properties_TextPropertiesSection_tsx-->src_state_useTextElementStyle_ts
 src_state_useTextElementStyle_ts-->src_model_textElementStyle_ts
 src_state_useTextElementStyle_ts-->src_state_useEditorProject_ts
-src_components_sidebar_LeftSidebar_tsx-->src_model_editorProject_ts
+src_components_sidebar_LeftSidebar_tsx-->src_model_elementCreation_ts
 src_components_sidebar_LeftSidebar_tsx-->src_types_editor_ts
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarPanels_tsx
-src_components_sidebar_SidebarPanels_tsx-->src_model_editorProject_ts
+src_components_sidebar_SidebarPanels_tsx-->src_model_elementCreation_ts
 src_components_sidebar_SidebarPanels_tsx-->src_types_editor_ts
+src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ElementsPanel_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_tsx
+src_components_sidebar_ElementsPanel_tsx-->src_model_elementCreation_ts
+src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ButtonLibraryPanel_tsx
+src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_SidebarIcon_tsx
+src_components_sidebar_ButtonLibraryPanel_tsx-->src_assets_buttons_buttonAssetCatalog_ts
+src_components_sidebar_ButtonLibraryPanel_tsx-->src_model_buttonAsset_ts
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
-src_state_editorProjectReducer_ts-->src_model_createEditorElement_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
 src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
+src_state_editorProjectReducer_ts-->src_state_addElementToActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_deleteElementFromActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
+src_state_editorProjectReducer_ts-->src_state_setButtonAsset_ts
+src_state_editorProjectReducer_ts-->src_state_setButtonLabel_ts
+src_state_editorProjectReducer_ts-->src_state_setElementLink_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
-src_state_editorProjectReducer_ts-->src_state_setTextElementLink_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
 src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
+src_model_createEditorProject_ts-->src_model_createStableId_ts
+src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_state_addElementToActivePage_ts-->src_assets_buttons_buttonAssetCatalog_ts
+src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
+src_state_addElementToActivePage_ts-->src_model_editorProject_ts
+src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
+src_model_createEditorElement_ts-->src_model_buttonAsset_ts
 src_model_createEditorElement_ts-->src_model_editorProject_ts
+src_model_createEditorElement_ts-->src_model_elementCreation_ts
 src_model_createEditorElement_ts-->src_model_elementLink_ts
 src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_textElementStyle_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
-src_model_createEditorProject_ts-->src_model_createStableId_ts
-src_model_createEditorProject_ts-->src_model_editorProject_ts
 src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
+src_state_setButtonAsset_ts-->src_assets_buttons_buttonAssetCatalog_ts
+src_state_setButtonAsset_ts-->src_model_buttonAsset_ts
+src_state_setButtonAsset_ts-->src_model_editorProject_ts
+src_state_setButtonLabel_ts-->src_model_buttonAsset_ts
+src_state_setButtonLabel_ts-->src_model_editorProject_ts
+src_state_setElementLink_ts-->src_model_editorProject_ts
+src_state_setElementLink_ts-->src_model_elementLink_ts
 src_state_setTextElementContent_ts-->src_model_editorProject_ts
-src_state_setTextElementLink_ts-->src_model_editorProject_ts
-src_state_setTextElementLink_ts-->src_model_elementLink_ts
 src_state_setTextElementStyle_ts-->src_model_editorProject_ts
 src_state_setTextElementStyle_ts-->src_model_textElementStyle_ts
 src_state_toggleElementLock_ts-->src_model_editorProject_ts

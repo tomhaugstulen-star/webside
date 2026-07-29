@@ -1,5 +1,7 @@
+import type { ButtonAssetId } from '../model/buttonAsset'
+import type { ElementCreationRequest } from '../model/elementCreation'
 import type { ElementLayout } from '../model/elementLayout'
-import type { EditorProject, ElementKind } from '../model/editorProject'
+import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
 import type { TextElementStylePatch } from '../model/textElementStyle'
 
@@ -10,7 +12,7 @@ export type EditorProjectAction =
   | {
       type: 'add-element-to-active-page'
       elementId: string
-      kind: ElementKind
+      request: ElementCreationRequest
       updatedAt: string
     }
   | {
@@ -42,8 +44,20 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
-      type: 'set-text-element-link'
+      type: 'set-element-link'
       elementId: string
       link: ElementLink
+      updatedAt: string
+    }
+  | {
+      type: 'set-button-label'
+      elementId: string
+      label: string
+      updatedAt: string
+    }
+  | {
+      type: 'set-button-asset'
+      elementId: string
+      assetId: ButtonAssetId
       updatedAt: string
     }

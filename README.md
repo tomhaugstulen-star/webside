@@ -2,7 +2,7 @@
 
 Lokal webside-editor bygget med React, TypeScript og Vite.
 
-Editoren åpner med et blankt, hvitt lerret. Brukeren kan opprette, markere, flytte, endre størrelse, låse og slette grunnleggende elementer. Tekstbokser støtter kontrollert flerlinjet redigering, tekstegenskaper og en ekstern lenke for hele tekstboksen.
+Editoren åpner med et blankt lerret. Brukeren kan opprette, markere, flytte, endre størrelse, låse og slette elementer. Tekstbokser støtter kontrollert flerlinjet redigering, tekstegenskaper og ekstern lenke. Den aktive feature-branchen legger til et ferdig SVG-knappbibliotek med redigerbar knappetekst, design og lenke.
 
 ## Repo og lokal mappe
 
@@ -29,7 +29,7 @@ npm run architecture:json
 npm run architecture:diagram
 ```
 
-`npm run check` kjører ESLint, TypeScript-kontroll, Dependency Cruiser og produksjonsbuild.
+`npm run check` kjører ESLint, TypeScript, Dependency Cruiser og produksjonsbuild.
 
 Arkitekturrapportene skrives til:
 
@@ -46,40 +46,41 @@ Det utvikles aldri direkte på `main`.
 main
   -> avgrenset feature- eller docs-branch
   -> låst omfang og design
-  -> implementering eller dokumentendring
+  -> implementering
   -> framtidsrettet audit
-  -> relevante kontroller
-  -> dokumentasjon
+  -> automatiske og manuelle kontroller
+  -> dokumentasjon og arkitekturrapporter
   -> PR-kontroll
   -> eksplisitt mergegodkjenning
 ```
 
-Produksjonsbrancher følger normalt `npm run check` og oppdaterte arkitekturrapporter. Rene Markdown-brancher bruker normalt dokumentkontroll, `git diff --check` og bekreftet clean tree når ingen kode, konfigurasjon eller arkitekturrapporter er endret.
-
 ## Gjeldende status
 
 ```text
-base main for dokumentasjonsaudit: 56e2af7
-GitHub-sak: #18 Audit and synchronize project documentation
-branch: docs/project-documentation-audit
-siste funksjonelle merge: b428cac, PR #16
-prosjektskjema: versjon 4
-produksjonskode i auditfasen: uendret
-ny produksjonsfase: ikke valgt
+base main: 06307a2
+GitHub-sak: #20 Build first bundled SVG button library
+branch: feature/button-library
+prosjektskjema på branchen: versjon 5
+produksjonscommits:
+  a8017d4  feat: add button element model
+  7fe89f2  feat: add bundled button assets
+  1b80890  feat: add button design library
+  ec30b9a  feat: add button property controls
+manuell akseptansetest: godkjent
+PR: ikke opprettet ennå
 ```
 
-Dokumentasjonsauditen skal fullføres og merges før en ny produksjonsfase velges.
+`main` inneholder dokumentasjonsauditen fra PR #19 og har fortsatt siste mergede funksjonelle fase fra PR #16. Knappbiblioteket er ferdig kontrollert på feature-branchen, men er ikke merget.
 
 ## Ferdig og merget til `main`
 
 - stabilt React/TypeScript/Vite-grunnlag
 - blankt PC- og Telefon-lerret
 - toppmeny og kontrollert venstremeny
-- Seksjon, Bilde, Tekst og Knapp
+- Seksjon, Bilde, Tekst og grunnleggende Knapp-element
 - prosjekt- og elementmodell med stabile ID-er
 - sentral prosjekt-state og aktiv side
-- transient elementmarkering
-- oppretting av alle fire elementtyper
+- elementmarkering
 - flytting og størrelsesendring med peker og tastatur
 - clamping, minimumsmål, edge-scroll og automatisk lerretsvekst
 - objektlåsing
@@ -101,7 +102,38 @@ PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
+PR #19  dokumentasjonsaudit          06307a2
 ```
+
+## Aktiv knappbibliotekfase
+
+Brukerflyt:
+
+```text
+Elementer -> Knapp -> velg ett av fire SVG-design
+```
+
+Valgt design oppretter og markerer en knapp. Høyremenyen kan deretter endre:
+
+- knappetekst
+- design
+- ekstern lenke
+- åpning i ny fane
+
+Knappen kan flyttes, resizes, låses, låses opp og slettes med eksisterende editorfunksjoner. Lenken aktiveres aldri i editormodus.
+
+Første stabile asset-ID-er:
+
+```text
+button.primary-rounded.v1
+button.secondary-rounded.v1
+button.outline-rounded.v1
+button.dark-rounded.v1
+```
+
+Prosjektdata lagrer stabil `assetId`, ikke filsti, import-URL eller rå SVG.
+
+Se `docs/BUTTON_LIBRARY.md`.
 
 ## Gjeldende venstremeny
 
@@ -113,25 +145,25 @@ Elementer
 Innstillinger
 ```
 
-Dette er dagens implementerte og gjeldende struktur.
-
-Alternative navn som `Filer`, `Alle farger`, `Fonts` og separat `Knapper` er ikke implementert eller vedtatt. De kan bare behandles som åpne framtidige produktbeslutninger.
+Knappbiblioteket ligger internt under `Elementer -> Knapp`. Det finnes ikke et separat venstremenypunkt kalt `Knapper`.
 
 ## Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette og velge struktur
+Venstremeny = opprette elementer og velge ferdig design
 Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere tekst og transformere elementer
 ```
 
-`Elementer -> Tekst` oppretter en vanlig fri tekstboks. Tekstinnhold redigeres på lerretet. Font, størrelse, lenke og sletting ligger i høyremenyen.
+For knapper gjelder:
 
-`Logo og header` skal senere eie strukturelle headerdeler som logo, hovedtekst, undertittel og header-oppsett.
+```text
+Venstremeny = velge design og opprette
+Høyremeny  = endre tekst, design og lenke
+Lerretet   = markere, flytte og endre størrelse
+```
 
 ## Høyremeny
-
-Gjeldende oppførsel:
 
 ```text
 Ingenting valgt -> ingen høyremeny
@@ -148,25 +180,33 @@ animasjon: 180 ms
 prefers-reduced-motion: animasjon deaktivert
 ```
 
-Panelet leser valgt element fra autoritativ selection-state. Det eier ingen separat elementkopi og muterer ikke prosjektet direkte.
+Panelet leser autoritative elementdata fra sentral state. Det eier ingen separat elementkopi og muterer ikke prosjektet direkte.
 
 ## Prosjektmodell
 
-Gjeldende prosjektskjema er versjon 4.
-
-Historiske skjematrinn:
+Gjeldende skjemaversjon på `feature/button-library` er versjon 5.
 
 ```text
+versjon 1  grunnmodell
 versjon 2  tekstinnhold
 versjon 3  tekststil
-versjon 4  elementlenke, gjeldende
+versjon 4  elementlenke
+versjon 5  stabilt knappasset, knappetekst og knappelenke
 ```
 
-Tekstelementer har obligatorisk:
+Tekstelement:
 
 ```text
 content
 textStyle
+link
+```
+
+Knappelement:
+
+```text
+assetId
+label
 link
 ```
 
@@ -177,64 +217,27 @@ none
 external-url { url, openInNewTab }
 ```
 
-Regler:
-
-- hele tekstboksen får lenken
-- bare absolutte `http://`- og `https://`-adresser godtas
-- ugyldig URL muterer ikke prosjektet
-- låste tekstbokser kan inspiseres, men ikke endres
-- lenken åpnes aldri i editormodus
-- enkeltord får ikke egne lenker
-
-Se `docs/ELEMENT_MODEL.md`, `docs/TEXT_PROPERTIES.md` og `docs/ELEMENT_LINKS.md`.
-
-## Sikker sletting
-
-PR #16 la til sletting av ett markert element:
-
-```text
-Slett seksjon
-Slett bilde
-Slett tekstboks
-Slett knapp
-```
-
-Regler:
-
-- sletteknappen ligger rett under statusboksen i høyremenyen
-- låst element kan ikke slettes
-- sletting krever alltid bekreftelsesdialog
-- `Escape` og `Avbryt` lukker uten mutasjon
-- `Delete` åpner samme dialog
-- Delete under tekstredigering påvirker bare teksten
-- bekreftet sletting fjerner bare målelementet
-- markeringen nullstilles bare når det slettede elementet var markert
-- sletting av Seksjon fjerner ikke visuelt overlappende elementer
-- dialogens `Escape` påvirker ikke et åpent verktøypanel
-
-Se `docs/ELEMENT_DELETION.md`.
+Bare absolutte `http://`- og `https://`-adresser godtas. Lenker aktiveres ikke i editormodus.
 
 ## State-grenser
 
 Varig prosjektdata:
 
-- elementgeometri
-- synlighet
+- elementgeometri og synlighet
 - låsestatus
-- tekstinnhold
-- tekststil
+- tekstinnhold og tekststil
 - elementlenke
+- knappens `assetId` og `label`
 - prosjektets `updatedAt`
 
 Transient editor-state:
 
 - `selectedElementId`
-- aktiv pekerinteraksjon og layout-preview
-- aktiv tekstredigering og draft
-- lenkeskjemaets draft og status
+- pekerinteraksjon og layout-preview
+- tekst-, knappetekst- og lenkedrafts
+- katalogvisning og lokal feedback
 - slettedialogens mål og fokusreferanse
-- aktive verktøy og paneler
-- fokus, hover og lokal UI-feedback
+- aktive verktøy, fokus og hover
 
 Transient state serialiseres ikke.
 
@@ -245,6 +248,16 @@ Transient state serialiseres ikke.
 - En fil deles tidligere når den får flere tydelige ansvar.
 - `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar.
 
+## Gjenstår før PR
+
+- regenerere `architecture.json`
+- regenerere `docs/dependency-graph.mmd`
+- kontrollere branchdiff og filgrenser
+- kjøre `git diff --check`
+- bekrefte clean og synkronisert branch
+- opprette PR mot `main`
+- merge bare etter eksplisitt godkjenning
+
 ## Autoritativ dokumentrekkefølge
 
 1. `docs/NEXT_CHAT_PROMPT.md`
@@ -252,17 +265,16 @@ Transient state serialiseres ikke.
 3. `docs/EDITOR_PLANNING.md`
 4. `docs/PROJECT_RULES.md`
 5. `README.md`
-6. `docs/ELEMENT_DELETION.md`
-7. `docs/ELEMENT_LINKS.md`
-8. `docs/TEXT_PROPERTIES.md`
+6. `docs/BUTTON_LIBRARY.md`
+7. `docs/ELEMENT_MODEL.md`
+8. `docs/ELEMENT_LINKS.md`
 9. `docs/RIGHT_PROPERTIES_PANEL.md`
-10. `docs/ELEMENT_MODEL.md`
-11. `docs/TEXT_BOX_EDITING.md`
-12. `docs/OBJECT_LOCKING.md`
-13. `docs/DRAG_RESIZE.md`
-14. `docs/ELEMENT_SELECTION.md`
-15. `docs/ELEMENT_CREATION.md`
-16. `docs/MOBILE_DESIGN_CONTROLS.md`
-17. `docs/CODE_AUDIT.md`
-
-Hoveddokumentene er autoritative for gjeldende prosjektstatus. Fasedokumentene er autoritative for den historiske implementeringsgrensen og de tekniske beslutningene i sin fase.
+10. `docs/ELEMENT_DELETION.md`
+11. `docs/TEXT_PROPERTIES.md`
+12. `docs/TEXT_BOX_EDITING.md`
+13. `docs/OBJECT_LOCKING.md`
+14. `docs/DRAG_RESIZE.md`
+15. `docs/ELEMENT_SELECTION.md`
+16. `docs/ELEMENT_CREATION.md`
+17. `docs/MOBILE_DESIGN_CONTROLS.md`
+18. `docs/CODE_AUDIT.md`

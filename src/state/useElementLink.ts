@@ -2,13 +2,13 @@ import { useCallback } from 'react'
 import type { ElementLink } from '../model/elementLink'
 import { useEditorProject } from './useEditorProject'
 
-export function useTextElementLink() {
+export function useElementLink() {
   const { dispatch } = useEditorProject()
 
-  const updateTextElementLink = useCallback(
+  const updateElementLink = useCallback(
     (elementId: string, link: ElementLink) => {
       dispatch({
-        type: 'set-text-element-link',
+        type: 'set-element-link',
         elementId,
         link,
         updatedAt: new Date().toISOString(),
@@ -17,5 +17,5 @@ export function useTextElementLink() {
     [dispatch],
   )
 
-  return { updateTextElementLink }
+  return { updateElementLink }
 }

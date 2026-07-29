@@ -188,12 +188,6 @@
   user-select: text;
 }
 
-.canvas-element--button {
-  border-color: #7c3c2f;
-  border-radius: 8px;
-  color: #ffffff;
-  background: #7d4032;
-}
 
 .canvas-element:hover {
   outline-color: rgba(143, 67, 47, 0.48);
