@@ -1,6 +1,8 @@
 import { createStableId } from './createStableId'
 
 export const MAX_IMAGE_FILE_BYTES = 10 * 1024 * 1024
+export const MAX_IMAGE_DIMENSION_PX = 16_384
+export const MAX_IMAGE_PIXEL_COUNT = 40_000_000
 
 export const supportedImageMimeTypes = [
   'image/png',
@@ -36,6 +38,25 @@ export function isSupportedImageMimeType(
   return supportedImageMimeTypes.some((mimeType) => mimeType === value)
 }
 
+export function hasValidImagePixelDimensions(
+  width: unknown,
+  height: unknown,
+) {
+  if (typeof width !== 'number' || typeof height !== 'number') {
+    return false
+  }
+
+  return (
+    Number.isInteger(width) &&
+    Number.isInteger(height) &&
+    width > 0 &&
+    height > 0 &&
+    width <= MAX_IMAGE_DIMENSION_PX &&
+    height <= MAX_IMAGE_DIMENSION_PX &&
+    width * height <= MAX_IMAGE_PIXEL_COUNT
+  )
+}
+
 export function isValidImageAssetMetadata(
   value: unknown,
 ): value is ImageAssetMetadata {
@@ -52,10 +73,7 @@ export function isValidImageAssetMetadata(
     Number.isInteger(metadata.byteSize) &&
     (metadata.byteSize ?? 0) > 0 &&
     (metadata.byteSize ?? 0) <= MAX_IMAGE_FILE_BYTES &&
-    Number.isInteger(metadata.width) &&
-    (metadata.width ?? 0) > 0 &&
-    Number.isInteger(metadata.height) &&
-    (metadata.height ?? 0) > 0
+    hasValidImagePixelDimensions(metadata.width, metadata.height)
   )
 }
 
