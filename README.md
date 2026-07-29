@@ -58,16 +58,18 @@ main
 
 ## Gjeldende status
 
+Siste funksjonelle merge til `main`:
+
 ```text
-main: f71b354  PR #14 – frittstående tekstlenker
-branch: feature/element-deletion
-GitHub-sak: #15
-PR: #16 Add safe deletion for selected elements
-produksjonscommit: 4f59b3e
-arkitekturrapporter: fbd8091
+b428cac  PR #16 – sikker sletting av elementer
 ```
 
-PR #16 er åpen og mergebar. Den skal ikke merges uten eksplisitt brukergodkjenning.
+```text
+GitHub-sak #15: lukket som fullført
+PR #16: merget
+prosjektskjema: versjon 4
+ingen ny produksjonsfase er valgt
+```
 
 ## Ferdig og merget til `main`
 
@@ -86,6 +88,7 @@ PR #16 er åpen og mergebar. Den skal ikke merges uten eksplisitt brukergodkjenn
 - høyremenyens grunnstruktur
 - tekstegenskaper for hele tekstboksen
 - ekstern lenke for hele tekstboksen
+- sikker sletting via høyremeny og `Delete`
 - Dependency Cruiser og samlet `npm run check`
 
 Viktige merges:
@@ -98,6 +101,7 @@ PR #8   navn og rekkefølge i meny    a35f59d
 PR #9   høyremenyens grunnstruktur   8de5f2e
 PR #11  tekstegenskaper              452b491
 PR #14  elementlenker                f71b354
+PR #16  sikker elementsletting       b428cac
 ```
 
 ## Fast ansvarsdeling
@@ -133,9 +137,9 @@ Regler:
 
 Se `docs/ELEMENT_LINKS.md`.
 
-## Sikker sletting i PR #16
+## Sikker sletting
 
-PR #16 legger til sletting av ett markert element:
+PR #16 la til sletting av ett markert element:
 
 ```text
 Slett seksjon
@@ -144,10 +148,9 @@ Slett tekstboks
 Slett knapp
 ```
 
-Sletteknappen ligger rett under statusboksen i høyremenyen.
-
 Regler:
 
+- sletteknappen ligger rett under statusboksen i høyremenyen
 - låst element kan ikke slettes
 - sletting krever alltid bekreftelsesdialog
 - `Escape` og `Avbryt` lukker uten mutasjon
@@ -164,7 +167,7 @@ Se `docs/ELEMENT_DELETION.md`.
 
 ## Verifisert status for PR #16
 
-Brukeren har kjørt kontroll etter de siste produksjonsrettelsene:
+Brukeren kjørte kontroll etter de siste produksjonsrettelsene:
 
 ```text
 ESLint: bestått
@@ -177,7 +180,7 @@ JavaScript: 232.19 kB, gzip 71.23 kB
 bygget på 225 ms
 ```
 
-Arkitekturrapportene er regenerert fra den endelige produksjonskoden. Det finnes ingen GitHub Actions-run for head; den brukerbekreftede lokale kontrollen er verifikasjonsgrunnlaget.
+Arkitekturrapportene ble regenerert fra den endelige produksjonskoden. Det fantes ingen GitHub Actions-run; den brukerbekreftede lokale kontrollen er verifikasjonsgrunnlaget.
 
 Manuelt godkjent:
 
