@@ -13,7 +13,7 @@ skjemaversjon innført i fasen: 2
 
 Fasen er ferdig, kodeauditert, kontrollert på PC og Telefon og merget til `main`.
 
-Skjemaversjon 2 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 4.
+Skjemaversjon 2 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 5.
 
 ## Historisk omfang
 
@@ -40,7 +40,7 @@ content: ''
 
 Tom tekst er gyldig prosjektdata. Teksten **Dobbeltklikk for å skrive** er bare en editor-placeholder og lagres aldri som innhold.
 
-Prosjektskjemaet ble senere utvidet med `textStyle` i versjon 3 og `link` i gjeldende versjon 4.
+Prosjektskjemaet ble senere utvidet med `textStyle` i versjon 3, `link` i versjon 4 og knappens `assetId`, `label` og `link` i gjeldende versjon 5.
 
 ## Objektmarkering og redigeringsmodus
 

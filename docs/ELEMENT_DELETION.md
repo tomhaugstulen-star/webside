@@ -17,7 +17,7 @@ arkitekturrapporter: fbd8091
 
 Slettefunksjonen er implementert, framtidsauditert, kompilert, manuelt godkjent og merget til `main` gjennom PR #16.
 
-Alle funksjonelle, tekniske og prosessuelle kriterier for fasen er oppfylt. Sak #15 ble automatisk lukket ved merge.
+Fasen endret ikke prosjektmodellen. Skjemaversjonen var 4 på fasens base og etter sletteleveransen. Gjeldende prosjektskjema er senere økt til versjon 5 av knappbibliotekfasen.
 
 ## Omfang
 
@@ -28,7 +28,7 @@ Leveransen gjelder ett markert element av typen:
 - Tekst
 - Knapp
 
-Følgende er ikke del av fasen:
+Følgende var ikke del av slettefasen:
 
 - angre/gjør om
 - papirkurv eller gjenoppretting
@@ -44,7 +44,7 @@ Følgende er ikke del av fasen:
 - farger
 - forhåndsvisning eller publisering
 
-Prosjektskjemaet forblir versjon 4.
+Flere av disse funksjonene kan være implementert senere eller stå som planlagte faser. Listen beskriver bare den historiske slettebranchens omfang.
 
 ## Plassering i høyremenyen
 
@@ -70,7 +70,6 @@ Knappen:
 - ligger i vanlig dokumentflyt
 - er ikke festet nederst i panelet
 - har samme bredde som statusboksen
-- krever ingen scrolling i dagens panel
 - bruker rød tekst og rød ramme
 - har hover-, focus-visible- og disabled-tilstand
 - er deaktivert når elementet er låst
@@ -122,7 +121,7 @@ Ytterligere grenser:
 - IME-komposisjon ignoreres
 - modifikatortaster sammen med `Delete` ignoreres
 - `Backspace` brukes ikke som global slettehandling
-- Delete under tekstredigering sletter tekst, ikke elementet
+- `Delete` under tekstredigering sletter tekst, ikke elementet
 
 ## Elementmodell og Seksjon
 
@@ -197,9 +196,7 @@ src/components/canvas/canvasElementAccessibility.ts
 src/App.css
 ```
 
-`EditorCanvasElement.tsx` er urørt av sletteimplementasjonen.
-
-Alle nye kildefiler er under aktiv 250-linjersgrense. Den største nye TSX-filen er 113 linjer.
+`EditorCanvasElement.tsx` er urørt av sletteimplementasjonen. Alle nye kildefiler var under aktiv 250-linjersgrense.
 
 ## Framtidsrettet kodeaudit
 
@@ -212,8 +209,6 @@ Etter rettelsene ble hele `npm run check` kjørt på nytt, og arkitekturrapporte
 
 ## Verifisert kvalitetskontroll
 
-Brukeren kjørte `npm run check` etter de siste produksjonsrettelsene:
-
 ```text
 ESLint: bestått
 TypeScript: bestått
@@ -225,29 +220,23 @@ JavaScript: 232.19 kB, gzip 71.23 kB
 bygget på 225 ms
 ```
 
-Arkitekturrapportene ble regenerert og committed i `fbd8091`.
-
-Ingen GitHub Actions-run var knyttet til head. Den brukerbekreftede lokale kontrollen er derfor verifikasjonsgrunnlaget.
+Arkitekturrapportene ble regenerert og committed i `fbd8091`. Ingen GitHub Actions-run var knyttet til head; brukerbekreftet lokal kontroll var verifikasjonsgrunnlaget.
 
 ## Manuelt godkjent
 
-Brukeren har godkjent:
+Brukeren godkjente:
 
 - riktig sletteetikett for alle fire elementtyper
 - riktig plassering rett under statusboksen
-- avbrytelse uten mutasjon
-- `Escape` uten mutasjon
+- avbrytelse og `Escape` uten mutasjon
 - bekreftet sletting via høyremenyen
 - høyremenyen lukkes etter sletting
 - ingen andre elementer slettes
 - `Delete` åpner samme dialog
-- låst element viser deaktivert knapp
-- `Delete` gjør ingenting på låst element
+- låst element kan ikke slettes
 - `Delete` under tekstredigering påvirker bare teksten
 - sletting av Seksjon lar visuelt overlappende elementer bli stående
 
 ## Akseptansestatus
 
-Fasen er fullført og merget til `main` i mergecommit `b428cac`.
-
-Det finnes ingen åpne kriterier eller kjente blokkerende kodefunn knyttet til denne fasen.
+Fasen er fullført og merget til `main` i mergecommit `b428cac`. Det finnes ingen åpne kriterier eller kjente blokkerende kodefunn knyttet til slettefasen.

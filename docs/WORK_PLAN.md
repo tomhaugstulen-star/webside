@@ -7,7 +7,7 @@ Dette dokumentet fastsetter utviklingsrekkefølge og kontrollkrav. Det utvikles 
 For hver avgrensede del:
 
 1. Kontroller riktig branch og rent arbeidsområde.
-2. Oppdater og kontroller `main`.
+2. Oppdater og kontroller faktisk `origin/main`.
 3. Opprett én avgrenset feature- eller docs-branch.
 4. Definer omfang, brukerhandlinger, varig state og transient state.
 5. Lås produkt- og designvalg før produksjonskode.
@@ -32,18 +32,33 @@ npm run architecture:diagram
 git diff --check
 ```
 
+For en ren Markdown-branch er `git diff --check`, dokumentkontroll og clean tree normalt tilstrekkelig når ingen kode, konfigurasjon eller arkitekturrapporter er endret.
+
 ## 2. Gjeldende status
 
+Faktisk `main`-HEAD er dynamisk og skal leses fra Git, ikke hardkodes i planen.
+
+```powershell
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git status
+git log -6 --oneline --decorate
+```
+
+Stabile historiske referanser:
+
 ```text
-main: 5e548ad
-fase 10: første bundlede SVG-knappbibliotek – fullført
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
+PR #21: første bundlede SVG-knappbibliotek – merget
+PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
+knappbibliotekets mergecommit: 5e548ad
 GitHub-sak #20: lukket som fullført
-PR #21: merget
 prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-Sluttverifisering:
+Siste verifiserte produksjonskontroll gjelder fase 10:
 
 ```text
 ESLint: bestått
@@ -87,21 +102,32 @@ Se `docs/BUTTON_LIBRARY.md`.
 - fase 9: sikker sletting – PR #16
 - dokumentasjonsaudit – PR #19
 - fase 10: SVG-knappbibliotek – PR #21, mergecommit `5e548ad`
+- dokumentasjonsstatus etter knappbiblioteket – PR #22, mergecommit `a77a9a9`
+
+Historiske mergecommits i listen er milepæler. De skal ikke tolkes som permanent gjeldende `main`-HEAD.
 
 ## 5. Senere faser
 
+Ingen av fasene under er aktiv før omfanget er eksplisitt valgt og godkjent.
+
 ### Fase 11 – Bilder
 
-Branch: `feature/image-import-and-placement`
+Planlagt branch: `feature/image-import-and-placement`
 
 - bildevelger
 - lokale bildefiler
 - selvstendig bildeobjekt
 - fri plassering og størrelse
+- stabil ressursreferanse
+- serialiserbar metadata
+- validering og kontrollert fallback
+- alt-tekst og tilgjengelighet
+
+Før fasen starter må minst bilde-/ressursmodell, lagringsformat, filtyper, maksimal størrelse, skalering, proporsjoner, mobil arv og slettelivssyklus låses.
 
 ### Fase 12 – Farger
 
-Branch: `feature/project-colors`
+Planlagt branch: `feature/project-colors`
 
 - register over faktiske prosjektfarger
 - global endring
@@ -109,7 +135,7 @@ Branch: `feature/project-colors`
 
 ### Fase 13 – Logo og header
 
-Branch: `feature/logo-header`
+Planlagt branch: `feature/logo-header`
 
 - logo
 - hovedtekst og undertittel
@@ -117,7 +143,7 @@ Branch: `feature/logo-header`
 
 ### Fase 14 – Korrigeringslinjer
 
-Branch: `feature/alignment-guides`
+Planlagt branch: `feature/alignment-guides`
 
 - horisontal midtstilling
 - samme linje og lik avstand
@@ -125,7 +151,7 @@ Branch: `feature/alignment-guides`
 
 ### Fase 15 – Responsiv redigering
 
-Branch: `feature/mobile-design-controls`
+Planlagt branch: `feature/mobile-design-controls`
 
 - desktop er grunnlaget
 - mobil arver desktop som standard
@@ -133,15 +159,15 @@ Branch: `feature/mobile-design-controls`
 
 ### Fase 16 – Angre og gjør om
 
-Branch: `feature/history-system`
+Planlagt branch: `feature/history-system`
 
 ### Fase 17 – Lokal automatisk lagring
 
-Branch: `feature/local-project-autosave`
+Planlagt branch: `feature/local-project-autosave`
 
 ### Fase 18 – Åpne og importere prosjekt
 
-Branch: `feature/project-open-import`
+Planlagt branch: `feature/project-open-import`
 
 ### Fase 19 – Forhåndsvisning og publisering
 
@@ -155,6 +181,7 @@ feature/publishing
 - 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
 - 300 linjer er hard unntaksgrense.
 - Canvas-komponenten skal ikke samle nye funksjonsansvar.
+- `RightPropertiesPanel.tsx` skal forbli komposisjon.
 - Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
 - Ugyldige og uendrede handlinger skal returnere samme state.
 - Transient markering, drafts, dialogstate, fokus, hover og feedback serialiseres ikke.

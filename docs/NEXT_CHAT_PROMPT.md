@@ -4,15 +4,15 @@ Kopier hele teksten under inn i neste chat.
 
 ---
 
-Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder og kodeansvarlig med presist omfang, full repokontroll og ingen gjetting.
+Du er ansvarlig for videre utvikling av Website-editoren. Arbeid som prosjektleder, teknisk arkitekt og kodeansvarlig med presist omfang, full repokontroll og ingen gjetting.
 
-Svar på norsk. Repo, faktisk kode og autoritativ dokumentasjon er kilden til sannhet.
+Svar på norsk. Repo, faktisk kode, brukerens terminaloutput og autoritativ dokumentasjon er kilden til sannhet.
 
 ## Repo og lokal mappe
 
 ```text
-https://github.com/tomhaugstulen-star/webside.git
-C:\Users\tomha\Desktop\website
+GitHub: https://github.com/tomhaugstulen-star/webside.git
+Lokalt: C:\Users\tomha\Desktop\website
 ```
 
 Bruk GitHub-connectoren til repoarbeid. Ikke bruk GitHub CLI. Bruk vanlige PowerShell-kommandoer for lokal `git`, `npm` og testing når lokal utførelse er nødvendig.
@@ -30,19 +30,29 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 7. `docs/ELEMENT_MODEL.md`
 8. `docs/ELEMENT_LINKS.md`
 9. `docs/RIGHT_PROPERTIES_PANEL.md`
-10. øvrige fasedokumenter
+10. `docs/CODE_AUDIT.md`
+11. relevante øvrige fasedokumenter
 
-## Gjeldende repo- og arbeidsstatus
+## Repo- og arbeidsstatus
+
+Ikke stol på et hardkodet commitnummer som «gjeldende main HEAD». Kontroller alltid faktisk `origin/main` og GitHub-status før planlegging eller arbeid.
+
+Stabile historiske referanser:
 
 ```text
-main: 5e548ad
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
+knappbibliotekets mergecommit: 5e548ad
 PR #21: Build first bundled SVG button library – merget
+PR #22: Update status after button library merge – merget
+PR #24: dokumentasjonssynkronisering; kontroller faktisk status på GitHub
 GitHub-sak #20: lukket som fullført
 prosjektskjema: versjon 5
 neste produksjonsfase: ikke valgt
 ```
 
-Sluttverifisering for knappfasen:
+`5e548ad` er mergecommit for selve knappbiblioteket. `a77a9a9` er base-commit før PR #24, ikke en permanent forventet topp-commit.
+
+Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
 
 ```text
 ESLint: bestått
@@ -65,16 +75,16 @@ git fetch origin
 git switch main
 git pull --ff-only origin main
 git status
-git log -6 --oneline
+git log -6 --oneline --decorate
 ```
 
-Forventet øverste mergecommit:
+Godkjent starttilstand:
 
-```text
-5e548ad Merge pull request #21 from tomhaugstulen-star/feature/button-library
-```
-
-Working tree skal være clean før planlegging eller ny branch.
+- aktiv branch er `main`
+- lokal `main` følger `origin/main`
+- lokal og remote `main` peker på samme faktiske commit
+- working tree er clean
+- topp-commit vurderes mot faktisk GitHub-status, ikke mot et hardkodet nummer i dokumentasjonen
 
 ## Ferdig funksjonalitet
 
@@ -90,7 +100,19 @@ Working tree skal være clean før planlegging eller ny branch.
 - sikker sletting
 - første bundlede SVG-knappbibliotek
 
-## Knappbiblioteket som nå ligger på `main`
+## Gjeldende venstremeny
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+`Elementer` inneholder Seksjon, Bilde, Tekst og Knapp. Det finnes ikke et separat hovedmenypunkt kalt `Knapper`.
+
+## Knappbiblioteket på `main`
 
 Brukerflyt:
 
@@ -114,12 +136,18 @@ Prosjektdata lagrer stabil `assetId`, aldri filsti, import-URL eller rå SVG.
 ## Fast ansvarsdeling
 
 ```text
+Venstremeny = opprette elementer og velge ferdig design
+Høyremeny  = egenskaper og handlinger for markert element
+Lerretet   = redigere tekst og transformere elementer
+```
+
+For knapper:
+
+```text
 Venstremeny = velge design og opprette knapp
 Høyremeny  = endre knappetekst, design og lenke
 Lerretet   = markere, flytte og endre størrelse
 ```
-
-Det finnes ikke et separat venstremenypunkt kalt `Knapper`.
 
 ## Prosjektmodell versjon 5
 
@@ -142,18 +170,22 @@ link: none
 
 `ButtonAssetId` er en validert og brandet stabil streng. Modellaget importerer ikke SVG-filer eller Vite-genererte adresser.
 
+Bildeelementet har foreløpig bare felles elementdata og geometri. Bildekilde, ressurs-ID, filmetadata, alt-tekst og skaleringsmodell er ikke implementert.
+
 ## State- og valideringsgrenser
 
 Alle varige endringer går gjennom typede reducer-actions.
 
-Reducergrensene avviser:
+Reducergrensene avviser blant annet:
 
 - manglende aktiv side
 - manglende element
+- element på feil side
+- duplisert element-ID
 - feil elementtype
 - låst element
 - ugyldig verdi
-- ukjent asset-ID
+- ukjent knappasset-ID
 - uendret data
 
 Ugyldige eller uendrede handlinger muterer ikke prosjektet eller `updatedAt`.
@@ -182,14 +214,25 @@ Markert knapp viser knappetekst, design, lenke, status og sletting.
 
 ## Neste arbeid
 
-Ingen ny produksjonsfase er valgt. Neste chat skal:
+Ingen ny produksjonsfase er valgt.
 
-1. bekrefte lokal `main` og clean tree
-2. lese autoritative dokumenter
-3. velge én avgrenset neste fase sammen med brukeren
-4. opprette ny GitHub-sak og feature-branch først etter at omfanget er låst
-5. ikke blande inn funksjoner fra senere faser
+Den planlagte neste fasen i `docs/WORK_PLAN.md` er fase 11 – Bilder, men den er ikke aktiv eller godkjent. Før eventuell implementering må bilde-/ressursmodell, stabil asset-ID, serialisering, filtyper, maksimal størrelse, feilhåndtering, skalering, proporsjoner, mobil arv og alt-tekst avklares og låses.
 
-Aktuelle senere faser står i `docs/WORK_PLAN.md`. Ikke start en av dem automatisk.
+Ikke opprett produksjonssak, feature-branch eller kode før omfanget er eksplisitt valgt og godkjent.
+
+Fast videre arbeidsmåte:
+
+1. bekreft faktisk lokal `main`, `origin/main` og clean tree
+2. les autoritative dokumenter og faktisk kode
+3. velg én avgrenset fase sammen med brukeren
+4. avklar varig og transient state
+5. lås produkt-, design- og valideringsregler
+6. opprett GitHub-sak og feature-branch først etter godkjenning
+7. implementer i små logiske commits
+8. gjennomfør framtidsrettet audit og filstørrelseskontroll
+9. kjør nødvendige lokale kontroller etter siste produksjonsendring
+10. oppdater dokumentasjon og arkitekturrapporter der relevant
+11. kontroller hele diffen, branchstatus, PR og review-tråder
+12. merge bare etter eksplisitt brukergodkjenning
 
 ---

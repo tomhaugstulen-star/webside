@@ -2,13 +2,38 @@
 
 Dette dokumentet fastsetter gjeldende arbeidsmåte, arkitekturgrenser og produktansvar for Website-editoren.
 
-## 1. Branch-strategi
+## 1. Repo-status og historiske referanser
+
+Faktisk `main`-HEAD er dynamisk og skal alltid kontrolleres mot `origin/main`. Dokumentasjonen skal ikke hardkode et commitnummer som permanent «gjeldende HEAD» eller forventet topp-commit.
+
+```powershell
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git status
+git log -6 --oneline --decorate
+```
+
+Stabile historiske referanser:
+
+```text
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
+PR #21: første bundlede SVG-knappbibliotek – merget
+PR #22: dokumentasjonsstatus etter knappbiblioteket – merget
+knappbibliotekets mergecommit: 5e548ad
+prosjektskjema: versjon 5
+neste produksjonsfase: ikke valgt
+```
+
+Historiske mergecommits beskriver leveranser. De skal ikke tolkes som nåværende branch-topp etter senere merges.
+
+## 2. Branch-strategi
 
 - Hver funksjon eller dokumentasjonsfase bygges i en egen avgrenset branch.
 - `main` skal alltid være stabil.
 - Det utvikles aldri direkte på `main`.
 - En godkjent branch merges før neste produksjonsbranch starter fra oppdatert `main`.
-- En eksisterende branch som ligger bak `main`, fast-forwardes kontrollert før nytt arbeid.
+- En branch som ligger bak `main`, synkroniseres kontrollert før videre arbeid.
 - En branch skal ikke inneholde skjult arbeid for senere faser.
 - Merge krever eksplisitt brukergodkjenning.
 
@@ -22,7 +47,7 @@ feature/right-properties-panel
 docs/project-documentation-audit
 ```
 
-## 2. Filstørrelser og moduldeling
+## 3. Filstørrelser og moduldeling
 
 - 250 linjer er aktiv terskel for å trekke ut ansvar.
 - En fil deles tidligere dersom den får flere tydelige ansvarsområder.
@@ -34,11 +59,13 @@ docs/project-documentation-audit
 - Store CSS-filer deles etter editorområde.
 - Ingen fil skal bli en generell samlefil.
 - `EditorCanvasElement.tsx` ligger nær aktiv grense og skal ikke få nye funksjonsansvar.
+- `RightPropertiesPanel.tsx` skal forbli en komposisjonskomponent.
+- Det skal ikke innføres en tilfeldig generell `features`-samlemappe.
 
-## 3. Autoritativ prosjektmodell
+## 4. Autoritativ prosjektmodell
 
 - `EditorProject` er autoritativ kilde for varige prosjektdata.
-- Gjeldende prosjektskjema er versjon 4.
+- Gjeldende prosjektskjema er versjon 5.
 - DOM-en brukes ikke som permanent prosjektlagring.
 - Prosjektidentitet bruker stabile kryptografiske ID-er.
 - State-avhengige beregninger bruker reducerens nyeste state.
@@ -50,35 +77,38 @@ Gjeldende varige prosjektdata omfatter blant annet:
 - sider og elementer
 - responsiv geometri og synlighet
 - låsestatus
-- tekstinnhold
-- tekststil
+- tekstinnhold og tekststil
 - elementlenke
+- knappens stabile `assetId` og `label`
 - tidsstempler
 
 Skjemahistorikk:
 
 ```text
-versjon 2  innførte varig tekstinnhold
-versjon 3  innførte varig tekststil
-versjon 4  innførte varig elementlenke og er gjeldende
+versjon 1  grunnmodell
+versjon 2  varig tekstinnhold
+versjon 3  varig tekststil
+versjon 4  varig elementlenke
+versjon 5  stabilt knappasset, knappetekst og knappelenke
 ```
 
-Historiske fasebeskrivelser av versjon 2 og 3 skal ikke leses som gjeldende prosjektstatus.
+Historiske fasedokumenter kan beskrive eldre skjemaversjoner. De skal samtidig skille historisk faseversjon fra gjeldende prosjektversjon.
 
 Se `docs/ELEMENT_MODEL.md`.
 
-## 4. Transient editor-state
+## 5. Transient editor-state
 
 Transient state holdes utenfor `EditorProject`, blant annet:
 
 - `selectedElementId`
-- aktiv pekerinteraksjon
-- layout-preview
+- aktiv pekerinteraksjon og layout-preview
 - åpne paneler og aktivt verktøy
 - aktiv tekstredigeringsøkt og lokal tekstdraft
-- lenkeskjemaets draft og feedback
+- knappetekst- og lenkedrafts
+- intern katalogvisning
+- valideringsmeldinger og lokal feedback
 - slettedialogens mål-ID og fokusreferanse
-- fokus, hover, animasjon og lokal UI-feedback
+- fokus, hover og animasjon
 
 Transient state skal ikke:
 
@@ -88,9 +118,33 @@ Transient state skal ikke:
 - eksporteres
 - publiseres
 
-Ferdige prosjektmutasjoner er den eksplisitte grensen for senere historikk og lagring.
+Ferdige prosjektmutasjoner er grensen for senere historikk og lagring.
 
-## 5. Layout og transform
+## 6. State- og reducergrenser
+
+Alle varige prosjektendringer går gjennom typede reducer-actions.
+
+Reducergrensene skal avvise:
+
+- manglende aktiv side
+- manglende element
+- element på feil side
+- duplisert element-ID
+- feil elementtype
+- låst element
+- ugyldig verdi
+- ukjent knappasset-ID
+- uendret data
+
+Ved ugyldig eller uendret handling:
+
+- samme state-objekt returneres
+- prosjektet muteres ikke
+- `updatedAt` endres ikke
+
+Den sentrale reduceren skal ikke samle alle implementasjonsdetaljer. Elementoppretting ligger i `src/state/addElementToActivePage.ts`, og elementspesifikke mutasjoner ligger i egne statefiler.
+
+## 7. Layout og transform
 
 - Opprettingsplassering gjelder bare elementets fødested.
 - Startplassering er ikke et automatisk kollisjonssystem.
@@ -104,7 +158,7 @@ Ferdige prosjektmutasjoner er den eksplisitte grensen for senere historikk og la
 - Reduceren avviser layoutmutasjon av låste elementer.
 - Lerretshøyde er avledet visning og lagres ikke i prosjektfilen.
 
-## 6. Objektlåsing
+## 8. Objektlåsing
 
 - `locked` er varig elementdata og felles for PC og Telefon.
 - Låsestatus endres gjennom reduceren.
@@ -120,7 +174,7 @@ Status: merget som PR #5 med mergecommit `a3eed45`.
 
 Se `docs/OBJECT_LOCKING.md`.
 
-## 7. Tekstredigering
+## 9. Tekstredigering
 
 - Bare `kind: 'text'` har obligatorisk `content`, `textStyle` og `link`.
 - Nye tekstbokser starter med tomt innhold, standardstil og ingen lenke.
@@ -141,7 +195,7 @@ Status: merget som PR #7 med mergecommit `c729d33`.
 
 Se `docs/TEXT_BOX_EDITING.md`.
 
-## 8. Venstremeny
+## 10. Venstremeny
 
 Gjeldende implementerte navn og rekkefølge:
 
@@ -157,23 +211,31 @@ Innstillinger
 - `Innstillinger` står nederst.
 - Paneloverskriftene følger samme navn.
 - Interne tool-ID-er kan beholde eksisterende verdier dersom det ikke gir arkitekturfeil.
-- Menynavn skal ikke blandes sammen med senere funksjonsimplementering.
+- `Elementer` inneholder Seksjon, Bilde, Tekst og Knapp.
+- `Knapp` åpner et internt designbibliotek.
+- Det finnes ikke et separat hovedmenypunkt kalt `Knapper`.
 
-Status: merget som PR #8 med mergecommit `a35f59d`.
+Alternative navn som `Filer`, `Alle farger` og `Fonts` er ikke implementert eller vedtatt. De er åpne framtidige produktbeslutninger.
 
-Alternative navn som `Filer`, `Alle farger`, `Fonts` og separat `Knapper` er ikke implementert eller vedtatt. De kan bare behandles som åpne framtidige produktbeslutninger.
-
-## 9. Fast ansvarsdeling
+## 11. Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette og velge struktur
+Venstremeny = opprette elementer og velge ferdig design
 Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere tekst og transformere elementer
 ```
 
+For knapper:
+
+```text
+Venstremeny = velge design og opprette knapp
+Høyremeny  = endre knappetekst, design og lenke
+Lerretet   = markere, flytte og endre størrelse
+```
+
 Denne ansvarsdelingen skal bevares i senere faser.
 
-## 10. Høyremeny og egenskaper
+## 12. Høyremeny og egenskaper
 
 Høyremenyens grunnstruktur er implementert og merget som PR #9 med mergecommit `8de5f2e`.
 
@@ -187,7 +249,7 @@ Gjeldende oppførsel:
 - panelet kan være åpent under tekstredigering
 - klikk i panelet bruker eksisterende blur/commit
 - markeringen beholdes etter normal tekstcommit
-- panelet oppretter ikke separat tekstdraft eller elementkopi
+- panelet oppretter ikke separat draft eller elementkopi
 - panelet følger `selectedElementId` og autoritative elementdata
 
 Layout:
@@ -201,19 +263,48 @@ animasjon: 180 ms
 prefers-reduced-motion: animasjon deaktivert
 ```
 
-Panelet er senere utvidet med tekstegenskaper, elementlenke og sikker sletting. Alle varige endringer går gjennom typed state-API og reducer-actions.
+Panelet er utvidet med tekstegenskaper, elementlenke, sikker sletting og knappkontroller. Alle varige endringer går gjennom typed state-API og reducer-actions.
 
 Se `docs/RIGHT_PROPERTIES_PANEL.md`, `docs/TEXT_PROPERTIES.md`, `docs/ELEMENT_LINKS.md` og `docs/ELEMENT_DELETION.md`.
 
-## 11. Responsiv grense
+## 13. Knappbibliotek
+
+Første bundlede SVG-knappbibliotek er implementert og merget som PR #21 med mergecommit `5e548ad`.
+
+Stabile asset-ID-er:
+
+```text
+button.primary-rounded.v1
+button.secondary-rounded.v1
+button.outline-rounded.v1
+button.dark-rounded.v1
+```
+
+Regler:
+
+- prosjektdata lagrer stabil `assetId`, ikke filsti, import-URL eller rå SVG
+- modellaget importerer ikke SVG-filer
+- katalogen oversetter ID til bundlet fil og metadata
+- SVG-en er dekorativ og inneholder ikke synlig tekst
+- knappens `label` er ekte HTML-tekst og tilgjengelig navn
+- tom eller whitespace-only label avvises
+- ukjent ny asset-ID avvises
+- ukjent lagret asset-ID gir fallback og reparasjonsvalg
+- låst knapp kan inspiseres, men ikke endres
+- lenken aktiveres aldri i editormodus
+
+Se `docs/BUTTON_LIBRARY.md`.
+
+## 14. Responsiv grense
 
 - `ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen.
 - Mobil arver desktopverdier når mobiloverstyring mangler.
+- Dagens UI oppretter ikke mobiloverstyringer.
 - Egne mobiloverstyringer bygges i `feature/mobile-design-controls` etter ny godkjenning.
 - En framtidig mobilendring skal ikke skrive desktopgeometri utilsiktet.
-- Låsestatus, tekstinnhold, tekststil og elementlenke er ikke responsive uten en ny eksplisitt produktbeslutning.
+- Låsestatus, tekstinnhold, tekststil, elementlenke, knappasset og knappelabel er ikke responsive uten en ny eksplisitt produktbeslutning.
 
-## 12. Endringskontroll
+## 15. Endringskontroll
 
 Før hver ny avgrensede del avklares:
 
@@ -240,7 +331,7 @@ Ytterligere regler:
 - Ikke opprett PR før branchen er kontrollert, synkronisert og lokal tree er clean.
 - Ikke merge uten eksplisitt godkjenning.
 
-## 13. Kvalitetskrav
+## 16. Kvalitetskrav
 
 - TypeScript brukes konsekvent.
 - Reducer-actions og union-baserte switcher håndteres uttømmende.
@@ -262,7 +353,7 @@ npm run dev
 
 For en ren Markdown-branch er `git diff --check`, dokumentkontroll og clean tree normalt tilstrekkelig når ingen kode, konfigurasjon eller arkitekturrapporter er endret.
 
-## 14. Tilgjengelighet og editorinteraksjon
+## 17. Tilgjengelighet og editorinteraksjon
 
 - Enter og mellomrom markerer et fokusert objekt.
 - Piltaster flytter et ulåst, fokusert objekt.
@@ -275,17 +366,8 @@ For en ren Markdown-branch er `git diff --check`, dokumentkontroll og clean tree
 - Tilgjengelige navn skal bli mer spesifikke når elementet får innhold.
 - Knappehandlinger og lenker aktiveres ikke i vanlig editormodus.
 
-## 15. Gjeldende status
+## 18. Neste produksjonsfase
 
-```text
-base main for dokumentasjonsaudit: 56e2af7
-GitHub-sak: #18 Audit and synchronize project documentation
-branch: docs/project-documentation-audit
-produksjonskode: uendret
-prosjektskjema: versjon 4
-ny produksjonsfase: ikke valgt
-```
+Ingen ny produksjonsfase er valgt.
 
-Ferdig og merget funksjonalitet omfatter editorgrunnlag, prosjektmodell, markering, elementoppretting, drag/resize, objektlåsing, tekstredigering, gjeldende venstremeny, høyremeny, tekstegenskaper, tekstlenker og sikker elementsletting.
-
-Ingen ny produksjonsbranch skal opprettes før dokumentasjonsauditen er fullført, merget og lokal `main` igjen er bekreftet synkronisert og clean.
+Fase 11 – Bilder står som neste planlagte fase i `docs/WORK_PLAN.md`, men skal ikke startes før brukerflyt, varig ressursmodell, transient filvalg, validering, serialisering, tilgjengelighet og omfang er eksplisitt avklart og godkjent.

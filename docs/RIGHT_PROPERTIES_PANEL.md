@@ -12,7 +12,7 @@ PR: #9 – merget
 mergecommit: 8de5f2e
 ```
 
-Panelet er senere utvidet i egne faser med tekstegenskaper, elementlenker, sikker sletting og knappkontroller.
+Panelet er senere utvidet i egne faser med tekstegenskaper, elementlenker, sikker sletting og knappkontroller. Alle disse utvidelsene er merget til `main`.
 
 ## Låst produktoppførsel
 
@@ -113,9 +113,9 @@ Skjemaet bruker lokal transient draft og valideringsfeedback. Gyldig lagring gå
 
 Bare absolutte `http://`- og `https://`-adresser godtas. Lenken aktiveres aldri i editormodus.
 
-## Knappkontroller på feature-branchen
+## Knappkontroller på `main`
 
-`feature/button-library` legger til en egen `ButtonPropertiesSection`.
+Knappkontrollene ble implementert i knappbibliotekfasen og merget som PR #21 med mergecommit `5e548ad`.
 
 Markert knapp viser:
 
@@ -201,11 +201,11 @@ src/state/*
 CSS-ansvar:
 
 ```text
-right-properties-panel.css  paneloverflate, scrolling og breakpoint
-text-properties.css         tekstkontroller
-button-properties.css       knappetekst og design
- element-link-properties.css lenkeskjema
- element-deletion.css        sletting og dialog
+right-properties-panel.css   paneloverflate, scrolling og breakpoint
+text-properties.css          tekstkontroller
+button-properties.css        knappetekst og design
+element-link-properties.css  lenkeskjema
+element-deletion.css         sletting og dialog
 ```
 
 ## Tilgjengelighet

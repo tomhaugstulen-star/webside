@@ -1,6 +1,6 @@
 # Mobiltilpasset design og viewport-overstyringer
 
-Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt fase og endrer ikke dagens oppførsel i `feature/drag-resize`.
+Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt fase og endrer ikke dagens midlertidige responsive oppførsel som allerede er merget til `main`.
 
 ## 1. Formål
 
@@ -14,7 +14,9 @@ Planlagt branch:
 feature/mobile-design-controls
 ```
 
-## 2. Dagens midlertidige oppførsel
+Branchen er ikke aktiv før fasen er eksplisitt valgt og godkjent.
+
+## 2. Dagens midlertidige oppførsel på `main`
 
 Før denne fasen er implementert:
 
@@ -22,6 +24,8 @@ Før denne fasen er implementert:
 - flytting og resizing i Telefon-visning committer til desktopgeometrien
 - en endring i Telefon påvirker derfor også PC
 - ingen mobiloverstyring opprettes skjult
+
+Denne oppførselen stammer fra drag/resize-leveransen som ble merget gjennom PR #4. `feature/drag-resize` er en historisk branchreferanse, ikke aktiv arbeidsstatus.
 
 Dette er kontrollert og godkjent som midlertidig oppførsel. Det skal ikke videreføres som endelig responsiv redigering.
 
@@ -172,9 +176,7 @@ Fasen er ikke ferdig før dette er bekreftet:
 
 ## 13. Avhengigheter
 
-Fasen bygges etter at grunnleggende objektredigering og låsing er stabile.
-
-Den må lese og bevare grensene i:
+Fasen bygges først etter ny eksplisitt godkjenning. Den må lese og bevare grensene i:
 
 - `docs/RESPONSIVE_DESIGN.md`
 - `docs/DRAG_RESIZE.md`

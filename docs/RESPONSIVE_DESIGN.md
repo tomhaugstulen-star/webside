@@ -40,9 +40,9 @@ type ResponsiveValue<T> = {
 
 Manglende `mobile`-verdi betyr arv. En reset til desktop skal derfor fjerne mobilverdien, ikke kopiere desktopverdien inn i `mobile`.
 
-## 3. Implementert grunnlag
+## 3. Implementert grunnlag på `main`
 
-Merget til `main`:
+Merget funksjonalitet:
 
 - responsive modellfelter for posisjon, størrelse og synlighet
 - desktopverdi med valgfri mobilverdi
@@ -53,13 +53,15 @@ Merget til `main`:
 - nye elementer opprettes med desktopverdier
 - mobil arver nye elementers desktopgeometri
 
-Implementert i `feature/drag-resize`:
+Flytting og resizing ble implementert i `feature/drag-resize` og merget til `main` gjennom PR #4:
 
 - PC- og Telefon-visningen kan brukes til å flytte og resize dagens elementer
 - clamping bruker den synlige lerretsbredden
 - transient preview påvirker avledet lerretshøyde under transform
 - varig layout-commit går foreløpig til desktopgeometrien
 - ingen mobiloverstyring opprettes skjult
+
+`feature/drag-resize` er en historisk branchreferanse, ikke aktiv arbeidsstatus.
 
 ## 4. Midlertidig regel før mobilkontroller
 
@@ -219,7 +221,7 @@ Dette skal ikke samles i én stor komponent.
 feature/mobile-design-controls
 ```
 
-Fasen spores i GitHub-sak `#3` og bygges etter grunnleggende objektredigering og låsing.
+Fasen spores i GitHub-sak `#3` og startes ikke uten ny eksplisitt godkjenning.
 
 ## 15. Akseptansekriterier
 

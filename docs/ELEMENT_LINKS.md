@@ -14,7 +14,7 @@ mergecommit: f71b354
 skjemaversjon innført i fasen: 4
 ```
 
-Den historiske fasen koblet lenken til tekstbokser. `feature/button-library` gjenbruker nå samme modell og samme høyremenyskjema for knapper og øker prosjektskjemaet til versjon 5.
+Den historiske fasen koblet lenken til tekstbokser. Knappbiblioteket gjenbruker samme modell og samme høyremenyskjema for knapper. Denne utvidelsen er merget til `main` gjennom PR #21 og inngår i gjeldende prosjektskjema versjon 5.
 
 ## Fast UX-regel
 
@@ -26,13 +26,7 @@ Forhåndsvisning/publisering = aktivere lenken
 
 Vanlig klikk i editoren markerer elementet. Lenken åpnes aldri i editormodus.
 
-## Støttede elementtyper
-
-På `main` før knappbiblioteket:
-
-- tekstboks
-
-På `feature/button-library`:
+## Støttede elementtyper på `main`
 
 - tekstboks
 - knapp

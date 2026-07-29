@@ -47,21 +47,39 @@ main
   -> eksplisitt mergegodkjenning
 ```
 
-## Gjeldende status
+## Gjeldende prosjektstatus
+
+Faktisk `main`-HEAD skal alltid kontrolleres mot `origin/main`. Dokumentasjonen hardkoder ikke et commitnummer som «gjeldende HEAD», fordi en slik verdi blir foreldet ved neste merge.
+
+```powershell
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git status
+git log -6 --oneline --decorate
+```
+
+Stabile historiske referanser:
 
 ```text
-main: 5e548ad
+base main før dokumentasjonssynkronisering i PR #24: a77a9a9
 PR #21: Build first bundled SVG button library – merget
-GitHub-sak #20: lukket som fullført
+PR #22: Update status after button library merge – merget
+knappbibliotekets mergecommit: 5e548ad
 prosjektskjema: versjon 5
-siste verifisering:
-  ESLint: bestått
-  TypeScript: bestått
-  Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
-  Vite: 78 moduler transformert
-  produksjonsbuild: bestått
-  arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
-  PC- og Telefon-test: godkjent
+neste produksjonsfase: ikke valgt
+```
+
+Siste verifiserte produksjonskontroll gjelder knappbibliotekfasen:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 69 moduler, 161 avhengigheter, ingen brudd
+Vite: 78 moduler transformert
+produksjonsbuild: bestått
+arkitekturrapport: 0 brudd, 0 feil, 0 advarsler
+PC- og Telefon-test: godkjent
 ```
 
 ## Ferdig og merget til `main`
@@ -94,6 +112,7 @@ PR #14  elementlenker                f71b354
 PR #16  sikker elementsletting       b428cac
 PR #19  dokumentasjonsaudit          06307a2
 PR #21  SVG-knappbibliotek           5e548ad
+PR #22  dokumentasjonsstatus         a77a9a9
 ```
 
 ## Gjeldende venstremeny
@@ -172,4 +191,5 @@ Tekstelementer har `content`, `textStyle` og `link`. Knappelementer har `assetId
 7. `docs/ELEMENT_MODEL.md`
 8. `docs/ELEMENT_LINKS.md`
 9. `docs/RIGHT_PROPERTIES_PANEL.md`
-10. øvrige fasedokumenter
+10. `docs/CODE_AUDIT.md`
+11. relevante øvrige fasedokumenter

@@ -33,7 +33,7 @@ Historiske modul- og avhengighetstall fra grunnlagsfasen er ikke gjeldende etter
 - 250 linjer er aktiv terskel for ansvarstrekk
 - 300 linjer er hard unntaksgrense
 - en fil deles tidligere når den får flere tydelige ansvar
-- `EditorCanvasElement.tsx` skal ikke få flere nye funksjonsansvar
+- `EditorCanvasElement.tsx` er 247 linjer og skal ikke få flere nye funksjonsansvar
 - `RightPropertiesPanel.tsx` skal være komposisjon
 - tilfeldig generell `features`-samlemappe skal ikke innføres
 
@@ -44,9 +44,11 @@ Reducerhandlinger skal avvise:
 - manglende aktiv side
 - manglende element
 - element på feil side
+- duplisert element-ID
 - feil elementtype
 - låst element
 - ugyldig verdi
+- ukjent knappasset-ID
 - uendret data
 
 Ved avvisning returneres samme state, prosjektet muteres ikke og `updatedAt` endres ikke.
@@ -100,7 +102,7 @@ canvas
 - katalogen eier mapping fra ID til bundlet fil og metadata
 - publiserte ID-er er versjonerte
 - ukjent lagret ID gir fallback, ikke krasj
-- ukjent ny ID avvises ved brukerendring
+- ukjent ny ID avvises ved brukerendring og i state-grensen
 
 SVG-kontroll:
 
@@ -151,7 +153,7 @@ addElementToActivePage.ts: 52 linjer
 
 Valideringen for aktiv side, unik element-ID og gyldig knappasset ligger fortsatt innenfor state-/reducergrensen.
 
-## Sluttkontroll
+## Sluttkontroll for knappbibliotekfasen
 
 ```text
 ESLint: bestått
