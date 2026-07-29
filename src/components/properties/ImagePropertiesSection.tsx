@@ -5,7 +5,7 @@ import { normalizeImageAltText } from '../../model/imageAsset'
 import {
   DEFAULT_IMAGE_TRANSFORM,
   MAX_IMAGE_ZOOM,
-  MIN_IMAGE_ZOOM,
+  getMinimumImageZoomForFrame,
   type ImageMode,
 } from '../../model/imagePresentation'
 import { useImageProperties } from '../../state/useImageProperties'
@@ -39,6 +39,10 @@ export function ImagePropertiesSection({
   const helpId = `${idPrefix}-alt-help`
   const cropHelpId = `${idPrefix}-crop-help`
   const disabled = element.locked
+  const minimumZoom = getMinimumImageZoomForFrame(
+    element.assetMetadata,
+    element.size.desktop,
+  )
   const zoomPercent = Math.round(element.transform.zoom * 100)
 
   const handleAltTextSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -127,7 +131,7 @@ export function ImagePropertiesSection({
             </span>
             <input
               type="range"
-              min={MIN_IMAGE_ZOOM}
+              min={minimumZoom}
               max={MAX_IMAGE_ZOOM}
               step="0.05"
               value={element.transform.zoom}
@@ -142,14 +146,18 @@ export function ImagePropertiesSection({
             />
           </label>
           <p id={cropHelpId} className="image-properties__help">
-            Dra motivet inne i rammen. Rammegrepene endrer bare det synlige området.
+            Dra motivet for å justere utsnittet. Hold Shift mens du drar for å
+            flytte hele rammen.
           </p>
           <button
             className="image-properties__reset"
             type="button"
             disabled={disabled}
             onClick={() =>
-              updateImageTransform(element.id, { ...DEFAULT_IMAGE_TRANSFORM })
+              updateImageTransform(element.id, {
+                ...DEFAULT_IMAGE_TRANSFORM,
+                zoom: minimumZoom,
+              })
             }
           >
             Tilbakestill utsnitt
