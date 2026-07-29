@@ -1,6 +1,6 @@
 import { createEditorColor, isEditorColor, type EditorColor } from './editorColor'
 
-export const sectionFrameWidths = [0, 1, 2, 3, 4] as const
+export const sectionFrameWidths = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
 
 export type SectionFrameWidth = (typeof sectionFrameWidths)[number]
 
