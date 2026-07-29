@@ -5,12 +5,7 @@ import {
   type ElementLayout,
 } from '../../model/elementLayout'
 import type { CanvasPosition, EditorElement } from '../../model/editorProject'
-import {
-  getImageCropSize,
-  imageTransformsEqual,
-  moveImageTransform,
-  type ImageTransform,
-} from '../../model/imagePresentation'
+import { getImageCropSize } from '../../model/imagePresentation'
 
 const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
   ArrowUp: { x: 0, y: -1 },
@@ -27,10 +22,6 @@ type CanvasElementKeyboardOptions = {
   onSelect: (elementId: string) => void
   onStartTextEditing: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
-  onCommitImageTransform: (
-    elementId: string,
-    transform: ImageTransform,
-  ) => void
 }
 
 export function handleCanvasElementKeyDown(
@@ -43,7 +34,6 @@ export function handleCanvasElementKeyDown(
     onSelect,
     onStartTextEditing,
     onCommitLayout,
-    onCommitImageTransform,
   }: CanvasElementKeyboardOptions,
 ) {
   if (event.key === 'Enter') {
@@ -82,23 +72,6 @@ export function handleCanvasElementKeyDown(
     x: direction.x * step,
     y: direction.y * step,
   }
-
-  if (element.kind === 'image' && element.mode === 'crop' && event.altKey) {
-    const nextTransform = moveImageTransform(
-      element.assetMetadata,
-      initialLayout.size,
-      element.transform,
-      delta.x,
-      delta.y,
-    )
-
-    if (!imageTransformsEqual(nextTransform, element.transform)) {
-      onCommitImageTransform(element.id, nextTransform)
-    }
-
-    return
-  }
-
   const maximumSize =
     element.kind === 'image' && element.mode === 'crop'
       ? getImageCropSize(element.assetMetadata, element.transform)
