@@ -23,6 +23,7 @@ import {
 import { EditorCanvasElementContent } from './EditorCanvasElementContent'
 import { ElementSelectionToolbar } from './ElementSelectionToolbar'
 import { getTextElementCssStyle } from './getTextElementCssStyle'
+import { ImageResizeHandles } from './ImageResizeHandles'
 import type { TextEditFinishReason } from './TextElementEditor'
 import { useElementPointerTransform } from './useElementPointerTransform'
 
@@ -201,15 +202,24 @@ export function EditorCanvasElement({
         <EditorCanvasElementContent
           element={element}
           editing={isTextEditing}
+          selected={selected}
+          frameSize={layout.size}
+          onSelect={onSelect}
           onCommitText={(content) => commitTextElementContent(element.id, content)}
           onFinishTextEditing={finishTextEditing}
         />
         {selected && !element.locked && !isTextEditing && (
-          <span
-            className="canvas-element__resize-handle"
-            aria-hidden="true"
-            onPointerDown={handleResizePointerDown}
-          />
+          element.kind === 'image' ? (
+            <ImageResizeHandles onPointerDown={handleResizePointerDown} />
+          ) : (
+            <span
+              className="canvas-element__resize-handle"
+              aria-hidden="true"
+              onPointerDown={(event) =>
+                handleResizePointerDown('south-east', event)
+              }
+            />
+          )
         )}
       </div>
       {selected && transformMode === null && !isTextEditing && (
