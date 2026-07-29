@@ -1,26 +1,18 @@
-# Høyremenyens grunnstruktur
+# Høyremenyens struktur og egenskaper
 
-Dette dokumentet er autoritativ spesifikasjon og historisk verifikasjonslogg for fase 7.
+Dette dokumentet beskriver høyremenyens autoritative produktoppførsel, arkitektur og nåværende elementkontroller.
 
-## Branch og utgangspunkt
+## Historisk grunnfase
+
+Høyremenyens grunnstruktur ble implementert i:
 
 ```text
 branch: feature/right-properties-panel
-base main: a35f59d
-produksjonskode og arkitekturrapporter: 2d25a542
 PR: #9 – merget
 mergecommit: 8de5f2e
 ```
 
-PR #7 leverte kontrollert tekstredigering. PR #8 låste navn og rekkefølge i venstremenyen. Denne fasen bygde deretter høyremenyens grunnstruktur.
-
-## Status
-
-Høyremenyens grunnstruktur er implementert, kodeauditert, visuelt kontrollert og merget til `main` gjennom PR #9.
-
-Tidligere formuleringer om at PR ikke var opprettet eller at dokumentasjonskontroll gjenstod beskrev branchens historiske tilstand før PR #9. De er ikke gjeldende prosjektstatus.
-
-Panelet er senere utvidet i egne faser med tekstegenskaper, elementlenke og sikker sletting.
+Panelet er senere utvidet i egne faser med tekstegenskaper, elementlenker, sikker sletting og knappkontroller.
 
 ## Låst produktoppførsel
 
@@ -33,92 +25,148 @@ Tomt lerret     -> høyremeny lukkes
 Detaljer:
 
 - panelet er 320 px bredt
-- ved vindusbredde på minst 1680 px er panelet dokket på høyre side
+- ved minst 1680 px er panelet dokket på høyre side
 - under 1680 px er panelet overlay fra høyre
-- overlay ligger oppå editorområdet og reduserer ikke lerretsbredden
+- overlay reduserer ikke lerretsbredden
 - skjult panel reserverer ingen plass
 - markering av et annet element oppdaterer samme panel umiddelbart
 - låst element kan markeres og inspiseres
-- panelet kan være åpent under tekstredigering
-- klikk i panelet bruker eksisterende blur/commit
-- markeringen beholdes etter normal tekstcommit
-- panelet oppretter ikke eller eier en separat tekstdraft
 - panelet har egen vertikal scrolling
 - åpning og lukking bruker 180 ms transform-animasjon
 - animasjonen deaktiveres ved `prefers-reduced-motion`
 
-## Historisk grunnleveranse
-
-Den første panelleveransen viste bare faktisk inspeksjonsinformasjon:
+## Fast ansvarsdeling
 
 ```text
-Egenskaper
-Knapp
-
-Element
-Status: Ulåst
-```
-
-Elementtypen endres mellom:
-
-```text
-Seksjon
-Bilde
-Tekst
-Knapp
-```
-
-Status er enten `Låst` eller `Ulåst`.
-
-Grunnleveransen hadde ingen tomme seksjoner, falske kontroller eller deaktiverte plassholdere.
-
-## Implementert arkitektur
-
-Ansvarsdeling:
-
-```text
-src/components/properties/RightPropertiesPanel.tsx
-  - presenterer egenskaper og handlinger for valgt element
-  - mottar elementet som prop
-  - muterer ingen prosjektdata direkte
-
-src/state/useElementSelection.ts
-  - autoritativ avledning av selectedElementId og selectedElement
-
-src/components/editor/EditorShell.tsx
-  - komponerer venstremeny, lerret og høyremeny
-  - leser selectedElement gjennom eksisterende hook
-  - eier ingen egenskapslogikk
-
-src/styles/right-properties-panel.css
-  - paneloverflate, scrolling, breakpoint og transform-animasjon
-
-src/styles/editor-base.css
-  - --properties-panel-width: 320px
-  - --properties-panel-reserved-width: 0px
+Venstremeny = opprette elementer og velge ferdig design
+Høyremeny  = egenskaper og handlinger for markert element
+Lerretet   = redigere tekst og transformere elementer
 ```
 
 Panelet:
 
-- søker ikke etter valgt element i DOM-en
-- lagrer ikke en separat kopi av elementdata
+- oppretter ikke elementer
+- eier ikke en separat elementkopi
+- søker ikke etter elementdata i DOM-en
 - muterer ikke prosjektdata direkte
 - serialiseres ikke
-- inngår ikke direkte i historikk eller autolagring
 
-Varige egenskapsendringer fra senere utvidelser går gjennom typed state-API og reducer-actions.
+Varige endringer sendes som typede brukerintensjoner til state-laget.
 
-## Betinget innhold og animasjon
+## Gjeldende panelstruktur
 
-Paneloverflaten er montert for å kunne animere ut. Selve innholdet rendres bare når et gyldig element er valgt.
+Felles topp:
 
-Dette hindrer at framtidige inputfelt og knapper blir liggende skjult i DOM-en etter at markeringen fjernes. `aria-labelledby` brukes bare når panelet er åpent.
+```text
+Egenskaper
+elementtype
+```
 
-## Tekstredigering
+Betinget innhold:
 
-Eksisterende tekstredigering bruker kontrollert `textarea` og lokal transient draft.
+```text
+Seksjon -> Element
+Bilde   -> Element
+Tekst   -> Tekstutseende -> Lenke -> Element
+Knapp   -> Knapp -> Lenke -> Element
+```
 
-Når brukeren klikker i høyremenyen under redigering:
+Felles elementseksjon:
+
+```text
+Element
+Status: Låst / Ulåst
+Slett <elementtype>
+```
+
+## Tekstegenskaper
+
+Markert tekstboks viser:
+
+```text
+Tekstutseende
+Font
+Størrelse
+Stil
+Justering
+Linjehøyde
+```
+
+Tekstinnhold redigeres fortsatt på lerretet. Høyremenyen endrer bare egenskaper som gjelder hele tekstboksen.
+
+Låst tekstboks viser verdiene, men kontrollene er deaktivert.
+
+## Lenkeegenskaper
+
+Tekstbokser og knapper viser samme lenkeseksjon:
+
+```text
+Lenke
+Type
+Ingen
+Ekstern lenke
+Nettadresse
+Åpne i ny fane
+```
+
+Skjemaet bruker lokal transient draft og valideringsfeedback. Gyldig lagring går gjennom den generelle `set-element-link`-handlingen.
+
+Bare absolutte `http://`- og `https://`-adresser godtas. Lenken aktiveres aldri i editormodus.
+
+## Knappkontroller på feature-branchen
+
+`feature/button-library` legger til en egen `ButtonPropertiesSection`.
+
+Markert knapp viser:
+
+```text
+Knapp
+Tekst
+Lagre tekst
+Design
+Valgt design / ukjent design-varsel
+```
+
+Regler for knappetekst:
+
+- inputfeltet bruker lokal draft
+- teksten trimmes ved lagring
+- tom eller whitespace-only tekst avvises
+- uendret tekst muterer ikke prosjektet
+- vellykket lagring gir lokal statusmelding
+
+Regler for design:
+
+- design velges fra den statiske asset-katalogen
+- designbytte går gjennom en typet reducerhandling
+- ukjent ny asset-ID avvises
+- uendret design muterer ikke prosjektet
+- ukjent lagret asset-ID viser et tydelig varsel
+- brukeren kan reparere knappen ved å velge et gyldig design
+
+Låst knapp:
+
+- kan inspiseres
+- tekstfelt og lagreknapp er deaktivert
+- designvelger er deaktivert
+- lenkekontroller er deaktivert
+- sletting er deaktivert gjennom eksisterende slettemodell
+
+## Selection og oppdatering
+
+Panelet mottar autoritativt valgt element som prop.
+
+```text
+selectedElementId -> selectedElement -> RightPropertiesPanel
+```
+
+Ved ny markering oppdateres panelet uten stale elementdata.
+
+Knappeseksjonen resetter lokal knappetekstdraft når et annet knappelement velges. Lenkeskjemaet nøkkelsettes av element-ID og lagret lenkedata for å unngå stale drafts.
+
+## Samspill med tekstredigering
+
+Når brukeren klikker i høyremenyen under aktiv tekstredigering:
 
 1. tekstfeltet mister fokus
 2. eksisterende blur-mekanisme committer draften
@@ -126,75 +174,80 @@ Når brukeren klikker i høyremenyen under redigering:
 4. elementmarkeringen beholdes
 5. panelet fortsetter å lese elementet fra sentral state
 
-Høyremenyen omgår eller dupliserer ikke commitgrensen.
+Høyremenyen omgår eller dupliserer ikke tekstens commitgrense.
 
-## Låste elementer
-
-Et låst element kan fortsatt være valgt og vises i panelet. Egenskapskontroller og handlinger som muterer elementet skal være deaktivert, og reducerens låsegrenser er autoritative.
-
-## Ikke del av den historiske grunnbranchen
-
-Følgende ble ikke implementert i selve `feature/right-properties-panel`:
-
-- tekstegenskaper
-- tekst- eller elementlenker
-- bildevelger eller bildeegenskaper
-- knappbibliotek
-- fargevelgere eller prosjektfargeregister
-- logo- eller headerbygger
-- sletting eller duplisering
-- lagpanel
-- historikk eller lagring
-- nytt prosjekt eller prosjektimport
-- mobile geometri-overstyringer
-
-Tekstegenskaper, elementlenke og sikker sletting ble senere implementert og merget i separate faser. De øvrige punktene er fortsatt planlagt eller åpne.
-
-## Kodeaudit
-
-Den framtidsrettede auditen kontrollerte:
-
-- stale markering og stale elementdata
-- duplisert state og parallelle selectors
-- direkte DOM-søk og prosjektmutasjon
-- tekstens blur/commit
-- låste elementer
-- sideskifte og ugyldig markering
-- overlay kontra dokket layout
-- CSS-eierskap og importrekkefølge
-- skjult innhold og framtidige fokuserbare kontroller
-- `prefers-reduced-motion`
-- filstørrelser og ansvarsgrenser
-
-To funn ble rettet før sluttkontrollen:
-
-1. Panelinnholdet rendres bare når et element finnes.
-2. Høyremenyens CSS styrer ikke `.canvas-page--desktop` direkte; en sentral variabel formidler reservert bredde.
-
-Alle nye kildefiler var under 250 linjer.
-
-## Verifisert før merge
+## Implementert arkitektur
 
 ```text
-npm run check: bestått
-Dependency Cruiser: 38 moduler, 80 avhengigheter, 0 brudd
-PC-visning: godkjent
-arkitekturrapporter: oppdatert
-arbeidsområde: clean
+src/components/properties/RightPropertiesPanel.tsx
+  - komposisjon basert på elementtype
+
+src/components/properties/TextPropertiesSection.tsx
+  - tekstutseende
+
+src/components/properties/ButtonPropertiesSection.tsx
+  - knappetekst og design
+
+src/components/properties/ElementLinkPropertiesSection.tsx
+  - lenke for tekst og knapp
+
+src/components/properties/DeleteElementSection.tsx
+  - sletting
+
+src/state/*
+  - validerte reducerhandlinger og hooks
 ```
 
-Bekreftet oppførsel:
+CSS-ansvar:
+
+```text
+right-properties-panel.css  paneloverflate, scrolling og breakpoint
+text-properties.css         tekstkontroller
+button-properties.css       knappetekst og design
+ element-link-properties.css lenkeskjema
+ element-deletion.css        sletting og dialog
+```
+
+## Tilgjengelighet
+
+- paneloverskrift brukes med `aria-labelledby`
+- skjult panelinnhold rendres ikke uten valgt element
+- formularfelter har eksplisitte labels
+- feil bruker `role="alert"`
+- lagringsfeedback bruker `role="status"`
+- designvelger er et vanlig tastaturbetjent `select`
+- SVG-en er dekorativ; knappens HTML-label er tilgjengelig navn
+- `prefers-reduced-motion` respekteres
+
+## Filgrenser
+
+- `RightPropertiesPanel.tsx` skal forbli en komposisjonskomponent
+- elementspesifikke kontroller trekkes ut i egne filer
+- 250 linjer er aktiv terskel for ansvarstrekk
+- 300 linjer er hard unntaksgrense
+- `EditorCanvasElement.tsx` skal ikke få høyremenyansvar
+
+## Verifisering
+
+Historisk grunnfase bekreftet:
 
 - ingen valgt element gir ingen synlig eller reservert høyremeny
 - valgt element åpner panelet
-- ny markering oppdaterer panelet uten stale data
 - klikk på tomt lerret lukker panelet
-- låst element kan inspiseres
-- aktiv tekstdraft mistes eller overskrives ikke
-- panelklikk bruker normal blur/commit
-- markeringen beholdes etter commit
-- ingen direkte DOM-søk eller direkte prosjektmutasjon
 - overlay under 1680 px
 - dokket panel fra 1680 px
 - egen scrolling
 - redusert bevegelse respekteres
+
+Knappbibliotekets manuelle test bekreftet:
+
+- knappetekst lagres og rendres
+- tom tekst avvises
+- alle fire design kan velges
+- designbytte oppdaterer lerretet
+- ekstern lenke kan legges til og fjernes
+- lenken åpnes ikke i editormodus
+- låst knapp kan inspiseres, men ikke endres
+- PC-, Telefon-, peker- og tastaturflyt fungerer
+
+Se `docs/BUTTON_LIBRARY.md`.

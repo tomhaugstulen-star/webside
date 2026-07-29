@@ -6,22 +6,21 @@ Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editore
 
 Grunnmodellen ble utviklet i `feature/element-model` og er senere utvidet kontrollert av feature-branchene som eier nye varige elementdata.
 
-Gjeldende skjemaversjon:
+Gjeldende skjemaversjon på `feature/button-library`:
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 4
+EDITOR_PROJECT_SCHEMA_VERSION = 5
 ```
 
 Historiske skjematrinn:
 
 ```text
 versjon 1  grunnmodell for prosjekt, sider og elementer
-versjon 2  varig tekstinnhold fra feature/text-box-editing
-versjon 3  varig tekststil fra feature/text-properties
-versjon 4  varig elementlenke fra feature/element-links
+versjon 2  varig tekstinnhold
+versjon 3  varig tekststil
+versjon 4  varig elementlenke
+versjon 5  stabilt knappasset, knappetekst og knappelenke
 ```
-
-Versjon 2 og 3 er historiske milepæler, ikke gjeldende prosjektstatus.
 
 Det finnes foreløpig ingen prosjektlagring eller import. Migrering mellom skjemaversjoner bygges sammen med `feature/project-open-import`.
 
@@ -37,7 +36,7 @@ Et `EditorProject` inneholder:
 
 Et nytt prosjekt starter med én blank side kalt `Forside`.
 
-`EditorProject` er autoritativ kilde for lagring, import, forhåndsvisning, eksport og publisering når disse funksjonene bygges.
+`EditorProject` er framtidig autoritativ kilde for lagring, import, forhåndsvisning, eksport og publisering.
 
 ## 3. Sider
 
@@ -70,8 +69,6 @@ Felles felter:
 - responsiv synlighet
 - låsestatus
 
-Elementtyper:
-
 ```ts
 type EditorElement =
   | SectionEditorElement
@@ -80,7 +77,7 @@ type EditorElement =
   | ButtonEditorElement
 ```
 
-Bare tekstobjektet har obligatorisk tekstinnhold, tekststil og lenkedata:
+### Tekstelement
 
 ```ts
 type TextEditorElement = BaseEditorElement & {
@@ -91,21 +88,77 @@ type TextEditorElement = BaseEditorElement & {
 }
 ```
 
-Dette hindrer at kode leser eller skriver tekstdata på Seksjon, Bilde eller Knapp uten først å snevre typen til `kind: 'text'`.
-
 Nye tekstbokser starter med:
 
-```ts
+```text
 content: ''
 textStyle: DEFAULT_TEXT_ELEMENT_STYLE
-link: { type: 'none' }
+link: none
 ```
 
 Tom tekst er gyldig. Editor-placeholder er ikke prosjektdata.
 
-## 5. Tekststil
+### Knappelement
 
-`textStyle` er varig prosjektdata og inneholder kontrollerte verdier for:
+```ts
+type ButtonEditorElement = BaseEditorElement & {
+  kind: 'button'
+  assetId: ButtonAssetId
+  label: string
+  link: ElementLink
+}
+```
+
+Nye knapper starter med:
+
+```text
+assetId: button.primary-rounded.v1
+label: Les mer
+link: none
+```
+
+`assetId`, `label` og `link` er obligatorisk varig prosjektdata for knappen.
+
+## 5. Stabil knappasset-ID
+
+`ButtonAssetId` er en brandet, validert streng.
+
+Regler:
+
+- ID-en er stabil prosjektidentitet
+- ID-en er ikke filsti eller import-URL
+- ID-en er ikke `keyof` den nåværende katalogen
+- modellaget importerer ikke SVG-filer
+- publiserte ID-er endres eller slettes ikke uten migrering eller kompatibilitetsmapping
+- vesentlig visuell eller skaleringsmessig endring får ny versjonert ID
+
+Første ID-er:
+
+```text
+button.primary-rounded.v1
+button.secondary-rounded.v1
+button.outline-rounded.v1
+button.dark-rounded.v1
+```
+
+En ukjent lagret ID skal ikke krasje editoren. Rendering bruker kontrollert fallback, og høyremenyen viser reparasjonsvalg.
+
+## 6. Knappetekst
+
+`label` er ekte HTML-tekst, ikke tekst i SVG-filen.
+
+Regler:
+
+- brukes som synlig knappetekst
+- brukes som tilgjengelig navn
+- trimmes før lagring
+- tom eller whitespace-only tekst avvises
+- uendret tekst gir ingen prosjektmutasjon
+- låst knapp kan inspiseres, men ikke endres
+
+## 7. Tekststil
+
+`textStyle` er varig prosjektdata bare for tekstelementer og inneholder kontrollerte verdier for:
 
 - fontfamilie
 - fontstørrelse
@@ -116,11 +169,7 @@ Tom tekst er gyldig. Editor-placeholder er ikke prosjektdata.
 
 Tekststilen gjelder hele tekstboksen. Riktekst og tegnbaserte stilspenn er ikke del av modellen.
 
-Tekststil er foreløpig felles for PC og Telefon. Mobile tekststiloverstyringer krever en egen produkt- og modellbeslutning.
-
-Se `docs/TEXT_PROPERTIES.md`.
-
-## 6. Elementlenke
+## 8. Elementlenke
 
 `link` er varig prosjektdata og bruker en diskriminert union:
 
@@ -129,19 +178,21 @@ none
 external-url { url, openInNewTab }
 ```
 
-Gjeldende implementering kobler lenken til hele tekstboksen.
+På `feature/button-library` støttes lenken av:
+
+- tekstbokser
+- knapper
 
 Regler:
 
 - bare absolutte `http://`- og `https://`-adresser godtas
 - ugyldig URL muterer ikke prosjektet
+- uendret lenke muterer ikke prosjektet
 - lenken aktiveres ikke i editormodus
+- teksten eller knappen får lenken som helhet
 - enkeltord og tekstsegmenter har ikke egne lenker
-- samme lenkemodell kan senere gjenbrukes av grafiske knapper
 
-Se `docs/ELEMENT_LINKS.md`.
-
-## 7. Responsive verdier
+## 9. Responsive verdier
 
 ```ts
 type ResponsiveValue<T> = {
@@ -152,32 +203,32 @@ type ResponsiveValue<T> = {
 
 Når mobilverdien mangler, arver Telefon-visningen desktopverdien.
 
-Følgende er responsive:
+Responsive verdier:
 
 - posisjon
 - størrelse
 - synlighet
 
-Følgende er foreløpig felles for PC og Telefon:
+Foreløpig felles for PC og Telefon:
 
 - låsestatus
 - tekstinnhold
 - tekststil
 - elementlenke
+- knappens `assetId`
+- knappens `label`
 
-Kontroller for eksplisitte mobiloverstyringer bygges i `feature/mobile-design-controls`.
+Eksplisitte mobiloverstyringer bygges i `feature/mobile-design-controls`.
 
-## 8. Stabile ID-er
+## 10. Stabile ID-er
 
-ID-er opprettes med nettleserens kryptografiske UUID-funksjon.
+Element-, side- og prosjekt-ID-er opprettes med nettleserens kryptografiske UUID-funksjon.
 
-- `crypto.randomUUID()` brukes når tilgjengelig.
-- `crypto.getRandomValues()` brukes som sikker reserve.
-- `Math.random()` brukes ikke til prosjektidentitet.
+- `crypto.randomUUID()` brukes når tilgjengelig
+- `crypto.getRandomValues()` brukes som sikker reserve
+- `Math.random()` brukes ikke til prosjektidentitet
 
-ID-er beholdes ved framtidig lagring, gjenåpning, import, eksport og publisering.
-
-## 9. Sentral state
+## 11. Sentral state
 
 `EditorProjectProvider` eier:
 
@@ -189,73 +240,73 @@ Varige mutasjoner går gjennom uttømmende reducer-actions, blant annet:
 
 - erstatte prosjekt
 - bytte aktiv side
-- opprette element
-- slette element
+- opprette og slette element
 - endre desktopgeometri
 - endre låsestatus
-- endre tekstinnhold
-- endre tekststil
+- endre tekstinnhold og tekststil
 - endre elementlenke
-
-State-avhengige resultater beregnes fra reducerens nyeste state.
+- endre knappetekst
+- endre knappdesign
 
 Høyremenyen eier aldri en separat elementmodell. Den leser valgt element fra autoritativ state og sender typede brukerintensjoner tilbake til state-laget.
 
-## 10. Prosjektdata og transient editor-state
+## 12. Validerte reducergrenser
+
+Reducergrensene krever:
+
+- aktiv side
+- eksisterende element på aktiv side
+- riktig elementtype
+- ulåst element ved mutasjon
+- gyldig verdi
+- faktisk endring
+
+Knappespesifikke krav:
+
+- oppretting med knapp krever kjent katalog-ID
+- designbytte krever kjent katalog-ID
+- knappetekst må være ikke-tom etter trimming
+
+Lenkekrav:
+
+- bare `none` eller gyldig `external-url`
+- URL må normaliseres og valideres
+
+Ugyldige eller uendrede actions returnerer samme state og endrer ikke `updatedAt`.
+
+## 13. Prosjektdata og transient editor-state
 
 Varig prosjektdata:
 
 - sider og elementer
-- geometri
-- synlighet
+- geometri og synlighet
 - låsestatus
-- tekstinnhold
-- tekststil
+- tekstinnhold og tekststil
 - elementlenke
+- knappens asset-ID og label
 - tidsstempler
 
 Transient editor-state:
 
 - `selectedElementId`
-- aktiv pekerinteraksjon
-- layout-preview
+- pekerinteraksjon og layout-preview
 - aktiv tekstredigeringsøkt
-- lokal tekstdraft
-- lenkeskjemaets draft og feedback
+- tekst-, knappetekst- og lenkedrafts
+- katalogvisning
+- validering og feedback
 - slettedialogens mål og fokusreferanse
-- åpne paneler, fokus, hover og lokal UI-feedback
+- åpne paneler, fokus og hover
 
-Transient state skal ikke:
+Transient state skal ikke serialiseres, eksporteres eller publiseres.
 
-- serialiseres som prosjektdata
-- utløse autolagring direkte
-- inngå direkte i historikk
-- eksporteres eller publiseres
-
-## 11. Validerte tekstmutasjoner
-
-Tekstinnhold, tekststil og elementlenke endres gjennom egne reducer-overganger.
-
-Reducergrensene:
-
-- krever aktiv side og eksisterende element
-- krever `kind: 'text'`
-- avviser låst element
-- validerer verdien som tilhører handlingen
-- avviser uendret data
-- oppdaterer `updatedAt` ved reell endring
-
-Tekstinnhold normaliserer linjeskift til `\n`. Tekststil bruker kontrollerte tokens og verdier. Elementlenken validerer lenketype og URL før prosjektet muteres.
-
-## 12. Videre modellutvidelser
-
-Nye varige egenskaper legges til i branchen som eier funksjonen.
+## 14. Videre modellutvidelser
 
 Planlagte eksempler:
 
-- grafisk knappinnhold og tilgjengelig navn i en framtidig knappbibliotekfase
 - bildeinnhold i `feature/image-import-and-placement`
 - prosjektfarger i `feature/project-colors`
 - eksplisitte mobiloverstyringer i `feature/mobile-design-controls`
+- historikk i `feature/history-system`
+- lagring og migrering i senere lagringsfaser
 
-Den parkerte `feature/button-element`-branchen er ikke gjeldende plan og skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
+Se også `docs/BUTTON_LIBRARY.md` og `docs/ELEMENT_LINKS.md`.
