@@ -1,13 +1,41 @@
+import type { CSSProperties } from 'react'
 import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ImageEditorElement } from '../../model/editorProject'
+import {
+  getImageRenderLayout,
+  type ImageFrameSize,
+} from '../../model/imagePresentation'
+import { useImageCropTransform } from './useImageCropTransform'
 
 type ImageElementContentProps = {
   element: ImageEditorElement
+  frameSize: ImageFrameSize
+  selected: boolean
+  onSelect: (elementId: string) => void
 }
 
-export function ImageElementContent({ element }: ImageElementContentProps) {
+export function ImageElementContent({
+  element,
+  frameSize,
+  selected,
+  onSelect,
+}: ImageElementContentProps) {
   const { getImageAsset } = useImageAssetStore()
   const resource = getImageAsset(element.assetId)
+  const {
+    transform,
+    dragging,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel,
+    handleLostPointerCapture,
+  } = useImageCropTransform({
+    element,
+    frameSize,
+    enabled: selected && element.mode === 'crop' && !element.locked,
+    onSelect,
+  })
 
   if (!resource) {
     return (
@@ -17,13 +45,30 @@ export function ImageElementContent({ element }: ImageElementContentProps) {
     )
   }
 
+  const renderLayout = getImageRenderLayout(
+    element.assetMetadata,
+    frameSize,
+    element.mode,
+    transform,
+  )
+  const imageStyle: CSSProperties = renderLayout
+
   return (
-    <img
-      className="image-element__image"
-      src={resource.objectUrl}
-      alt={element.altText}
-      draggable={false}
-      style={{ objectFit: element.fit }}
-    />
+    <div
+      className={`image-element__content image-element__content--${element.mode}${dragging ? ' image-element__content--dragging' : ''}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onLostPointerCapture={handleLostPointerCapture}
+    >
+      <img
+        className="image-element__image"
+        src={resource.objectUrl}
+        alt={element.altText}
+        draggable={false}
+        style={imageStyle}
+      />
+    </div>
   )
 }
