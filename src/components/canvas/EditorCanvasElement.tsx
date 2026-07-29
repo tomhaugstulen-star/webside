@@ -9,7 +9,6 @@ import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
-import { useImageProperties } from '../../state/useImageProperties'
 import { useTextElementContent } from '../../state/useTextElementContent'
 import type { ViewportMode } from '../../types/editor'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
@@ -52,7 +51,6 @@ export function EditorCanvasElement({
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
   const { commitElementDesktopLayout } = useElementLayout()
-  const { updateImageTransform } = useImageProperties()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
   const initialLayout: ElementLayout = {
@@ -106,7 +104,6 @@ export function EditorCanvasElement({
       onSelect,
       onStartTextEditing,
       onCommitLayout: commitElementDesktopLayout,
-      onCommitImageTransform: updateImageTransform,
     })
   }
 
