@@ -50,7 +50,8 @@ export function EditorCanvasElement({
   onPreviewLayoutChange,
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
-  const { commitElementDesktopLayout } = useElementLayout()
+  const { commitElementDesktopLayout, commitImageDesktopFrame } =
+    useElementLayout()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
   const initialLayout: ElementLayout = {
@@ -59,6 +60,7 @@ export function EditorCanvasElement({
   }
   const {
     layout,
+    imageTransform,
     transformMode,
     handleMovePointerDown,
     handleResizePointerDown,
@@ -73,6 +75,7 @@ export function EditorCanvasElement({
     scrollContainerRef,
     onSelect,
     onCommitLayout: commitElementDesktopLayout,
+    onCommitImageFrame: commitImageDesktopFrame,
     onPreviewLayoutChange,
   })
 
@@ -81,6 +84,10 @@ export function EditorCanvasElement({
   }
 
   const isTextEditing = editing && element.kind === 'text'
+  const contentElement =
+    element.kind === 'image' && imageTransform
+      ? { ...element, transform: imageTransform }
+      : element
   const style: CSSProperties = {
     left: layout.position.x,
     top: layout.position.y,
@@ -104,6 +111,7 @@ export function EditorCanvasElement({
       onSelect,
       onStartTextEditing,
       onCommitLayout: commitElementDesktopLayout,
+      onCommitImageFrame: commitImageDesktopFrame,
     })
   }
 
@@ -150,7 +158,7 @@ export function EditorCanvasElement({
         onKeyDown={isTextEditing ? undefined : handleKeyDown}
       >
         <EditorCanvasElementContent
-          element={element}
+          element={contentElement}
           editing={isTextEditing}
           selected={selected}
           frameSize={layout.size}
