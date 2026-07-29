@@ -8,13 +8,13 @@ For hver avgrensede del:
 
 1. Kontroller riktig branch og rent arbeidsområde.
 2. Oppdater og kontroller `main`.
-3. Opprett en avgrenset feature-branch.
+3. Opprett en avgrenset feature- eller docs-branch.
 4. Definer omfang, brukerhandlinger, state og grenser mot senere funksjoner.
 5. Lås produkt- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
 7. Trekk ut ansvar før en kildefil passerer 250 linjer.
-8. Gjennomfør framtidsrettet kodeaudit.
-9. Kjør `npm run check` etter siste produksjonskodeendring.
+8. Gjennomfør framtidsrettet audit.
+9. Kjør relevante kontroller etter siste endring.
 10. Regenerer arkitekturrapporter ved strukturendringer.
 11. Test PC, Telefon, peker og tastatur der det er relevant.
 12. Oppdater all relevant dokumentasjon.
@@ -23,7 +23,30 @@ For hver avgrensede del:
 15. Merge bare etter eksplisitt brukergodkjenning.
 16. Oppdater lokal `main` og kontroller clean tree før neste fase.
 
-## 2. Ferdig og merget til `main`
+Produksjonsbrancher bruker normalt `npm run check` og oppdaterte arkitekturrapporter. Rene Markdown-brancher bruker normalt dokumentkontroll, `git diff --check` og clean tree når kode, konfigurasjon og arkitekturrapporter er urørt.
+
+## 2. Gjeldende dokumentasjonsfase
+
+```text
+GitHub-sak: #18 Audit and synchronize project documentation
+branch: docs/project-documentation-audit
+base main: 56e2af7
+produksjonskode: uendret
+ny produksjonsfase: ikke valgt
+```
+
+Mål:
+
+- dokumentere skjemaversjon 4 som gjeldende
+- rette foreldet repo- og høyremenystatus
+- skille historiske faseopplysninger fra gjeldende status
+- fjerne misvisende «før PR», «gjenstår» og «neste fase»-formuleringer
+- fastslå gjeldende venstremeny
+- holde framtidige menyalternativer som åpne produktbeslutninger
+
+Ingen ny produksjonsbranch opprettes før dokumentasjonsauditen er fullført og merget.
+
+## 3. Ferdig og merget til `main`
 
 ### Fase 0 – Stabilt editorgrunnlag
 
@@ -42,6 +65,8 @@ Branch: `feature/element-model`
 - låsestatus
 - sentral prosjekt-state og aktiv side
 
+Modellen er senere utvidet kontrollert. Gjeldende skjemaversjon er 4.
+
 ### Fase 2 – Markering
 
 Branch: `feature/element-selection`
@@ -49,6 +74,8 @@ Branch: `feature/element-selection`
 - transient `selectedElementId`
 - peker- og tastaturmarkering
 - klikk på tomt lerret fjerner markering
+
+Status: fullført og ligger på `main`.
 
 ### Fase 3 – Opprette elementer
 
@@ -59,6 +86,8 @@ Branch: `feature/element-creation`
 - kontrollerte standardstørrelser og startplassering
 - automatisk markering
 - avledet lerretshøyde
+
+Status: fullført og ligger på `main`.
 
 ### Fase 4 – Flytting og størrelsesendring
 
@@ -78,17 +107,32 @@ Branch: `feature/text-box-editing`
 
 Status: merget som PR #7 med mergecommit `c729d33`.
 
-- prosjektskjema versjon 2
-- `content` bare for tekstobjekter
+Historisk skjematrinn i fasen:
+
+- versjon 2 innførte `content` bare for tekstobjekter
 - kontrollert flerlinjet `textarea`
 - blur, submit og cancel med eksplisitte grenser
 - låst tekst kan ikke redigeres
+
+Gjeldende skjemaversjon er senere økt til 4.
 
 ### Menynavn og rekkefølge
 
 Branch: `feature/left-menu-labels`
 
 Status: merget som PR #8 med mergecommit `a35f59d`.
+
+Gjeldende implementerte meny:
+
+```text
+Prosjekt
+Farger
+Logo og header
+Elementer
+Innstillinger
+```
+
+Alternative navn som `Filer`, `Alle farger`, `Fonts` og separat `Knapper` er ikke vedtatt eller implementert.
 
 ### Fase 7 – Høyremenyens grunnstruktur
 
@@ -111,11 +155,14 @@ Branch: `feature/text-properties`
 
 Status: merget som PR #11 med mergecommit `452b491`.
 
-- prosjektskjema versjon 3
-- obligatorisk `textStyle` bare for tekstelementer
+Historisk skjematrinn i fasen:
+
+- versjon 3 innførte obligatorisk `textStyle` bare for tekstelementer
 - font, størrelse, fet, kursiv, justering og linjehøyde
 - formatering gjelder hele tekstboksen
 - låste tekstbokser kan inspiseres, men ikke endres
+
+Gjeldende skjemaversjon er senere økt til 4.
 
 Se `docs/TEXT_PROPERTIES.md`.
 
@@ -125,7 +172,7 @@ Branch: `feature/element-links`
 
 Status: merget som PR #14 med mergecommit `f71b354`.
 
-- prosjektskjema versjon 4
+- gjeldende prosjektskjema versjon 4
 - hele tekstboksen kan få ekstern `http://`- eller `https://`-lenke
 - `openInNewTab` lagres eksplisitt
 - ugyldig URL muterer ikke prosjektet
@@ -187,13 +234,13 @@ bygget på 225 ms
 
 Alle manuelle akseptansetester ble godkjent. Se `docs/ELEMENT_DELETION.md`.
 
-## 3. Gjeldende produksjonsstatus
+## 4. Gjeldende produksjonsstatus
 
 Ingen ny produksjonsfase er valgt.
 
-Før neste branch opprettes skal brukeren velge og godkjenne én avgrenset fase. Det skal ikke blandes inn funksjoner fra senere faser.
+Før neste produksjonsbranch opprettes skal dokumentasjonsauditen være merget og brukeren velge og godkjenne én avgrenset fase. Funksjoner fra senere faser skal ikke blandes inn.
 
-## 4. Senere faser
+## 5. Senere faser
 
 ### Fase 10 – Knappbibliotek
 
@@ -274,11 +321,11 @@ feature/publishing
 - holde navigasjon deaktivert i editormodus
 - publisere gyldig og tilgjengelig nettside
 
-## 5. Faste tekniske grenser
+## 6. Faste tekniske grenser
 
 - 250 linjer er aktiv terskel for ansvarstrekk i kildefiler.
 - 300 linjer er hard unntaksgrense.
 - Canvas-komponenten skal ikke samle nye funksjonsansvar.
 - Varige prosjektdata endres bare gjennom validerte reducerhandlinger.
 - Transient markering, dialogstate, drafts, fokus, hover og statusmeldinger serialiseres ikke.
-- Ingen feature-branch merges uten eksplisitt brukergodkjenning.
+- Ingen branch merges uten eksplisitt brukergodkjenning.
