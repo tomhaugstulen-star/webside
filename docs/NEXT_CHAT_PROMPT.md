@@ -47,9 +47,7 @@ Siste bekreftede `main`:
 f71b354
 ```
 
-Dette er mergecommit fra PR #14, som la inn frittstående lenker for hele tekstbokser.
-
-PR #14 er merget. GitHub-sak #13 er lukket som fullført.
+Dette er mergecommit fra PR #14, som la inn frittstående lenker for hele tekstbokser. Sak #13 er lukket som fullført.
 
 Gjeldende branch:
 
@@ -57,21 +55,33 @@ Gjeldende branch:
 feature/element-deletion
 ```
 
-Branch er opprettet fra `main` ved `f71b354`.
-
-GitHub-sak:
+Branch-base:
 
 ```text
-#15 Plan: safe deletion for selected elements
+main ved f71b354
 ```
 
-Plancommit:
+Sporing:
+
+```text
+GitHub-sak #15 Plan: safe deletion for selected elements
+PR: ikke opprettet
+```
+
+Viktige commits på branchen:
 
 ```text
 7269cb1 docs: define safe element deletion
+338fecd docs: hand off element deletion phase
+bfaf299 docs: set element deletion as current phase
+4f59b3e feat: add safe element deletion
+4f231f9 docs: record verified element deletion
+24189f0 docs: refresh project status for deletion
+7ecaa80 docs: align editor plan with deletion phase
+6ce52e1 docs: update work plan after deletion verification
 ```
 
-PR er ikke opprettet. Produksjonskode for sletting er ikke implementert ennå.
+Denne filens dokumentasjonscommit ligger etter `6ce52e1`.
 
 ## Ferdig og merget til `main`
 
@@ -108,34 +118,10 @@ PR #14  elementlenker                f71b354
 ```text
 Venstremeny = opprette og velge struktur
 Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere selve teksten og transformere elementer
+Lerretet   = redigere tekst og transformere elementer
 ```
 
 Lenker aktiveres ikke i editormodus. `EditorCanvasElement.tsx` ligger nær aktiv filgrense og skal ikke få flere nye funksjonsansvar.
-
-## Merget lenkefase
-
-Prosjektskjemaet er versjon 4.
-
-Tekstelementer har obligatorisk:
-
-```text
-link: none
-eller
-link: external-url { url, openInNewTab }
-```
-
-Bare absolutte `http://`- og `https://`-adresser godtas. URL-en lagres i prosjektdata og vises igjen i høyremenyen. Editorens DOM har ikke aktivt `href` på tekstboksen.
-
-Siste verifiserte kontroll for lenkefasen:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 48 moduler, 109 avhengigheter, ingen brudd
-produksjonsbuild: bestått
-Vite: 58 moduler transformert
-```
 
 ## Gjeldende fase – sikker sletting
 
@@ -146,7 +132,13 @@ docs/ELEMENT_DELETION.md
 GitHub-sak #15
 ```
 
-Første leveranse gjelder:
+Produksjonskode er implementert i:
+
+```text
+4f59b3e feat: add safe element deletion
+```
+
+Første leveranse gjelder ett markert element:
 
 - Seksjon
 - Bilde
@@ -159,18 +151,16 @@ Sletteknappen ligger i høyremenyens `Element`-seksjon rett under statusboksen.
 
 ```text
 Element
-
 Status: Ulåst
-
 Slett seksjon / Slett bilde / Slett tekstboks / Slett knapp
 ```
 
 Knappen:
 
-- samme bredde som statusboksen
-- vanlig dokumentflyt, ikke festet nederst
-- rød tekst og rød ramme
-- deaktivert når elementet er låst
+- har samme bredde som statusboksen
+- ligger i vanlig dokumentflyt
+- bruker rød tekst og rød ramme
+- er deaktivert når elementet er låst
 - krever ingen scrolling i dagens panel
 
 ### Bekreftelse
@@ -179,31 +169,27 @@ Sletting krever alltid dialog fordi angre/gjør om ikke finnes.
 
 ```text
 Slett tekstboksen?
-
 Dette kan ikke angres.
-
 Avbryt    Slett
 ```
 
-Dialogen skal bruke nyeste state. Et element som er blitt låst, fjernet eller flyttet ut av aktiv side mens dialogen er åpen, skal ikke slettes.
+Dialogen bruker native modal `<dialog>`, fokuserer `Avbryt`, støtter `Escape`, returnerer fokus ved avbrytelse og validerer nyeste elementstate før bekreftelse.
 
 ### Tastatur
 
-`Delete` åpner samme dialog for markert element.
+`Delete` åpner samme dialog for markert, ulåst element.
 
-Global sletting skal ikke aktiveres i tekstredigering, input, textarea, select, button, contenteditable eller dialogkontroller. `Backspace` brukes ikke globalt.
+Global sletting blokkeres i tekstredigering, input, textarea, select, button, aktiv lenke, dialog, contenteditable og eksplisitt blokkerte områder. `Backspace` brukes ikke globalt.
 
 ### Modell og reducer
 
 Prosjektskjemaet forblir versjon 4.
 
-Forventet handling:
-
 ```text
 delete-element-from-active-page { elementId, updatedAt }
 ```
 
-Reducergrensen avviser manglende aktiv side, manglende element, feil side, låst element og no-op.
+Reducergrensen avviser manglende aktiv side, manglende element, feil side, låst element, utdatert mål og no-op.
 
 Ved gyldig sletting:
 
@@ -212,23 +198,65 @@ Ved gyldig sletting:
 - `selectedElementId` settes til `null`
 - høyremenyen lukkes gjennom eksisterende selection-avledning
 
-Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; andre elementer blir stående.
+Elementmodellen er flat. Sletting av Seksjon fjerner bare selve seksjonen; visuelt overlappende elementer blir stående.
 
-### Arkitektur
-
-Forventede separate ansvar:
+### Implementert arkitektur
 
 ```text
-state reducerhjelper
-state dispatch-hook
-properties sletteseksjon
-bekreftelsesdialog
-global Delete-grense
+src/state/deleteElementFromActivePage.ts
+src/state/useElementDeletion.ts
+src/components/properties/DeleteElementSection.tsx
+src/components/dialogs/ConfirmElementDeletionDialog.tsx
+src/components/editor/isElementDeletionShortcutTarget.ts
+src/components/editor/useElementDeletionShortcut.ts
+src/styles/element-deletion.css
 ```
 
-Ikke legg sletting i `EditorCanvasElement.tsx`.
+Integrasjon:
 
-Alle nye kildefiler skal være under 250 linjer.
+```text
+src/state/editorProjectAction.ts
+src/state/editorProjectReducer.ts
+src/components/editor/EditorShell.tsx
+src/components/properties/RightPropertiesPanel.tsx
+src/components/canvas/canvasElementAccessibility.ts
+src/App.css
+```
+
+`EditorCanvasElement.tsx` er urørt. Alle nye kildefiler er under 250 linjer.
+
+## Verifisert kontroll
+
+Brukeren kjørte `npm run check` etter produksjonscommit `4f59b3e`:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 54 moduler, 120 avhengigheter, ingen brudd
+produksjonsbuild: bestått
+Vite: 64 moduler transformert
+CSS: 20.13 kB, gzip 4.60 kB
+JavaScript: 232.13 kB, gzip 71.21 kB
+bygget på 168 ms
+```
+
+Working tree var clean ved denne kontrollen. Det finnes ingen GitHub Actions-run for commiten.
+
+## Manuelt godkjent
+
+Brukeren har godkjent:
+
+- alle fire sletteetiketter
+- plassering rett under statusboksen
+- deaktivert knapp og ingen Delete-dialog for låst element
+- avbrytelse uten mutasjon
+- `Escape` uten mutasjon
+- bekreftet sletting via høyremenyen
+- bekreftet sletting via `Delete`
+- høyremenyen lukkes etter sletting
+- ingen andre elementer slettes
+- Delete under tekstredigering sletter bare tekst
+- sletting av Seksjon lar visuelt overlappende elementer bli stående
 
 ## Ikke del av slettingsfasen
 
@@ -246,17 +274,25 @@ Alle nye kildefiler skal være under 250 linjer.
 - farger
 - forhåndsvisning eller publisering
 
-## Neste handling
+## Kritisk gjenstående arbeid
 
-1. Hent `feature/element-deletion` lokalt.
+Arkitekturrapportene er ikke regenerert etter at slettefilene ble lagt til.
+
+Neste handling skal være:
+
+1. Hent siste dokumentasjonscommits på `feature/element-deletion`.
 2. Kontroller branch og clean tree.
-3. Les `docs/ELEMENT_DELETION.md`.
-4. Auditér eksisterende selection-, keyboard-, panel- og dialogstruktur før produksjonskode.
-5. Implementer bare låst omfang.
-6. Kjør `npm run check` etter siste produksjonskodeendring.
-7. Regenerer arkitekturrapporter.
-8. Oppdater all relevant dokumentasjon.
-9. Opprett PR først etter manuell kontroll og clean tree.
-10. Merge bare etter eksplisitt brukergodkjenning.
+3. Kjør `npm run architecture:json`.
+4. Kjør `npm run architecture:diagram`.
+5. Kontroller at bare `architecture.json` og `docs/dependency-graph.mmd` er endret.
+6. Ikke kjør ny full `npm run check` bare på grunn av rapport- eller Markdown-endringer.
+7. Få rapportfilene inn på branchen gjennom kontrollert repoarbeid.
+8. Kontroller endelig diff, filstørrelser og clean tree.
+9. Opprett PR mot `main` med `Closes #15`.
+10. Kontroller mergebarhet, endrede filer, review-tråder og eventuell CI.
+11. Merge bare etter eksplisitt brukergodkjenning.
+12. Etter merge: bytt til `main`, pull og bekreft clean tree.
+
+Den parkerte `feature/button-element`-branchen skal ikke røres eller merges. Sak #12 er lukket som `not_planned`.
 
 ---
