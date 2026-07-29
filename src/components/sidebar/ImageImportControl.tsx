@@ -1,4 +1,10 @@
-import { useId, useRef, useState, type ChangeEvent } from 'react'
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from 'react'
 import { prepareImageFile } from '../../assets/images/prepareImageFile'
 import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
@@ -19,10 +25,18 @@ export function ImageImportControl({
   onCreateImage,
 }: ImageImportControlProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const mountedRef = useRef(true)
   const errorId = useId()
   const [busy, setBusy] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const { registerImageAsset, removeImageAsset } = useImageAssetStore()
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0] ?? null
@@ -38,6 +52,10 @@ export function ImageImportControl({
 
     try {
       const result = await prepareImageFile(file)
+
+      if (!mountedRef.current) {
+        return
+      }
 
       if (!result.ok) {
         setErrorMessage(result.message)
@@ -70,9 +88,13 @@ export function ImageImportControl({
         removeImageAsset(registeredAssetId)
       }
 
-      setErrorMessage('Bildet kunne ikke behandles. Prøv en annen fil.')
+      if (mountedRef.current) {
+        setErrorMessage('Bildet kunne ikke behandles. Prøv en annen fil.')
+      }
     } finally {
-      setBusy(false)
+      if (mountedRef.current) {
+        setBusy(false)
+      }
     }
   }
 
