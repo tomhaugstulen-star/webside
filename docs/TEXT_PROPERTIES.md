@@ -15,16 +15,16 @@ skjemaversjon innført i fasen: 3
 
 Fasen er implementert, auditert, kontrollert og merget til `main` gjennom PR #11.
 
-Skjemaversjon 3 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 4.
+Skjemaversjon 3 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 5.
 
 Tidligere «Status før PR»-formuleringer beskrev branchens tilstand før PR #11 og er ikke gjeldende prosjektstatus.
 
 ## Fast UX-regel
 
 ```text
-Venstremeny = opprette og velge struktur
-Høyremeny  = egenskaper for markert element
-Lerretet   = redigere selve teksten
+Venstremeny = opprette elementer og velge ferdig design
+Høyremeny  = egenskaper og handlinger for markert element
+Lerretet   = redigere selve teksten og transformere elementer
 ```
 
 `Elementer -> Tekst` oppretter en vanlig fri tekstboks og markerer den automatisk. Tekstinnholdet redigeres bare direkte på lerretet. Høyremenyen har ikke et ekstra tekstfelt.
@@ -45,11 +45,16 @@ Kursiv
 Justering
 Linjehøyde
 
+Lenke
+
 Element
 Status: Ulåst
+Slett tekstboks
 ```
 
 Formateringen gjelder hele tekstboksen. Det finnes ikke riktekst eller tegnbasert formatering. Andre elementtyper åpner høyremenyen uten `Tekstutseende`.
+
+Lenke og sletting ble implementert i senere faser og er tatt med her for å beskrive dagens panelstruktur. Se `docs/ELEMENT_LINKS.md` og `docs/ELEMENT_DELETION.md`.
 
 ## Kontrollerte verdier
 
@@ -116,7 +121,7 @@ lineHeight
 
 Tekststil er varig prosjektdata og er foreløpig felles for PC og Telefon. Nye tekstbokser får en egen kopi av standardstilen.
 
-Prosjektskjemaet ble senere økt til gjeldende versjon 4 i lenkefasen.
+Prosjektskjemaet ble senere økt til versjon 4 i lenkefasen og til gjeldende versjon 5 i knappbibliotekfasen.
 
 ## Reducer og validering
 
@@ -168,7 +173,7 @@ Implementert ansvarsdeling:
 - `src/components/canvas/getTextElementCssStyle.ts` — fonttoken og stil til CSS
 - `RightPropertiesPanel` — komposisjon, ikke egen tekststate
 
-Alle nye kildefiler var under 250 linjer. `EditorCanvasElement.tsx` var 244 linjer og skal ikke få nye funksjonsansvar.
+Alle nye kildefiler var under 250 linjer i denne fasen. `EditorCanvasElement.tsx` var 244 linjer under fase 8 og er 247 linjer etter senere utvidelser. Den skal ikke få nye funksjonsansvar.
 
 ## Framtidsrettet kodeaudit
 
