@@ -17,13 +17,15 @@ async function readDimensionsWithImageElement(file: File) {
   const objectUrl = URL.createObjectURL(file)
 
   try {
-    return await new Promise<{ width: number; height: number }>((resolve, reject) => {
-      const image = new Image()
-      image.onload = () =>
-        resolve({ width: image.naturalWidth, height: image.naturalHeight })
-      image.onerror = () => reject(new Error('Image decoding failed.'))
-      image.src = objectUrl
-    })
+    return await new Promise<{ width: number; height: number }>(
+      (resolve, reject) => {
+        const image = new Image()
+        image.onload = () =>
+          resolve({ width: image.naturalWidth, height: image.naturalHeight })
+        image.onerror = () => reject(new Error('Image decoding failed.'))
+        image.src = objectUrl
+      },
+    )
   } finally {
     URL.revokeObjectURL(objectUrl)
   }
@@ -46,7 +48,9 @@ async function readImageDimensions(file: File) {
 export async function prepareImageFile(
   file: File,
 ): Promise<PrepareImageFileResult> {
-  if (!isSupportedImageMimeType(file.type)) {
+  const mimeType = file.type
+
+  if (!isSupportedImageMimeType(mimeType)) {
     return {
       ok: false,
       message: 'Velg en PNG-, JPEG- eller WebP-fil.',
@@ -81,7 +85,7 @@ export async function prepareImageFile(
         file,
         metadata: {
           fileName: file.name,
-          mimeType: file.type,
+          mimeType,
           byteSize: file.size,
           width: dimensions.width,
           height: dimensions.height,
