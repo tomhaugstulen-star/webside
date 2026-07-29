@@ -34,36 +34,21 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 ## Gjeldende status
 
 ```text
-aktiv leveranse: fase 11A – bildeimport, ramme og utsnitt
-branch: feature/image-import-and-placement
-GitHub-sak: #25
-PR: #26 – åpen, ikke draft
-base main: 7e4c71fed4a26dfb829cc19ae81df95215c42a64
+siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
+GitHub-sak: #25 – lukket som fullført
+PR: #26 – merget
+mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
 prosjektskjema: versjon 6
-implementering: ferdig
-manuell PC- og Telefon-test: godkjent
-framtidsrettet sluttaudit: ferdig
-siste produksjonskontroll: bestått
-arkitekturrapporter etter sluttaudit: må regenereres
-merge: ikke godkjent eller utført
+lokal main: synkronisert og clean
+arkitekturrapporter: regenerert etter sluttaudit, ingen diff
+neste produksjonsfase: ikke valgt
 ```
 
-Faktisk feature- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Ikke bruk et hardkodet commitnummer som permanent forventet topp-commit.
-
-Historiske kontrollpunkter:
-
-```text
-main-base for fase 11A: 7e4c71f
-arkitekturrapporter før sluttaudit: 94ed2fb
-første fullførte dokumentstatus: 9c92fb1
-siste verifiserte produksjonscommit ved kontrollen: 7378e24
-```
-
-Dokumentcommits ligger etter `7378e24`. Faktisk feature-head må leses fra Git.
+Faktisk `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Commitnummeret over er et historisk kontrollpunkt for fase 11A, ikke en permanent forventet topp-commit.
 
 ## Siste verifiserte kvalitetskontroll
 
-Brukerens lokale terminaloutput bekreftet etter den endelige kodeauditen:
+Brukerens lokale terminaloutput etter den endelige kodeauditen bekreftet:
 
 ```text
 ESLint: bestått
@@ -168,47 +153,26 @@ Lagre gyldige prosjektmutasjoner, ikke transient editor- eller ressursstate.
 
 ## Første oppgave i neste chat
 
-Fase 11A skal ikke implementeres på nytt. Ikke start fase 12.
+Fase 11A skal ikke implementeres på nytt. Ikke start fase 12 eller en annen produksjonsfase uten at brukeren velger den eksplisitt.
 
-Trekk siste feature-branch og regenerer arkitekturrapportene etter sluttauditen:
+Kontroller først repoets faktiske status:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
-git pull --ff-only origin feature/image-import-and-placement
-git status
-git log -10 --oneline --decorate
-npm run architecture:json
-npm run architecture:diagram
-git status --short
-git diff --check
-git diff --stat
-```
-
-Forventet:
-
-- working tree var clean før rapportgenerering
-- bare `architecture.json` og `docs/dependency-graph.mmd` endres
-- `git diff --check` har ingen reelle feil
-
-Etter lokal rapportkontroll:
-
-1. commit og push bare de to rapportene
-2. trekk og kontroller alle dokumentcommits lokalt
-3. kontroller samlet PR #26 mot `main`
-4. kontroller PR-head, mergebarhet, changed files, review-tråder, reviews og CI
-5. oppdater PR-body med siste kontroll og rapportcommit
-6. presenter PR #26 for eksplisitt brukergodkjenning
-7. ikke merge før brukeren skriver `godkjent`
-
-Etter eventuell godkjent merge:
-
-```powershell
+git fetch origin
 git switch main
 git pull --ff-only origin main
 git status
 git log -6 --oneline --decorate
 ```
 
-Velg først deretter neste produksjonsfase sammen med brukeren.
+Forventet utgangspunkt etter fase 11A:
+
+- lokal `main` er synkronisert med `origin/main`
+- working tree er clean
+- mergecommit `f5e4657` finnes i historikken
+- ingen feature-branch startes før neste fase er valgt og omfanget er låst
+
+Velg deretter neste produksjonsfase sammen med brukeren. Opprett alltid en ny branch fra oppdatert `main` før kode eller dokumentendringer.
 
 ---
