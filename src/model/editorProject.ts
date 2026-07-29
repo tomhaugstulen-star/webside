@@ -1,10 +1,7 @@
 import type { ButtonAssetId } from './buttonAsset'
 import type { ElementLink } from './elementLink'
-import type {
-  ImageAssetId,
-  ImageAssetMetadata,
-  ImageFit,
-} from './imageAsset'
+import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
+import type { ImageMode, ImageTransform } from './imagePresentation'
 import type { TextElementStyle } from './textElementStyle'
 
 export const EDITOR_PROJECT_SCHEMA_VERSION = 6 as const
@@ -45,7 +42,8 @@ export type ImageEditorElement = BaseEditorElement & {
   assetId: ImageAssetId
   assetMetadata: ImageAssetMetadata
   altText: string
-  fit: ImageFit
+  mode: ImageMode
+  transform: ImageTransform
 }
 
 export type TextEditorElement = BaseEditorElement & {
