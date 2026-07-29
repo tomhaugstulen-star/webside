@@ -4,6 +4,7 @@ import type { SectionEditorElement } from '../../model/editorProject'
 import {
   isSectionFrameWidth,
   sectionFrameWidths,
+  type SectionFrameWidth,
 } from '../../model/sectionAppearance'
 import { useSectionAppearance } from '../../state/useSectionAppearance'
 
@@ -11,7 +12,7 @@ type FramePropertiesSectionProps = {
   element: SectionEditorElement
 }
 
-function getFrameWidthLabel(width: number) {
+function getFrameWidthLabel(width: SectionFrameWidth) {
   return width === 0 ? 'Ingen' : `${width} px`
 }
 
