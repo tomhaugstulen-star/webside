@@ -1,3 +1,9 @@
+import {
+  createEditorColor,
+  isEditorColor,
+  type EditorColor,
+} from './editorColor'
+
 export const textFontFamilies = [
   'system',
   'arial',
@@ -46,6 +52,7 @@ export type TextElementStyle = {
   fontStyle: TextFontStyle
   textAlign: TextAlignment
   lineHeight: TextLineHeight
+  color: EditorColor
 }
 
 export type TextElementStylePatch = {
@@ -59,6 +66,7 @@ export const DEFAULT_TEXT_ELEMENT_STYLE: TextElementStyle = {
   fontStyle: 'normal',
   textAlign: 'left',
   lineHeight: 1.45,
+  color: createEditorColor('#625C58'),
 }
 
 function includesValue<T extends readonly unknown[]>(values: T, value: unknown) {
@@ -75,6 +83,7 @@ const textElementStyleValidators: Record<
   fontStyle: (value) => includesValue(textFontStyles, value),
   textAlign: (value) => includesValue(textAlignments, value),
   lineHeight: (value) => includesValue(textLineHeights, value),
+  color: isEditorColor,
 }
 
 const textElementStyleKeys = Object.keys(textElementStyleValidators)
@@ -129,6 +138,7 @@ export function textElementStylesEqual(
     first.fontWeight === second.fontWeight &&
     first.fontStyle === second.fontStyle &&
     first.textAlign === second.textAlign &&
-    first.lineHeight === second.lineHeight
+    first.lineHeight === second.lineHeight &&
+    first.color === second.color
   )
 }
