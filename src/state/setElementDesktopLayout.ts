@@ -10,7 +10,7 @@ function getPersistedLayout(
   element: EditorElement,
   layout: ElementLayout,
 ): ElementLayout {
-  if (element.kind !== 'header' || element.widthMode !== 'full') {
+  if (element.kind !== 'header') {
     return layout
   }
 
