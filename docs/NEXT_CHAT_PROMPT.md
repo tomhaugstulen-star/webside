@@ -37,7 +37,7 @@ Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer 
 7. `docs/CODE_AUDIT.md`
 8. `README.md`
 
-Historiske fasefiler som var fullt innarbeidet i dokumentene over er slettet for å unngå parallelle sannhetskilder.
+Foreldede fasefiler som var fullt innarbeidet i dokumentene over er slettet. Ikke gjenopprett parallelle sannhetskilder.
 
 ## Gjeldende status
 
@@ -48,13 +48,31 @@ GitHub-sak: #31 – åpen
 base main: 9937e4fd785da9cbd171443ea4f1d93041a8b326
 prosjektskjema: versjon 8
 manuell funksjonstest: godkjent
-kodeaudit og opprydding: gjennomført
-ny automatisk kontroll etter opprydding: gjenstår
+framtidsrettet kodeaudit og opprydding: gjennomført
 PR: ikke opprettet
 merge: ikke godkjent
 ```
 
-Branchen var på `1587d76` før den avsluttende dokumentasjons- og kodeoppryddingen. Faktisk head skal leses på nytt.
+Faktisk branch-head og `origin/main` skal leses på nytt før PR.
+
+## Siste verifiserte automatiske kontroll
+
+Brukerens lokale terminaloutput etter avsluttende kodeopprydding bekreftet:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
+Vite: 122 moduler transformert
+CSS: 36.54 kB, gzip 6.80 kB
+JavaScript: 275.73 kB, gzip 81.65 kB
+produksjonsbuild: bestått på 198 ms
+architecture.json: regenerert
+docs/dependency-graph.mmd: regenerert
+git diff --check: ingen whitespace-feil
+```
+
+LF til CRLF-advarslene for de to genererte arkitekturrapportene er forventede Windows-linjesluttadvarsler, ikke whitespace-feil.
 
 ## Implementert Header
 
@@ -98,62 +116,48 @@ Utenfor fase 13:
 - prosjektimport
 - publisering
 
-## Avsluttende kodeopprydding som er gjort remote
+## Avsluttende kodeopprydding
 
 - duplisert bilderessursopprydding er fjernet fra `EditorShell`
 - `useElementDeletion` er eneste ansvarssted for opprydding av Bilde- og Header-assets
 - `useElementCreation` kontrollerer aktiv side og ID-kollisjon før den rapporterer suksess
 - nye Header-elementer lagrer `x = 0`
 - Header-layoutcommits normaliserer `x = 0` og kanonisk serialisert bredde
-- ren pekerberegning er flyttet til `elementPointerTransform.ts`
-- `useElementPointerTransform.ts` er redusert fra 247 til 204 linjer
-- `canvas.css` er delt i `canvas.css` og `canvas-interaction.css`
+- rene pekerberegninger ligger i `elementPointerTransform.ts`
+- `useElementPointerTransform.ts` er redusert til 204 linjer
+- canvas-stiler er delt mellom grunnlayout og interaksjon
 - alle kjente berørte produksjonsfiler er under 250 linjer
-
-Tre foreldede dokumenter er slettet:
-
-```text
-docs/PROJECT_COLORS.md
-docs/DRAG_RESIZE.md
-docs/OBJECT_LOCKING.md
-```
+- foreldet og duplisert dokumentasjon er fjernet
+- issue #31 er synkronisert med faktisk omfang
 
 ## Neste handling
 
-Brukeren skal først trekke siste remote-endringer:
+Trekk siste dokumentasjonsretting lokalt:
 
 ```powershell
 git pull --ff-only origin feature/logo-header
 ```
 
-Vent på hele outputen.
-
-Deretter:
+Vent på hele outputen. Kontroller deretter at slettede dokumentreferanser og foreldet fase-12-status ikke finnes:
 
 ```powershell
-npm run check
+git grep -n -E 'docs/(PROJECT_COLORS|DRAG_RESIZE|OBJECT_LOCKING)\.md|docs/phase-12-handover|feature/project-colors|aktiv docs-branch|omfang ikke låst|prosjektskjema: versjon 7|Gjeldende skjemaversjon er 7|EDITOR_PROJECT_SCHEMA_VERSION = 7'
 ```
 
-Ved bestått kontroll:
+Forventet resultat er ingen treff.
+
+Deretter kontrolleres:
 
 ```powershell
-npm run architecture:json
-npm run architecture:diagram
-```
-
-Deretter:
-
-```powershell
-git diff --check
 git status --short
 git diff --stat
 ```
 
-Arkitekturrapportene skal committes og pushes etter kontroll. Dokumentasjonen skal bare justeres igjen dersom faktiske kontrolltall eller auditfunn krever det.
+Arkitekturrapportene skal committes og pushes. Dersom dokumentasjonsrettingen kom remote etter siste lokale kontroll, trenger ikke `npm run check` kjøres på nytt fordi rettingen bare endrer Markdown. `git diff --check` skal likevel kjøres etter siste lokale commitklargjøring.
 
-## Obligatorisk manuell regresjonstest
+## Obligatorisk kort regresjonstest
 
-Kontroller kort:
+Kontroller:
 
 - Header full bredde i PC og Telefon
 - bare vertikal flytting
@@ -161,15 +165,15 @@ Kontroller kort:
 - panel lukkes under transform og åpnes fra `Egenskaper`
 - font, bakgrunn, tekstfarge og ramme
 - låsing og sletting
-- Header-logoressurs fjernes uten å skade delte Bilde-assets
 - Seksjon, Bilde, Tekst og Knapp fungerer som før
 
 ## Før PR
 
 - clean tree og synkronisert branch
-- nye arkitekturrapporter
+- arkitekturrapporter committet
 - alle berørte filer under 250 linjer
 - ingen gamle width-mode-referanser
+- ingen foreldede dokumentreferanser
 - ingen duplisert ressursopprydding
 - samlet diff kontrollert mot `main`
 - issue #31 samsvarer med faktisk omfang
