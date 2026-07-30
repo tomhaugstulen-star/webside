@@ -6,7 +6,7 @@ Kopier hele teksten mellom `START HANDOVER` og `SLUTT HANDOVER` inn i neste chat
 
 # START HANDOVER
 
-Du overtar ansvaret for Website-editoren. Arbeid som prosjektleder, teknisk arkitekt og kodeansvarlig. Svar på norsk. Vær presis og bruk faktisk GitHub-state, faktisk kode, autoritativ dokumentasjon og brukerens terminaloutput som sannhetskilder. Ikke gjett, og ikke påstå at noe er clean, testet eller synkronisert uten bevis.
+Du overtar ansvaret for Website-editoren. Arbeid som prosjektleder, teknisk arkitekt og kodeansvarlig. Svar på norsk. Bruk faktisk GitHub-state, faktisk kode, autoritativ dokumentasjon og brukerens terminaloutput som sannhetskilder. Ikke gjett, og ikke påstå at noe er clean, testet eller synkronisert uten bevis.
 
 ## 1. Repo og lokal mappe
 
@@ -16,56 +16,52 @@ Lokalt: C:\Users\tomha\Desktop\website
 Standardbranch: main
 ```
 
-Bruk GitHub-connectoren til remote-operasjoner, kodeinspeksjon, branches, commits, issues og pull requests. Gi brukeren eksakte PowerShell-kommandoer bare for lokale Git-, Node-, Vite- og manuelle kontroller som connectoren ikke kan utføre.
+Bruk GitHub-connectoren til remote-operasjoner, kodeinspeksjon, branches, commits, issues og pull requests. Gi eksakte PowerShell-kommandoer for lokale Git-, Node-, Vite- og manuelle kontroller.
 
-## 2. Siste verifiserte status ved handover
-
-Siste verifiserte remote-status før denne handoveroppdateringen:
+## 2. Siste bekreftede remote-status
 
 ```text
-main: a046c14ca8bf5ba3c90521875104f4bdd4e42eba
-commit: Merge pull request #40 from tomhaugstulen-star/docs/record-phase-14-merge
-PR #39: merget – fase 14 produksjonsleveranse
-PR #40: merget – dokumentasjonssynk etter fase 14
-issue #34: lukket som fullført
-åpne pull requests: 0
-aktiv produksjonsfase: ingen
-aktiv produksjonsbranch: ingen
-neste planlagte fase: 15 – duse portalfarger og tydelig visuell struktur
-fase 15: ikke startet
+main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
+commit: Merge pull request #43 from tomhaugstulen-star/feature/phase-15-portal-colors
+PR #43: merget
+issue #42: lukket som fullført
+fase 15: fullført på main
+source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
+verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
 prosjektskjema: versjon 9
+neste planlagte fase: 16 – automatisert testgrunnlag
+fase 16: ikke startet
 ```
 
-Viktig presisering:
+Dokumentasjonssynk etter merge arbeides på:
 
-- Brukeren skrev at lokal synkronisering var i orden etter PR #40.
-- Den siste terminaloutputen for lokal `main` etter PR #40 ble ikke limt inn i chatten.
-- Ikke påstå eksakt lokal HEAD eller clean tree før dette er kontrollert på nytt.
-- Denne handoveren oppdateres på en separat docs-branch. `main` kan derfor være nyere enn `a046c14` når neste chat starter.
-- Første handling i neste chat er alltid å lese faktisk remote `main`, åpne PR-er og lokal status.
+```text
+branch: docs/record-phase-15-merge
+base: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
+```
+
+Ikke anta at docs-branchen eller en eventuell docs-PR er merget. Kontroller faktisk GitHub-status først.
+
+Brukerens lokale `main` er ikke bekreftet synkronisert til `1ae0beb` i denne handoveren. Ikke påstå lokal HEAD eller clean tree før terminaloutput er lest.
 
 ## 3. Ufravikelig arbeidsmåte
 
 - Aldri utvikling direkte på `main`.
 - Én avgrenset feature- eller docs-branch per leveranse.
-- Ingen ny branch før faktisk `main`, lokal status og åpent PR-bilde er kontrollert.
-- Lås produkt-, modell- og UI-omfang før produksjonskode.
-- Ikke bland inn senere faser eller separate issues skjult.
-- Én kontrollert handling om gangen; les hele resultatet før neste handling.
-- Bruk faktisk branch, commit, diff, kode og terminaloutput.
 - Ingen merge uten at brukeren eksplisitt skriver `godkjent`.
 - `fungerer` godkjenner en test, ikke en merge.
-- Ikke endre den låste roadmapen uten eksplisitt produktbeslutning.
-- Gjennomfør framtidsrettet kodeaudit, dependency-kontroll og filstørrelseskontroll før PR.
-- Kontroller PR-diff, mergebarhet, CI/status, reviews, kommentarer og åpne review-tråder.
-- Oppdater autoritativ dokumentasjon og fjern foreldet status før leveransen avsluttes.
-- Regenerer `architecture.json` og `docs/dependency-graph.mmd` når modul- eller importgrafen endres.
-- Ikke regenerer arkitekturrapporter bare fordi fargeverdier eller tekst i eksisterende filer endres.
-- Ikke opprett eller merge PR bare for å komme videre raskere.
+- Lås omfang før produksjonskode.
+- Ikke bland inn senere faser eller separate issues.
+- Hold produksjonsfiler under aktiv terskel på 250 linjer; hard grense 300.
+- Gjennomfør framtidsrettet kodeaudit før PR.
+- Kjør full automatisk kontroll etter siste produksjonsendring.
+- Kontroller diff, PR, mergebarhet, CI/status, reviews, kommentarer og åpne tråder.
+- Regenerer arkitekturrapporter bare ved faktisk modul- eller importgrafendring.
+- Oppdater autoritativ dokumentasjon etter faktisk mergecommit.
 
-## 4. Autoritativ dokumentasjon
+## 4. Autoritative dokumenter
 
-Les i denne rekkefølgen før ny produksjonsfase:
+Les i denne rekkefølgen:
 
 1. `docs/WORK_PLAN.md`
 2. `docs/PROJECT_RULES.md`
@@ -79,15 +75,22 @@ Les i denne rekkefølgen før ny produksjonsfase:
 
 Regler:
 
-- Faktisk kode og terminaloutput vinner dersom gammel dokumenttekst motsier dem.
-- Rett motstridende dokumentasjon på egen branch.
-- Ikke gjenopprett parallelle historiske fasefiler som egne sannhetskilder.
-- `docs/WORK_PLAN.md` eier låst rekkefølge og faseomfang.
-- `docs/PROJECT_RULES.md` eier varige arbeids-, modell- og arkitekturgrenser.
+- Faktisk kode og terminaloutput vinner over foreldet dokumenttekst.
+- `WORK_PLAN.md` eier låst rekkefølge og faseomfang.
+- `PROJECT_RULES.md` eier varige arbeids-, modell- og arkitekturgrenser.
+- Historiske fasefiler skal ikke gjenopprettes som parallelle sannhetskilder.
 
 ## 5. Første kontroll i neste chat
 
-Før produksjonsplan eller branch opprettes, be brukeren kjøre denne lokale kontrollen dersom terminalstatus ikke allerede er vist i den nye chatten:
+Kontroller med GitHub-connectoren:
+
+- faktisk remote `main`
+- åpne pull requests
+- status for `docs/record-phase-15-merge`
+- relevante åpne issues
+- at PR #43 er merget og issue #42 lukket
+
+Be deretter brukeren kjøre dersom lokal status ikke allerede er vist:
 
 ```powershell
 Set-Location C:\Users\tomha\Desktop\website
@@ -98,19 +101,9 @@ git status --short
 git log -1 --oneline
 ```
 
-Samtidig skal assistenten kontrollere med GitHub-connectoren:
+Ikke opprett fase-16-branch før dokumentasjonssynken etter fase 15 er avsluttet og lokal `main` er bekreftet clean.
 
-- faktisk remote `main`
-- åpne pull requests
-- relevante åpne issues
-- at ingen gammel featurebranch eller docs-PR må ferdigstilles først
-- at `main` inneholder PR #39 og PR #40
-
-Ikke opprett fase-15-branch før kontrollen er lest og fase-15-omfanget er eksplisitt godkjent av brukeren.
-
-## 6. Teknologistack og kommandoer
-
-Prosjektet bruker:
+## 6. Teknologistack og standardkontroll
 
 ```text
 React 19
@@ -122,20 +115,6 @@ Dependency Cruiser 17
 Windows / PowerShell
 ```
 
-Autoritative npm-scripts i `package.json`:
-
-```text
-npm run dev
-npm run build
-npm run typecheck
-npm run lint
-npm run architecture:check
-npm run architecture:json
-npm run architecture:diagram
-npm run check
-npm run preview
-```
-
 `npm run check` kjører:
 
 ```text
@@ -145,7 +124,7 @@ lint
 -> production build
 ```
 
-Standard lokal sluttkontroll etter produksjonsendringer:
+Standard lokal sluttkontroll:
 
 ```powershell
 npm run check
@@ -180,65 +159,89 @@ Get-ChildItem src -Recurse -File -Include *.ts,*.tsx,*.css |
     Format-Table -AutoSize
 ```
 
-Filgrenser:
+## 7. Fase 15 – levert resultat
+
+Fase 15 innførte et semantisk portaltema uten å endre prosjektdata, skjema, reducer eller elementlogikk.
+
+Godkjent palett:
 
 ```text
-aktiv terskel: 250 linjer
-hard unntaksgrense: 300 linjer
+portal/header        #F6EFE6
+panel                #FAF6F1
+aktiv bakgrunn       #FFE8DA
+kant                 #E6DED2
+aktiv oransje        #E25A1C
+mørk tekst           #1F1F1F
+sekundær tekst       #6B6F76
+blå ikon             #2F6DB6
+grønn ikon           #2E7D32
+lilla ikon           #7E3FA8
+oransje ikon         #E07A24
 ```
 
-Del filer etter reelt ansvar. Ikke lag tilfeldige hjelpefiler bare for å flytte linjer.
+Den røde topplinjen i referanseskjermbildet tilhører nettleserens dev-miljø og er ikke en del av editoren.
 
-## 7. Låst produktretning
+Visuell betydning:
 
-Website-editoren skal være en komplett lokal arbeidsportal på brukerens egen PC.
+- Prosjekt og Seksjon: blå.
+- Farger og Bilde: grønn.
+- Logo og header samt Tekst: lilla.
+- Elementer og Knapp: oransje.
+- Innstillinger: nøytral mørk.
+- valgt tilstand: aktiv oransje med lys oransje bakgrunn.
 
-Den skal støtte:
+Framtidsrettet auditrettelse:
 
-- flere lokale nettsideprosjekter
-- sider, seksjoner, Header, Hero og elementer
-- rask portalnavigasjon og hurtigsøk
-- lokal prosjektlagring og autolagring
-- sikkerhetskopi og prosjektimport
-- gjenoppretting etter feil eller krasj
-- lokal fullskjermsforhåndsvisning
-- OpenAI som kontrollert meddesigner i siste hovedfase
+Første implementasjon brukte `nth-child` for ikonfarger. Dette ble fjernet fordi menyutvidelser eller endret rekkefølge kunne gi feil farge. Fargene er nå bundet til eksplisitte semantiske variantklasser:
 
-Dette skal ikke bygges:
+```text
+rail-button--files
+rail-button--design
+rail-button--media
+rail-button--elements
+rail-button--settings
 
-- hosting
-- domeneoppsett
-- opplasting til offentlig server
-- offentlig publiseringsknapp
-- produksjonsdeployment
-- publiseringshistorikk
+element-card--section
+element-card--image
+element-card--text
+element-card--button
+```
 
-En eksisterende eller framtidig handling med navnet `Publiser` skal ikke utvikles som offentlig publisering. Produktretningen bruker senere lokal `Forhåndsvis` eller tilsvarende.
+Kompatibilitetsaliasene `--text`, `--muted`, `--accent`, `--border`, `--border-strong`, `--panel` og `--app-bg` beholdes foreløpig fordi eldre stilfiler bruker dem. Nye portalstiler skal bruke `--portal-*`-roller. Aliasene skal ikke fjernes uten egen kartlagt opprydding.
 
-## 8. To separate navigasjonssystemer
+Bevarte grenser:
 
-Arbeidsportalens navigasjon og nettsidens navigasjon er forskjellige ansvar.
+- høyrepanel 320 px
+- overlay under 1680 px
+- reservert plass ved 1680 px og bredere
+- venstrepanelets oppførsel uendret
+- `prefers-reduced-motion` bevart
+- nettsideprosjektets egne farger uendret
+- ingen importgrafendring
 
-Arbeidsportalens navigasjon:
+## 8. Verifisert fase-15-kontroll
 
-- åpner prosjekter, sider, elementer, paneler, verktøy og innstillinger
-- er editor-UI
-- inngår ikke i nettsideprosjektets serialiserte innhold
+Produksjonskoden ble verifisert på `7ea58a5`:
 
-Nettsidens navigasjon:
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 118 moduler, 341 avhengigheter, 0 brudd
+Vite: 127 moduler transformert
+CSS: 45.36 kB, gzip 7.34 kB
+JavaScript: 280.72 kB, gzip 83.19 kB
+produksjonsbuild: bestått på 197 ms
+git diff --check: ingen feil
+git status --short: clean
+produksjonsfiler >= 250 linjer: 0
+visuell regresjon: godkjent
+```
 
-- vises i nettstedets Header
-- peker til stabile side-ID-er, seksjons-ID-er eller eksterne URL-er
-- er varig prosjektdata
-- bygges senere i fase 19–20
-
-Ikke bruk portalmenyen som kilde for nettsidens meny eller motsatt.
+Arkitekturrapportene ble ikke regenerert fordi import- og modulgrafen var uendret.
 
 ## 9. Gjeldende prosjektmodell
 
 Prosjektskjemaet er versjon 9.
-
-Skjemahistorikk:
 
 ```text
 1  grunnmodell
@@ -252,449 +255,84 @@ Skjemahistorikk:
 9  Header-fontstørrelse
 ```
 
-Varige data:
-
-- `EditorProject`, sider og elementer
-- posisjon, størrelse og synlighet
-- låsestatus for Seksjon, Bilde, Tekst og Knapp
-- Headerens kompatibilitetsfelt `locked`, alltid `false` i dagens flyt
-- side- og elementutseende
-- tekst, lenker og asset-ID-er
-- bilde- og logometadata
-- Header-fontfamilie og fontstørrelse
-- tidsstempler
-
-Transient data:
-
-- markering og åpne paneler
-- pointerøkter og layoutpreview
-- alignment-mål og aktive guider
-- fryste lerretsmål under pointerøkt
-- lokale drafts og valideringsfeedback
-- filvelger
-- `File`, Blob, Object URL og ressurskart
-- dialoger, fokus, hover og animasjon
-- framtidige ikke-godkjente AI-forslag
-
-Regler:
-
-- `EditorProject` er eneste varige sannhetskilde.
-- Varige endringer går gjennom typede actions og reducere.
-- Reduceren er siste valideringsgrense.
-- Ugyldige, låste og uendrede handlinger returnerer samme state.
-- `updatedAt` endres bare ved gyldig reell mutasjon.
-- DOM og CSS er rendering, ikke permanent lagring.
-- `File`, Blob, Object URL og lokal filsti lagres ikke i prosjektmodellen.
-- Det finnes ennå ingen prosjektimport-, migrerings- eller lokal lagringsmotor.
-- Nettleserreload-persistens er derfor ikke et gjeldende akseptansepunkt.
+Varige data går gjennom typede actions og reducere. `EditorProject` er eneste varige sannhetskilde. DOM, CSS, hover, fokus, dialoger, pointerpreview, guider, `File`, Blob og Object URL er transient.
 
 ## 10. Implementert editorgrunnlag
-
-Følgende er levert på `main`:
 
 - blankt PC- og Telefon-lerret
 - toppmeny, venstremeny, venstrepanel og høyrepanel
 - Seksjon, Bilde, Tekst, Knapp og Header
 - sentral prosjektstate og typede reducerhandlinger
-- markering, pointerflytting og størrelsesendring
-- tastaturflytting og tastaturresize der elementtypen tillater det
+- markering, flytting og størrelsesendring
+- tastaturflytting og tastaturresize der tillatt
 - låsing for Seksjon, Bilde, Tekst og Knapp
-- tekstredigering, font, størrelse, farge, fet, kursiv, justering og linjehøyde
-- eksterne lenker for tekst og knapp
-- sikker elementssletting
-- bundlet SVG-knappbibliotek med stabile asset-ID-er
-- lokal bildeimport
-- bildeplassering, crop, zoom, alternativ tekst og metadata
-- kontrollert Object URL-livssyklus
-- sidebakgrunn, Seksjon-bakgrunn, tekstfarger og rammer
-- Header med logo, navn, undertittel, bakgrunn, tekstfarge, fontfamilie, fontstørrelse og ramme
-- korrigeringslinjer og snapping ved pointerflytting
+- tekstredigering og eksterne lenker
+- sikker sletting
+- SVG-knappbibliotek med stabile asset-ID-er
+- lokal bilde- og logoimport
+- bildeutsnitt, zoom, alternativ tekst og metadata
+- side- og elementfarger
+- Seksjon- og Header-ramme
+- korrigeringslinjer og 6 px snapping ved pekerflytting
+- semantisk portaltema og tydelige interaksjonstilstander
 
-Gjeldende venstremeny:
+## 11. Separate åpne saker
 
-```text
-Prosjekt
-Farger
-Logo og header
-Elementer
-Innstillinger
-```
-
-Gjeldende ansvarsdeling:
+Disse ble ikke blandet inn i fase 15:
 
 ```text
-Venstremeny = opprette elementer, velge fil/design og vise prosjektoversikt
-Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere innhold og transformere elementer
-Ressurslag = eie transient fil og Object URL
-Prosjekt   = eie serialiserbare verdier
+#35 tekstboksbakgrunn som varig prosjektdata
+#36 editor-only elementgrense
+#37 elementnotat og høyrepanelmodell
+#38 like mellomrom og fordelingsguider
+#3  senere mobile designkontroller
 ```
 
-## 11. Høyrepanelets invariant
+Ikke implementer dem skjult i fase 16.
 
-Høyrepanelet skal fortsatt:
+## 12. Neste planlagte fase: 16 – automatisert testgrunnlag
 
-- være 320 px bredt
-- være overlay fra høyre under 1680 px viewport
-- reservere plass ved 1680 px og bredere
-- åpnes ved valg av element
-- lukkes ved klikk på tomt lerret
-- ha egen vertikal scrolling
-- bruke 180 ms transformanimasjon
-- deaktivere animasjon ved `prefers-reduced-motion`
-- bevare elementmarkeringen og transformflyten
+Formål: redusere regresjonsrisiko før sider, navigasjon, Header-meny, Hero, historikk, lagring og AI gjør modellen større.
 
-Fase 15 kan endre portalens visuelle tokenbruk, men skal ikke endre panelbredde, breakpoint, åpne-/lukkelogikk eller layoutansvar.
+Planlagt omfang:
 
-## 12. Header-invariant
+- velge et lite og vedlikeholdbart testverktøy for TypeScript-moduler
+- tester for modellvalidatorer
+- tester for reducerhandlinger
+- tester for snapping, layout og clamping
+- tester for ugyldige og uendrede handlinger
+- tester for ressurs- og ID-grenser der det er praktisk
+- et lite kontrollert sett nettleserbaserte regresjonstester
+- én tydelig testkommando i kvalitetskontrollen
+- testkommando som kan kjøres lokalt og senere i CI
 
-Header er én sammensatt `HeaderEditorElement`.
+Ikke del av fase 16:
 
-Låste regler:
+- full pixeltest av hele editoren
+- testing av framtidige funksjoner som ikke finnes
+- store mock-rammeverk uten dokumentert behov
+- fase 17–29-funksjoner
 
-- fast ved `x = 0, y = 0`
-- følger hele aktiv lerretsbredde
-- kan ikke flyttes med pointer eller tastatur
-- høyde 70–100 px
-- standardhøyde 88 px
-- fontstørrelse 12–96 px, standard 24 px
-- bare vertikal resizing
-- kan velges og åpne egenskaper
-- kan slettes kontrollert
-- kan brukes som snapmål
-- nye elementer opprettes under Header
-- Header er ikke låsbar
-- Header viser ingen låsekontroll eller låsestatus
+Akseptansekriterier fra arbeidsplanen:
 
-Invarianten håndheves i UI-, pointer-, tastatur-, layout- og commitlaget. Sentrale filer:
+- testkommando kan kjøres lokalt og i CI
+- eksisterende rene modell- og layoutfunksjoner er dekket
+- reducerens valideringsgrenser er dekket
+- minst én kritisk editorflyt testes i nettleser
+- `npm run check` inkluderer eller følges av dokumentert testkontroll
 
-- `src/components/canvas/EditorCanvasElement.tsx`
-- `src/components/canvas/useElementPointerTransform.ts`
-- `src/components/canvas/elementPointerTransform.ts`
-- `src/components/canvas/canvasElementKeyboard.ts`
-- `src/state/setElementDesktopLayout.ts`
-- `src/model/createEditorElement.ts`
-- `src/components/canvas/getAlignmentTargets.ts`
-- `src/components/canvas/getCanvasContentHeight.ts`
-- `src/model/findElementCreationPosition.ts`
+Før kode:
 
-Ikke svekk disse grensene under senere refaktorering.
+1. Avslutt dokumentasjonssynken etter fase 15.
+2. Kontroller faktisk `main`, clean tree og åpne PR-er.
+3. Les eksisterende scripts, rene modellfunksjoner og reducerstruktur.
+4. Lås testverktøy, testnivåer, filplassering og kommandoer.
+5. Opprett issue og egen featurebranch først etter eksplisitt brukergodkjenning.
 
-## 13. Fullført fase 14 – korrigeringslinjer og snapping
-
-Produksjonsleveransen ble merget gjennom PR #39.
-
-Referanser:
+## 13. Låst videre rekkefølge
 
 ```text
-source branch-head: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
-produksjonsmergecommit: 0122605b60808689cdda7cb1601eb3342680f88c
-issue: #34 – lukket
-PR: #39 – merget
-dokumentasjonssynk: PR #40 – merget
-main etter dokumentasjonssynk: a046c14ca8bf5ba3c90521875104f4bdd4e42eba
-```
-
-Levert omfang:
-
-- snapping gjelder bare pointerflytting
-- Seksjon, Bilde, Tekst og Knapp kan flyttes og snappe på begge akser
-- aktive anker: venstre/midt/høyre og topp/midt/bunn
-- mål: andre synlige elementer og horisontal/vertikal lerretsmidt
-- Header kan være mål, men ikke aktivt flytteelement
-- låste synlige elementer kan være mål
-- skjulte elementer og aktivt element ekskluderes
-- 6 px snapgrense i lerretskoordinater
-- X og Y velges uavhengig
-- nærmeste gyldige treff vinner
-- midtanker prioriteres ved lik avstand
-- guider vises bare mens snap er aktivt
-- snapmål og lerretsmål fryses ved pointerstart
-- preview og guider er transient state
-- commit, cancel og tapt pointer capture rydder preview og guider
-- auto-scroll og clamping er bevart
-- resize og tastatur bruker ikke snapping
-- ingen alignmentverdi lagres i prosjektet
-
-Slutt-auditen fjernet eller rettet:
-
-- lavnivåmulighet for Header-flytting
-- duplisert Header-tastaturhåndtering
-- dødt Header-flagg i snapmotoren
-- unødvendig kobling fra move-preview til hele elementobjektet
-- validering før Header-layoutnormalisering
-- unødvendig Header-plasseringsberegning
-- umulig låsttilstand i Header-fontpanelet
-- én overflødig importavhengighet
-
-## 14. Siste verifiserte automatiske kontroll
-
-Brukerens terminaloutput på branch-head `28da295` viste:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 118 moduler, 341 avhengigheter, ingen brudd
-Vite: 127 moduler transformert
-CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.63 kB, gzip 83.17 kB
-produksjonsbuild: bestått på 216 ms
-git diff --check: ingen feil
-produksjonsfiler på eller over 250 linjer: 0
-```
-
-Arkitekturgraf:
-
-```text
-118 moduler
-341 avhengigheter
-0 dependency-brudd
-```
-
-Største berørte produksjonsfiler etter fase-14-audit:
-
-```text
-useElementPointerTransform.ts    249 linjer
-EditorCanvasElement.tsx          243 linjer
-snapElementMove.ts               194 linjer
-```
-
-Repoet hadde ingen PR-utløst GitHub Actions-kjøring for fase 14. Lokal `npm run check` er derfor den dokumenterte automatiske kontrollen.
-
-## 15. Godkjent manuell fase-14-regresjon
-
-Brukeren godkjente i PC- og Telefon-visning:
-
-- elementkanter og elementmidtpunkter på begge akser
-- horisontal og vertikal lerretsmidt
-- samtidig snapping på begge akser
-- Seksjon, Bilde, Tekst og Knapp som aktive elementer
-- låste synlige elementer som snapmål
-- aktivt element ekskludert som eget mål
-- Header som fast, fullbredde snapmål
-- Header-høyde og fontstørrelse gjennom viewport-bytte
-- nye elementer opprettet under Header
-- pointer sluppet utenfor vinduet uten hengende guider
-- auto-scroll uten hopp eller feil commit
-- resizing uten snapping eller guider
-- tastaturflytting uten snapping eller guider
-- clamping ved alle lerretsgrenser
-- Header kunne ikke dras eller flyttes med vanlige piltaster etter slutt-auditen
-- `Ctrl + pil opp/ned` endret bare Header-høyden
-- vanlige elementer snappet fortsatt mot elementer, lerretsmidt og Header
-
-Skjulte elementer kan ikke styres fra dagens UI. Ekskluderingen er kodeverifisert i `getAlignmentTargets()`.
-
-## 16. Separate åpne saker som ikke må glemmes
-
-Alle sakene under er åpne og skal beholdes. De skal ikke blandes inn i fase 15 uten eksplisitt roadmapendring.
-
-### Issue #35 – tekstboksbakgrunn
-
-- Tekstbokser har hardkodet hvit bakgrunn i `.canvas-element--text`.
-- Modellen mangler varig bakgrunnsfarge for tekstbokser.
-- Leveransen krever schema-/modellvalg, reducer, hook, Farger-panel og rendering.
-- Planlagt i fase 17.
-
-### Issue #36 – editor-only elementgrense
-
-- Alle elementbokser skal ha subtil 1 px grå grense i editoren.
-- Designramme `0 / Ingen` skal ikke fjerne editorens boksmarkering.
-- Markeringen må være editor-only og må ikke endre layout eller prosjektdata.
-- Ikke løs dette indirekte under fase-15-fargearbeidet.
-
-### Issue #37 – elementnotat og ryddet høyrepanel
-
-Godkjent produktbeslutning:
-
-- vanlig elementklikk åpner vanlige egenskaper
-- flytende `Egenskaper`-knapp blir `Notat`
-- notatet lagres per element som prosjektdata
-- notatet vises aldri på nettsiden eller i forhåndsvisning
-- høyrepanelets passive låsestatus og låseknapp fjernes
-- låseikonet ved elementet beholdes
-- Header forblir ikke-låsbar
-- synlig alternativ tekst-felt fjernes senere; teknisk `altText` kan være tomt for kompatibilitet
-- OpenAI skal ikke sende notater ut uten eksplisitt brukerhandling
-
-### Issue #38 – like mellomrom og fordelingsguider
-
-- senere utvidelse av snapmotoren
-- like avstander til lerretskanter
-- like faktiske boksgap mellom tre eller flere elementer
-- horisontal og vertikal variant
-- editor-only avstandsmarkører
-- snapping til lik avstand
-- eksisterende kant-/sentersnapping skal bevares
-- ingen prosjektdata eller schemaendring
-
-## 17. Neste planlagte fase: fase 15
-
-Navn:
-
-```text
-Duse portalfarger og tydelig visuell struktur
-```
-
-Fase 15 er planlagt, men ikke startet. Ingen issue eller produksjonsbranch skal opprettes før omfanget er gjennomgått og brukeren eksplisitt godkjenner det.
-
-### Formål
-
-Skille arbeidsportalens områder visuelt uten å gjøre grensesnittet sterkt, urolig eller dekorativt tungt.
-
-### Låst omfang
-
-- semantiske tokens for portalbakgrunn
-- semantiske tokens for toppmeny
-- semantiske tokens for venstremeny/rail
-- semantiske tokens for åpent venstrepanel
-- semantiske tokens for høyrepanel
-- semantiske tokens for arbeidsområde
-- dempede, beslektede fargetoner
-- tydelig aktiv og valgt tilstand
-- tydelig hover og fokus
-- tydelig disabled
-- tydelig advarsel og sletting
-- lesbar kontrast
-- bevare `prefers-reduced-motion`
-- ingen endring av nettsideprosjektets egne farger
-
-### Ikke del av fase 15
-
-- tekstboksbakgrunn i prosjektmodellen eller issue #35
-- editor-only elementgrense eller issue #36
-- elementnotat/høyrepanelmodell eller issue #37
-- fordelingsguider eller issue #38
-- globale nettsidemaler
-- mørk modus
-- brukerdefinerte portaltemaer
-- portalnavigator eller `Ctrl + K`
-- sider eller navigasjonsmodell
-- Header-meny
-- Hero
-- responsive mobiloverstyringer
-- undo/redo
-- lokal lagring
-- prosjektimport
-- lokal fullskjermsforhåndsvisning
-- OpenAI
-- offentlig publisering
-- prosjektmodell- eller skjemaversjonsendring
-
-### Akseptansekriterier
-
-- portal, paneler, arbeidsområde og nettsidelerret kan skilles umiddelbart
-- aktive, valgte, hover-, fokus-, disabled-, advarsels- og slettetilstander er tydelige
-- CSS bruker sentrale semantiske tokens fremfor gjentatte tilfeldige fargeverdier
-- kontrast og synlig fokus er lesbart
-- eksisterende layout og interaksjon endres ikke
-- høyrepanelets 1680 px-regel bevares
-- venstrepanelets oppførsel bevares
-- PC-visningen fungerer på eksisterende minimumsbredde
-- nettsideprosjektets bakgrunner, tekstfarger, Seksjon-farger, Header-farger og knappdesign endres ikke
-- ingen prosjektdata eller skjemaversjon endres
-- `npm run check` består
-- relevant visuell regresjon består
-
-## 18. Fase-15-kodeområder som må inspiseres før plan låses
-
-`src/App.css` importerer alle stilområdene. Aktuelle portal-CSS-filer er primært:
-
-- `src/styles/editor-base.css`
-- `src/styles/toolbar.css`
-- `src/styles/sidebar.css`
-- `src/styles/sidebar-content.css`
-- `src/styles/canvas.css`
-- `src/styles/right-properties-panel.css`
-- relevante kontroll-/dialogstiler der hover, fokus, disabled, advarsel eller sletting brukes
-
-Gjeldende sentrale tokens i `editor-base.css`:
-
-```css
---app-bg
---panel
---border
---border-strong
---text
---muted
---accent
-```
-
-Fase-15-retningen er å erstatte generiske og spredte portalverdier med semantiske portalroller, ikke å endre prosjektfarger.
-
-Faktiske funn som neste chat må ta hensyn til:
-
-- `editor-base.css` har portalbakgrunn og skallbakgrunn, men tokenstrukturen er fortsatt generell.
-- `toolbar.css` har mange hardkodede hvit-, beige-, brun- og tilstandsverdier.
-- `sidebar.css` bruker både tokens og hardkodede portalverdier.
-- `canvas.css` blander arbeidsområdets portalbakgrunn med nettsidelerret og elementrendering.
-- `right-properties-panel.css` bruker tokens og hardkodede hvite flater.
-- `.canvas-page`, `.canvas-element--text`, Seksjon-/Header-rendering og prosjektfarger må ikke feilklassifiseres som portaltema.
-- `.canvas-element--text { background: #ffffff; }` tilhører issue #35, ikke fase 15.
-- `.canvas-element`-grensen og designrammeproblemet tilhører issue #36, ikke fase 15.
-- `.publish-button` finnes i dagens CSS, men offentlig publisering er fjernet fra produktretningen. Ikke bruk fase 15 til å bygge publisering eller endre funksjonen uten separat beslutning.
-- `toolbar.css` var 242 linjer ved siste inspeksjon og ligger nær aktiv 250-linjersgrense. Ikke legg ukritisk mer ansvar i denne filen.
-- Dersom en ny CSS-fil eller ny import opprettes, vurder ansvarstrekket og regenerer arkitekturrapportene dersom importgrafen faktisk endres.
-
-## 19. Anbefalt oppstartssekvens for fase 15
-
-Utfør i denne rekkefølgen:
-
-1. Verifiser remote `main`, åpne PR-er og lokal clean status.
-2. Les autoritative dokumenter i oppgitt rekkefølge.
-3. Les alle aktuelle portal-CSS-filer og tilhørende React-struktur.
-4. Kartlegg eksisterende fargeverdier etter semantisk rolle, ikke bare hex-verdi.
-5. Skill portalflater fra nettsideprosjektets egne flater.
-6. Kontroller filstørrelser før kode; spesielt `toolbar.css`.
-7. Presenter et presist forslag med:
-   - tokennavn og roller
-   - hvilke filer som endres
-   - hvilke verdier som forblir prosjektdata
-   - interaksjonstilstander
-   - kontrast- og reduced-motion-grenser
-   - eksplisitt ikke-omfang
-8. Få eksplisitt godkjenning av fase-15-omfanget.
-9. Opprett issue dersom ingen fase-15-issue finnes.
-10. Opprett en egen featurebranch fra oppdatert `main`.
-11. Implementer bare godkjent fase-15-omfang.
-12. Kjør automatiske kontroller og filstørrelseskontroll.
-13. Test visuelt i relevante bredder og viewportmoduser.
-14. Gjennomfør framtidsrettet CSS-/komponentaudit.
-15. Synkroniser dokumentasjon.
-16. Opprett PR og kontroller hele diffen.
-17. Merge bare etter eksplisitt `godkjent`.
-
-Ikke start med å velge tilfeldige nye farger. Start med semantiske roller og grensene mellom portal og nettsideprosjekt.
-
-## 20. Visuell regresjon som fase 15 minst må dekke
-
-Kontroller uten å endre funksjonalitet:
-
-- toppmenyen kan skilles fra bakgrunnen
-- venstre rail kan skilles fra åpent venstrepanel
-- åpent venstrepanel kan skilles fra arbeidsområdet
-- høyrepanelet kan skilles fra arbeidsområdet
-- arbeidsområdet kan skilles fra nettsidelerretet
-- nettsidelerretets prosjektfarge er uendret
-- PC- og Telefon-knappens aktive tilstand er tydelig
-- aktiv venstremenyknapp er tydelig
-- hover er synlig uten å bli sterk
-- tastaturfokus er synlig
-- disabled controls er tydelige, men lesbare
-- sletting og advarsel kan skilles fra nøytrale handlinger
-- høyrepanel overlay under 1680 px fungerer som før
-- høyrepanel reserverer plass ved 1680 px og bredere som før
-- venstrepanel åpner/lukker uten layoutregresjon
-- `prefers-reduced-motion` beholder deaktivert overgang der dette allerede støttes
-- Header, Seksjon, Tekst, Bilde og Knapp beholder sine prosjektfarger og rendering
-- alignment-guider og markering fungerer visuelt mot de nye portalflatene
-- ingen utilsiktet endring av elementbokser, rammer eller prosjektmodell
-
-## 21. Låst roadmap
-
-```text
-fase 14  Korrigeringslinjer og snapping – fullført
-fase 15  Duse portalfarger og tydelig visuell struktur
+fase 15  Duse portalfarger og tydelig visuell struktur – fullført
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
@@ -711,206 +349,27 @@ fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  OpenAI-integrasjon
 ```
 
-Ikke endre rekkefølgen uten eksplisitt produktbeslutning og synkronisert dokumentasjon.
+Rekkefølgen endres ikke uten eksplisitt produktbeslutning og synkronisert dokumentasjon.
 
-## 22. Låst senere retning
+## 14. Eksplisitt utsatt eller fjernet
 
-### Automatisert testing – fase 16
+Utsatt uten egen aktiv leveranse:
 
-- TypeScript-testverktøy
-- modellvalidatorer
-- reducere
-- snapping, layout og clamping
-- ugyldige og uendrede handlinger
-- kritisk nettleserregresjon
-- tydelig testkommando
-
-### Portalnavigasjon – fase 18
-
-- prosjektoversikt
-- side-/elementnavigator
-- finn og marker element
-- filter
-- `Ctrl + K`
-- portalstatus avledet fra eksisterende state
-
-### Sider og navigasjonsmodell – fase 19
-
-- stabile side-ID-er
-- slugs
-- startside
-- stabile seksjons-ID-er
-- side-, seksjons- og eksterne lenkemål
-
-### Nettstedets Header-meny – fase 20
-
-- automatisk responsiv modus
-- horisontal modus
-- kompakt modus
-- aktive menypunkter
-- side- og seksjonsmål
-- ekstern lenke
-- ett nivå undermeny
-- valgfri handlingsknapp
-- tilgjengelig tastaturnavigasjon
-
-### Hero – fase 21
-
-Hero skal være én egen sammensatt hovedtype med:
-
-- full bredde som standard
-- plassering under Header som standard
-- bakgrunnsbilde eller bakgrunnsfarge
-- kontrollert bildeutsnitt
-- valgfritt overlay
-- hovedoverskrift og undertittel
-- én eller to knapper
-- side-, seksjons- eller eksterne lenker
-- tekstjustering og maksimal tekstbredde
-- eksplisitt PC- og Telefon-regel
-
-Endelig modell og schema låses før kode.
-
-### Responsive mobiloverstyringer – fase 23
-
-- Telefon arver PC når mobilverdi mangler
-- egne viewport-spesifikke actions og reducere
-- mobilendring skal ikke overskrive desktop
-- reset fjerner mobilverdi i stedet for å kopiere desktop
-
-### Historikk – fase 24
-
-- transient preview inngår ikke
-- én ferdig transform er én historikkhandling
-- ugyldige og uendrede actions inngår ikke
-- AI-forslag skal senere kunne committes som én handling
-
-### Lokal lagring og prosjektfiler – fase 25–26
-
-- flere lokale prosjekter
-- autolagring etter gyldige mutasjoner
-- manuell lagring
-- snapshots
-- krasjgjenoppretting
-- kanonisk prosjektfilformat
-- full validering før import
-- migrering mellom støttede schema
-- kontrollert assethåndtering
-
-### Lokal forhåndsvisning – fase 27
-
-- fullskjerm uten editorverktøy
-- PC og Telefon
-- alle sider
-- Header-meny og intern navigasjon
-- fungerende lenker
-- ingen hosting eller offentlig URL
-
-### OpenAI – fase 29
-
-OpenAI kommer sist og er en kontrollert meddesigner, ikke en skjult autopilot.
-
-Mulig bruk:
-
-- tekst og omskriving
-- fargeinspirasjon
-- bildegenerering til valgte felt
-- Hero-generator
-- seksjonsgenerator
-- navigasjons- og sideforslag
-- komplette sideutkast
-- helhets- og konsistenskontroll
-
-Låst AI-flyt:
-
-```text
-Forslag
-  -> validering
-  -> forhåndsvisning
-  -> eksplisitt godkjenning
-  -> typede actions/reducere
-  -> én historikkhandling
-```
-
-Sikkerhetsgrense:
-
-- API-nøkkel aldri i browser- eller Vite-kode
-- lokal Node-prosess eller tilsvarende server-side grense på samme PC
-- nøkkel fra miljøvariabel
-- forslag valideres mot egne typer
-- forslag skrives aldri direkte til `EditorProject`
-- ikke-godkjente forslag er transient state
-- AI-genererte bilder får stabil asset-ID etter godkjenning og lokal lagring
-- ingen skjult overskriving eller sletting
-- gjeldende offisielle OpenAI API/SDK skal undersøkes på nytt når fase 29 faktisk starter
-
-## 23. Eksplisitt utsatt eller fjernet
-
-Utsatt uten ny beslutning:
-
-- resize-snapping
-- tastatursnapping
-- grid
-- avstandsmål og automatisk fordeling, sporet i issue #38
+- snapping ved resizing
+- snapping ved tastatur
+- grid og avstandsmål
+- automatisk fordeling
 - flermerking og gruppering
-- flere mobilbrytepunkter
 - nettbrett som egen viewport
 - automatisk kollisjonsunngåelse
-- AI-generert mobiloppsett
 - generell CSS-editor
 - mer enn ett undermenynivå
 
-Fjernet fra produktet:
+Fjernet fra produktplanen:
 
 - offentlig publisering
 - hosting
 - domener
-- deployment
-
-## 24. PR- og mergekontroll
-
-Før enhver merge:
-
-- bekreft base og head
-- bekreft eksakt head-SHA
-- kontroller alle endrede filer
-- kontroller at ingen senere fase er blandet inn
-- kontroller mergebarhet
-- kontroller kommentarer
-- kontroller reviews
-- kontroller åpne review-tråder
-- kontroller CI/status eller dokumenter at repoet ikke har relevant workflow
-- kontroller lokal `npm run check` etter siste produksjonsendring
-- kontroller `git diff --check`
-- kontroller filstørrelser
-- kontroller arkitekturrapporter ved grafendring
-- kontroller manuell regresjon
-- oppdater dokumentasjon
-- merge bare etter eksplisitt `godkjent`
-
-## 25. Kommunikasjon med brukeren
-
-- Svar på norsk.
-- Vær prosjektleder og ta ansvar for rekkefølge og risikokontroll.
-- Ikke gi mange små tilfeldige kommandoer; gi én kontrollert blokk når lokal kjøring er nødvendig.
-- Forklar hva som er verifisert, hva som er en antakelse og hva som gjenstår.
-- Ikke be brukeren gjøre remote-operasjoner connectoren kan gjøre.
-- Ikke la brukeren committe før diff og kontroller er vurdert.
-- Ikke merge på grunnlag av `ok` eller `fungerer`; krev `godkjent`.
-- Når brukeren sier at noe fungerer, registrer testen, men skille tydelig mellom testgodkjenning og mergegodkjenning.
-- Ikke start fase 15 automatisk bare fordi fase 14 er ferdig.
-
-## 26. Første svar i neste chat
-
-Etter å ha lest denne handoveren skal du:
-
-1. bekrefte at du har forstått at fase 14 er fullført
-2. kontrollere faktisk GitHub- og lokal status
-3. bekrefte at ingen produksjonsfase er aktiv
-4. lese fase-15-omfang og aktuelle CSS-filer
-5. presentere et avgrenset fase-15-forslag
-6. vente på eksplisitt godkjenning før issue, branch eller produksjonskode
-
-Ikke start med kode. Ikke endre `main`. Ikke bland inn issue #35–#38 eller senere roadmapfaser.
+- produksjonsdeployment
 
 # SLUTT HANDOVER
