@@ -22,7 +22,7 @@ Headeren er fast øverst ved `x = 0, y = 0`, følger hele den synlige sidebredde
 
 Korrigeringslinjene bruker venstre/midt/høyre og topp/midt/bunn mot andre synlige elementer samt horisontal og vertikal lerretsmidt. Snapmål fryses ved pekerstart, aksene behandles uavhengig, og preview er transient fram til pekerslipp.
 
-Kjent avgrensning: Tekstbokser har foreløpig ingen lagret bakgrunnsfarge. Dette spores i GitHub-sak #35 og er ikke blandet inn i fase 14.
+Kjent avgrensning: Tekstbokser har foreløpig ingen lagret bakgrunnsfarge. Dette spores i GitHub-sak #35.
 
 ## Repo og lokal mappe
 
@@ -66,25 +66,26 @@ main
 ## Gjeldende status
 
 ```text
-aktiv produksjonsbranch: feature/alignment-guides
-base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
-aktiv fase: 14 – korrigeringslinjer og snapping
-GitHub-sak: #34 – åpen
+siste fullførte produksjonsfase: fase 14 – korrigeringslinjer og snapping
+GitHub-sak: #34 – lukket som fullført
+pull request: #39 – merget
+mergecommit på main: 0122605b60808689cdda7cb1601eb3342680f88c
 prosjektskjema: versjon 9
-fase-14-kode: implementert
-manuell kontroll: element- og lerretsjustering godkjent; Header og fontstørrelse godkjent
-kodeaudit: gjennomført, ett Header-layoutavvik funnet og rettet
-endelig branchgodkjenning: ikke fullført
-pull request: ikke opprettet
+automatisk sluttkontroll: bestått på branch-head 28da295
+manuell regresjon: godkjent i PC- og Telefon-visning
+lokal main: synkronisert og clean på 0122605
+aktiv produksjonsfase: ingen
+neste planlagte produksjonsfase: fase 15 – duse portalfarger og tydelig visuell struktur
 ```
 
-Siste lokalt verifiserte `npm run check` før auditrettelsen besto med 118 moduler, 342 avhengigheter og 127 Vite-moduler. Full kontroll må kjøres på nytt etter de siste fem auditcommitene før status kan regnes som endelig.
+Siste lokale produksjonskontroll før merge besto med 118 moduler, 341 avhengigheter uten brudd og 127 Vite-moduler. Ingen produksjonsfiler var på eller over 250 linjer.
+
+Fase 15 er planlagt, men ikke startet. Omfanget skal leses fra `docs/WORK_PLAN.md` og låses eksplisitt før en ny produksjonsbranch opprettes.
 
 ## Tekniske grenser
 
 - 250 linjer er aktiv terskel for ansvarstrekk
 - 300 linjer er hard unntaksgrense
-- alle branch-endringene som er kontrollert er under 250 linjer
 - varige data endres bare gjennom validerte reducerhandlinger
 - ugyldige, låste og uendrede handlinger returnerer samme state
 - Header lagres og avledes ved `x = 0, y = 0`
@@ -105,4 +106,4 @@ Siste lokalt verifiserte `npm run check` før auditrettelsen besto med 118 modul
 7. `docs/CODE_AUDIT.md`
 8. `docs/NEXT_CHAT_PROMPT.md`
 
-Historiske fasebeskrivelser som er fullt innarbeidet i dokumentene over, beholdes ikke som parallelle sannhetskilder. Roadmap-innhold, inkludert eventuell egen Hero-leveranse, vurderes etter at den aktive branchen er ferdig kontrollert.
+Historiske fasebeskrivelser som er fullt innarbeidet i dokumentene over, beholdes ikke som parallelle sannhetskilder.
