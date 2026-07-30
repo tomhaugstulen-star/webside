@@ -1,5 +1,6 @@
 .canvas-element__resize-handle {
   position: absolute;
+  z-index: 3;
   right: 0;
   bottom: 0;
   width: 32px;
@@ -31,7 +32,7 @@
 
 .canvas-object-toolbar {
   position: absolute;
-  z-index: 2;
+  z-index: 4;
   display: flex;
   transform: translate(-100%, calc(-100% - 8px));
 }
