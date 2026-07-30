@@ -11,6 +11,7 @@ const elementKindLabels: Record<ElementKind, string> = {
   image: 'Bilde',
   text: 'Tekst',
   button: 'Knapp',
+  header: 'Header',
 }
 
 type RightPropertiesPanelProps = {
