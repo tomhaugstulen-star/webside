@@ -17,7 +17,6 @@ export function HeaderFontPropertiesSection({
 }: HeaderFontPropertiesSectionProps) {
   const { updateHeaderFontFamily, updateHeaderFontSize } =
     useHeaderAppearance()
-  const disabled = element.locked
 
   return (
     <section
@@ -35,7 +34,6 @@ export function HeaderFontPropertiesSection({
           <select
             id="header-font-properties-family"
             value={element.appearance.fontFamily}
-            disabled={disabled}
             onChange={(event) =>
               updateHeaderFontFamily(
                 element.id,
@@ -59,7 +57,6 @@ export function HeaderFontPropertiesSection({
           <select
             id="header-font-properties-size"
             value={element.appearance.fontSize}
-            disabled={disabled}
             onChange={(event) =>
               updateHeaderFontSize(
                 element.id,
@@ -75,12 +72,6 @@ export function HeaderFontPropertiesSection({
           </select>
         </label>
       </div>
-
-      {disabled && (
-        <p className="text-properties__locked-note">
-          Lås opp headeren for å endre tekstutseendet.
-        </p>
-      )}
     </section>
   )
 }
