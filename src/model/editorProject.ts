@@ -2,7 +2,6 @@ import type { ButtonAssetId } from './buttonAsset'
 import type { ElementSize } from './elementDimensions'
 import type { ElementLink } from './elementLink'
 import type { HeaderAppearance } from './headerAppearance'
-import type { HeaderWidthMode } from './headerWidth'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
 import type { PageAppearance } from './pageAppearance'
@@ -68,7 +67,6 @@ export type HeaderEditorElement = BaseEditorElement & {
   siteName: string
   subtitle: string
   appearance: HeaderAppearance
-  widthMode: HeaderWidthMode
 }
 
 export type EditorElement =
