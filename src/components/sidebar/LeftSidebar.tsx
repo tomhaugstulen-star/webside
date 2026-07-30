@@ -30,7 +30,7 @@ export function LeftSidebar({
           {tools.map((tool) => (
             <button
               key={tool.id}
-              className="rail-button"
+              className={`rail-button rail-button--${tool.id}`}
               type="button"
               aria-expanded={activeTool === tool.id}
               aria-pressed={activeTool === tool.id}
