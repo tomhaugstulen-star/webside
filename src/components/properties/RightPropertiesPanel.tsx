@@ -42,7 +42,7 @@ export function RightPropertiesPanel({
               {elementKindLabels[element.kind]}
             </p>
 
-            {element.kind === 'section' && (
+            {(element.kind === 'section' || element.kind === 'header') && (
               <FramePropertiesSection element={element} />
             )}
 
