@@ -1,11 +1,14 @@
 import { useCallback } from 'react'
 import { normalizeEditorColor } from '../model/editorColor'
+import { useHeaderAppearance } from './useHeaderAppearance'
 import { useSectionAppearance } from './useSectionAppearance'
 import { useTextElementStyle } from './useTextElementStyle'
 import { useEditorProject } from './useEditorProject'
 
 export function useProjectColors() {
   const { dispatch } = useEditorProject()
+  const { updateHeaderTextColor, updateHeaderFrameColor } =
+    useHeaderAppearance()
   const { updateSectionBackgroundColor, updateSectionFrameColor } =
     useSectionAppearance()
   const { updateTextElementStyle } = useTextElementStyle()
@@ -47,5 +50,7 @@ export function useProjectColors() {
     updateSectionBackgroundColor,
     updateSectionFrameColor,
     updateTextColor,
+    updateHeaderTextColor,
+    updateHeaderFrameColor,
   }
 }
