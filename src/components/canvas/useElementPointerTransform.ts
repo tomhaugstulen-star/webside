@@ -196,9 +196,7 @@ export function useElementPointerTransform({
     setTransformMode(null)
     publishDraftLayout(null)
 
-    if (!commit || !interaction || !finalLayout) {
-      return
-    }
+    if (!commit || !interaction || !finalLayout) return
 
     if (elementLayoutsEqual(interaction.initialLayout, finalLayout)) {
       onClickWithoutTransform()
@@ -224,13 +222,15 @@ export function useElementPointerTransform({
   }
 
   const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
-    if (interactionRef.current?.pointerId !== event.pointerId) return
-    finishInteraction(false)
+    if (interactionRef.current?.pointerId === event.pointerId) {
+      finishInteraction(false)
+    }
   }
 
   const handleLostPointerCapture = (event: PointerEvent<HTMLDivElement>) => {
-    if (interactionRef.current?.pointerId !== event.pointerId) return
-    finishInteraction(false)
+    if (interactionRef.current?.pointerId === event.pointerId) {
+      finishInteraction(false)
+    }
   }
 
   return {
