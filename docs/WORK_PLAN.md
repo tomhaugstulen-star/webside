@@ -27,116 +27,106 @@ git status --short
 git diff --stat
 ```
 
-## Siste fullførte leveranse
+## Aktiv leveranse
 
 ```text
-fase: 13 – Logo og header
-GitHub-sak: #31 – lukket som fullført
-pull request: #32 – merget
-mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
-prosjektskjema: versjon 8
-manuell funksjonstest: godkjent
-automatisk kontroll etter siste produksjonsendring: bestått
-kodeaudit og opprydding: gjennomført
-lokal main: synkronisert og clean
+fase: 14 – korrigeringslinjer og snapping
+branch: feature/alignment-guides
+base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
+GitHub-sak: #34 – åpen
+pull request: ikke opprettet
+prosjektskjema: versjon 9
 ```
 
 Implementert omfang:
 
-- egen `HeaderEditorElement`
-- lokal logoimport via eksisterende bildevalidering og ressurslager
-- navn og valgfri undertittel
-- felles Header-bakgrunn, tekstfarge, font og ramme
-- full synlig sidebredde i PC- og Telefon-visning
-- bare vertikal flytting
-- høyde 70–100 px
-- markering og sikker sletting
-- ingen Header-låseknapp eller låsestatus
-- reduceren avviser forsøk på å låse Header
-- egenskapspanel som kan lukkes under transform og åpnes igjen fra objektverktøyet
+- pekerflytting for Seksjon, Bilde, Tekst og Knapp
+- venstre/midt/høyre og topp/midt/bunn mot andre synlige elementer
+- horisontal og vertikal lerretsmidt
+- 6 px snapgrense i lerretskoordinater
+- uavhengig snapping per akse
+- nærmeste treff per akse, med midtanker som lik-avstand-prioritet
+- guider bare mens snap er aktiv
+- låste elementer kan være mål
+- skjulte elementer og aktivt element er ikke mål
+- Seksjon og Header kan være mål
+- mål og lerretsmål fryses ved pekerstart
+- auto-scroll og eksisterende commit-/cancel-regler beholdes
+- resize og tastatur snapping er ikke del av fasen
+
+Header-regler etter produktavklaring:
+
+- fast øverst ved `x = 0, y = 0`
+- full aktiv lerretsbredde
+- ingen peker- eller tastaturflytting
+- høyde 70–100 px kan fortsatt endres
+- fontfamilie og fontstørrelse 12–96 px
+- navn og undertittel deler fontfamilie, fontstørrelsen styrer hierarkiet
+- ingen låsing eller låsestatus
+
+## Manuell status
+
+Godkjent av brukeren:
+
+- elementkant og elementmidt på begge akser
+- horisontal og vertikal lerretsmidt
+- samtidig snapping på begge akser
+- Header fast øverst og full bredde
+- Header-fontstørrelse og lagring
+
+Ikke ferdig kontrollert:
+
+- resterende målregresjon for låste/skjulte elementer
+- alle elementtyper som aktive elementer
+- pointercancel/tapt capture og auto-scroll
+- bekreftelse av at resize og tastatur fortsatt ikke snapper
+- clamp ved lerretsgrenser
+- full filstørrelseskontroll etter siste auditrettelse
+- siste `npm run check` etter auditrettelse og dokumentoppdatering
+
+## Kodeaudit 30. juli 2026
+
+Auditen gjennomgikk alle produksjonsfiler endret fra `main`, state- og modellgrensene de avhenger av, samt alle autoritative dokumenter.
+
+Funnet avvik:
+
+- Header ble rendret ved `y = 0`, men oppretting og enkelte avledede beregninger kunne fortsatt bruke en gammel lagret `y`.
+
+Rettet i:
+
+- `createEditorElement.ts`
+- `setElementDesktopLayout.ts`
+- `getAlignmentTargets.ts`
+- `getCanvasContentHeight.ts`
+- `findElementCreationPosition.ts`
+
+Gjeldende invariant er at Header både opprettes, serialiseres, rendres og brukes i avledede beregninger ved `x = 0, y = 0`.
 
 ## Siste verifiserte automatiske kontroll
+
+Brukerens siste terminaloutput før de fem auditrettelsene:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
-Vite: 122 moduler transformert
-CSS: 36.54 kB, gzip 6.80 kB
-JavaScript: 275.80 kB, gzip 81.65 kB
-produksjonsbuild: bestått på 206 ms
-working tree før kontroll: clean
+Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
+Vite: 127 moduler transformert
+CSS: 36.85 kB, gzip 6.87 kB
+JavaScript: 280.85 kB, gzip 83.22 kB
+produksjonsbuild: bestått på 195 ms
 ```
 
-Tallene er bekreftet av brukerens terminaloutput etter siste produksjonsendring på commit `8c7c7a0`.
+Disse tallene er ikke sluttstatus for branch-head etter auditrettelsen. Full kontroll må kjøres på nytt.
 
-Berørte filer i siste opprydding:
+## Arkitekturrapporter
 
-```text
-HeaderCreationControl.tsx       224
-EditorCanvasElement.tsx         223
-RightPropertiesPanel.tsx        105
-SidebarPanels.tsx                95
-ElementSelectionToolbar.tsx      83
-toggleElementLock.ts             40
-```
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert etter at alignment-modulene ble lagt til. Senere Header- og auditrettelser endret ingen modul- eller importkanter. Rapportene er derfor strukturelt aktuelle, men skal fortsatt kontrolleres sammen med siste branch-diff før PR.
 
-Alle produksjonsfiler er kontrollert etter merge. Ingen er på eller over aktiv terskel på 250 linjer, og ingen er på eller over hard unntaksgrense på 300 linjer.
+## Roadmap etter aktiv leveranse
 
-## Gjennomført avsluttende opprydding
-
-- duplisert ressursopprydding er fjernet fra `EditorShell`
-- `useElementDeletion` eier opprydding for både Bilde og Header
-- elementoppretting kontrollerer aktiv side og ID-kollisjon før suksess rapporteres
-- Header opprettes og lagres med normalisert horisontal geometri
-- pekerberegninger er trukket ut av React-hooken
-- Headerens pointer-preview normaliserer horisontalt delta til `x = 0`
-- canvas-stiler er delt etter grunnlayout og interaksjon
-- Header-låseknappen og låsestatusen er fjernet
-- låsereduceren avviser Header
-- eksisterende låsing for Seksjon, Bilde, Tekst og Knapp er bevart
-- dobbelt panellukking etter Header-oppretting er fjernet
-- logoressursen markeres som overført før lokal UI-opprydding
-- alle kjente berørte produksjonsfiler er under 250 linjer
-- tre fullt foreldede fasefiler er slettet
-- issue #31 og PR #32 er lukket som fullført
-
-## Manuell regresjon
-
-Brukeren har godkjent:
-
-- Header i full bredde på PC og Telefon
-- bare vertikal flytting og stabil pointer-preview
-- høydegrensene 70 og 100 px
-- panelåpning og panellukking under transform
-- font, bakgrunn, tekstfarge og ramme
-- logooppretting og ressursbevaring
-- ingen låseknapp eller låsestatus for Header
-- sikker sletting og delt asset-kontroll
-- fortsatt fungerende låsing for andre elementtyper
-- regresjon av Seksjon, Bilde, Tekst og Knapp
-
-## Gjeldende dokumentasjonsleveranse
+Eksisterende senere fasekandidater:
 
 ```text
-branch: docs/record-phase-13-merge
-base: main på b2e8e05c6daeec494130ce695bc51875d0d949f0
-omfang: bare autoritativ Markdown-status
-produksjonskode: uendret
-arkitekturrapporter: uendret
-```
-
-Før denne dokumentasjonsleveransen merges:
-
-- kontroller at bare avtalte Markdown-filer er endret
-- kontroller `git diff --check`
-- kontroller PR, mergebarhet, reviews og tråder
-- merge bare etter eksplisitt brukergodkjenning
-
-## Senere faser
-
-```text
-fase 14  korrigeringslinjer
 fase 15  responsive mobiloverstyringer
 fase 16  angre og gjør om
 fase 17  lokal automatisk lagring
@@ -144,4 +134,4 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Ingen senere fase startes automatisk. Fase 14 er neste planlagte kandidat, men omfanget må avklares og låses først.
+Roadmapet gjennomgås på nytt etter at fase 14 er kontrollert. Ingen manglende leveranse, inkludert eventuell egen Hero-funksjon, legges inn eller prioriteres skjult under denne dokumentasjonsoppryddingen.
