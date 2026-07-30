@@ -24,9 +24,10 @@ export function createEditorElement({
   existingElements,
 }: CreateEditorElementInput): EditorElement {
   const size = getDefaultElementSize(request.kind)
-  const creationPosition = findElementCreationPosition(size, existingElements)
   const position =
-    request.kind === 'header' ? { x: 0, y: 0 } : creationPosition
+    request.kind === 'header'
+      ? { x: 0, y: 0 }
+      : findElementCreationPosition(size, existingElements)
   const common = {
     id,
     position: { desktop: position },
