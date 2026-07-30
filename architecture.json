@@ -722,7 +722,6 @@
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/canvas/elementPointerTransform.ts",
         "src/components/canvas/getAlignmentTargets.ts",
-        "src/components/canvas/getPointerMovePreview.ts",
         "src/components/canvas/getCanvasContentHeight.ts",
         "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
         "src/components/properties/RightPropertiesPanel.tsx",
@@ -4069,24 +4068,6 @@
     {
       "source": "src/components/canvas/getPointerMovePreview.ts",
       "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../model/editorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/editorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "dynamic": false,
           "module": "../../model/elementLayout",
@@ -8207,7 +8188,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 118,
-    "totalDependenciesCruised": 342,
+    "totalDependenciesCruised": 341,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
