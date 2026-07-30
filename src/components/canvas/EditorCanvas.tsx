@@ -8,6 +8,7 @@ import type { EditorElement } from '../../model/editorProject'
 import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
 import type { ViewportMode } from '../../types/editor'
+import { AlignmentGuideOverlay } from './AlignmentGuideOverlay'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
 import { EditorCanvasElement } from './EditorCanvasElement'
 import { getCanvasContentHeight } from './getCanvasContentHeight'
@@ -78,6 +79,7 @@ export function EditorCanvas({
     ...(contentHeight > 0 ? { height: contentHeight } : {}),
   }
   const renderElements = orderElementsForRendering(activePage.elements)
+  const alignmentGuides = layoutPreview?.guides ?? []
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current
@@ -140,6 +142,7 @@ export function EditorCanvas({
               <EditorCanvasElement
                 key={element.id}
                 element={element}
+                pageElements={activePage.elements}
                 viewport={viewport}
                 canvasWidth={canvasWidth}
                 selected={element.id === selectedElementId}
@@ -154,6 +157,7 @@ export function EditorCanvas({
                 onPreviewLayoutChange={handlePreviewLayoutChange}
               />
             ))}
+            <AlignmentGuideOverlay guides={alignmentGuides} />
           </div>
         </div>
       </div>
