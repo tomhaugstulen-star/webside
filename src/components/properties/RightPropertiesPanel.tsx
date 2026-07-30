@@ -4,7 +4,6 @@ import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
 import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
-import { HeaderWidthPropertiesSection } from './HeaderWidthPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
@@ -60,10 +59,7 @@ export function RightPropertiesPanel({
             </div>
 
             {element.kind === 'header' && (
-              <>
-                <HeaderWidthPropertiesSection element={element} />
-                <HeaderFontPropertiesSection element={element} />
-              </>
+              <HeaderFontPropertiesSection element={element} />
             )}
 
             {(element.kind === 'section' || element.kind === 'header') && (
