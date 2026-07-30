@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 8
+EDITOR_PROJECT_SCHEMA_VERSION = 9
 ```
 
 ```text
@@ -17,15 +17,23 @@ EDITOR_PROJECT_SCHEMA_VERSION = 8
 6  bildeasset, metadata, alternativ tekst, visning og utsnitt
 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 8  Header med logo, tekst, utseende og ramme
+9  Header-fontstørrelse
 ```
 
-Det finnes ennå ingen prosjektimport eller migreringsmotor. Framtidig import må validere hele versjon-8-objektet før `replace-project`, og eldre versjoner må migreres eller avvises kontrollert.
+Det finnes ennå ingen prosjektimport eller migreringsmotor. Framtidig import må validere hele versjon-9-objektet før `replace-project`.
+
+Kontrollert migreringsretning:
+
+- versjon 8 til 9 må legge til `HeaderAppearance.fontSize`, standard 24 px
+- Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
+- Header med `locked: true` må normaliseres eller avvises
+- eldre ukjente versjoner må ikke lastes delvis
 
 ## Prosjektstruktur
 
 ```ts
 type EditorProject = {
-  schemaVersion: 8
+  schemaVersion: 9
   id: string
   name: string
   pages: EditorPage[]
@@ -72,7 +80,7 @@ type EditorElement =
 
 Telefon arver desktopverdien når `mobile` mangler. Dagens UI oppretter ikke mobiloverstyringer.
 
-`locked` beholdes som felles versjon-8-data. Seksjon, Bilde, Tekst og Knapp kan endre feltet gjennom eksisterende låseflyt. Header er ikke låsbar: nye Header-elementer opprettes med `locked: false`, objektverktøyet og høyrepanelet eksponerer ingen låsing, og reduceren avviser `toggle-element-lock` for Header. Framtidig prosjektimport må avvise eller kontrollert normalisere en Header med `locked: true` før prosjektbytte.
+`locked` beholdes som felles data. Seksjon, Bilde, Tekst og Knapp kan endre feltet. Header er ikke låsbar: nye Header-elementer opprettes med `locked: false`, UI eksponerer ingen låsing, og reduceren avviser Header-låsehandlinger.
 
 ## Seksjon
 
@@ -121,6 +129,8 @@ type TextEditorElement = BaseEditorElement & {
 Standardstørrelse: `240 × 96 px`  
 Minimum: `120 × 48 px`
 
+Tekststilen inneholder tekstfarge, men ikke bakgrunnsfarge. Tekstboksbakgrunn er derfor ikke varig prosjektdata i versjon 9. Mangelen spores i GitHub-sak #35.
+
 ## Knapp
 
 ```ts
@@ -153,6 +163,7 @@ type HeaderAppearance = {
   backgroundColor: EditorColor
   textColor: EditorColor
   fontFamily: TextFontFamily
+  fontSize: TextFontSize
   frame: ElementFrame
 }
 ```
@@ -162,17 +173,34 @@ Regler:
 - `siteName` er obligatorisk, normalisert og maks 80 tegn
 - `subtitle` er valgfri, normalisert og maks 120 tegn
 - logo bruker samme validerte metadata og transiente ressurslager som Bilde
-- Header rendres alltid ved `x = 0` og med aktiv lerretsbredde
-- brukeren kan bare endre `y` og høyde
+- Header opprettes, lagres og rendres ved `x = 0, y = 0`
+- synlig bredde er hele aktivt lerret
+- brukeren kan bare endre høyden
 - standardhøyde er 88 px
 - minimumshøyde er 70 px
 - maksimumshøyde er 100 px
-- Telefon arver desktop y/høyde inntil fase 15
-- navn og undertittel deler font og tekstfarge
+- fontstørrelse er en validert verdi fra 12 til 96 px
+- standard fontstørrelse er 24 px
+- navn og undertittel deler fontfamilie og tekstfarge
+- undertittelens størrelse avledes relativt fra Header-fontstørrelsen
 - Header eksponerer ikke låsing eller låsestatus
 - Header-låsehandlinger avvises ved reducergrensen
 
-Baseelementet krever fortsatt `position.desktop.x` og `size.desktop.width`. For Header er disse horisontale feltene deterministiske, normaliseres av modell/state-laget og brukes ikke som fri brukerredigerbar bredde.
+Baseelementet krever fortsatt `position` og `size`. For Header er `x`, `y` og serialisert bredde deterministiske kompatibilitetsverdier. De er ikke frie brukerredigerbare layoutverdier.
+
+## Alignment preview
+
+Korrigeringslinjer og snapping lagres ikke i `EditorProject`.
+
+Transient alignment-state omfatter:
+
+- snapmål for X og Y
+- aktive guider
+- fryst lerretsbredde og -høyde
+- fryste målekoordinater for aktiv pekerøkt
+- layoutpreview før commit
+
+Ved normalt pekerslipp committes bare ferdig `ElementLayout`. Ved cancel eller tapt pointer capture forkastes preview og guider.
 
 ## Farge og ramme
 
@@ -216,12 +244,14 @@ Reducerhandlinger krever:
 - gyldig layout og størrelsesintervall
 - faktisk endring
 
+Header-layoutcommit normaliserer alltid `x = 0, y = 0` og kanonisk serialisert bredde.
+
 Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
 
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
-- prosjektimport avviser eller normaliserer Header med `locked: true`
+- versjon 8 migreres kontrollert til versjon 9
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
