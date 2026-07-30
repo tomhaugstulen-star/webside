@@ -1,6 +1,6 @@
 # Mobiltilpasset design og viewport-overstyringer
 
-Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt fase og endrer ikke dagens midlertidige responsive oppførsel som allerede er merget til `main`.
+Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt fase og endrer ikke dagens midlertidige responsive oppførsel.
 
 ## 1. Formål
 
@@ -16,7 +16,7 @@ feature/mobile-design-controls
 
 Branchen er ikke aktiv før fasen er eksplisitt valgt og godkjent.
 
-## 2. Dagens midlertidige oppførsel på `main`
+## 2. Dagens midlertidige oppførsel
 
 Før denne fasen er implementert:
 
@@ -24,10 +24,9 @@ Før denne fasen er implementert:
 - flytting og resizing i Telefon-visning committer til desktopgeometrien
 - en endring i Telefon påvirker derfor også PC
 - ingen mobiloverstyring opprettes skjult
+- Header følger full aktiv lerretsbredde og deler foreløpig y og høyde med desktop
 
-Denne oppførselen stammer fra drag/resize-leveransen som ble merget gjennom PR #4. `feature/drag-resize` er en historisk branchreferanse, ikke aktiv arbeidsstatus.
-
-Dette er kontrollert og godkjent som midlertidig oppførsel. Det skal ikke videreføres som endelig responsiv redigering.
+Denne oppførselen er kontrollert som midlertidig grunnlag. Den skal ikke videreføres som endelig responsiv redigering.
 
 ## 3. Anbefalt arvemodell
 
@@ -68,6 +67,8 @@ Disse egenskapene vurderes senere og skal ikke blandes inn uten egen beslutning:
 - bildebeskjæring
 - innholdsrekkefølge
 
+Header krever en eksplisitt regel fordi synlig bredde er full viewportbredde. Før fase 15 må det avgjøres om bare y og høyde kan overstyres på mobil, mens bredden fortsatt avledes.
+
 ## 5. Brukergrensesnitt
 
 Telefon-visningen skal tydelig vise om valgt element:
@@ -104,6 +105,7 @@ Reducerregler:
 - reset-action fjerner mobilverdiene i stedet for å kopiere desktopverdien
 - ukjent, låst, ugyldig eller uendret layout ignoreres
 - transient pointer-preview forblir utenfor `EditorProject`
+- Headerens fullbreddeinvariant må håndheves uavhengig av viewport
 
 ## 7. Oppretting av nye elementer
 
@@ -161,6 +163,7 @@ Fasen er ikke ferdig før dette er bekreftet:
 - status for arv, overstyring og skjuling er tydelig
 - peker og tastatur bruker samme viewport-bevisste layoutregler
 - desktop og mobil har samme clamping- og minimumsmålregler der de gjelder
+- Header beholder fullbreddeinvarianten
 - historikk og lagring kan senere behandle én ferdig transform som én endring
 - `npm run check` og separate desktop-/mobiltester er bestått
 
@@ -179,6 +182,6 @@ Fasen er ikke ferdig før dette er bekreftet:
 Fasen bygges først etter ny eksplisitt godkjenning. Den må lese og bevare grensene i:
 
 - `docs/RESPONSIVE_DESIGN.md`
-- `docs/DRAG_RESIZE.md`
 - `docs/ELEMENT_MODEL.md`
 - `docs/PROJECT_RULES.md`
+- `docs/CODE_AUDIT.md`
