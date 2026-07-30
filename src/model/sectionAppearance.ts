@@ -1,4 +1,8 @@
-import { isEditorColor, type EditorColor } from './editorColor'
+import {
+  createEditorColor,
+  isEditorColor,
+  type EditorColor,
+} from './editorColor'
 import {
   DEFAULT_ELEMENT_FRAME,
   isValidElementFrame,
@@ -20,7 +24,7 @@ export type SectionAppearance = {
 }
 
 export const DEFAULT_SECTION_APPEARANCE: SectionAppearance = {
-  backgroundColor: '#FFFDFB' as EditorColor,
+  backgroundColor: createEditorColor('#FFFDFB'),
   frame: { ...DEFAULT_ELEMENT_FRAME },
 }
 
