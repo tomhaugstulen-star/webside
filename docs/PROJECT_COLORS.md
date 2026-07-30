@@ -8,12 +8,14 @@ Dette dokumentet beskriver det implementerte omfanget og de tekniske grensene fo
 fase: 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
 GitHub-sak: #28
+PR: #29 – åpen, ikke draft
+base main: 504b6d66670eb4a10f929e5addf6c56b00782487
 prosjektskjema: versjon 7
 implementering: ferdig
 manuell PC- og Telefon-test: godkjent
-automatiske kontroller etter siste 10 px-endring: gjenstår
-arkitekturrapporter etter siste produksjonsendring: gjenstår
-PR: ikke opprettet
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
+sluttaudit: ferdig
 merge: ikke godkjent eller utført
 ```
 
@@ -111,6 +113,23 @@ Auditen bekrefter:
 - bilderessurslageret berøres ikke
 - alle nye og berørte produksjonsfiler er under 250 linjer
 
+## Verifisert sluttkontroll
+
+Brukerens lokale terminaloutput etter siste produksjonsendring bekreftet:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
+```
+
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`.
+
 ## Manuell godkjenning
 
 Godkjent på PC og Telefon:
@@ -126,12 +145,10 @@ Godkjent på PC og Telefon:
 - utelatelse av Knapp og Bilde
 - uendret bilde-, tekst-, knapp-, flytte- og resizefunksjonalitet
 
-## Gjenstående før PR
+## Gjenstående før merge
 
-1. trekk siste branch lokalt
-2. kjør `npm run check` etter 10 px-endringen
-3. regenerer `architecture.json` og `docs/dependency-graph.mmd`
-4. kontroller `git diff --check`, rapportdiff og clean tree
-5. oppdater kontrolltallene i dokumentasjonen dersom de endres
-6. opprett og kontroller PR
-7. merge bare etter eksplisitt godkjenning
+1. trekk siste dokumentcommit lokalt
+2. kontroller `git status`, branch-head og clean tree
+3. kontroller PR #29: changed files, mergebarhet, reviews og CI
+4. merge bare etter eksplisitt brukergodkjenning
+5. oppdater lokal `main` etter merge
