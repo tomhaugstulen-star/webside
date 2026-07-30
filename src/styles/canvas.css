@@ -206,6 +206,10 @@
   outline-offset: 2px;
 }
 
+.canvas-element--header.canvas-element--selected {
+  outline-offset: -2px;
+}
+
 .canvas-element--locked {
   cursor: default;
 }
