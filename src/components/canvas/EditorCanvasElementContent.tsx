@@ -1,5 +1,6 @@
 import type { ElementSize, EditorElement } from '../../model/editorProject'
 import { ButtonElementContent } from './ButtonElementContent'
+import { HeaderElementContent } from './HeaderElementContent'
 import { ImageElementContent } from './ImageElementContent'
 import { TextElementEditor, type TextEditFinishReason } from './TextElementEditor'
 
@@ -55,6 +56,8 @@ export function EditorCanvasElementContent({
       )
     case 'button':
       return <ButtonElementContent element={element} />
+    case 'header':
+      return <HeaderElementContent element={element} />
   }
 
   const unhandledElement: never = element
