@@ -57,19 +57,19 @@
   outline-offset: -4px;
 }
 
-.left-rail__main .rail-button:nth-child(1) {
+.rail-button--files {
   --rail-icon-color: var(--portal-icon-blue);
 }
 
-.left-rail__main .rail-button:nth-child(2) {
+.rail-button--design {
   --rail-icon-color: var(--portal-icon-green);
 }
 
-.left-rail__main .rail-button:nth-child(3) {
+.rail-button--media {
   --rail-icon-color: var(--portal-icon-purple);
 }
 
-.left-rail__main .rail-button:nth-child(4) {
+.rail-button--elements {
   --rail-icon-color: var(--portal-icon-orange);
 }
 
