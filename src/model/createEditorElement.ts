@@ -68,6 +68,15 @@ export function createEditorElement({
         label: DEFAULT_BUTTON_LABEL,
         link: { ...NO_ELEMENT_LINK },
       }
+    case 'header':
+      return {
+        ...common,
+        kind: 'header',
+        logoAssetId: request.logoAssetId,
+        logoAssetMetadata: { ...request.logoAssetMetadata },
+        siteName: request.siteName,
+        subtitle: request.subtitle,
+      }
   }
 
   const unhandledRequest: never = request
