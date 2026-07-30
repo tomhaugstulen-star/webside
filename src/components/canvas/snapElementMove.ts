@@ -116,15 +116,15 @@ function findBestMatch(
   targets: AlignmentTarget[],
   canvasWidth: number,
   threshold: number,
-) {
+): SnapMatch | null {
   let bestMatch: SnapMatch | null = null
 
-  ACTIVE_ANCHORS.forEach((activeAnchor) => {
+  for (const activeAnchor of ACTIVE_ANCHORS) {
     const activeCoordinate = getAnchorCoordinate(layout, axis, activeAnchor)
 
-    targets.forEach((target) => {
+    for (const target of targets) {
       const delta = target.coordinate - activeCoordinate
-      const candidate = { axis, activeAnchor, delta, target }
+      const candidate: SnapMatch = { axis, activeAnchor, delta, target }
 
       if (
         Math.abs(delta) <= threshold &&
@@ -133,8 +133,8 @@ function findBestMatch(
       ) {
         bestMatch = candidate
       }
-    })
-  })
+    }
+  }
 
   return bestMatch
 }
@@ -176,14 +176,15 @@ export function snapElementMove({
   const snappedLayout = moveElementLayout(
     layout,
     {
-      x: xMatch?.delta ?? 0,
-      y: yMatch?.delta ?? 0,
+      x: xMatch ? xMatch.delta : 0,
+      y: yMatch ? yMatch.delta : 0,
     },
     canvasWidth,
   )
-  const guides = [xMatch, yMatch]
-    .filter((match): match is SnapMatch => match !== null)
-    .map((match) => createGuide(match, snappedLayout))
+  const guides: AlignmentGuide[] = []
+
+  if (xMatch) guides.push(createGuide(xMatch, snappedLayout))
+  if (yMatch) guides.push(createGuide(yMatch, snappedLayout))
 
   return { layout: snappedLayout, guides }
 }
