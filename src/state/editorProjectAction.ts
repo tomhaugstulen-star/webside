@@ -1,6 +1,7 @@
 import type { ButtonAssetId } from '../model/buttonAsset'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import type { EditorColor } from '../model/editorColor'
+import type { ElementFrameWidth } from '../model/elementFrame'
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
@@ -28,6 +29,26 @@ export type ColorProjectAction =
     }
   | {
       type: 'set-section-frame-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
+
+export type HeaderAppearanceAction =
+  | {
+      type: 'set-header-text-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
+  | {
+      type: 'set-header-frame-width'
+      elementId: string
+      width: ElementFrameWidth
+      updatedAt: string
+    }
+  | {
+      type: 'set-header-frame-color'
       elementId: string
       color: EditorColor
       updatedAt: string
@@ -115,3 +136,4 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | ColorProjectAction
+  | HeaderAppearanceAction
