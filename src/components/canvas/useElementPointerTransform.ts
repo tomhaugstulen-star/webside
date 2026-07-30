@@ -1,5 +1,9 @@
 import { useRef, useState, type PointerEvent, type RefObject } from 'react'
-import type { ElementLayout, ResizeHandle } from '../../model/elementLayout'
+import {
+  elementLayoutsEqual,
+  type ElementLayout,
+  type ResizeHandle,
+} from '../../model/elementLayout'
 import type {
   EditorElement,
   ResponsiveViewport,
@@ -111,7 +115,11 @@ export function useElementPointerTransform({
           })
         : null
     setTransformMode(mode)
-    publishDraftPreview({ elementId: element.id, layout: initialLayout, guides: [] })
+    publishDraftPreview({
+      elementId: element.id,
+      layout: initialLayout,
+      guides: [],
+    })
   }
 
   const handleMovePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -182,20 +190,7 @@ export function useElementPointerTransform({
     publishDraftPreview(null)
 
     if (!commit || !interaction || !finalLayout) return
-    if (
-      elementLayoutPreviewsEqual(
-        {
-          elementId: element.id,
-          layout: interaction.initialLayout,
-          guides: [],
-        },
-        {
-          elementId: element.id,
-          layout: finalLayout,
-          guides: [],
-        },
-      )
-    ) {
+    if (elementLayoutsEqual(interaction.initialLayout, finalLayout)) {
       onClickWithoutTransform()
       return
     }
