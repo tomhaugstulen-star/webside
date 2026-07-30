@@ -42,7 +42,6 @@ type EditorCanvasElementProps = {
   onFinishTextEditing: (elementId: string) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
 }
-
 export function EditorCanvasElement({
   element,
   pageElements,
@@ -101,11 +100,9 @@ export function EditorCanvasElement({
     onCommitImageFrame: commitImageDesktopFrame,
     onPreviewLayoutChange,
   })
-
   if (!visible) {
     return null
   }
-
   const isTextEditing = editing && element.kind === 'text'
   const contentElement =
     element.kind === 'image' && imageTransform
@@ -134,13 +131,11 @@ export function EditorCanvasElement({
       handleMovePointerDown(event)
       return
     }
-
     if (event.button !== 0) return
     event.stopPropagation()
     onSelect(element.id)
     onOpenProperties()
   }
-
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (
       isHeader &&
@@ -153,7 +148,6 @@ export function EditorCanvasElement({
       onOpenProperties()
       return
     }
-
     handleCanvasElementKeyDown(event, {
       element,
       selected,
@@ -167,20 +161,16 @@ export function EditorCanvasElement({
       onCommitImageFrame: commitImageDesktopFrame,
     })
   }
-
   const handleDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
     if (element.kind !== 'text' || element.locked) {
       return
     }
-
     event.preventDefault()
     event.stopPropagation()
     onStartTextEditing(element.id)
   }
-
   const finishTextEditing = (reason: TextEditFinishReason) => {
     onFinishTextEditing(element.id)
-
     if (reason !== 'blur') {
       requestAnimationFrame(() => elementRef.current?.focus())
     }
