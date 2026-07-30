@@ -14,7 +14,6 @@
   box-shadow: 0 8px 28px rgba(55, 63, 82, 0.1);
   backdrop-filter: blur(16px);
 }
-
 .top-toolbar__brand,
 .top-toolbar__viewport,
 .top-toolbar__history,
@@ -22,11 +21,9 @@
   display: flex;
   align-items: center;
 }
-
 .top-toolbar__brand {
   gap: 12px;
 }
-
 .brand-mark {
   width: 38px;
   height: 38px;
@@ -37,12 +34,10 @@
   background: var(--portal-accent-soft);
   border: 1px solid color-mix(in srgb, var(--portal-accent) 24%, white);
 }
-
 .brand-mark svg {
   width: 25px;
   height: 25px;
 }
-
 .brand-name {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 25px;
@@ -50,7 +45,6 @@
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
-
 .page-selector {
   height: 48px;
   display: flex;
@@ -65,25 +59,21 @@
   cursor: pointer;
   font-size: 15px;
 }
-
 .page-selector:hover,
 .toolbar-action:hover,
 .toolbar-icon-button:hover:not(:disabled) {
   border-color: var(--portal-border-strong);
   background: var(--portal-control-hover);
 }
-
 .page-selector svg {
   width: 18px;
   height: 18px;
 }
-
 .top-toolbar__viewport {
   justify-self: center;
   align-self: stretch;
   gap: 0;
 }
-
 .viewport-button,
 .toolbar-icon-button,
 .main-menu-button {
@@ -91,7 +81,6 @@
   background: transparent;
   cursor: pointer;
 }
-
 .viewport-button {
   width: 72px;
   height: 100%;
@@ -101,33 +90,27 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 }
-
 .viewport-button:hover:not([aria-pressed='true']) {
   color: var(--portal-accent);
   background: color-mix(in srgb, var(--portal-control-hover) 72%, transparent);
 }
-
 .viewport-button[aria-pressed='true'] {
   color: var(--portal-accent);
   background: var(--portal-control-selected);
   border-left-color: color-mix(in srgb, var(--portal-accent) 26%, white);
   border-right-color: color-mix(in srgb, var(--portal-accent) 26%, white);
 }
-
 .viewport-button:first-child[aria-pressed='true'] {
   border-radius: 11px 0 0 11px;
 }
-
 .viewport-button:last-child[aria-pressed='true'] {
   border-radius: 0 11px 11px 0;
 }
-
 .top-toolbar__history {
   gap: 8px;
   padding-left: 16px;
   border-left: 1px solid var(--portal-border);
 }
-
 .toolbar-icon-button {
   width: 42px;
   height: 42px;
@@ -137,18 +120,15 @@
   border-radius: 9px;
   color: var(--portal-text);
 }
-
 .toolbar-icon-button:disabled {
   color: color-mix(in srgb, var(--portal-text-muted) 58%, white);
   background: transparent;
   cursor: default;
 }
-
 .top-toolbar__actions {
   justify-content: flex-end;
   gap: 12px;
 }
-
 .toolbar-action,
 .publish-button {
   height: 48px;
@@ -163,20 +143,17 @@
   font-weight: 600;
   white-space: nowrap;
 }
-
 .toolbar-action {
   border: 1px solid var(--portal-border);
   color: var(--portal-text);
   background: color-mix(in srgb, var(--portal-control-surface) 84%, transparent);
 }
-
 .publish-button {
   border: 1px solid var(--portal-accent-hover);
   color: #ffffff;
   background: linear-gradient(180deg, var(--portal-accent) 0%, var(--portal-accent-hover) 100%);
   box-shadow: 0 8px 18px color-mix(in srgb, var(--portal-accent) 24%, transparent);
 }
-
 .publish-button:hover {
   background: linear-gradient(
     180deg,
@@ -184,12 +161,10 @@
     var(--portal-accent-hover) 100%
   );
 }
-
 .main-menu-wrap {
   position: relative;
   margin-left: 12px;
 }
-
 .main-menu-button {
   width: 50px;
   height: 50px;
@@ -199,12 +174,10 @@
   color: var(--portal-text);
   background: var(--portal-control-subtle);
 }
-
 .main-menu-button:hover {
   color: var(--portal-accent);
   background: var(--portal-control-hover);
 }
-
 .main-menu-popover {
   position: absolute;
   top: calc(100% + 12px);
@@ -216,7 +189,6 @@
   background: var(--portal-control-surface);
   box-shadow: 0 18px 44px rgba(44, 58, 72, 0.18);
 }
-
 .main-menu-popover button {
   width: 100%;
   height: 38px;
@@ -229,11 +201,9 @@
   cursor: pointer;
   font-size: 13px;
 }
-
 .main-menu-popover button:hover {
   background: var(--portal-control-hover);
 }
-
 .page-selector:focus-visible,
 .viewport-button:focus-visible,
 .toolbar-icon-button:focus-visible,
@@ -244,17 +214,14 @@
   outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
 }
-
 @media (max-width: 1320px) {
   .top-toolbar {
     grid-template-columns: auto 180px minmax(150px, 1fr) auto auto;
     column-gap: 12px;
   }
-
   .toolbar-action span {
     display: none;
   }
-
   .toolbar-action {
     width: 48px;
     padding: 0;
