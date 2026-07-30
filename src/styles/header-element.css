@@ -57,11 +57,11 @@
 }
 
 .header-element__site-name {
-  font-size: clamp(17px, 2.1vw, 25px);
+  font-size: inherit;
   line-height: 1.08;
 }
 
 .header-element__subtitle {
-  font-size: clamp(11px, 1.2vw, 14px);
+  font-size: clamp(11px, 0.56em, 36px);
   line-height: 1.2;
 }
