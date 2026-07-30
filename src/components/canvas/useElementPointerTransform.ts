@@ -87,7 +87,6 @@ export function useElementPointerTransform({
     resizeHandle: ResizeHandle = 'south-east',
   ) => {
     if (event.button !== 0) return
-
     onSelect(element.id)
 
     if (element.locked) {
@@ -97,7 +96,6 @@ export function useElementPointerTransform({
 
     const canvas = canvasRef.current
     const scrollContainer = scrollContainerRef.current
-
     if (!canvas || !scrollContainer || canvas.clientWidth <= 0) {
       onClickWithoutTransform()
       return
@@ -137,7 +135,6 @@ export function useElementPointerTransform({
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const interaction = interactionRef.current
     const scrollContainer = scrollContainerRef.current
-
     if (
       !interaction ||
       interaction.pointerId !== event.pointerId ||
@@ -185,7 +182,6 @@ export function useElementPointerTransform({
     ) {
       return
     }
-
     publishDraftLayout(nextLayout)
   }
 
@@ -197,7 +193,6 @@ export function useElementPointerTransform({
     publishDraftLayout(null)
 
     if (!commit || !interaction || !finalLayout) return
-
     if (elementLayoutsEqual(interaction.initialLayout, finalLayout)) {
       onClickWithoutTransform()
       return
