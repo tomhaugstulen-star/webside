@@ -6,15 +6,14 @@ Dette dokumentet beskriver den framtidsrettede auditen av fase 13.
 
 ```text
 fase: 13 – Logo og header
-branch: feature/logo-header
-GitHub-sak: #31
-pull request: #32 – åpen, ikke draft
+GitHub-sak: #31 – lukket som fullført
+pull request: #32 – merget
+mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
 prosjektskjema: versjon 8
 funksjonell manuell test: godkjent
 dokumentasjon: synkronisert med faktisk kontrollstatus
 kodeopprydding: gjennomført
 automatisk sluttkontroll etter siste produksjonsendring: bestått
-merge: ikke godkjent
 ```
 
 ## Arkitekturretning
@@ -83,7 +82,7 @@ Tiltak:
 
 ### 6. Header kunne gli horisontalt under pointer-preview
 
-Den varige layoutcommiten normaliserte `x = 0`, men pointer-preview sendte tidligere både horisontalt og vertikalt delta til den generelle flyttelogikken. Header kunne derfor gli sideveis under drag og hoppe tilbake ved slipp.
+Den varige layoutcommiten normaliserte `x = 0`, men pointer-preview sendte tidligere både horisontalt og vertikalt delta til den generelle flyttelogikken.
 
 Tiltak:
 
@@ -93,7 +92,7 @@ Tiltak:
 
 ### 7. Header-låsing var ikke ønsket produktoppførsel
 
-Header arver `locked` fra versjon-8-basemodellen, men brukeren besluttet at Header ikke skal ha låsing.
+Header arver `locked` fra versjon-8-basemodellen, men Header skal ikke ha låsing.
 
 Tiltak:
 
@@ -106,7 +105,7 @@ Tiltak:
 
 ### 8. Header-opprettingen hadde en ekstra avslutningscallback
 
-Den generelle opprettingsflyten lukket allerede venstrepanelet. Header-komponenten kalte i tillegg `onCreated()` etter vellykket oppretting. En senere feil i denne ekstra callbacken kunne utløse catch-blokken etter at prosjektet allerede eide Headeren.
+Den generelle opprettingsflyten lukket allerede venstrepanelet. Header-komponenten kalte i tillegg `onCreated()` etter vellykket oppretting.
 
 Tiltak:
 
@@ -164,7 +163,13 @@ ElementSelectionToolbar.tsx      83
 toggleElementLock.ts             40
 ```
 
-Alle er under aktiv terskel på 250 linjer.
+Alle produksjonsfiler ble kontrollert på lokal `main` etter merge:
+
+```text
+filer på eller over 250 linjer: 0
+filer på eller over 300 linjer: 0
+working tree: clean
+```
 
 ## Verifisert kontroll
 
@@ -185,4 +190,6 @@ Manuell regresjon av Header, logooppretting, objektverktøy, høyrepanel, font, 
 
 ## Konklusjon
 
-Ingen kjent kode- eller funksjonsblokkerer står igjen. PR #32 må fortsatt kontrolleres for samlet diff, mergebarhet, reviews, uløste tråder og CI. Merge er blokkert til brukeren gir eksplisitt godkjenning.
+Fase 13 er merget til `main` gjennom PR #32. Issue #31 er lukket som fullført. Ingen kjent kode-, funksjons-, filstørrelses- eller ressursblokkerer står igjen fra leveransen.
+
+Fase 14 skal ikke startes før korrigeringslinjenes produktoppførsel, snappinggrense, ytelsesmodell og responsivitet er avklart.
