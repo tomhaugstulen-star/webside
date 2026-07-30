@@ -13,19 +13,21 @@ GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer for lokale `git`- og `npm`-kontroller.
+Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer bare for lokale `git`- og `npm`-kontroller som connectoren ikke kan utføre.
 
 ## Ufravikelig arbeidsmåte
 
 - aldri utvikling direkte på `main`
 - én avgrenset branch per leveranse
-- én konkret lokal handling om gangen
-- ikke påstå clean tree eller bestått kontroll uten terminaloutput
-- ikke merge uten eksplisitt godkjenning
+- én kontrollert handling om gangen
+- bruk faktisk branch, commit, diff og terminaloutput
+- ikke påstå clean tree eller bestått lokal kontroll uten terminaloutput
+- ingen merge uten eksplisitt `godkjent`
 - ikke start senere fase automatisk
 - ikke endre låst roadmap uten eksplisitt produktbeslutning
-- gjennomfør framtidsrettet audit før PR
-- kontroller filstørrelser, arkitekturrapporter, PR-diff, mergebarhet, reviews, tråder og CI
+- gjennomfør kodeaudit og filstørrelseskontroll før PR
+- kontroller PR-diff, mergebarhet, CI, reviews og åpne tråder
+- aktive produksjonsfiler bør være under 250 linjer; 300 er hard unntaksgrense
 
 ## Autoritativ dokumentasjon
 
@@ -42,7 +44,7 @@ Ikke gjenopprett parallelle historiske fasefiler.
 
 ## Låst produktretning
 
-Website-editoren er en lokal arbeidsportal på brukerens egen PC.
+Website-editoren skal være en lokal arbeidsportal på brukerens egen PC.
 
 Den skal støtte:
 
@@ -54,8 +56,6 @@ Den skal støtte:
 - lokal fullskjermsforhåndsvisning
 - OpenAI som kontrollert meddesigner i siste hovedfase
 
-Offentlig publisering er fjernet.
-
 Ikke bygg:
 
 - hosting
@@ -63,21 +63,7 @@ Ikke bygg:
 - offentlig publiseringsknapp
 - produksjonsdeployment
 
-## To navigasjonssystemer
-
-Arbeidsportalens navigasjon:
-
-- finner prosjekter, sider, elementer, verktøy og innstillinger
-- er editor-UI
-- inngår ikke i nettsideprosjektet
-
-Nettsidens navigasjon:
-
-- vises i nettstedets Header
-- lagres som prosjektdata
-- peker senere til stabile side-ID-er, seksjons-ID-er eller eksterne URL-er
-
-Disse ansvarene skal aldri blandes.
+Arbeidsportalens navigasjon og nettsidens Header-navigasjon er to separate systemer og skal aldri blandes.
 
 ## Gjeldende status
 
@@ -85,13 +71,15 @@ Disse ansvarene skal aldri blandes.
 siste fullførte produksjonsfase på main: 13 – Logo og header
 aktiv produksjonsfase: 14 – korrigeringslinjer og snapping
 aktiv branch: feature/alignment-guides
-base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
+base origin/main ved fase-start: ff39d8df7d59843c796616ad7d56cf00a41236f8
 GitHub-sak: #34 – åpen
 pull request: ikke opprettet
 prosjektskjema: versjon 9
 ```
 
-Faktisk branch-head og `origin/main` skal alltid leses på nytt før nye operasjoner.
+Faktisk remote-head og `origin/main` skal alltid leses på nytt før nye operasjoner.
+
+Ved siste GitHub-kontroll var branchen foran `main` og 0 commits bak. Det finnes ingen PR for branchen.
 
 ## Implementert fase 14
 
@@ -103,45 +91,31 @@ Faktisk branch-head og `origin/main` skal alltid leses på nytt før nye operasj
 - nærmeste treff per akse
 - midtanker prioriteres ved lik avstand
 - guider vises bare mens snap er aktiv
-- låste elementer kan være mål
+- låste synlige elementer kan være mål
 - skjulte elementer og aktivt element ekskluderes
 - Header og Seksjon kan være mål
 - mål og lerretsmål fryses ved pekerstart
 - alignment preview er transient
+- guider ryddes ved commit, cancel og tapt pointer capture
+- auto-scroll er beholdt
 - resize og tastatur snapping er ikke implementert
 
-Manuelt godkjent:
-
-- elementkanter og elementmidt
-- horisontal og vertikal lerretsmidt
-- samtidig snapping på begge akser
-- Header fast øverst og full bredde
-- Header-fontstørrelse og lagring
-
-## Gjeldende Header
+## Header-invariant i fase 14
 
 - én sammensatt `HeaderEditorElement`
-- lokal PNG-, JPEG- eller WebP-logo
-- navn og valgfri undertittel
 - fast ved `x = 0, y = 0`
 - full aktiv lerretsbredde
 - ingen peker- eller tastaturflytting
 - høyde 70–100 px
-- bakgrunn, tekstfarge og ramme
+- bakgrunn, tekstfarge og designramme
 - fontfamilie
 - fontstørrelse 12–96 px, standard 24 px
-- ingen låseknapp eller låsestatus
-- sikker sletting og delt asset-livssyklus
+- bare vertikal resizing
+- kan velges og åpne egenskaper
+- kan brukes som snapmål
+- nye elementer opprettes under Header
 
-## Kodeaudit 30. juli 2026
-
-Hele branch-diffen og dens modell-/state-avhengigheter ble gjennomgått.
-
-Funnet og rettet avvik:
-
-- Header rendret ved `y = 0`, men fem kodeveier kunne fortsatt lese eller lagre gammel y
-
-Rettet i:
+Header-invarianten er rettet i alle identifiserte kodeveier:
 
 - `src/model/createEditorElement.ts`
 - `src/state/setElementDesktopLayout.ts`
@@ -149,13 +123,33 @@ Rettet i:
 - `src/components/canvas/getCanvasContentHeight.ts`
 - `src/model/findElementCreationPosition.ts`
 
-Gjeldende invariant:
+## Manuell fase-14-regresjon
 
-- Header opprettes, serialiseres, rendres og brukes i avledede beregninger ved `x = 0, y = 0`.
+Brukeren har godkjent hele den relevante manuelle testen:
 
-## Siste verifiserte automatiske kontroll
+- elementkanter og elementmidtpunkter på begge akser
+- horisontal og vertikal lerretsmidt
+- samtidig snapping på begge akser
+- Seksjon, Bilde, Tekst og Knapp som aktive elementer
+- låste synlige elementer som snapmål
+- aktivt element ekskludert som eget mål
+- Header som fast, fullbredde snapmål
+- Header-høyde og fontstørrelse gjennom PC/Telefon-bytte
+- nye elementer opprettet under Header
+- pointer sluppet utenfor vinduet uten hengende guider
+- auto-scroll uten hopp eller feil commit
+- resizing uten snapping eller guider
+- tastaturflytting uten snapping eller guider
+- clamping ved alle lerretsgrenser
+- PC- og Telefon-visning
 
-Brukerens terminaloutput på branch-head `8893a9c`:
+Skjulte elementer kan ikke styres fra dagens UI. Ekskluderingen er kodeverifisert i `getAlignmentTargets()`.
+
+Lokal lagring finnes ikke ennå og var derfor ikke et akseptansepunkt for fase 14.
+
+## Siste verifiserte lokale automatiske kontroll
+
+Brukerens terminaloutput på commit `8893a9c`:
 
 ```text
 ESLint: bestått
@@ -165,46 +159,79 @@ Vite: 127 moduler transformert
 CSS: 36.85 kB, gzip 6.87 kB
 JavaScript: 280.88 kB, gzip 83.22 kB
 produksjonsbuild: bestått på 198 ms
+git status --short: ingen output
 ```
 
-Filstørrelseskontroll mot remote-head:
+Senere commits var dokumentasjonssynk og endret ikke produksjonskode eller importgraf.
+
+Remote audit av endrede produksjonsfiler viste:
 
 ```text
-EditorCanvasElement.tsx          243
-useElementPointerTransform.ts    243
+EditorCanvasElement.tsx          243 linjer
+useElementPointerTransform.ts    243 linjer
+snapElementMove.ts               190 linjer
 filer på eller over 250 linjer: 0
 filer på eller over 300 linjer: 0
 ```
 
-Brukerens lokale status etter kontroll:
+## Gjenstående før PR
 
-```text
-git status --short: ingen output
-working tree: clean
-```
+Brukeren skal bare gjøre den lokale delen connectoren ikke kan utføre:
 
-Dokumentoppdateringer etter denne kontrollen endrer ingen produksjonskode eller avhengighetskanter.
+1. pull siste remote-head
+2. kjør `npm run check`
+3. kjør `git diff --check`
+4. kjør repositoryomfattende filstørrelseskontroll
+5. bekreft `git status --short` uten output og eksakt HEAD
 
-## Gjenstående fase-14-kontroll
+Deretter skal assistenten:
 
-1. Låste elementer fungerer som snapmål.
-2. Skjulte elementer ignoreres.
-3. Aktivt element brukes ikke som eget mål.
-4. Seksjon, Bilde, Tekst og Knapp fungerer som aktive elementer.
-5. `pointercancel` forkaster preview og guider.
-6. Tapt pointer capture forkaster preview og guider.
-7. Auto-scroll fungerer uten hopp eller feil commit.
-8. Resize snapper fortsatt ikke.
-9. Tastaturflytting snapper fortsatt ikke.
-10. Clamp mot venstre, høyre og topp fungerer.
-11. Samme regler fungerer i PC og Telefon.
-12. Oppdater dokumentert manuell status.
-13. Kontroller komplett diff, PR, reviews, tråder og CI.
-14. Merge aldri uten eksplisitt `godkjent`.
+1. verifisere remote branch og diff på nytt
+2. kontrollere at dokumentasjonen er synkronisert
+3. opprette PR først når sluttkontrollen er bestått
+4. kontrollere PR-diff, mergebarhet, CI, reviews og tråder
+5. aldri merge uten eksplisitt `godkjent`
 
-## Kjent separat gap
+## Godkjente separate saker etter fase 14
 
-Tekstboksbakgrunn finnes ikke i modellen og er hardkodet i CSS. Dette spores i GitHub-sak #35 og tilhører fase 17.
+### Sak #35 – tekstboksbakgrunn
+
+- lagret og validert bakgrunnsfarge for tekstbokser
+- vis `Bakgrunn` og `Tekstfarge` i Farger-panelet
+- egen modell-/schema-leveranse
+- ikke bland inn i `feature/alignment-guides`
+
+### Sak #36 – editor-only elementgrense
+
+- alle elementbokser skal ha en subtil 1 px grå markering i editoren
+- gjelder også Seksjon og Header når designramme er `0 / Ingen`
+- ingen prosjektdata, schema eller layoutendring
+- ingen grense i lokal forhåndsvisning
+- egen liten visuell branch
+
+### Sak #37 – elementnotat og ryddet høyrepanel
+
+Dette er eksplisitt godkjent av brukeren og skal tas på egen branch etter fase 14:
+
+- vanlig klikk på element åpner vanlige egenskaper
+- flytende `Egenskaper`-knapp endres til `Notat`
+- `Notat` åpner elementets interne arbeidsmerknad i høyrepanelet
+- notat lagres per element
+- notat vises aldri på nettsiden eller i forhåndsvisning
+- høyrepanelet skal ikke vise låseknapp eller `Status: Låst/Ulåst`
+- eksisterende låseikon ved elementet beholdes
+- Header er fortsatt ikke låsbar
+- synlig felt for alternativ tekst fjernes
+- teknisk `altText` kan stå tomt internt for kompatibilitet
+- OpenAI skal senere ikke sende notater ut uten eksplisitt brukerhandling
+
+### Sak #38 – like mellomrom og fordelingsguider
+
+- like avstander til lerretskanter
+- likt faktisk mellomrom mellom tre eller flere elementbokser
+- horisontal og vertikal variant
+- midlertidige editor-only avstandsmarkører
+- senere utvidelse av snap-motoren, ikke del av fase 14
 
 ## Låst roadmap
 
@@ -227,26 +254,23 @@ fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  OpenAI-integrasjon
 ```
 
-Detaljert omfang, avhengigheter og akseptansekriterier ligger i `docs/WORK_PLAN.md`.
+Detaljert omfang og avhengigheter ligger i `docs/WORK_PLAN.md`.
 
 ## Låst Hero-retning
 
-Hero er en egen hovedleveranse og skal ikke falle ut av planen.
+Hero er en egen sammensatt hovedleveranse med:
 
-Planlagt retning:
-
-- egen sammensatt `HeroEditorElement`
 - full bredde som standard
-- plassert under Header som standard
+- plassering under Header
 - bakgrunnsbilde eller bakgrunnsfarge
 - bildeutsnitt og valgfritt overlay
 - hovedoverskrift og undertittel
 - én eller to knapper
-- lenker til side, seksjon eller ekstern URL
+- side-, seksjons- eller eksterne lenker
 - tekstjustering og maksimal tekstbredde
 - eksplisitt PC- og Telefon-regel
 
-Endelig modell låses før fase 21 starter.
+Endelig modell låses før fase 21.
 
 ## Låst nettstedsmeny-retning
 
@@ -269,7 +293,7 @@ Arbeidsportalen skal senere få:
 - prosjektoversikt
 - side-/elementnavigator
 - finn og marker element
-- dempede, semantiske portalfarger
+- dempede semantiske portalfarger
 - `Ctrl + K` hurtigsøk
 - tydelig aktiv side og prosjekt
 - PC/Telefon-kontroll
@@ -279,7 +303,7 @@ Arbeidsportalen skal senere få:
 
 ## Låst OpenAI-retning
 
-OpenAI kommer til slutt og skal brukes til:
+OpenAI kommer til slutt og kan brukes til:
 
 - tekst og omskriving
 - fargeinspirasjon
@@ -317,8 +341,7 @@ Utsatt:
 - resize-snapping
 - tastatursnapping
 - grid
-- avstandsmål
-- automatisk fordeling
+- avstandsmål og automatisk fordeling, sporet i sak #38
 - flermerking og gruppering
 - flere mobilbrytepunkter
 - nettbrett som egen viewport
