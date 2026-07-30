@@ -103,14 +103,14 @@ Alle produksjonsfiler endret på branchen som er lest under auditen er under akt
 Største kontrollerte filer:
 
 ```text
-EditorCanvasElement.tsx          245
-useElementPointerTransform.ts    245
-snapElementMove.ts               192
-EditorCanvas.tsx                 168
-editorProjectAction.ts           163
-textElementStyle.ts              154
-reduceHeaderAppearanceAction.ts  155
-getAlignmentTargets.ts           137
+EditorCanvasElement.tsx          243
+useElementPointerTransform.ts    243
+snapElementMove.ts               190
+EditorCanvas.tsx                 166
+editorProjectAction.ts           161
+reduceHeaderAppearanceAction.ts  153
+textElementStyle.ts              152
+getAlignmentTargets.ts           135
 ```
 
 Genererte filer `architecture.json` og `docs/dependency-graph.mmd` vurderes ikke etter produksjonsgrensen.
@@ -137,7 +137,7 @@ JavaScript: 280.88 kB, gzip 83.22 kB
 produksjonsbuild: bestått på 198 ms
 ```
 
-Senere commits fram til `6f2799e` endret bare dokumentasjon. Produksjonskoden og importgrafen er uendret, men en endelig lokal `npm run check` på siste branch-head er fortsatt obligatorisk før PR.
+Senere commits endret bare dokumentasjon. Produksjonskoden og importgrafen er uendret, men en endelig lokal `npm run check` på siste branch-head er fortsatt obligatorisk før PR.
 
 ## Manuell kontroll
 
