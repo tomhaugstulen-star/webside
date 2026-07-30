@@ -27,6 +27,7 @@ import { useElementPointerTransform } from './useElementPointerTransform'
 
 type EditorCanvasElementProps = {
   element: EditorElement
+  pageElements: EditorElement[]
   viewport: ViewportMode
   canvasWidth: number
   selected: boolean
@@ -43,6 +44,7 @@ type EditorCanvasElementProps = {
 
 export function EditorCanvasElement({
   element,
+  pageElements,
   viewport,
   canvasWidth,
   selected,
@@ -86,6 +88,8 @@ export function EditorCanvasElement({
     handleLostPointerCapture,
   } = useElementPointerTransform({
     element,
+    pageElements,
+    viewport,
     initialLayout,
     canvasRef,
     scrollContainerRef,
