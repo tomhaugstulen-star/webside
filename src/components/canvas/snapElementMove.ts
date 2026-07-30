@@ -70,7 +70,11 @@ function canApplyDelta(
 }
 
 function compareOptionalText(first?: string, second?: string) {
-  return (first ?? '').localeCompare(second ?? '')
+  const normalizedFirst = first ?? ''
+  const normalizedSecond = second ?? ''
+
+  if (normalizedFirst === normalizedSecond) return 0
+  return normalizedFirst < normalizedSecond ? -1 : 1
 }
 
 function isPreferredMatch(candidate: SnapMatch, current: SnapMatch | null) {
