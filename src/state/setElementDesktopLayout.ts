@@ -18,7 +18,7 @@ function getPersistedLayout(
   return {
     position: {
       x: 0,
-      y: layout.position.y,
+      y: 0,
     },
     size: {
       width: HEADER_SERIALIZED_WIDTH,
