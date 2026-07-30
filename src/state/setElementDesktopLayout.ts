@@ -1,3 +1,4 @@
+import { HEADER_SERIALIZED_WIDTH } from '../model/elementDimensions'
 import {
   elementLayoutsEqual,
   getElementDesktopLayout,
@@ -16,11 +17,11 @@ function getPersistedLayout(
 
   return {
     position: {
-      x: element.position.desktop.x,
+      x: 0,
       y: layout.position.y,
     },
     size: {
-      width: element.size.desktop.width,
+      width: HEADER_SERIALIZED_WIDTH,
       height: layout.size.height,
     },
   }
