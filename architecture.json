@@ -805,6 +805,7 @@
         "src/state/setImageTransform.ts",
         "src/state/setButtonAsset.ts",
         "src/state/setButtonLabel.ts",
+        "src/state/setElementDesktopLayout.ts",
         "src/state/setElementLink.ts",
         "src/state/setTextElementContent.ts",
         "src/state/setTextElementStyle.ts",
@@ -1692,8 +1693,8 @@
         "src/components/canvas/ElementSelectionToolbar.tsx",
         "src/components/canvas/ImageResizeHandles.tsx",
         "src/components/canvas/useElementPointerTransform.ts",
-        "src/state/editorProjectReducer.ts",
-        "src/state/setImageDesktopFrame.ts"
+        "src/state/setImageDesktopFrame.ts",
+        "src/state/setElementDesktopLayout.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -6061,23 +6062,6 @@
         },
         {
           "dynamic": false,
-          "module": "../model/elementLayout",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/model/elementLayout.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "./addElementToActivePage",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -6206,6 +6190,23 @@
             "import"
           ],
           "resolved": "src/state/setButtonLabel.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./setElementDesktopLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/setElementDesktopLayout.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -7403,6 +7404,58 @@
       "valid": true
     },
     {
+      "source": "src/state/setElementDesktopLayout.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/editorProjectReducer.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/state/setElementLink.ts",
       "dependencies": [
         {
@@ -7649,8 +7702,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 111,
-    "totalDependenciesCruised": 318,
+    "totalCruised": 112,
+    "totalDependenciesCruised": 320,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,

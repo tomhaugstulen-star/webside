@@ -130,6 +130,7 @@ subgraph src["src"]
     src_state_setImageTransform_ts["setImageTransform.ts"]
     src_state_setButtonAsset_ts["setButtonAsset.ts"]
     src_state_setButtonLabel_ts["setButtonLabel.ts"]
+    src_state_setElementDesktopLayout_ts["setElementDesktopLayout.ts"]
     src_state_setElementLink_ts["setElementLink.ts"]
     src_state_setTextElementContent_ts["setTextElementContent.ts"]
     src_state_setTextElementStyle_ts["setTextElementStyle.ts"]
@@ -388,7 +389,6 @@ src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
 src_state_editorProjectReducer_ts-->src_model_editorProject_ts
-src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
 src_state_editorProjectReducer_ts-->src_state_addElementToActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_deleteElementFromActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
@@ -397,6 +397,7 @@ src_state_editorProjectReducer_ts-->src_state_reduceHeaderAppearanceAction_ts
 src_state_editorProjectReducer_ts-->src_state_reduceImageProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_setButtonAsset_ts
 src_state_editorProjectReducer_ts-->src_state_setButtonLabel_ts
+src_state_editorProjectReducer_ts-->src_state_setElementDesktopLayout_ts
 src_state_editorProjectReducer_ts-->src_state_setElementLink_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
@@ -451,6 +452,8 @@ src_state_setButtonAsset_ts-->src_model_buttonAsset_ts
 src_state_setButtonAsset_ts-->src_model_editorProject_ts
 src_state_setButtonLabel_ts-->src_model_buttonAsset_ts
 src_state_setButtonLabel_ts-->src_model_editorProject_ts
+src_state_setElementDesktopLayout_ts-->src_model_editorProject_ts
+src_state_setElementDesktopLayout_ts-->src_model_elementLayout_ts
 src_state_setElementLink_ts-->src_model_editorProject_ts
 src_state_setElementLink_ts-->src_model_elementLink_ts
 src_state_setTextElementContent_ts-->src_model_editorProject_ts
