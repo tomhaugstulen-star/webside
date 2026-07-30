@@ -147,98 +147,55 @@ AI skal aldri:
 
 OpenAI-integrasjonen skal bruke en lokal serverprosess eller tilsvarende sikker server-side grense på samme PC. API-nøkkel lastes fra miljøvariabel og eksponeres ikke i klienten.
 
-## Aktiv leveranse
+## Leveransestatus
 
 ```text
-fase: 14 – korrigeringslinjer og snapping
-branch: feature/alignment-guides
-base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
-GitHub-sak: #34 – åpen
-pull request: ikke opprettet
+siste fullførte produksjonsfase: 14 – korrigeringslinjer og snapping
+source branch-head: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
+pull request: #39 – merget
+mergecommit på main: 0122605b60808689cdda7cb1601eb3342680f88c
+GitHub-sak: #34 – lukket som fullført
 prosjektskjema: versjon 9
+aktiv produksjonsfase: ingen
+neste planlagte fase: 15 – duse portalfarger og tydelig visuell struktur
+fase 15: ikke startet
 ```
 
-Implementert:
+Fase 14 leverte:
 
-- pekerflytting for Seksjon, Bilde, Tekst og Knapp
-- venstre/midt/høyre og topp/midt/bunn mot andre synlige elementer
+- korrigeringslinjer og 6 px snapping ved pekerflytting
+- elementankere på venstre/midt/høyre og topp/midt/bunn
 - horisontal og vertikal lerretsmidt
-- 6 px snapgrense i lerretskoordinater
-- uavhengig snapping per akse
-- nærmeste treff per akse, med midtanker som lik-avstand-prioritet
-- guider bare mens snap er aktiv
-- låste elementer kan være mål
-- skjulte elementer og aktivt element er ikke mål
-- Seksjon og Header kan være mål
-- mål og lerretsmål fryses ved pekerstart
-- auto-scroll og eksisterende commit-/cancel-regler beholdes
-- resize og tastatur snapping er ikke del av fasen
+- uavhengig valg per akse
+- låste synlige elementer som mål
+- skjulte elementer og aktivt element ekskludert
+- Header som fast, fullbredde snapmål
+- transient preview, snapmål og guider
+- kontrollert auto-scroll, clamping, cancel og tapt pointer capture
+- Header-fontstørrelse 12–96 px
+- Header fast ved `x = 0, y = 0` i alle identifiserte kodeveier
 
-Header-regler:
-
-- fast øverst ved `x = 0, y = 0`
-- full aktiv lerretsbredde
-- ingen peker- eller tastaturflytting
-- høyde 70–100 px kan fortsatt endres
-- fontfamilie og fontstørrelse 12–96 px
-- navn og undertittel deler fontfamilie; fontstørrelsen styrer hierarkiet
-- ingen låsing eller låsestatus
-
-Manuelt godkjent:
-
-- elementkant og elementmidt på begge akser
-- horisontal og vertikal lerretsmidt
-- samtidig snapping på begge akser
-- Header fast øverst og full bredde
-- Header-fontstørrelse og lagring
-
-Automatisk kontroll på branch-head `8893a9c`:
+Sluttkontroll på branch-head `28da295`:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
+Dependency Cruiser: 118 moduler, 341 avhengigheter, ingen brudd
 Vite: 127 moduler transformert
 CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.88 kB, gzip 83.22 kB
-produksjonsbuild: bestått på 198 ms
+JavaScript: 280.63 kB, gzip 83.17 kB
+produksjonsbuild: bestått på 216 ms
+produksjonsfiler på eller over 250 linjer: 0
 ```
 
-Filstørrelse:
+Hele den relevante manuelle regresjonen ble godkjent i PC- og Telefon-visning. PR #39 ble merget etter eksplisitt brukergodkjenning, og brukerens lokale `main` ble synkronisert og bekreftet clean på mergecommit `0122605`.
 
-```text
-EditorCanvasElement.tsx          243
-useElementPointerTransform.ts    243
-filer på eller over 250 linjer: 0
-filer på eller over 300 linjer: 0
-```
-
-Lokal status etter kontroll:
-
-```text
-git status --short: ingen output
-working tree: clean
-```
-
-Gjenstående før PR:
-
-- låste elementer som snapmål
-- skjulte elementer ignoreres
-- aktivt element ekskluderes som eget mål
-- alle flyttbare elementtyper som aktivt element
-- `pointercancel` og tapt pointer capture
-- auto-scroll under snapping
-- bekreftelse av at resize fortsatt ikke snapper
-- bekreftelse av at tastaturflytting fortsatt ikke snapper
-- clamp ved lerretsgrensene
-- manuell kontroll i både PC- og Telefon-visning
-- siste dokumentstatus etter manuell godkjenning
-- komplett diff-, PR-, review-, tråd- og CI-kontroll
+Ingen produksjonsbranch er aktiv. Fase 15 skal ikke startes før omfanget under er gjennomgått og eksplisitt godkjent.
 
 ## Låst roadmap
 
 ```text
-fase 14  Fullføre korrigeringslinjer og snapping
+fase 14  Korrigeringslinjer og snapping – fullført
 fase 15  Duse portalfarger og tydelig visuell struktur
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
