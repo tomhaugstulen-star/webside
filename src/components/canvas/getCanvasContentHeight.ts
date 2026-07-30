@@ -19,7 +19,9 @@ export function getCanvasContentHeight(
     const previewLayout = preview?.elementId === element.id ? preview.layout : null
     const position = previewLayout
       ? previewLayout.position
-      : resolveResponsiveValue(element.position, viewport)
+      : element.kind === 'header'
+        ? { x: 0, y: 0 }
+        : resolveResponsiveValue(element.position, viewport)
     const size = previewLayout
       ? previewLayout.size
       : resolveResponsiveValue(element.size, viewport)
