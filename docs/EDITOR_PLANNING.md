@@ -10,7 +10,8 @@ branch: feature/logo-header
 GitHub-sak: #31
 prosjektskjema: versjon 8
 manuell funksjonstest: godkjent
-sluttaudit og dokumentasjon: pågår
+kodeaudit og dokumentasjonsopprydding: gjennomført
+ny automatisk sluttkontroll: gjenstår
 PR: ikke opprettet
 ```
 
@@ -86,14 +87,14 @@ Utseende:
 
 ## Gjenstående før fase 13 kan merges
 
-- avsluttende kodeopprydding
-- framtidsrettet audit
-- ny full automatisk kontroll
-- nye arkitekturrapporter
-- filstørrelseskontroll
-- oppdatert dokumentasjon
-- PR-kontroll
-- eksplisitt mergegodkjenning
+- trekk siste remote-endringer lokalt
+- kjør ny full automatisk kontroll
+- regenerer arkitekturrapporter
+- kontroller stale dokumentreferanser
+- gjennomfør kort regresjonstest
+- kontroller filstørrelser og samlet diff
+- opprett og inspiser PR
+- innhent eksplisitt mergegodkjenning
 
 ## Senere faser
 
