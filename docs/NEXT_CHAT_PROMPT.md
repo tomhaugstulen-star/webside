@@ -38,21 +38,21 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
 GitHub-sak: #28
+PR: #29 – åpen, ikke draft
 base main: 504b6d66670eb4a10f929e5addf6c56b00782487
 prosjektskjema: versjon 7
 implementering: ferdig
 manuell PC- og Telefon-test: godkjent
 rammebredde: Ingen eller 1–10 px
 framtidsrettet sluttaudit: ferdig
-automatiske kontroller etter siste 10 px-endring: gjenstår
-arkitekturrapporter etter siste produksjonsendring: gjenstår
-PR: ikke opprettet
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
 merge: ikke godkjent eller utført
 ```
 
-Faktisk feature- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Commitnumrene over er kontrollpunkter, ikke permanente forventede topper.
+Faktisk feature-, PR- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Commitnumrene over er kontrollpunkter, ikke permanente forventede topper.
 
-## Siste komplette kontroll før 10 px-utvidelsen
+## Siste verifiserte kontroll
 
 ```text
 ESLint: bestått
@@ -61,10 +61,11 @@ Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
 Vite: 111 moduler transformert
 CSS: 33.62 kB, gzip 6.34 kB
 JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 189 ms
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
-Utvidelsen fra 4 til 10 px berørte bare `sectionFrameWidths` og menyetiketten. Full `npm run check` etter denne endringen er likevel obligatorisk før PR.
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`.
 
 ## Implementert funksjonalitet
 
@@ -140,7 +141,7 @@ Lagre gyldige prosjektmutasjoner, ikke transient editor- eller ressursstate.
 
 ## Første oppgave i neste chat
 
-Fase 12 skal ikke implementeres på nytt. Kontroller og ferdigstill eksisterende branch:
+Fase 12 skal ikke implementeres på nytt. Trekk siste branch og kontroller PR #29:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
@@ -148,31 +149,25 @@ git fetch origin
 git switch feature/project-colors
 git pull --ff-only origin feature/project-colors
 git status
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status --short
-git diff --stat
+git log -6 --oneline --decorate
 ```
 
 Forventet:
 
-- branch er synkronisert
-- working tree er clean før rapportgenerering
-- `npm run check` består etter 10 px-endringen
-- arkitekturrapportene oppdateres for de nye modulene
-- ingen andre produksjonsfiler endres
-- ingen whitespace-feil
+- branch er synkronisert med `origin/feature/project-colors`
+- working tree er clean
+- de siste statusdokumentene finnes på lokal branch
 
-Etter terminalkontrollen:
+Kontroller deretter med GitHub-connectoren:
 
-1. kontroller rapportdiffen
-2. commit og push bare nødvendige rapport-/dokumentendringer
-3. kontroller samlet diff mot `main`
-4. opprett PR mot `main` med `Closes #28`
-5. kontroller changed files, mergebarhet, reviews og CI
-6. merge bare etter brukerens eksplisitte ord `godkjent`
-7. oppdater lokal `main` etter merge
+1. PR #29 har base `main` og head `feature/project-colors`
+2. PR-en er åpen og ikke draft
+3. head-SHA samsvarer med branch-head
+4. changed files og samlet diff er som forventet
+5. mergebarhet er ferdigberegnet
+6. reviews og uløste tråder er kontrollert
+7. CI/statuskontroller er kontrollert
+8. merge bare etter brukerens eksplisitte ord `godkjent`
+9. oppdater lokal `main` etter merge
 
 ---
