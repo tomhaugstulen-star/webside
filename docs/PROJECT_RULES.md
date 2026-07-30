@@ -21,26 +21,30 @@ Regler:
 - ingen skjult funksjonalitet for senere faser legges inn
 - merge krever eksplisitt brukergodkjenning
 - ny produksjonsbranch starter først etter godkjent merge og oppdatert lokal `main`
+- lokal teststatus og clean tree bekreftes bare fra faktisk terminaloutput
 
 Gjeldende status:
 
 ```text
-aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
-branch: feature/project-colors
-GitHub-sak: #28
-PR: #29 – åpen, ikke draft
+siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
+GitHub-sak: #28 – lukket som fullført
+PR: #29 – merget
+mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
-implementering og manuell test: godkjent
+implementering, audit og manuell test: godkjent
 automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
-merge: ikke godkjent eller utført
+lokal main: brukeren har bekreftet clean tree etter merge
+aktiv docs-branch: docs/phase-12-handover
+neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
 ```
 
 ## 2. Filstørrelser og ansvar
 
 - 250 linjer er aktiv terskel for ansvarstrekk
 - 300 linjer er hard unntaksgrense
-- filer deles etter ansvar, ikke tilfeldig
+- linjetall kontrolleres før en stor fil utvides og igjen før PR
+- filer deles etter ansvar, ikke tilfeldig eller mekanisk
 - `App.tsx` setter bare sammen hovedproviders og skall
 - `EditorShell` koordinerer skalltilstand og komposisjon
 - `RightPropertiesPanel.tsx` forblir komposisjon
@@ -58,6 +62,8 @@ projectColorEntries.ts: under 100 linjer
 ColorsPanel.tsx: under 100 linjer
 FramePropertiesSection.tsx: under 100 linjer
 ```
+
+Disse tallene skal kontrolleres på nytt etter senere endringer.
 
 ## 3. Autoritativ prosjektmodell
 
@@ -295,4 +301,4 @@ produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
 
-Arkitekturrapportene ble regenerert og committet i `1963088`. PR #29 kontrolleres før merge. Ingen merge uten eksplisitt godkjenning.
+Arkitekturrapportene ble regenerert og committet i `1963088`, som inngikk i PR #29. Fase 12 er merget. Post-merge-dokumentasjonen ferdigstilles på `docs/phase-12-handover` før fase 13 avgrenses.
