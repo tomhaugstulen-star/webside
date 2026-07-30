@@ -7,8 +7,9 @@ Dette dokumentet beskriver den framtidsrettede auditen av fase 12 og grensene so
 ```text
 fase: 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
-GitHub-sak: #28
-PR: #29 – åpen, ikke draft
+GitHub-sak: #28 – lukket som fullført
+PR: #29 – merget
+mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
 implementering: ferdig
 manuell PC- og Telefon-test: godkjent
@@ -16,7 +17,7 @@ rammebredde: Ingen eller 1–10 px
 sluttaudit: ferdig
 automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
-merge: ikke godkjent eller utført
+lokal main: brukeren har bekreftet clean tree etter merge
 ```
 
 ## 2. Arkitekturretning
@@ -43,7 +44,7 @@ useProjectColors.ts: under 100 linjer
 alle nye og berørte produksjonsfiler: under 250 linjer
 ```
 
-250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense.
+250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense. Linjetall skal kontrolleres på nytt før senere PR-er; fase-12-tallene er ikke en varig garanti.
 
 ## 4. Prosjektskjema og fargemodell
 
@@ -180,7 +181,7 @@ produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
 
-Arkitekturrapportene ble regenerert og committet i `1963088`. Lokal branch var synkronisert og clean etter push før de siste statusdokumentene ble lagt til gjennom GitHub-connectoren.
+Arkitekturrapportene ble regenerert og committet i `1963088`, som inngikk i PR #29. De siste committene før merge endret bare autoritativ dokumentasjon; produksjonskoden og rapportene var uendret etter den verifiserte kontrollen.
 
 ## 11. Obligatoriske grenser for senere faser
 
@@ -213,10 +214,17 @@ Arkitekturrapportene ble regenerert og committet i `1963088`. Lokal branch var s
 - reager bare på gyldige prosjektmutasjoner
 - ikke lagre transient editor-, panel- eller ressursstate direkte
 
-## 12. Gjenstående før merge
+## 12. Auditkonklusjon
 
-1. trekk de siste statusdokumentene lokalt
-2. kontroller synkronisert branch og clean tree
-3. kontroller PR #29: changed files, mergebarhet, reviews, tråder og CI
-4. merge bare etter eksplisitt godkjenning
-5. oppdater lokal `main` etter merge
+Fase 12 ble merget etter:
+
+- framtidsrettet statisk audit av produksjonsendringene
+- kontroll av filstørrelser og ansvar
+- bestått `npm run check`
+- godkjent manuell PC- og Telefon-test
+- regenererte og kontrollerte arkitekturrapporter
+- synkronisert og clean feature-branch
+- kontrollert PR-head, base, changed files, reviews, tråder og CI-status
+- eksplisitt brukergodkjenning
+
+Ingen kjent statisk blokkerer gjenstår fra fase 12. Neste produksjonsfase skal starte på en ny branch fra oppdatert `main` etter at post-merge-dokumentasjonen er synkronisert.
