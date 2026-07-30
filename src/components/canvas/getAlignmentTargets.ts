@@ -36,7 +36,7 @@ function getResolvedLayout(
 
   if (element.kind === 'header') {
     return {
-      position: { x: 0, y: position.y },
+      position: { x: 0, y: 0 },
       size: { width: canvasWidth, height: size.height },
     }
   }
