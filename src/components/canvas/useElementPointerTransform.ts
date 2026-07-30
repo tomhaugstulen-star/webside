@@ -1,33 +1,20 @@
 import { useRef, useState, type PointerEvent, type RefObject } from 'react'
 import {
   elementLayoutsEqual,
-  moveElementLayout,
-  resizeElementLayout,
   type ElementLayout,
   type ResizeHandle,
 } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
-import {
-  getImageCropSize,
-  getImageTransformForResizedFrame,
-  type ImageTransform,
-} from '../../model/imagePresentation'
+import type { ImageTransform } from '../../model/imagePresentation'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
 import type { ElementLayoutPreview } from './canvasLayoutPreview'
-
-type TransformMode = 'move' | 'resize'
-
-type PointerInteraction = {
-  pointerId: number
-  mode: TransformMode
-  resizeHandle: ResizeHandle
-  startClientX: number
-  startClientY: number
-  startScrollLeft: number
-  startScrollTop: number
-  canvasWidth: number
-  initialLayout: ElementLayout
-}
+import {
+  getNextPointerLayout,
+  getPointerInteractionDelta,
+  getResizedImageTransform,
+  type PointerInteraction,
+  type TransformMode,
+} from './elementPointerTransform'
 
 type ElementPointerTransformOptions = {
   element: EditorElement
@@ -68,18 +55,6 @@ export function useElementPointerTransform({
     setDraftLayout(layout)
     onPreviewLayoutChange(layout ? { elementId: element.id, layout } : null)
   }
-
-  const getResizedImageTransform = (layout: ElementLayout) =>
-    element.kind === 'image' && element.mode === 'crop'
-      ? getImageTransformForResizedFrame(
-          element.assetMetadata,
-          initialLayout.size,
-          layout.size,
-          element.transform,
-          layout.position.x - initialLayout.position.x,
-          layout.position.y - initialLayout.position.y,
-        )
-      : null
 
   const startInteraction = (
     mode: TransformMode,
@@ -144,37 +119,14 @@ export function useElementPointerTransform({
     }
 
     autoScrollCanvasNearEdges(scrollContainer, event.clientX, event.clientY)
-    const delta = {
-      x:
-        event.clientX -
-        interaction.startClientX +
-        scrollContainer.scrollLeft -
-        interaction.startScrollLeft,
-      y:
-        event.clientY -
-        interaction.startClientY +
-        scrollContainer.scrollTop -
-        interaction.startScrollTop,
-    }
-    const maximumSize =
-      element.kind === 'image' && element.mode === 'crop'
-        ? getImageCropSize(element.assetMetadata, element.transform)
-        : undefined
-    const nextLayout =
-      interaction.mode === 'move'
-        ? moveElementLayout(
-            interaction.initialLayout,
-            delta,
-            interaction.canvasWidth,
-          )
-        : resizeElementLayout(
-            element.kind,
-            interaction.initialLayout,
-            delta,
-            interaction.canvasWidth,
-            interaction.resizeHandle,
-            maximumSize,
-          )
+    const delta = getPointerInteractionDelta(
+      interaction,
+      event.clientX,
+      event.clientY,
+      scrollContainer.scrollLeft,
+      scrollContainer.scrollTop,
+    )
+    const nextLayout = getNextPointerLayout(element, interaction, delta)
 
     if (
       draftLayoutRef.current &&
@@ -182,6 +134,7 @@ export function useElementPointerTransform({
     ) {
       return
     }
+
     publishDraftLayout(nextLayout)
   }
 
@@ -200,7 +153,11 @@ export function useElementPointerTransform({
 
     const imageTransform =
       interaction.mode === 'resize'
-        ? getResizedImageTransform(finalLayout)
+        ? getResizedImageTransform(
+            element,
+            interaction.initialLayout,
+            finalLayout,
+          )
         : null
 
     if (imageTransform) {
@@ -232,7 +189,7 @@ export function useElementPointerTransform({
     layout: draftLayout ?? initialLayout,
     imageTransform:
       transformMode === 'resize' && draftLayout
-        ? getResizedImageTransform(draftLayout)
+        ? getResizedImageTransform(element, initialLayout, draftLayout)
         : null,
     transformMode,
     handleMovePointerDown,
