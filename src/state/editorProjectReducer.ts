@@ -177,6 +177,7 @@ function reduceEditorProjectState(
     case 'set-header-background-color':
     case 'set-header-text-color':
     case 'set-header-font-family':
+    case 'set-header-font-size':
     case 'set-header-frame-width':
     case 'set-header-frame-color':
       return reduceHeaderAppearanceAction(state, action)

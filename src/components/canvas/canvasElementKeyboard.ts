@@ -86,8 +86,15 @@ export function handleCanvasElementKeyDown(
 
   const resizing = event.ctrlKey || event.metaKey
 
-  if (element.kind === 'header' && direction.x !== 0) {
-    return
+  if (element.kind === 'header') {
+    if (!resizing) {
+      onOpenProperties()
+      return
+    }
+
+    if (direction.x !== 0) {
+      return
+    }
   }
 
   onCloseProperties()

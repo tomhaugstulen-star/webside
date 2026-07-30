@@ -77,12 +77,16 @@ export function isTextFontFamily(value: unknown): value is TextFontFamily {
   return includesValue(textFontFamilies, value)
 }
 
+export function isTextFontSize(value: unknown): value is TextFontSize {
+  return includesValue(textFontSizes, value)
+}
+
 const textElementStyleValidators: Record<
   keyof TextElementStyle,
   (value: unknown) => boolean
 > = {
   fontFamily: isTextFontFamily,
-  fontSize: (value) => includesValue(textFontSizes, value),
+  fontSize: isTextFontSize,
   fontWeight: (value) => includesValue(textFontWeights, value),
   fontStyle: (value) => includesValue(textFontStyles, value),
   textAlign: (value) => includesValue(textAlignments, value),

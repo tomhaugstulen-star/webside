@@ -59,7 +59,7 @@ export function getAccessibleElementLabel(element: EditorElement) {
   }
 
   if (element.kind === 'header') {
-    return `${summary} Headeren følger hele sidebredden. Pil opp og ned flytter den. Control eller Command sammen med pil opp og ned endrer høyden. Delete åpner slettebekreftelse.`
+    return `${summary} Headeren er fast øverst og følger hele sidebredden. Control eller Command sammen med pil opp og ned endrer høyden. Delete åpner slettebekreftelse.`
   }
 
   return `${summary} Piltaster flytter. Control eller Command sammen med piltaster endrer størrelse. Delete åpner slettebekreftelse.`
@@ -71,7 +71,7 @@ export function getCanvasElementKeyboardShortcuts(element: EditorElement) {
   }
 
   if (element.kind === 'header') {
-    return 'Enter Space Delete ArrowUp ArrowDown Control+ArrowUp Control+ArrowDown Meta+ArrowUp Meta+ArrowDown'
+    return 'Enter Space Delete Control+ArrowUp Control+ArrowDown Meta+ArrowUp Meta+ArrowDown'
   }
 
   const baseShortcuts =

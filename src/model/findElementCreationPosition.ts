@@ -28,10 +28,14 @@ function getOccupiedVerticalSpans(
 ): VerticalSpan[] {
   return existingElements
     .filter((element) => overlapsCreationColumn(element, size))
-    .map((element) => ({
-      top: element.position.desktop.y,
-      bottom: element.position.desktop.y + element.size.desktop.height,
-    }))
+    .map((element) => {
+      const top = element.kind === 'header' ? 0 : element.position.desktop.y
+
+      return {
+        top,
+        bottom: top + element.size.desktop.height,
+      }
+    })
     .sort((first, second) => first.top - second.top)
 }
 

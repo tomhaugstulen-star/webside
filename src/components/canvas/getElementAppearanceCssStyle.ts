@@ -19,6 +19,7 @@ export function getElementAppearanceCssStyle(
       backgroundColor: element.appearance.backgroundColor,
       color: element.appearance.textColor,
       fontFamily: getTextFontFamilyCssValue(element.appearance.fontFamily),
+      fontSize: element.appearance.fontSize,
       borderColor: element.appearance.frame.color,
       borderStyle: 'solid',
       borderWidth: element.appearance.frame.width,

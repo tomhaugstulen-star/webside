@@ -13,18 +13,21 @@ GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer for lokale `git`- og `npm`-kontroller.
+Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer bare for lokale `git`- og `npm`-kontroller som connectoren ikke kan utføre.
 
 ## Ufravikelig arbeidsmåte
 
 - aldri utvikling direkte på `main`
 - én avgrenset branch per leveranse
-- én konkret lokal handling om gangen
-- ikke påstå clean tree eller bestått kontroll uten terminaloutput
-- ikke merge uten eksplisitt godkjenning
+- én kontrollert handling om gangen
+- bruk faktisk branch, commit, diff og terminaloutput
+- ikke påstå clean tree eller bestått lokal kontroll uten terminaloutput
+- ingen merge uten eksplisitt `godkjent`
 - ikke start senere fase automatisk
-- gjennomfør framtidsrettet audit før PR
-- kontroller filstørrelser, arkitekturrapporter, PR-diff, mergebarhet, reviews, tråder og CI
+- ikke endre låst roadmap uten eksplisitt produktbeslutning
+- gjennomfør kodeaudit og filstørrelseskontroll før PR
+- kontroller PR-diff, mergebarhet, CI, reviews og åpne tråder
+- aktive produksjonsfiler bør være under 250 linjer; 300 er hard unntaksgrense
 
 ## Autoritativ dokumentasjon
 
@@ -37,179 +40,320 @@ Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer 
 7. `docs/CODE_AUDIT.md`
 8. `README.md`
 
-Foreldede fasefiler som var fullt innarbeidet i dokumentene over er slettet. Ikke gjenopprett parallelle sannhetskilder.
+Ikke gjenopprett parallelle historiske fasefiler.
+
+## Låst produktretning
+
+Website-editoren skal være en lokal arbeidsportal på brukerens egen PC.
+
+Den skal støtte:
+
+- lokale nettsideprosjekter
+- sider, seksjoner, Header, Hero og elementer
+- rask portalnavigasjon og hurtigsøk
+- lokal lagring, autolagring og gjenoppretting
+- sikkerhetskopi og prosjektimport
+- lokal fullskjermsforhåndsvisning
+- OpenAI som kontrollert meddesigner i siste hovedfase
+
+Ikke bygg:
+
+- hosting
+- domeneoppsett
+- offentlig publiseringsknapp
+- produksjonsdeployment
+
+Arbeidsportalens navigasjon og nettsidens Header-navigasjon er to separate systemer og skal aldri blandes.
 
 ## Gjeldende status
 
 ```text
-siste fullførte produksjonsfase: 13 – Logo og header
-GitHub-sak: #31 – lukket som fullført
-pull request: #32 – merget
-mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
-prosjektskjema: versjon 8
-manuell funksjonstest: godkjent
-framtidsrettet kodeaudit og opprydding: gjennomført
-automatisk sluttkontroll: bestått etter siste produksjonsendring
-lokal main: synkronisert og clean
-aktiv dokumentasjonsbranch: docs/record-phase-13-merge
-neste produksjonsfase: ikke startet
+siste fullførte produksjonsfase på main: 13 – Logo og header
+aktiv produksjonsfase: 14 – korrigeringslinjer og snapping
+aktiv branch: feature/alignment-guides
+base origin/main ved fase-start: ff39d8df7d59843c796616ad7d56cf00a41236f8
+GitHub-sak: #34 – åpen
+pull request: ikke opprettet
+prosjektskjema: versjon 9
 ```
 
-Faktisk branch-head og `origin/main` skal alltid leses på nytt før nye operasjoner.
+Faktisk remote-head og `origin/main` skal alltid leses på nytt før nye operasjoner.
 
-## Siste verifiserte automatiske kontroll
+Ved siste GitHub-kontroll var branchen foran `main` og 0 commits bak. Det finnes ingen PR for branchen.
 
-Brukerens lokale terminaloutput etter siste produksjonsendring bekreftet:
+## Implementert fase 14
+
+- pekerflytting for Seksjon, Bilde, Tekst og Knapp
+- venstre/midt/høyre og topp/midt/bunn mot andre synlige elementer
+- horisontal og vertikal lerretsmidt
+- 6 px snapgrense i lerretskoordinater
+- X og Y velges uavhengig
+- nærmeste treff per akse
+- midtanker prioriteres ved lik avstand
+- guider vises bare mens snap er aktiv
+- låste synlige elementer kan være mål
+- skjulte elementer og aktivt element ekskluderes
+- Header og Seksjon kan være mål
+- mål og lerretsmål fryses ved pekerstart
+- alignment preview er transient
+- guider ryddes ved commit, cancel og tapt pointer capture
+- auto-scroll er beholdt
+- resize og tastatur snapping er ikke implementert
+
+## Header-invariant i fase 14
+
+- én sammensatt `HeaderEditorElement`
+- fast ved `x = 0, y = 0`
+- full aktiv lerretsbredde
+- ingen peker- eller tastaturflytting
+- høyde 70–100 px
+- bakgrunn, tekstfarge og designramme
+- fontfamilie
+- fontstørrelse 12–96 px, standard 24 px
+- bare vertikal resizing
+- kan velges og åpne egenskaper
+- kan brukes som snapmål
+- nye elementer opprettes under Header
+
+Header-invarianten er rettet i alle identifiserte kodeveier:
+
+- `src/model/createEditorElement.ts`
+- `src/state/setElementDesktopLayout.ts`
+- `src/components/canvas/getAlignmentTargets.ts`
+- `src/components/canvas/getCanvasContentHeight.ts`
+- `src/model/findElementCreationPosition.ts`
+
+## Manuell fase-14-regresjon
+
+Brukeren har godkjent hele den relevante manuelle testen:
+
+- elementkanter og elementmidtpunkter på begge akser
+- horisontal og vertikal lerretsmidt
+- samtidig snapping på begge akser
+- Seksjon, Bilde, Tekst og Knapp som aktive elementer
+- låste synlige elementer som snapmål
+- aktivt element ekskludert som eget mål
+- Header som fast, fullbredde snapmål
+- Header-høyde og fontstørrelse gjennom PC/Telefon-bytte
+- nye elementer opprettet under Header
+- pointer sluppet utenfor vinduet uten hengende guider
+- auto-scroll uten hopp eller feil commit
+- resizing uten snapping eller guider
+- tastaturflytting uten snapping eller guider
+- clamping ved alle lerretsgrenser
+- PC- og Telefon-visning
+
+Skjulte elementer kan ikke styres fra dagens UI. Ekskluderingen er kodeverifisert i `getAlignmentTargets()`.
+
+Lokal lagring finnes ikke ennå og var derfor ikke et akseptansepunkt for fase 14.
+
+## Siste verifiserte lokale automatiske kontroll
+
+Brukerens terminaloutput på commit `8893a9c`:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
-Vite: 122 moduler transformert
-CSS: 36.54 kB, gzip 6.80 kB
-JavaScript: 275.80 kB, gzip 81.65 kB
-produksjonsbuild: bestått på 206 ms
-working tree før kontroll: clean
-working tree etter målrettet kontroll: clean
+Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
+Vite: 127 moduler transformert
+CSS: 36.85 kB, gzip 6.87 kB
+JavaScript: 280.88 kB, gzip 83.22 kB
+produksjonsbuild: bestått på 198 ms
+git status --short: ingen output
 ```
 
-Arkitekturrapportene ble regenerert etter pointer-preview-rettelsen. Siste Header-låseopprydding endret ingen import- eller avhengighetskanter.
+Senere commits var dokumentasjonssynk og endret ikke produksjonskode eller importgraf.
 
-## Filstørrelser
-
-Brukeren kontrollerte alle `.ts`, `.tsx` og `.css`-filer på lokal `main` etter merge:
+Remote audit av endrede produksjonsfiler viste:
 
 ```text
-produksjonsfiler på eller over 250 linjer: 0
-produksjonsfiler på eller over 300 linjer: 0
-working tree: clean
+EditorCanvasElement.tsx          243 linjer
+useElementPointerTransform.ts    243 linjer
+snapElementMove.ts               190 linjer
+filer på eller over 250 linjer: 0
+filer på eller over 300 linjer: 0
 ```
 
-Siste berørte Header-filer:
+## Gjenstående før PR
+
+Brukeren skal bare gjøre den lokale delen connectoren ikke kan utføre:
+
+1. pull siste remote-head
+2. kjør `npm run check`
+3. kjør `git diff --check`
+4. kjør repositoryomfattende filstørrelseskontroll
+5. bekreft `git status --short` uten output og eksakt HEAD
+
+Deretter skal assistenten:
+
+1. verifisere remote branch og diff på nytt
+2. kontrollere at dokumentasjonen er synkronisert
+3. opprette PR først når sluttkontrollen er bestått
+4. kontrollere PR-diff, mergebarhet, CI, reviews og tråder
+5. aldri merge uten eksplisitt `godkjent`
+
+## Godkjente separate saker etter fase 14
+
+### Sak #35 – tekstboksbakgrunn
+
+- lagret og validert bakgrunnsfarge for tekstbokser
+- vis `Bakgrunn` og `Tekstfarge` i Farger-panelet
+- egen modell-/schema-leveranse
+- ikke bland inn i `feature/alignment-guides`
+
+### Sak #36 – editor-only elementgrense
+
+- alle elementbokser skal ha en subtil 1 px grå markering i editoren
+- gjelder også Seksjon og Header når designramme er `0 / Ingen`
+- ingen prosjektdata, schema eller layoutendring
+- ingen grense i lokal forhåndsvisning
+- egen liten visuell branch
+
+### Sak #37 – elementnotat og ryddet høyrepanel
+
+Dette er eksplisitt godkjent av brukeren og skal tas på egen branch etter fase 14:
+
+- vanlig klikk på element åpner vanlige egenskaper
+- flytende `Egenskaper`-knapp endres til `Notat`
+- `Notat` åpner elementets interne arbeidsmerknad i høyrepanelet
+- notat lagres per element
+- notat vises aldri på nettsiden eller i forhåndsvisning
+- høyrepanelet skal ikke vise låseknapp eller `Status: Låst/Ulåst`
+- eksisterende låseikon ved elementet beholdes
+- Header er fortsatt ikke låsbar
+- synlig felt for alternativ tekst fjernes
+- teknisk `altText` kan stå tomt internt for kompatibilitet
+- OpenAI skal senere ikke sende notater ut uten eksplisitt brukerhandling
+
+### Sak #38 – like mellomrom og fordelingsguider
+
+- like avstander til lerretskanter
+- likt faktisk mellomrom mellom tre eller flere elementbokser
+- horisontal og vertikal variant
+- midlertidige editor-only avstandsmarkører
+- senere utvidelse av snap-motoren, ikke del av fase 14
+
+## Låst roadmap
 
 ```text
-HeaderCreationControl.tsx       224
-EditorCanvasElement.tsx         223
-RightPropertiesPanel.tsx        105
-SidebarPanels.tsx                95
-ElementSelectionToolbar.tsx      83
-toggleElementLock.ts             40
+fase 14  Fullføre korrigeringslinjer og snapping
+fase 15  Duse portalfarger og tydelig visuell struktur
+fase 16  Automatisert testgrunnlag
+fase 17  Tekstboksbakgrunn og små eksisterende modellgap
+fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
+fase 19  Sider, seksjons-ID-er og navigasjonsmodell
+fase 20  Nettstedets Header og menynavigasjon
+fase 21  Hero
+fase 22  Header-redigering og nettstedstruktur
+fase 23  Responsive mobiloverstyringer
+fase 24  Angre og gjør om
+fase 25  Lokal prosjektlagring, autolagring og gjenoppretting
+fase 26  Sikkerhetskopi, prosjektformat, import og migrering
+fase 27  Lokal forhåndsvisning
+fase 28  Malbibliotek og gjenbrukbare seksjoner
+fase 29  OpenAI-integrasjon
 ```
 
-Genererte filer som `architecture.json` og `docs/dependency-graph.mmd` vurderes ikke etter 250-linjersregelen.
+Detaljert omfang og avhengigheter ligger i `docs/WORK_PLAN.md`.
 
-## Implementert Header
+## Låst Hero-retning
 
-Header er én egen sammensatt elementtype med:
+Hero er en egen sammensatt hovedleveranse med:
 
-- lokal PNG-, JPEG- eller WebP-logo
-- stabil logoasset-ID og serialiserbar metadata
-- navn på nettsted eller firma
-- valgfri undertittel
-- bakgrunn
-- felles tekstfarge
-- felles font
-- ramme `Ingen` eller 1–10 px
-- markering og sikker sletting
-- ingen låseknapp eller låsestatus
+- full bredde som standard
+- plassering under Header
+- bakgrunnsbilde eller bakgrunnsfarge
+- bildeutsnitt og valgfritt overlay
+- hovedoverskrift og undertittel
+- én eller to knapper
+- side-, seksjons- eller eksterne lenker
+- tekstjustering og maksimal tekstbredde
+- eksplisitt PC- og Telefon-regel
 
-Layout:
+Endelig modell låses før fase 21.
 
-- full bredde i aktiv PC- eller Telefon-visning
-- rendres ved `x = 0`
-- ingen fri horisontal flytting eller resizing
-- bare vertikal flytting
-- standardhøyde 88 px
-- minimum 70 px
-- maksimum 100 px
-- Telefon arver desktop y/høyde fram til fase 15
+## Låst nettstedsmeny-retning
 
-Panel:
+Nettstedets Header skal senere støtte:
 
-- markering og panelåpen tilstand er separate
-- panelet lukkes under transform
-- `Egenskaper` i objektverktøyet åpner det igjen
-- Header viser font, ramme og sletting i høyremenyen
-- Header viser ikke `Låst/Ulåst`
-- bakgrunn, tekstfarge og aktiv rammefarge vises i `Farger`
+- automatisk responsiv meny
+- alltid horisontal meny
+- alltid kompakt rullegardin/hamburgermeny
+- aktive menypunkter
+- side- og seksjonsmål
+- eksterne lenker
+- ett nivå med undermeny
+- valgfri handlingsknapp
+- tilgjengelig tastaturnavigasjon
 
-Låsegrense:
+## Låst portalretning
 
-- Seksjon, Bilde, Tekst og Knapp beholder eksisterende låsing
-- Header opprettes med `locked: false` av hensyn til versjon-8-modellen
-- objektverktøyet eksponerer ikke Header-låsing
-- `toggleElementLock` avviser Header
-- framtidig prosjektimport må avvise eller normalisere Header med `locked: true`
+Arbeidsportalen skal senere få:
 
-Utenfor fase 13:
+- prosjektoversikt
+- side-/elementnavigator
+- finn og marker element
+- dempede semantiske portalfarger
+- `Ctrl + K` hurtigsøk
+- tydelig aktiv side og prosjekt
+- PC/Telefon-kontroll
+- historikkstatus
+- lagringsstatus
+- lokal forhåndsvisning
 
-- bytte av Header-logo eller tekst etter oppretting
-- mobiloverstyringer
-- historikk
-- autolagring
-- prosjektimport
-- publisering
+## Låst OpenAI-retning
 
-## Avsluttende kodeopprydding
+OpenAI kommer til slutt og kan brukes til:
 
-- duplisert bilderessursopprydding er fjernet fra `EditorShell`
-- `useElementDeletion` er eneste ansvarssted for opprydding av Bilde- og Header-assets
-- `useElementCreation` kontrollerer aktiv side og ID-kollisjon før den rapporterer suksess
-- nye Header-elementer lagrer `x = 0`
-- Header-layoutcommits normaliserer `x = 0` og kanonisk serialisert bredde
-- rene pekerberegninger ligger i `elementPointerTransform.ts`
-- Headerens pointer-preview låser horisontalt delta til `x = 0` under drag
-- `useElementPointerTransform.ts` er redusert til 204 linjer
-- canvas-stiler er delt mellom grunnlayout og interaksjon
-- Header-låseknappen og låsestatusen er fjernet
-- låsereduceren avviser Header
-- ekstra `onCreated`-callback etter Header-oppretting er fjernet
-- venstrepanelet lukkes bare av felles opprettingsflyt
-- logoressursansvar overføres før lokal UI-opprydding
-- issue #31 og PR #32 er fullført
+- tekst og omskriving
+- fargeinspirasjon
+- bildegenerering til valgte felt
+- Hero-generator
+- seksjonsgenerator
+- navigasjons- og sideforslag
+- komplette sideutkast
+- helhets- og konsistenskontroll
 
-## Manuelt godkjent
+AI-flyt:
 
-Brukeren har godkjent:
+```text
+Forslag
+  -> validering
+  -> forhåndsvisning
+  -> eksplisitt godkjenning
+  -> typede actions/reducere
+  -> én historikkhandling
+```
 
-- full bredde i PC og Telefon
-- bare vertikal flytting
-- stabil pointer-preview uten sideveis hopp
-- høyde 70–100 px
-- panel lukkes under transform og åpnes fra `Egenskaper`
-- font, bakgrunn, tekstfarge og ramme
-- logooppretting og ressursbevaring
-- ingen Header-låseknapp eller låsestatus
-- sikker sletting og delt asset-kontroll
-- eksisterende låsing for Seksjon, Bilde, Tekst og Knapp
-- regresjon av Seksjon, Bilde, Tekst og Knapp
+Sikkerhetsgrense:
 
-## Gjeldende dokumentasjonsleveranse
+- ingen API-nøkkel i browser- eller Vite-kode
+- lokal server-side prosess på samme PC
+- nøkkel fra miljøvariabel
+- ikke-godkjente forslag er transient state
+- AI-genererte bilder får stabil asset-ID først etter godkjenning og lokal lagring
+- ingen skjult overskriving eller sletting
 
-`docs/record-phase-13-merge` skal bare registrere at fase 13 er merget og klargjøre overleveringen.
+## Eksplisitt utsatt eller fjernet
 
-Kontroller før docs-PR:
+Utsatt:
 
-- branchen er basert på mergecommit `b2e8e05c6daeec494130ce695bc51875d0d949f0`
-- bare avtalte Markdown-filer er endret
-- ingen produksjonskode, konfigurasjon eller arkitekturrapport er endret
-- `git diff --check` er uten treff
-- PR er ikke draft
-- merge skjer bare etter eksplisitt brukergodkjenning
+- resize-snapping
+- tastatursnapping
+- grid
+- avstandsmål og automatisk fordeling, sporet i sak #38
+- flermerking og gruppering
+- flere mobilbrytepunkter
+- nettbrett som egen viewport
+- AI-generert mobiloppsett
+- generell CSS-editor
+- mer enn ett undermenynivå
 
-## Neste produksjonsfase
+Fjernet:
 
-Fase 14 – korrigeringslinjer – er neste planlagte kandidat, men den er ikke startet.
-
-Før issue eller feature-branch opprettes, må produktomfanget avklares:
-
-- hvilke elementkanter og midtpunkter som skal gi linjer
-- om linjene gjelder lerret, andre elementer eller begge
-- terskel for visning
-- om snapping skal inngå eller om linjene bare er visuelle
-- pointer-, tastatur- og responsiv oppførsel
-- ytelsesgrense ved mange elementer
-
-Ikke implementer fase 14 før disse beslutningene er eksplisitt godkjent.
+- offentlig publisering
+- hosting
+- domener
+- deployment
 
 ---

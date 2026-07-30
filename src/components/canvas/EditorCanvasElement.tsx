@@ -3,6 +3,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
+  type PointerEvent,
   type RefObject,
 } from 'react'
 import type { ElementLayout } from '../../model/elementLayout'
@@ -27,6 +28,7 @@ import { useElementPointerTransform } from './useElementPointerTransform'
 
 type EditorCanvasElementProps = {
   element: EditorElement
+  pageElements: EditorElement[]
   viewport: ViewportMode
   canvasWidth: number
   selected: boolean
@@ -43,6 +45,7 @@ type EditorCanvasElementProps = {
 
 export function EditorCanvasElement({
   element,
+  pageElements,
   viewport,
   canvasWidth,
   selected,
@@ -67,7 +70,7 @@ export function EditorCanvasElement({
   const initialLayout: ElementLayout =
     isHeader && canvasWidth > 0
       ? {
-          position: { x: 0, y: resolvedPosition.y },
+          position: { x: 0, y: 0 },
           size: { width: canvasWidth, height: resolvedSize.height },
         }
       : {
@@ -86,6 +89,8 @@ export function EditorCanvasElement({
     handleLostPointerCapture,
   } = useElementPointerTransform({
     element,
+    pageElements,
+    viewport,
     initialLayout,
     canvasRef,
     scrollContainerRef,
@@ -111,6 +116,7 @@ export function EditorCanvasElement({
     top: layout.position.y,
     width: layout.size.width,
     height: layout.size.height,
+    cursor: isHeader ? 'default' : undefined,
     ...getElementAppearanceCssStyle(element),
     ...(element.kind === 'text'
       ? getTextElementCssStyle(element.textStyle)
@@ -122,6 +128,18 @@ export function EditorCanvasElement({
   const lockedClass = element.locked ? ' canvas-element--locked' : ''
   const editingClass = isTextEditing ? ' canvas-element--editing' : ''
   const accessibleLabel = getAccessibleElementLabel(element)
+
+  const handleElementPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isHeader) {
+      handleMovePointerDown(event)
+      return
+    }
+
+    if (event.button !== 0) return
+    event.stopPropagation()
+    onSelect(element.id)
+    onOpenProperties()
+  }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     handleCanvasElementKeyDown(event, {
@@ -172,7 +190,7 @@ export function EditorCanvasElement({
         }
         aria-pressed={isTextEditing ? undefined : selected}
         data-element-id={element.id}
-        onPointerDown={isTextEditing ? undefined : handleMovePointerDown}
+        onPointerDown={isTextEditing ? undefined : handleElementPointerDown}
         onPointerMove={isTextEditing ? undefined : handlePointerMove}
         onPointerUp={isTextEditing ? undefined : handlePointerUp}
         onPointerCancel={isTextEditing ? undefined : handlePointerCancel}

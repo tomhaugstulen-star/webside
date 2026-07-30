@@ -50,7 +50,7 @@ Seksjon -> Ramme -> Element
 Bilde   -> Bilde -> Element
 Tekst   -> Tekstutseende -> Lenke -> Element
 Knapp   -> Knapp -> Lenke -> Element
-Header  -> Font -> Ramme -> Element
+Header  -> Tekstutseende -> Ramme -> Element
 ```
 
 Felles `Element`-seksjon viser sikker sletting. Låsestatus vises bare for Seksjon, Bilde, Tekst og Knapp.
@@ -70,11 +70,14 @@ Bakgrunn og tekstfarge endres i `Farger`, ikke som parallelle verdier i høyreme
 
 Markert Header viser:
 
-- font for navn og undertittel
+- fontfamilie for navn og undertittel
+- fontstørrelse 12–96 px
 - rammetykkelse og rammefarge
 - sikker sletting
 
-Header viser ikke låseknapp eller `Låst/Ulåst`. Headerens innhold, logo, bakgrunn og tekstfarge redigeres ikke fra en separat lokal panelkopi. Fase 13 har ikke en funksjon for å bytte logo eller tekst etter oppretting.
+Header viser ikke låseknapp eller `Låst/Ulåst`. Header er fast øverst og har ingen flyttekontroll. Høyden endres på lerretet med nederste resizehåndtak eller `Control/Command + Pil opp/ned`.
+
+Headerens innhold, logo, bakgrunn og tekstfarge redigeres ikke fra en separat lokal panelkopi. Dagens leveranse har ikke en funksjon for å bytte logo eller tekst etter oppretting.
 
 ## Bilde
 
@@ -94,6 +97,8 @@ Tekst viser font, størrelse, stil, justering, linjehøyde og lenke. Tekstinnhol
 
 Knapp viser knappetekst, design og lenke. Asset-ID valideres mot det bundlete biblioteket.
 
+Tekstboksbakgrunn er ikke en modellert egenskap i versjon 9 og vises derfor ikke i panelet eller `Farger`. Gapet spores i sak #35.
+
 ## Tilgjengelighet
 
 - paneloverskrift kobles med `aria-labelledby`
@@ -101,6 +106,8 @@ Knapp viser knappetekst, design og lenke. Asset-ID valideres mot det bundlete bi
 - feil bruker `role="alert"`
 - status bruker `role="status"`
 - låste kontroller er deaktivert for låsbare elementer
+- Header opplyser at den er fast øverst
+- Header annonserer bare tilgjengelige resize-snarveier
 - redusert bevegelse respekteres
 
 ## Arkitekturgrense

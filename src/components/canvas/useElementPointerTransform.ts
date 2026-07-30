@@ -4,10 +4,17 @@ import {
   type ElementLayout,
   type ResizeHandle,
 } from '../../model/elementLayout'
-import type { EditorElement } from '../../model/editorProject'
+import type {
+  EditorElement,
+  ResponsiveViewport,
+} from '../../model/editorProject'
 import type { ImageTransform } from '../../model/imagePresentation'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
-import type { ElementLayoutPreview } from './canvasLayoutPreview'
+import type { AlignmentTargets } from './alignmentGuideTypes'
+import {
+  elementLayoutPreviewsEqual,
+  type ElementLayoutPreview,
+} from './canvasLayoutPreview'
 import {
   getNextPointerLayout,
   getPointerInteractionDelta,
@@ -15,9 +22,13 @@ import {
   type PointerInteraction,
   type TransformMode,
 } from './elementPointerTransform'
+import { getAlignmentTargets } from './getAlignmentTargets'
+import { getPointerMovePreview } from './getPointerMovePreview'
 
 type ElementPointerTransformOptions = {
   element: EditorElement
+  pageElements: EditorElement[]
+  viewport: ResponsiveViewport
   initialLayout: ElementLayout
   canvasRef: RefObject<HTMLDivElement | null>
   scrollContainerRef: RefObject<HTMLDivElement | null>
@@ -35,6 +46,8 @@ type ElementPointerTransformOptions = {
 
 export function useElementPointerTransform({
   element,
+  pageElements,
+  viewport,
   initialLayout,
   canvasRef,
   scrollContainerRef,
@@ -45,15 +58,17 @@ export function useElementPointerTransform({
   onCommitImageFrame,
   onPreviewLayoutChange,
 }: ElementPointerTransformOptions) {
-  const [draftLayout, setDraftLayout] = useState<ElementLayout | null>(null)
+  const [draftPreview, setDraftPreview] =
+    useState<ElementLayoutPreview | null>(null)
   const [transformMode, setTransformMode] = useState<TransformMode | null>(null)
   const interactionRef = useRef<PointerInteraction | null>(null)
-  const draftLayoutRef = useRef<ElementLayout | null>(null)
+  const draftPreviewRef = useRef<ElementLayoutPreview | null>(null)
+  const alignmentTargetsRef = useRef<AlignmentTargets | null>(null)
 
-  const publishDraftLayout = (layout: ElementLayout | null) => {
-    draftLayoutRef.current = layout
-    setDraftLayout(layout)
-    onPreviewLayoutChange(layout ? { elementId: element.id, layout } : null)
+  const publishDraftPreview = (preview: ElementLayoutPreview | null) => {
+    draftPreviewRef.current = preview
+    setDraftPreview(preview)
+    onPreviewLayoutChange(preview)
   }
 
   const startInteraction = (
@@ -63,6 +78,11 @@ export function useElementPointerTransform({
   ) => {
     if (event.button !== 0) return
     onSelect(element.id)
+
+    if (mode === 'move' && element.kind === 'header') {
+      onClickWithoutTransform()
+      return
+    }
 
     if (element.locked) {
       onClickWithoutTransform()
@@ -89,8 +109,22 @@ export function useElementPointerTransform({
       canvasWidth: canvas.clientWidth,
       initialLayout,
     }
+    alignmentTargetsRef.current =
+      mode === 'move'
+        ? getAlignmentTargets({
+            elements: pageElements,
+            activeElementId: element.id,
+            viewport,
+            canvasWidth: canvas.clientWidth,
+            canvasHeight: canvas.clientHeight,
+          })
+        : null
     setTransformMode(mode)
-    publishDraftLayout(initialLayout)
+    publishDraftPreview({
+      elementId: element.id,
+      layout: initialLayout,
+      guides: [],
+    })
   }
 
   const handleMovePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -127,25 +161,35 @@ export function useElementPointerTransform({
       scrollContainer.scrollTop,
     )
     const nextLayout = getNextPointerLayout(element, interaction, delta)
+    const nextPreview =
+      interaction.mode === 'move'
+        ? getPointerMovePreview({
+            elementId: element.id,
+            layout: nextLayout,
+            targets: alignmentTargetsRef.current,
+            canvasWidth: interaction.canvasWidth,
+          })
+        : { elementId: element.id, layout: nextLayout, guides: [] }
 
     if (
-      draftLayoutRef.current &&
-      elementLayoutsEqual(draftLayoutRef.current, nextLayout)
+      draftPreviewRef.current &&
+      elementLayoutPreviewsEqual(draftPreviewRef.current, nextPreview)
     ) {
       return
     }
 
-    publishDraftLayout(nextLayout)
+    publishDraftPreview(nextPreview)
   }
 
   const finishInteraction = (commit: boolean) => {
     const interaction = interactionRef.current
-    const finalLayout = draftLayoutRef.current
+    const finalLayout = draftPreviewRef.current?.layout ?? null
     interactionRef.current = null
+    alignmentTargetsRef.current = null
     setTransformMode(null)
-    publishDraftLayout(null)
-
+    publishDraftPreview(null)
     if (!commit || !interaction || !finalLayout) return
+
     if (elementLayoutsEqual(interaction.initialLayout, finalLayout)) {
       onClickWithoutTransform()
       return
@@ -159,7 +203,6 @@ export function useElementPointerTransform({
             finalLayout,
           )
         : null
-
     if (imageTransform) {
       onCommitImageFrame(element.id, finalLayout, imageTransform)
     } else {
@@ -184,6 +227,8 @@ export function useElementPointerTransform({
       finishInteraction(false)
     }
   }
+
+  const draftLayout = draftPreview?.layout ?? null
 
   return {
     layout: draftLayout ?? initialLayout,

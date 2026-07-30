@@ -1,21 +1,40 @@
 # Plan for Website-editoren
 
-Dette dokumentet viser implementert grunnlag, siste fullførte fase og senere leveranser.
+Dette dokumentet oppsummerer produktretningen, implementert grunnlag, aktiv produksjonsfase og den låste videre rekkefølgen.
+
+Detaljert faseomfang og akseptansekriterier ligger i `docs/WORK_PLAN.md`.
+
+## Produktdefinisjon
+
+Website-editoren skal være en komplett lokal arbeidsportal på brukerens egen PC.
+
+Portalen skal brukes til å:
+
+- opprette og vedlikeholde nettsideprosjekter
+- administrere sider, seksjoner, Header, Hero og elementer
+- navigere raskt mellom prosjektinnhold og verktøy
+- lagre og sikkerhetskopiere prosjekter lokalt
+- forhåndsvise nettsiden lokalt
+- bruke OpenAI som kontrollert meddesigner i siste hovedfase
+
+Offentlig publisering, hosting, domener og produksjonsdeployment er fjernet fra produktplanen.
 
 ## Gjeldende status
 
 ```text
-siste fullførte produksjonsfase: 13 – Logo og header
-GitHub-sak: #31 – lukket som fullført
-pull request: #32 – merget
-mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
-prosjektskjema: versjon 8
-manuell funksjonstest: godkjent
-kodeaudit og dokumentasjonsopprydding: gjennomført
-automatisk sluttkontroll: bestått etter siste produksjonsendring
-lokal main: synkronisert og clean
-aktiv dokumentasjonsbranch: docs/record-phase-13-merge
-neste produksjonsfase: ikke startet
+siste fullførte produksjonsfase på main: 13 – Logo og header
+aktiv produksjonsfase: 14 – korrigeringslinjer og snapping
+aktiv branch: feature/alignment-guides
+base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
+GitHub-sak: #34 – åpen
+pull request: ikke opprettet
+prosjektskjema: versjon 9
+fase-14-implementasjon: til stede
+framtidsrettet kodeaudit: gjennomført
+full automatisk kontroll etter audit: bestått
+filstørrelseskontroll: bestått
+lokal working tree etter kontroll: clean
+manuell fase-14-regresjon: delvis godkjent
 ```
 
 ## Implementert editorgrunnlag
@@ -34,8 +53,9 @@ neste produksjonsfase: ikke startet
 - bildeutsnitt, zoom, alternativ tekst og metadata
 - side- og elementfarger
 - Seksjon- og Header-ramme
+- korrigeringslinjer og snapping ved pekerflytting
 
-## Menystruktur
+## Gjeldende portalstruktur
 
 ```text
 Prosjekt
@@ -45,6 +65,8 @@ Elementer
 Innstillinger
 ```
 
+Gjeldende ansvarsdeling:
+
 ```text
 Venstremeny = opprette elementer, velge fil/design og vise prosjektoversikt
 Høyremeny  = egenskaper og handlinger for markert element
@@ -53,92 +75,243 @@ Ressurslag = eie transient fil og Object URL
 Prosjekt   = eie serialiserbare verdier
 ```
 
-## Fase 13 – Logo og header
+Portalstrukturen skal utvides i fase 18 med oversikt, sider/navigasjon, Hero/seksjoner, filer/bilder, navigator og hurtigsøk.
 
-Header er én egen sammensatt elementtype, ikke en gruppe av Seksjon, Bilde og Tekst.
+## To separate navigasjonssystemer
 
-Oppretting:
+### Arbeidsportalens navigasjon
+
+Brukes for å finne:
+
+- prosjekter
+- sider
+- elementer
+- paneler
+- verktøy
+- innstillinger
+- senere AI-assistent
+
+Denne navigasjonen er editor-UI og inngår ikke i nettsideprosjektets innhold.
+
+### Nettsidens navigasjon
+
+Vises i nettstedets Header og lagres som prosjektdata.
+
+Den skal senere støtte:
+
+- interne sider
+- seksjoner
+- eksterne lenker
+- aktivt menypunkt
+- handlingsknapp
+- ett nivå med undermeny
+- horisontal meny
+- kompakt rullegardin/hamburgermeny
+- automatisk responsiv meny
+
+## Header
+
+Header er én egen sammensatt elementtype.
+
+Gjeldende oppførsel:
 
 - navn på nettsted eller firma
 - valgfri undertittel
 - lokal PNG-, JPEG- eller WebP-logo
-- eksisterende bildevalidering og ressurslager gjenbrukes
-- Header opprettes først når tekst og fil er gyldige
-- vellykket oppretting overfører eierskap til logoressursen før lokal UI-opprydding
-- venstrepanelet lukkes gjennom den felles opprettingsflyten, ikke en ekstra Header-callback
-
-Oppførsel:
-
-- full synlig sidebredde i PC og Telefon
-- horisontal plassering og bredde er faste
-- bare vertikal flytting
-- pointer-preview holder Header ved `x = 0` under hele dragoperasjonen
+- full synlig sidebredde
+- fast posisjon `x = 0, y = 0`
+- ingen peker- eller tastaturflytting
 - høyde 70–100 px, standard 88 px
 - markering og sikker sletting som ett element
-- ingen låseknapp eller låsestatus
-- låsereduceren avviser Header
-- egenskapspanel kan lukkes under transform og åpnes fra objektverktøyet
+- ingen låsing eller låsestatus
+- bakgrunn, tekstfarge, fontfamilie, fontstørrelse og ramme
 
-Utseende:
+Senere Header-leveranser bygger:
 
-- bakgrunn
-- felles tekstfarge for navn og undertittel
-- én font for navn og undertittel
-- ramme `Ingen` eller 1–10 px
-- rammefarge vises i `Farger` når rammen er aktiv
+- nettstedets menynavigasjon
+- automatisk, horisontal eller kompakt meny
+- redigering av logo, navn og undertittel etter oppretting
+- nettstednivå kontra sidenivå
 
-## Responsiv retning
+## Fase 14 – korrigeringslinjer og snapping
 
-- Telefon arver desktopgeometri når mobiloverstyring mangler.
-- Header følger alltid aktiv lerretsbredde.
-- Header y og høyde er foreløpig felles for PC og Telefon.
-- Egne mobiloverstyringer bygges først i fase 15.
+Implementert:
 
-## Verifisert fase-13-kontroll
+- bare pekerflytting; resize og tastatur snapping er utsatt
+- Seksjon, Bilde, Tekst og Knapp kan flyttes og snappe på begge akser
+- Header kan ikke flyttes, men kan brukes som snapmål
+- andre synlige elementer gir venstre/midt/høyre og topp/midt/bunn
+- lerretet gir horisontal og vertikal midtlinje
+- snapgrense er 6 px i lerretskoordinater
+- nærmeste treff velges separat per akse
+- midtanker vinner ved lik avstand
+- guider vises bare mens snap er aktiv
+- låste elementer kan være mål
+- skjulte elementer og aktivt element er ikke mål
+- mål fryses ved pekerstart
+- ingen alignmentdata lagres i prosjektet
 
-Automatisk:
+Manuelt godkjent:
 
-- ESLint bestått
-- TypeScript bestått
-- Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
-- Vite: 122 moduler transformert
-- produksjonsbuild bestått på 206 ms
-- alle seks filer i siste opprydding er under 250 linjer
-- full kontroll etter merge viser ingen produksjonsfiler på eller over 250 eller 300 linjer
+- justering mot elementkanter og midtpunkter
+- horisontal og vertikal lerretsmidt
+- samtidig snapping på begge akser
+- Header fast øverst og full bredde
+- Header-fontstørrelse
 
-Manuelt:
+Gjenstående før PR:
 
-- Header og logooppretting godkjent
-- PC- og Telefon-visning godkjent
-- pointer- og tastaturregler godkjent
-- font, farger og ramme godkjent
-- sikker sletting og delt asset-livssyklus godkjent
-- Header uten låsing godkjent
-- låsing for øvrige elementtyper godkjent
-- Seksjon, Bilde, Tekst og Knapp regresjonstestet
+- låste og skjulte mål
+- aktivt element ekskludert
+- alle flyttbare elementtyper
+- pointercancel og tapt pointer capture
+- auto-scroll
+- resize og tastatur uten snapping
+- clamp ved lerretsgrenser
+- PC- og Telefon-regresjon
+- sluttstatus, diff og PR-kontroll
 
-## Neste produksjonsfase
-
-Fase 14 – korrigeringslinjer – er neste planlagte kandidat. Den er ikke startet, og følgende må avklares før en feature-branch opprettes:
-
-- hvilke elementkanter og midtpunkter som skal gi linjer
-- om linjene gjelder lerret, andre elementer eller begge
-- terskel for visning og eventuell snapping
-- forskjell mellom visuell veiledning og faktisk posisjonsendring
-- pointer-, tastatur- og responsiv oppførsel
-- ytelsesgrense ved mange elementer
-
-Ingen fase-14-kode skal bygges før produkt- og modellomfanget er godkjent.
-
-## Senere faser
+Verifisert automatisk kontroll på `8893a9c`:
 
 ```text
-fase 14  korrigeringslinjer
-fase 15  responsive mobiloverstyringer
-fase 16  angre og gjør om
-fase 17  lokal automatisk lagring
-fase 18  åpne og importere prosjekt
-fase 19  forhåndsvisning og publisering
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
+Vite: 127 moduler transformert
+CSS: 36.85 kB, gzip 6.87 kB
+JavaScript: 280.88 kB, gzip 83.22 kB
+produksjonsbuild: bestått på 198 ms
 ```
 
-Åpne beslutninger for senere faser låses først når den aktuelle fasen starter.
+Filstørrelse:
+
+```text
+største produksjonsfiler: 243 linjer
+filer på eller over 250 linjer: 0
+filer på eller over 300 linjer: 0
+```
+
+## Hero
+
+Hero er nå låst som en egen senere hovedleveranse og skal ikke falle ut av planen igjen.
+
+Første planlagte retning:
+
+- egen sammensatt `HeroEditorElement`
+- full bredde som standard
+- plassert under Header som standard
+- bakgrunnsbilde eller bakgrunnsfarge
+- kontrollert bildeutsnitt
+- valgfritt fargeoverlegg
+- hovedoverskrift og undertittel
+- én eller to knapper
+- interne og eksterne lenker
+- tekstjustering og maksimal tekstbredde
+- dokumentert PC- og Telefon-oppførsel
+
+Endelig Hero-modell låses før fase 21 starter.
+
+## Visuell portalretning
+
+Portalen skal få dempede, harmoniske farger som skiller:
+
+- toppmeny
+- venstremeny
+- åpent venstrepanel
+- høyrepanel
+- arbeidsområde
+- nettsidelerret
+- aktive og valgte tilstander
+
+Dette er editorutseende og skal ikke endre nettsideprosjektets egne farger.
+
+## Lokal drift og data
+
+Planen beholder:
+
+- flere lokale prosjekter
+- prosjektoversikt
+- autolagring
+- manuell lagring
+- snapshots
+- krasjgjenoppretting
+- sikkerhetskopi til prosjektfil
+- kontrollert import og migrering
+- lokal fullskjermsforhåndsvisning
+
+Planen inneholder ikke offentlig publisering.
+
+## OpenAI
+
+OpenAI bygges etter at prosjektmodell, navigasjon, Hero, historikk, lagring, import og forhåndsvisning er stabile.
+
+Planlagt bruk:
+
+- tekst og omskriving
+- fargepaletter og designinspirasjon
+- bildegenerering til valgte felt
+- Hero-generator
+- seksjonsgenerator
+- side- og navigasjonsforslag
+- komplette sideutkast
+- konsistenskontroll
+
+AI-flyt:
+
+```text
+Forslag
+  -> validering
+  -> forhåndsvisning
+  -> eksplisitt godkjenning
+  -> typede actions/reducere
+  -> én historikkhandling
+```
+
+API-nøkkel skal ikke ligge i Vite- eller browserkode. En lokal sikker server-side grense brukes når fasen starter.
+
+## Låst videre rekkefølge
+
+```text
+fase 14  Fullføre korrigeringslinjer og snapping
+fase 15  Duse portalfarger og tydelig visuell struktur
+fase 16  Automatisert testgrunnlag
+fase 17  Tekstboksbakgrunn og små eksisterende modellgap
+fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
+fase 19  Sider, seksjons-ID-er og navigasjonsmodell
+fase 20  Nettstedets Header og menynavigasjon
+fase 21  Hero
+fase 22  Header-redigering og nettstedstruktur
+fase 23  Responsive mobiloverstyringer
+fase 24  Angre og gjør om
+fase 25  Lokal prosjektlagring, autolagring og gjenoppretting
+fase 26  Sikkerhetskopi, prosjektformat, import og migrering
+fase 27  Lokal forhåndsvisning
+fase 28  Malbibliotek og gjenbrukbare seksjoner
+fase 29  OpenAI-integrasjon
+```
+
+Rekkefølgen endres ikke uten eksplisitt produktbeslutning og synkronisert dokumentasjon.
+
+## Eksplisitt utsatt eller fjernet
+
+Utsatt uten egen fase:
+
+- snapping ved resizing
+- snapping ved tastatur
+- grid
+- avstandsmål
+- automatisk fordeling
+- flermerking og gruppering
+- flere mobile brytepunkter
+- nettbrett som egen viewport
+- automatisk kollisjonsunngåelse
+- AI-generert mobiloppsett
+- generell CSS-editor
+- mer enn ett undermenynivå
+
+Fjernet fra produktplanen:
+
+- offentlig publisering
+- hosting
+- domener
+- deployment

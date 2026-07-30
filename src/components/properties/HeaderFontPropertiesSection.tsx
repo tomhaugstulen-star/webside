@@ -1,7 +1,9 @@
 import type { HeaderEditorElement } from '../../model/editorProject'
 import {
   textFontFamilies,
+  textFontSizes,
   type TextFontFamily,
+  type TextFontSize,
 } from '../../model/textElementStyle'
 import { useHeaderAppearance } from '../../state/useHeaderAppearance'
 import { textFontFamilyLabels } from './textFontFamilyLabels'
@@ -13,8 +15,8 @@ type HeaderFontPropertiesSectionProps = {
 export function HeaderFontPropertiesSection({
   element,
 }: HeaderFontPropertiesSectionProps) {
-  const { updateHeaderFontFamily } = useHeaderAppearance()
-  const disabled = element.locked
+  const { updateHeaderFontFamily, updateHeaderFontSize } =
+    useHeaderAppearance()
 
   return (
     <section
@@ -32,7 +34,6 @@ export function HeaderFontPropertiesSection({
           <select
             id="header-font-properties-family"
             value={element.appearance.fontFamily}
-            disabled={disabled}
             onChange={(event) =>
               updateHeaderFontFamily(
                 element.id,
@@ -47,13 +48,30 @@ export function HeaderFontPropertiesSection({
             ))}
           </select>
         </label>
-      </div>
 
-      {disabled && (
-        <p className="text-properties__locked-note">
-          Lås opp headeren for å endre fonten.
-        </p>
-      )}
+        <label
+          className="text-properties__field"
+          htmlFor="header-font-properties-size"
+        >
+          <span>Størrelse</span>
+          <select
+            id="header-font-properties-size"
+            value={element.appearance.fontSize}
+            onChange={(event) =>
+              updateHeaderFontSize(
+                element.id,
+                Number(event.target.value) as TextFontSize,
+              )
+            }
+          >
+            {textFontSizes.map((fontSize) => (
+              <option key={fontSize} value={fontSize}>
+                {fontSize} px
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
     </section>
   )
 }

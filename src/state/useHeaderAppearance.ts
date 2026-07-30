@@ -1,7 +1,10 @@
 import { useCallback } from 'react'
 import { normalizeEditorColor } from '../model/editorColor'
 import type { ElementFrameWidth } from '../model/elementFrame'
-import type { TextFontFamily } from '../model/textElementStyle'
+import type {
+  TextFontFamily,
+  TextFontSize,
+} from '../model/textElementStyle'
 import { useEditorProject } from './useEditorProject'
 
 export function useHeaderAppearance() {
@@ -57,6 +60,18 @@ export function useHeaderAppearance() {
     [dispatch],
   )
 
+  const updateHeaderFontSize = useCallback(
+    (elementId: string, fontSize: TextFontSize) => {
+      dispatch({
+        type: 'set-header-font-size',
+        elementId,
+        fontSize,
+        updatedAt: new Date().toISOString(),
+      })
+    },
+    [dispatch],
+  )
+
   const updateHeaderFrameWidth = useCallback(
     (elementId: string, width: ElementFrameWidth) => {
       dispatch({
@@ -92,6 +107,7 @@ export function useHeaderAppearance() {
     updateHeaderBackgroundColor,
     updateHeaderTextColor,
     updateHeaderFontFamily,
+    updateHeaderFontSize,
     updateHeaderFrameWidth,
     updateHeaderFrameColor,
   }

@@ -24,11 +24,10 @@ export function createEditorElement({
   existingElements,
 }: CreateEditorElementInput): EditorElement {
   const size = getDefaultElementSize(request.kind)
-  const creationPosition = findElementCreationPosition(size, existingElements)
   const position =
     request.kind === 'header'
-      ? { x: 0, y: creationPosition.y }
-      : creationPosition
+      ? { x: 0, y: 0 }
+      : findElementCreationPosition(size, existingElements)
   const common = {
     id,
     position: { desktop: position },
@@ -85,6 +84,7 @@ export function createEditorElement({
           backgroundColor: DEFAULT_HEADER_APPEARANCE.backgroundColor,
           textColor: DEFAULT_HEADER_APPEARANCE.textColor,
           fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
+          fontSize: DEFAULT_HEADER_APPEARANCE.fontSize,
           frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
         },
       }
