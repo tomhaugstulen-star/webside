@@ -6,6 +6,7 @@ type ElementSelectionToolbarProps = {
   elementId: string
   locked: boolean
   layout: ElementLayout
+  onOpenProperties: () => void
 }
 
 function LockIcon({ locked }: { locked: boolean }) {
@@ -36,6 +37,7 @@ export function ElementSelectionToolbar({
   elementId,
   locked,
   layout,
+  onOpenProperties,
 }: ElementSelectionToolbarProps) {
   const { toggleElementLocked } = useElementLocking()
   const style: CSSProperties = {
@@ -55,6 +57,13 @@ export function ElementSelectionToolbar({
       aria-label="Objektverktøy"
       onPointerDown={stopPointerPropagation}
     >
+      <button
+        className="canvas-object-toolbar__button canvas-object-toolbar__button--label"
+        type="button"
+        onClick={onOpenProperties}
+      >
+        Egenskaper
+      </button>
       <button
         className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
         type="button"
