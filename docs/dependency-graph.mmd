@@ -26,10 +26,14 @@ subgraph src["src"]
     src_model_elementDimensions_ts["elementDimensions.ts"]
     src_model_elementLink_ts["elementLink.ts"]
     src_model_imagePresentation_ts["imagePresentation.ts"]
+    src_model_pageAppearance_ts["pageAppearance.ts"]
+    src_model_editorColor_ts["editorColor.ts"]
+    src_model_sectionAppearance_ts["sectionAppearance.ts"]
     src_model_textElementStyle_ts["textElementStyle.ts"]
     src_model_elementCreation_ts["elementCreation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
+    src_model_projectColorEntries_ts["projectColorEntries.ts"]
     src_model_createEditorProject_ts["createEditorProject.ts"]
     src_model_createEditorElement_ts["createEditorElement.ts"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
@@ -53,6 +57,7 @@ subgraph src["src"]
       src_components_canvas_useImageCropTransform_ts["useImageCropTransform.ts"]
       src_components_canvas_TextElementEditor_tsx["TextElementEditor.tsx"]
       src_components_canvas_ElementSelectionToolbar_tsx["ElementSelectionToolbar.tsx"]
+      src_components_canvas_getElementAppearanceCssStyle_ts["getElementAppearanceCssStyle.ts"]
       src_components_canvas_getTextElementCssStyle_ts["getTextElementCssStyle.ts"]
       src_components_canvas_ImageResizeHandles_tsx["ImageResizeHandles.tsx"]
       src_components_canvas_useElementPointerTransform_ts["useElementPointerTransform.ts"]
@@ -67,13 +72,18 @@ subgraph src["src"]
       src_components_properties_ButtonPropertiesSection_tsx["ButtonPropertiesSection.tsx"]
       src_components_properties_DeleteElementSection_tsx["DeleteElementSection.tsx"]
       src_components_properties_ElementLinkPropertiesSection_tsx["ElementLinkPropertiesSection.tsx"]
+      src_components_properties_FramePropertiesSection_tsx["FramePropertiesSection.tsx"]
       src_components_properties_ImagePropertiesSection_tsx["ImagePropertiesSection.tsx"]
       src_components_properties_TextPropertiesSection_tsx["TextPropertiesSection.tsx"]
+    end
+    subgraph src_components_colors["colors"]
+      src_components_colors_ColorSwatchInput_tsx["ColorSwatchInput.tsx"]
     end
     subgraph src_components_sidebar["sidebar"]
       src_components_sidebar_LeftSidebar_tsx["LeftSidebar.tsx"]
       src_components_sidebar_SidebarIcon_tsx["SidebarIcon.tsx"]
       src_components_sidebar_SidebarPanels_tsx["SidebarPanels.tsx"]
+      src_components_sidebar_ColorsPanel_tsx["ColorsPanel.tsx"]
       src_components_sidebar_ElementsPanel_tsx["ElementsPanel.tsx"]
       src_components_sidebar_ButtonLibraryPanel_tsx["ButtonLibraryPanel.tsx"]
       src_components_sidebar_ImageImportControl_tsx["ImageImportControl.tsx"]
@@ -96,11 +106,14 @@ subgraph src["src"]
     src_state_useElementLocking_ts["useElementLocking.ts"]
     src_state_useButtonProperties_ts["useButtonProperties.ts"]
     src_state_useElementLink_ts["useElementLink.ts"]
+    src_state_useSectionAppearance_ts["useSectionAppearance.ts"]
     src_state_useTextElementStyle_ts["useTextElementStyle.ts"]
+    src_state_useProjectColors_ts["useProjectColors.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
     src_state_addElementToActivePage_ts["addElementToActivePage.ts"]
     src_state_deleteElementFromActivePage_ts["deleteElementFromActivePage.ts"]
+    src_state_reduceColorProjectAction_ts["reduceColorProjectAction.ts"]
     src_state_reduceImageProjectAction_ts["reduceImageProjectAction.ts"]
     src_state_setImageAltText_ts["setImageAltText.ts"]
     src_state_setImageDesktopFrame_ts["setImageDesktopFrame.ts"]
@@ -149,9 +162,14 @@ src_model_editorProject_ts-->src_model_elementDimensions_ts
 src_model_editorProject_ts-->src_model_elementLink_ts
 src_model_editorProject_ts-->src_model_imageAsset_ts
 src_model_editorProject_ts-->src_model_imagePresentation_ts
+src_model_editorProject_ts-->src_model_pageAppearance_ts
+src_model_editorProject_ts-->src_model_sectionAppearance_ts
 src_model_editorProject_ts-->src_model_textElementStyle_ts
 src_model_imagePresentation_ts-->src_model_elementDimensions_ts
 src_model_imagePresentation_ts-->src_model_imageAsset_ts
+src_model_pageAppearance_ts-->src_model_editorColor_ts
+src_model_sectionAppearance_ts-->src_model_editorColor_ts
+src_model_textElementStyle_ts-->src_model_editorColor_ts
 src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
 src_model_elementCreation_ts-->src_model_imageAsset_ts
@@ -159,11 +177,13 @@ src_state_useEditorProject_ts-->src_state_editorProjectContext_ts
 src_state_editorProjectContext_ts-->src_model_editorProject_ts
 src_state_editorProjectContext_ts-->src_state_editorProjectAction_ts
 src_state_editorProjectAction_ts-->src_model_buttonAsset_ts
+src_state_editorProjectAction_ts-->src_model_editorColor_ts
 src_state_editorProjectAction_ts-->src_model_editorProject_ts
 src_state_editorProjectAction_ts-->src_model_elementCreation_ts
 src_state_editorProjectAction_ts-->src_model_elementLayout_ts
 src_state_editorProjectAction_ts-->src_model_elementLink_ts
 src_state_editorProjectAction_ts-->src_model_imagePresentation_ts
+src_state_editorProjectAction_ts-->src_model_sectionAppearance_ts
 src_state_editorProjectAction_ts-->src_model_textElementStyle_ts
 src_model_elementLayout_ts-->src_model_editorProject_ts
 src_model_elementLayout_ts-->src_model_elementDimensions_ts
@@ -204,6 +224,7 @@ src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasElem
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_canvasLayoutPreview_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_EditorCanvasElementContent_tsx
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_ElementSelectionToolbar_tsx
+src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_getElementAppearanceCssStyle_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_getTextElementCssStyle_ts
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_ImageResizeHandles_tsx
 src_components_canvas_EditorCanvasElement_tsx-->src_components_canvas_TextElementEditor_tsx
@@ -233,6 +254,7 @@ src_components_canvas_useImageCropTransform_ts-->src_state_useImageProperties_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_model_elementLayout_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_state_useElementLocking_ts
 src_state_useElementLocking_ts-->src_state_useEditorProject_ts
+src_components_canvas_getElementAppearanceCssStyle_ts-->src_model_editorProject_ts
 src_components_canvas_getTextElementCssStyle_ts-->src_model_textElementStyle_ts
 src_components_canvas_ImageResizeHandles_tsx-->src_model_elementLayout_ts
 src_components_canvas_useElementPointerTransform_ts-->src_model_editorProject_ts
@@ -248,6 +270,7 @@ src_components_properties_RightPropertiesPanel_tsx-->src_model_editorProject_ts
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ButtonPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_DeleteElementSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ElementLinkPropertiesSection_tsx
+src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_FramePropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ImagePropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_TextPropertiesSection_tsx
 src_components_properties_ButtonPropertiesSection_tsx-->src_assets_buttons_buttonAssetCatalog_ts
@@ -262,6 +285,14 @@ src_components_properties_ElementLinkPropertiesSection_tsx-->src_model_elementLi
 src_components_properties_ElementLinkPropertiesSection_tsx-->src_state_useElementLink_ts
 src_state_useElementLink_ts-->src_model_elementLink_ts
 src_state_useElementLink_ts-->src_state_useEditorProject_ts
+src_components_properties_FramePropertiesSection_tsx-->src_model_editorProject_ts
+src_components_properties_FramePropertiesSection_tsx-->src_model_sectionAppearance_ts
+src_components_properties_FramePropertiesSection_tsx-->src_state_useSectionAppearance_ts
+src_components_properties_FramePropertiesSection_tsx-->src_components_colors_ColorSwatchInput_tsx
+src_state_useSectionAppearance_ts-->src_model_editorColor_ts
+src_state_useSectionAppearance_ts-->src_model_sectionAppearance_ts
+src_state_useSectionAppearance_ts-->src_state_useEditorProject_ts
+src_components_colors_ColorSwatchInput_tsx-->src_model_editorColor_ts
 src_components_properties_ImagePropertiesSection_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_properties_ImagePropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_ImagePropertiesSection_tsx-->src_model_imageAsset_ts
@@ -278,8 +309,19 @@ src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_LeftSidebar_tsx-->src_components_sidebar_SidebarPanels_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_model_elementCreation_ts
 src_components_sidebar_SidebarPanels_tsx-->src_types_editor_ts
+src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ColorsPanel_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ElementsPanel_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_tsx
+src_components_sidebar_ColorsPanel_tsx-->src_model_projectColorEntries_ts
+src_components_sidebar_ColorsPanel_tsx-->src_state_useEditorProject_ts
+src_components_sidebar_ColorsPanel_tsx-->src_state_useProjectColors_ts
+src_components_sidebar_ColorsPanel_tsx-->src_components_colors_ColorSwatchInput_tsx
+src_model_projectColorEntries_ts-->src_model_editorColor_ts
+src_model_projectColorEntries_ts-->src_model_editorProject_ts
+src_state_useProjectColors_ts-->src_model_editorColor_ts
+src_state_useProjectColors_ts-->src_state_useEditorProject_ts
+src_state_useProjectColors_ts-->src_state_useSectionAppearance_ts
+src_state_useProjectColors_ts-->src_state_useTextElementStyle_ts
 src_components_sidebar_ElementsPanel_tsx-->src_model_elementCreation_ts
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ButtonLibraryPanel_tsx
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ImageImportControl_tsx
@@ -305,6 +347,7 @@ src_state_editorProjectReducer_ts-->src_model_elementLayout_ts
 src_state_editorProjectReducer_ts-->src_state_addElementToActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_deleteElementFromActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
+src_state_editorProjectReducer_ts-->src_state_reduceColorProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_reduceImageProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_setButtonAsset_ts
 src_state_editorProjectReducer_ts-->src_state_setButtonLabel_ts
@@ -314,6 +357,7 @@ src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
 src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
 src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_model_createEditorProject_ts-->src_model_pageAppearance_ts
 src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
 src_state_addElementToActivePage_ts-->src_model_editorProject_ts
 src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
@@ -325,9 +369,15 @@ src_model_createEditorElement_ts-->src_model_elementDimensions_ts
 src_model_createEditorElement_ts-->src_model_elementLink_ts
 src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_imagePresentation_ts
+src_model_createEditorElement_ts-->src_model_sectionAppearance_ts
 src_model_createEditorElement_ts-->src_model_textElementStyle_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
 src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
+src_state_reduceColorProjectAction_ts-->src_model_editorColor_ts
+src_state_reduceColorProjectAction_ts-->src_model_editorProject_ts
+src_state_reduceColorProjectAction_ts-->src_model_pageAppearance_ts
+src_state_reduceColorProjectAction_ts-->src_model_sectionAppearance_ts
+src_state_reduceColorProjectAction_ts-->src_state_editorProjectAction_ts
 src_state_reduceImageProjectAction_ts-->src_model_editorProject_ts
 src_state_reduceImageProjectAction_ts-->src_state_editorProjectAction_ts
 src_state_reduceImageProjectAction_ts-->src_state_setImageAltText_ts
