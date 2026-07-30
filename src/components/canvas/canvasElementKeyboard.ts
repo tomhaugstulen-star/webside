@@ -84,28 +84,29 @@ export function handleCanvasElementKeyDown(
     return
   }
 
+  const resizing = event.ctrlKey || event.metaKey
+
+  if (element.kind === 'header' && direction.x !== 0) {
+    return
+  }
+
   onCloseProperties()
   const step = event.shiftKey ? 10 : 1
   const delta = {
     x: direction.x * step,
     y: direction.y * step,
   }
-  const resizing = event.ctrlKey || event.metaKey
   const maximumSize =
     element.kind === 'image' && element.mode === 'crop'
       ? getImageCropSize(element.assetMetadata, element.transform)
       : undefined
-  const resizeHandle =
-    element.kind === 'header' && element.widthMode === 'full'
-      ? 'south'
-      : 'south-east'
   const nextLayout = resizing
     ? resizeElementLayout(
         element.kind,
         initialLayout,
         delta,
         canvasWidth,
-        resizeHandle,
+        element.kind === 'header' ? 'south' : 'south-east',
         maximumSize,
       )
     : moveElementLayout(initialLayout, delta, canvasWidth)
