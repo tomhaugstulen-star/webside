@@ -1,7 +1,9 @@
 import type { HeaderEditorElement } from '../../model/editorProject'
 import {
   textFontFamilies,
+  textFontSizes,
   type TextFontFamily,
+  type TextFontSize,
 } from '../../model/textElementStyle'
 import { useHeaderAppearance } from '../../state/useHeaderAppearance'
 import { textFontFamilyLabels } from './textFontFamilyLabels'
@@ -13,7 +15,8 @@ type HeaderFontPropertiesSectionProps = {
 export function HeaderFontPropertiesSection({
   element,
 }: HeaderFontPropertiesSectionProps) {
-  const { updateHeaderFontFamily } = useHeaderAppearance()
+  const { updateHeaderFontFamily, updateHeaderFontSize } =
+    useHeaderAppearance()
   const disabled = element.locked
 
   return (
@@ -47,11 +50,35 @@ export function HeaderFontPropertiesSection({
             ))}
           </select>
         </label>
+
+        <label
+          className="text-properties__field"
+          htmlFor="header-font-properties-size"
+        >
+          <span>Størrelse</span>
+          <select
+            id="header-font-properties-size"
+            value={element.appearance.fontSize}
+            disabled={disabled}
+            onChange={(event) =>
+              updateHeaderFontSize(
+                element.id,
+                Number(event.target.value) as TextFontSize,
+              )
+            }
+          >
+            {textFontSizes.map((fontSize) => (
+              <option key={fontSize} value={fontSize}>
+                {fontSize} px
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {disabled && (
         <p className="text-properties__locked-note">
-          Lås opp headeren for å endre fonten.
+          Lås opp headeren for å endre tekstutseendet.
         </p>
       )}
     </section>
