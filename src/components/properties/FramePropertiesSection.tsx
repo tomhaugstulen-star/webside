@@ -1,18 +1,24 @@
 import { useId } from 'react'
 import { ColorSwatchInput } from '../colors/ColorSwatchInput'
-import type { SectionEditorElement } from '../../model/editorProject'
+import type {
+  HeaderEditorElement,
+  SectionEditorElement,
+} from '../../model/editorProject'
 import {
-  isSectionFrameWidth,
-  sectionFrameWidths,
-  type SectionFrameWidth,
-} from '../../model/sectionAppearance'
+  elementFrameWidths,
+  isElementFrameWidth,
+  type ElementFrameWidth,
+} from '../../model/elementFrame'
+import { useHeaderAppearance } from '../../state/useHeaderAppearance'
 import { useSectionAppearance } from '../../state/useSectionAppearance'
 
+type FramedEditorElement = SectionEditorElement | HeaderEditorElement
+
 type FramePropertiesSectionProps = {
-  element: SectionEditorElement
+  element: FramedEditorElement
 }
 
-function getFrameWidthLabel(width: SectionFrameWidth) {
+function getFrameWidthLabel(width: ElementFrameWidth) {
   return width === 0 ? 'Ingen' : `${width} px`
 }
 
@@ -21,10 +27,26 @@ export function FramePropertiesSection({
 }: FramePropertiesSectionProps) {
   const { updateSectionFrameWidth, updateSectionFrameColor } =
     useSectionAppearance()
+  const { updateHeaderFrameWidth, updateHeaderFrameColor } =
+    useHeaderAppearance()
   const idPrefix = useId()
   const widthId = `${idPrefix}-width`
   const colorId = `${idPrefix}-color`
   const disabled = element.locked
+
+  const updateFrameWidth = (width: ElementFrameWidth) => {
+    if (element.kind === 'section') {
+      updateSectionFrameWidth(element.id, width)
+      return
+    }
+
+    updateHeaderFrameWidth(element.id, width)
+  }
+
+  const updateFrameColor = (value: string) =>
+    element.kind === 'section'
+      ? updateSectionFrameColor(element.id, value)
+      : updateHeaderFrameColor(element.id, value)
 
   return (
     <section className="frame-properties" aria-labelledby={`${idPrefix}-title`}>
@@ -40,12 +62,12 @@ export function FramePropertiesSection({
             onChange={(event) => {
               const width = Number(event.target.value)
 
-              if (isSectionFrameWidth(width)) {
-                updateSectionFrameWidth(element.id, width)
+              if (isElementFrameWidth(width)) {
+                updateFrameWidth(width)
               }
             }}
           >
-            {sectionFrameWidths.map((width) => (
+            {elementFrameWidths.map((width) => (
               <option key={width} value={width}>
                 {getFrameWidthLabel(width)}
               </option>
@@ -58,13 +80,13 @@ export function FramePropertiesSection({
           label="Farge"
           value={element.appearance.frame.color}
           disabled={disabled}
-          onChange={(value) => updateSectionFrameColor(element.id, value)}
+          onChange={updateFrameColor}
         />
       </div>
 
       {disabled && (
         <p className="frame-properties__locked-note">
-          Lås opp seksjonen for å endre rammen.
+          Lås opp elementet for å endre rammen.
         </p>
       )}
     </section>
