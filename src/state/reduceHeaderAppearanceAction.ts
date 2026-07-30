@@ -8,6 +8,7 @@ import {
   isValidHeaderAppearance,
   type HeaderAppearance,
 } from '../model/headerAppearance'
+import { isTextFontFamily } from '../model/textElementStyle'
 import type { HeaderAppearanceAction } from './editorProjectAction'
 
 type HeaderAppearanceUpdater = (
@@ -65,6 +66,21 @@ export function reduceHeaderAppearanceAction(
   action: HeaderAppearanceAction,
 ): EditorProjectState {
   switch (action.type) {
+    case 'set-header-background-color':
+      if (!isEditorColor(action.color)) {
+        return state
+      }
+
+      return updateActiveHeaderAppearance(
+        state,
+        action.elementId,
+        action.updatedAt,
+        (element) =>
+          element.appearance.backgroundColor === action.color
+            ? null
+            : { ...element.appearance, backgroundColor: action.color },
+      )
+
     case 'set-header-text-color':
       if (!isEditorColor(action.color)) {
         return state
@@ -78,6 +94,21 @@ export function reduceHeaderAppearanceAction(
           element.appearance.textColor === action.color
             ? null
             : { ...element.appearance, textColor: action.color },
+      )
+
+    case 'set-header-font-family':
+      if (!isTextFontFamily(action.fontFamily)) {
+        return state
+      }
+
+      return updateActiveHeaderAppearance(
+        state,
+        action.elementId,
+        action.updatedAt,
+        (element) =>
+          element.appearance.fontFamily === action.fontFamily
+            ? null
+            : { ...element.appearance, fontFamily: action.fontFamily },
       )
 
     case 'set-header-frame-width':
