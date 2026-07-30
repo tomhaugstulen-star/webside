@@ -8,7 +8,10 @@ import {
   isValidHeaderAppearance,
   type HeaderAppearance,
 } from '../model/headerAppearance'
-import { isTextFontFamily } from '../model/textElementStyle'
+import {
+  isTextFontFamily,
+  isTextFontSize,
+} from '../model/textElementStyle'
 import type { HeaderAppearanceAction } from './editorProjectAction'
 
 type HeaderAppearanceUpdater = (
@@ -109,6 +112,21 @@ export function reduceHeaderAppearanceAction(
           element.appearance.fontFamily === action.fontFamily
             ? null
             : { ...element.appearance, fontFamily: action.fontFamily },
+      )
+
+    case 'set-header-font-size':
+      if (!isTextFontSize(action.fontSize)) {
+        return state
+      }
+
+      return updateActiveHeaderAppearance(
+        state,
+        action.elementId,
+        action.updatedAt,
+        (element) =>
+          element.appearance.fontSize === action.fontSize
+            ? null
+            : { ...element.appearance, fontSize: action.fontSize },
       )
 
     case 'set-header-frame-width':
