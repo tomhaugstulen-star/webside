@@ -40,7 +40,7 @@ function StandardElementCard({
 }) {
   return (
     <button
-      className="element-card"
+      className={`element-card element-card--${item.kind}`}
       type="button"
       onClick={() => onCreateElement({ kind: item.kind })}
     >
@@ -85,7 +85,7 @@ export function ElementsPanel({
         <StandardElementCard item={textItem} onCreateElement={onCreateElement} />
 
         <button
-          className="element-card"
+          className="element-card element-card--button"
           type="button"
           onClick={() => setView('buttons')}
         >
