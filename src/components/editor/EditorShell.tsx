@@ -25,6 +25,7 @@ type DeletionRequest = {
 export function EditorShell() {
   const [activeTool, setActiveTool] = useState<EditorTool | null>(null)
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
+  const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
   const { state, activePage } = useEditorProject()
   const { createElement } = useElementCreation()
@@ -34,7 +35,9 @@ export function EditorShell() {
   const { removeImageAsset } = useImageAssetStore()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
-    ? activePage.elements.find((element) => element.id === deletionRequest.elementId) ?? null
+    ? activePage.elements.find(
+        (element) => element.id === deletionRequest.elementId,
+      ) ?? null
     : null
 
   const toggleToolPanel = (tool: EditorTool) => {
@@ -117,9 +120,16 @@ export function EditorShell() {
   })
 
   useEffect(() => {
+    if (!selectedElement) {
+      setPropertiesPanelOpen(false)
+    }
+  }, [selectedElement])
+
+  useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !deletionDialogOpen) {
         setActiveTool(null)
+        setPropertiesPanelOpen(false)
       }
     }
 
@@ -127,9 +137,12 @@ export function EditorShell() {
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [deletionDialogOpen])
 
+  const visiblePropertiesElement =
+    propertiesPanelOpen && selectedElement ? selectedElement : null
+
   return (
     <div
-      className={`editor-shell${activeTool ? ' editor-shell--panel-open' : ''}${selectedElement ? ' editor-shell--properties-open' : ''}`}
+      className={`editor-shell${activeTool ? ' editor-shell--panel-open' : ''}${visiblePropertiesElement ? ' editor-shell--properties-open' : ''}`}
     >
       <TopToolbar
         pageName={activePage.name}
@@ -143,9 +156,14 @@ export function EditorShell() {
           onPanelAction={closeToolPanel}
           onCreateElement={createElementAndClosePanel}
         />
-        <EditorCanvas viewport={viewport} />
+        <EditorCanvas
+          viewport={viewport}
+          onOpenProperties={() => setPropertiesPanelOpen(true)}
+          onCloseProperties={() => setPropertiesPanelOpen(false)}
+        />
         <RightPropertiesPanel
-          element={selectedElement}
+          element={visiblePropertiesElement}
+          onClose={() => setPropertiesPanelOpen(false)}
           onRequestElementDeletion={requestElementDeletion}
         />
       </div>
