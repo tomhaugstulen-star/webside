@@ -270,14 +270,17 @@ Manuelt godkjent på PC og Telefon:
 - tekst-, knapp- og bildeegenskaper
 - crop, zoom, sletting og fallback
 
-Siste komplette automatiske kontroll før 10 px-utvidelsen:
+Siste verifiserte automatiske kontroll:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
 Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
 Vite: 111 moduler transformert
-produksjonsbuild: bestått på 189 ms
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
-Ny komplett kontroll kreves før PR.
+Arkitekturrapportene ble regenerert og committet i `1963088`. Implementeringen ligger i PR #29 og merges bare etter eksplisitt godkjenning.
