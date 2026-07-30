@@ -38,23 +38,23 @@ git diff --check
 aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
 GitHub-sak: #28
+PR: #29 – åpen, ikke draft
 base main: 504b6d66670eb4a10f929e5addf6c56b00782487
 prosjektskjema: versjon 7
 implementering: ferdig
 manuell PC- og Telefon-test: godkjent
 rammebredde: Ingen eller 1–10 px
 framtidsrettet sluttaudit: ferdig
-automatiske kontroller etter siste 10 px-endring: gjenstår
-arkitekturrapporter etter siste produksjonsendring: gjenstår
-PR: ikke opprettet
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
 merge: ikke godkjent eller utført
 ```
 
-Faktisk branch- og `main`-HEAD leses fra Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
+Faktisk branch-, PR- og `main`-HEAD leses fra GitHub/Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
 
-## 3. Siste komplette automatiske kontroll
+## 3. Siste verifiserte automatiske kontroll
 
-Brukerens lokale terminaloutput før utvidelsen fra 4 til 10 px bekreftet:
+Brukerens lokale terminaloutput etter siste produksjonsendring bekreftet:
 
 ```text
 ESLint: bestått
@@ -63,10 +63,11 @@ Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
 Vite: 111 moduler transformert
 CSS: 33.62 kB, gzip 6.34 kB
 JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 189 ms
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
-Utvidelsen til 10 px endret bare rammeverdi-listen og menyetiketten. En ny komplett `npm run check` er likevel obligatorisk før PR.
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`.
 
 ## 4. Fase 12 – implementert funksjonsomfang
 
@@ -124,7 +125,7 @@ Detaljene står i `docs/PROJECT_COLORS.md`.
 - dokumentasjonsstatus – PR #22 og PR #24
 - fase 11A: bildeimport, ramme og utsnitt – PR #26
 
-Fase 12 er ferdig implementert, men ikke merget.
+Fase 12 er ferdig implementert og ligger i PR #29, men er ikke merget.
 
 ## 7. Neste handling
 
@@ -133,22 +134,24 @@ Kjør på `feature/project-colors`:
 ```powershell
 git pull --ff-only origin feature/project-colors
 git status
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status --short
-git diff --stat
+git log -5 --oneline --decorate
 ```
 
 Forventet:
 
-- `npm run check` består etter 10 px-endringen
-- arkitekturrapportene oppdateres i tråd med de nye modulene
-- ingen andre produksjonsfiler endres
-- ingen whitespace-feil
+- lokal branch trekker de siste statusdokumentene
+- branch er synkronisert med `origin/feature/project-colors`
+- working tree er clean
 
-Rapportene og dokumentasjonen committes før PR. Ingen merge uten eksplisitt godkjenning.
+Kontroller deretter PR #29:
+
+1. head og base
+2. changed files og samlet diff
+3. mergebarhet
+4. reviews og uløste tråder
+5. CI/statuskontroller
+
+Ingen merge uten eksplisitt godkjenning.
 
 ## 8. Planlagte senere faser
 
