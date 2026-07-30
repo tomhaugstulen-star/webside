@@ -91,7 +91,6 @@ export function useElementPointerTransform({
 
     const canvas = canvasRef.current
     const scrollContainer = scrollContainerRef.current
-
     if (!canvas || !scrollContainer || canvas.clientWidth <= 0) {
       onClickWithoutTransform()
       return
@@ -145,7 +144,6 @@ export function useElementPointerTransform({
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const interaction = interactionRef.current
     const scrollContainer = scrollContainerRef.current
-
     if (
       !interaction ||
       interaction.pointerId !== event.pointerId ||
@@ -190,7 +188,6 @@ export function useElementPointerTransform({
     alignmentTargetsRef.current = null
     setTransformMode(null)
     publishDraftPreview(null)
-
     if (!commit || !interaction || !finalLayout) return
 
     if (elementLayoutsEqual(interaction.initialLayout, finalLayout)) {
@@ -206,7 +203,6 @@ export function useElementPointerTransform({
             finalLayout,
           )
         : null
-
     if (imageTransform) {
       onCommitImageFrame(element.id, finalLayout, imageTransform)
     } else {
