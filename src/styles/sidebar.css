@@ -48,11 +48,8 @@
 .rail-button[aria-pressed='true'] {
   color: var(--portal-accent);
   background: var(--portal-control-selected);
-  box-shadow: inset 4px 0 0 var(--portal-accent);
-}
-
-.rail-button:first-child[aria-pressed='true'] {
-  border-radius: 15px 15px 15px 0;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px var(--portal-accent);
 }
 
 .rail-button:focus-visible {
@@ -60,13 +57,35 @@
   outline-offset: -4px;
 }
 
-.rail-button svg {
-  width: 30px;
-  height: 30px;
+.left-rail__main .rail-button:nth-child(1) {
+  --rail-icon-color: var(--portal-icon-blue);
+}
+
+.left-rail__main .rail-button:nth-child(2) {
+  --rail-icon-color: var(--portal-icon-green);
+}
+
+.left-rail__main .rail-button:nth-child(3) {
+  --rail-icon-color: var(--portal-icon-purple);
+}
+
+.left-rail__main .rail-button:nth-child(4) {
+  --rail-icon-color: var(--portal-icon-orange);
 }
 
 .rail-button--settings {
   min-height: 112px;
+  --rail-icon-color: var(--portal-text);
+}
+
+.rail-button svg {
+  width: 30px;
+  height: 30px;
+  color: var(--rail-icon-color, var(--portal-text));
+}
+
+.rail-button[aria-pressed='true'] svg {
+  color: var(--portal-accent);
 }
 
 .left-panel {
