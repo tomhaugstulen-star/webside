@@ -20,7 +20,7 @@ type ResponsiveValue<T> = {
 - Dagens UI oppretter ikke mobiloverstyringer.
 - Transform i PC- og Telefon-visning endrer derfor den delte desktopgeometrien.
 
-Dette er en kontrollert midlertidig regel fram til en egen mobilfase.
+Dette er en kontrollert midlertidig regel fram til fase 23.
 
 ## Gjeldende responsive verdier
 
@@ -53,6 +53,30 @@ Når lerretsbredden endres, oppdateres Headerens renderingsbredde via `ResizeObs
 
 En framtidig mobiloverstyring for Header kan gjelde høyde og eventuelt synlighet. Fri `x`, `y` eller bredde inngår ikke uten en ny eksplisitt produktendring.
 
+Nettstedets menynavigasjon bygges før mobilfasen og skal ha en eksplisitt modus:
+
+- automatisk responsiv
+- alltid horisontal
+- alltid kompakt
+
+Mobilfasen skal bevare disse menyinvariantene og ikke opprette en separat, urelatert mobilmeny.
+
+## Hero
+
+Hero bygges som egen sammensatt elementtype før mobilfasen.
+
+Før fase 23 starter skal Hero ha dokumenterte regler for:
+
+- full bredde eller eventuell annen breddeinvariant
+- plassering under Header
+- høyde
+- bakgrunnsbilde og bildeutsnitt
+- tekstplassering
+- knapper og lenker
+- mobil synlighet og eventuell mobil høyde
+
+Mobilfasen skal ikke improvisere Hero-modellen. Den skal bare innføre eksplisitte overstyringer som er tillatt av den ferdige Hero-modellen.
+
 ## Korrigeringslinjer i aktiv viewport
 
 Alignment-mål bygges fra aktiv viewport:
@@ -78,7 +102,7 @@ Lerretshøyden er avledet og lagres ikke. Den beregnes fra:
 
 Header behandles ved `y = 0` uavhengig av eventuelle eldre lagrede verdier. Avbrutt transform fjerner preview uten prosjektmutasjon.
 
-## Senere mobiloverstyringer
+## Fase 23 – responsive mobiloverstyringer
 
 Før implementering må følgende låses:
 
@@ -89,6 +113,8 @@ Før implementering må følgende låses:
 - viewport-bevisst flytting og størrelsesendring
 - oppretting i aktiv viewport
 - historikk og autolagring for mobilendringer
+- Header-menyens mobile oppførsel
+- Hero-overstyringer innenfor Hero-modellens grenser
 
 Minimum for frie elementer:
 
@@ -109,18 +135,22 @@ Senere layoutactions må angi viewport:
 - låst, ugyldig og uendret layout ignoreres
 - preview forblir transient
 - Header-invarianten håndheves uavhengig av viewport
+- Hero-invarianten håndheves uavhengig av viewport
 
 Mobilendringer skal aldri skrives inn i desktopfeltet implisitt.
 
-## Publisering
+## Lokal forhåndsvisning
 
-Ferdige nettsider skal bruke kontrollert generert CSS:
+Produktet skal ikke publisere nettsiden offentlig.
 
-1. les prosjektmodellen
-2. generer desktopregler
-3. generer mobilregler i én samlet media query
-4. bruk stabile element-ID-er eller genererte klassenavn
-5. gi samme resultat i editor, forhåndsvisning og eksport
+Lokal forhåndsvisning skal:
+
+1. lese den samme prosjektmodellen som editoren
+2. bruke desktopregler som grunnlag
+3. bruke mobiloverstyringer i én kontrollert media query eller tilsvarende samlet responsiv regel
+4. bruke stabile element-ID-er eller genererte klassenavn
+5. gi samme resultat som editorens PC- og Telefon-visning
+6. ikke vise editorpaneler, transformgrep eller portalnavigasjon
 
 `!important` skal ikke brukes som standard.
 
@@ -131,5 +161,7 @@ Ferdige nettsider skal bruke kontrollert generert CSS:
 - visuell status for arv og overstyring
 - markering av skjulte elementer
 - hvilke stilverdier som eventuelt blir responsive
+- nøyaktig mobilgrense for automatisk Header-meny
+- hvilke Hero-egenskaper som kan overstyres
 
-Disse beslutningene tas først når mobilfasen velges eksplisitt.
+Disse beslutningene tas først når fase 23 velges eksplisitt.
