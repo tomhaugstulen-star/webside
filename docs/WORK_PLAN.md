@@ -45,12 +45,12 @@ automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
 lokal main: brukeren har bekreftet clean tree etter merge
 aktiv docs-branch: docs/phase-12-handover
-dokumentasjons-PR: #30 – åpen, ikke draft og mergebar
+dokumentasjons-PR: #30 – åpen og ikke draft
 PR #30 omfang: åtte Markdown-filer, ingen produksjonskode eller arkitekturrapporter
 neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
 ```
 
-Faktisk branch-, PR- og `main`-HEAD leses fra GitHub/Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
+Head-SHA, mergebarhet, reviews, tråder og CI/status for PR #30 skal leses på nytt fra GitHub før merge. Faktisk branch-, PR- og `main`-HEAD leses fra GitHub/Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
 
 ## 3. Siste verifiserte automatiske kontroll
 
@@ -145,7 +145,7 @@ Kontroller deretter PR #30 med GitHub-connectoren:
 3. head-SHA samsvarer med branch-head
 4. åtte endrede Markdown-filer
 5. ingen produksjonskode eller arkitekturrapporter
-6. mergebarhet
+6. mergebarhet er ferdigberegnet
 7. reviews og uløste tråder
 8. CI/statuskontroller
 
