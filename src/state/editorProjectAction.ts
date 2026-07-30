@@ -7,7 +7,10 @@ import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
 import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import type { SectionFrameWidth } from '../model/sectionAppearance'
-import type { TextElementStylePatch } from '../model/textElementStyle'
+import type {
+  TextElementStylePatch,
+  TextFontFamily,
+} from '../model/textElementStyle'
 
 export type ColorProjectAction =
   | {
@@ -36,9 +39,21 @@ export type ColorProjectAction =
 
 export type HeaderAppearanceAction =
   | {
+      type: 'set-header-background-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
+  | {
       type: 'set-header-text-color'
       elementId: string
       color: EditorColor
+      updatedAt: string
+    }
+  | {
+      type: 'set-header-font-family'
+      elementId: string
+      fontFamily: TextFontFamily
       updatedAt: string
     }
   | {
