@@ -30,7 +30,6 @@ type SnapElementMoveOptions = {
   layout: ElementLayout
   targets: AlignmentTargets
   canvasWidth: number
-  allowHorizontal: boolean
   threshold?: number
 }
 
@@ -160,12 +159,15 @@ export function snapElementMove({
   layout,
   targets,
   canvasWidth,
-  allowHorizontal,
   threshold = ALIGNMENT_SNAP_THRESHOLD,
 }: SnapElementMoveOptions): MoveSnapResult {
-  const xMatch = allowHorizontal
-    ? findBestMatch(layout, 'x', targets.x, canvasWidth, threshold)
-    : null
+  const xMatch = findBestMatch(
+    layout,
+    'x',
+    targets.x,
+    canvasWidth,
+    threshold,
+  )
   const yMatch = findBestMatch(
     layout,
     'y',
