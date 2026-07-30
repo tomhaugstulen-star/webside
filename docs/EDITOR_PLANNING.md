@@ -1,6 +1,6 @@
 # Plan for Website-editoren
 
-Dette dokumentet oppsummerer produktretningen, implementert grunnlag, aktiv produksjonsfase og den låste videre rekkefølgen.
+Dette dokumentet oppsummerer produktretningen, implementert grunnlag, leveransestatus og den låste videre rekkefølgen.
 
 Detaljert faseomfang og akseptansekriterier ligger i `docs/WORK_PLAN.md`.
 
@@ -22,19 +22,20 @@ Offentlig publisering, hosting, domener og produksjonsdeployment er fjernet fra 
 ## Gjeldende status
 
 ```text
-siste fullførte produksjonsfase på main: 13 – Logo og header
-aktiv produksjonsfase: 14 – korrigeringslinjer og snapping
-aktiv branch: feature/alignment-guides
-base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
-GitHub-sak: #34 – åpen
-pull request: ikke opprettet
+siste fullførte produksjonsfase på main: 14 – korrigeringslinjer og snapping
+main mergecommit: 0122605b60808689cdda7cb1601eb3342680f88c
+source branch-head: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
+GitHub-sak #34: lukket som fullført
+pull request #39: merget
 prosjektskjema: versjon 9
-fase-14-implementasjon: til stede
-framtidsrettet kodeaudit: gjennomført
-full automatisk kontroll etter audit: bestått
+framtidsrettet kodeaudit: fullført
+automatisk sluttkontroll: bestått
 filstørrelseskontroll: bestått
-lokal working tree etter kontroll: clean
-manuell fase-14-regresjon: delvis godkjent
+manuell fase-14-regresjon: fullført og godkjent
+lokal main: synkronisert og clean på 0122605
+aktiv produksjonsfase: ingen
+neste planlagte fase: 15 – duse portalfarger og tydelig visuell struktur
+fase 15: ikke startet
 ```
 
 ## Implementert editorgrunnlag
@@ -135,60 +136,50 @@ Senere Header-leveranser bygger:
 
 ## Fase 14 – korrigeringslinjer og snapping
 
-Implementert:
+Fase 14 er fullført og merget til `main`.
 
-- bare pekerflytting; resize og tastatur snapping er utsatt
+Levert:
+
+- bare pekerflytting bruker snapping; resize- og tastatursnapping er utsatt
 - Seksjon, Bilde, Tekst og Knapp kan flyttes og snappe på begge akser
 - Header kan ikke flyttes, men kan brukes som snapmål
 - andre synlige elementer gir venstre/midt/høyre og topp/midt/bunn
 - lerretet gir horisontal og vertikal midtlinje
-- snapgrense er 6 px i lerretskoordinater
+- snapgrensen er 6 px i lerretskoordinater
 - nærmeste treff velges separat per akse
 - midtanker vinner ved lik avstand
-- guider vises bare mens snap er aktiv
-- låste elementer kan være mål
+- guider vises bare mens snap er aktivt
+- låste synlige elementer kan være mål
 - skjulte elementer og aktivt element er ikke mål
-- mål fryses ved pekerstart
-- ingen alignmentdata lagres i prosjektet
+- mål og lerretsmål fryses ved pekerstart
+- alignmentdata lagres ikke i prosjektet
+- auto-scroll, clamping, pointercancel og tapt pointer capture er kontrollert
+- Header er fast ved `x = 0, y = 0`
+- Header-fontstørrelse er varig og validert fra 12 til 96 px
 
-Manuelt godkjent:
+Slutt-auditen fjernet overflødig Header- og previewlogikk, normaliserte Header-layout før validering og reduserte importgrafen med én avhengighet.
 
-- justering mot elementkanter og midtpunkter
-- horisontal og vertikal lerretsmidt
-- samtidig snapping på begge akser
-- Header fast øverst og full bredde
-- Header-fontstørrelse
-
-Gjenstående før PR:
-
-- låste og skjulte mål
-- aktivt element ekskludert
-- alle flyttbare elementtyper
-- pointercancel og tapt pointer capture
-- auto-scroll
-- resize og tastatur uten snapping
-- clamp ved lerretsgrenser
-- PC- og Telefon-regresjon
-- sluttstatus, diff og PR-kontroll
-
-Verifisert automatisk kontroll på `8893a9c`:
+Verifisert automatisk kontroll på `28da295`:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
+Dependency Cruiser: 118 moduler, 341 avhengigheter, ingen brudd
 Vite: 127 moduler transformert
 CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.88 kB, gzip 83.22 kB
-produksjonsbuild: bestått på 198 ms
+JavaScript: 280.63 kB, gzip 83.17 kB
+produksjonsbuild: bestått på 216 ms
+produksjonsfiler på eller over 250 linjer: 0
 ```
 
-Filstørrelse:
+Manuell regresjon ble fullført og godkjent i PC- og Telefon-visning, inkludert alle flyttbare elementtyper, låste mål, Header, lerretsmidt, auto-scroll, clamping, resize og tastatur uten snapping samt målrettet Header-regresjon etter slutt-auditen.
+
+Leveransereferanser:
 
 ```text
-største produksjonsfiler: 243 linjer
-filer på eller over 250 linjer: 0
-filer på eller over 300 linjer: 0
+GitHub-sak: #34 – lukket
+pull request: #39 – merget
+mergecommit: 0122605b60808689cdda7cb1601eb3342680f88c
 ```
 
 ## Hero
@@ -272,7 +263,7 @@ API-nøkkel skal ikke ligge i Vite- eller browserkode. En lokal sikker server-si
 ## Låst videre rekkefølge
 
 ```text
-fase 14  Fullføre korrigeringslinjer og snapping
+fase 14  Korrigeringslinjer og snapping – fullført
 fase 15  Duse portalfarger og tydelig visuell struktur
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
