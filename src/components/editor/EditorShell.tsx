@@ -101,6 +101,7 @@ export function EditorShell() {
       : false
 
     deleteElement(deletionRequest.elementId)
+    setPropertiesPanelOpen(false)
 
     if (imageAssetId && !imageAssetIsShared) {
       removeImageAsset(imageAssetId)
@@ -118,12 +119,6 @@ export function EditorShell() {
     disabled: deletionDialogOpen,
     onCommitTransform: updateImageTransform,
   })
-
-  useEffect(() => {
-    if (!selectedElement) {
-      setPropertiesPanelOpen(false)
-    }
-  }, [selectedElement])
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
