@@ -1,10 +1,30 @@
 import { useCallback } from 'react'
 import { normalizeEditorColor } from '../model/editorColor'
 import type { ElementFrameWidth } from '../model/elementFrame'
+import type { TextFontFamily } from '../model/textElementStyle'
 import { useEditorProject } from './useEditorProject'
 
 export function useHeaderAppearance() {
   const { dispatch } = useEditorProject()
+
+  const updateHeaderBackgroundColor = useCallback(
+    (elementId: string, value: string) => {
+      const color = normalizeEditorColor(value)
+
+      if (!color) {
+        return false
+      }
+
+      dispatch({
+        type: 'set-header-background-color',
+        elementId,
+        color,
+        updatedAt: new Date().toISOString(),
+      })
+      return true
+    },
+    [dispatch],
+  )
 
   const updateHeaderTextColor = useCallback(
     (elementId: string, value: string) => {
@@ -21,6 +41,18 @@ export function useHeaderAppearance() {
         updatedAt: new Date().toISOString(),
       })
       return true
+    },
+    [dispatch],
+  )
+
+  const updateHeaderFontFamily = useCallback(
+    (elementId: string, fontFamily: TextFontFamily) => {
+      dispatch({
+        type: 'set-header-font-family',
+        elementId,
+        fontFamily,
+        updatedAt: new Date().toISOString(),
+      })
     },
     [dispatch],
   )
@@ -57,7 +89,9 @@ export function useHeaderAppearance() {
   )
 
   return {
+    updateHeaderBackgroundColor,
     updateHeaderTextColor,
+    updateHeaderFontFamily,
     updateHeaderFrameWidth,
     updateHeaderFrameColor,
   }
