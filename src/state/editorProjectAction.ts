@@ -5,7 +5,6 @@ import type { ElementFrameWidth } from '../model/elementFrame'
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
-import type { HeaderWidthMode } from '../model/headerWidth'
 import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import type { SectionFrameWidth } from '../model/sectionAppearance'
 import type {
@@ -69,13 +68,6 @@ export type HeaderAppearanceAction =
       color: EditorColor
       updatedAt: string
     }
-
-export type HeaderLayoutAction = {
-  type: 'set-header-width-mode'
-  elementId: string
-  widthMode: HeaderWidthMode
-  updatedAt: string
-}
 
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
@@ -160,4 +152,3 @@ export type EditorProjectAction =
     }
   | ColorProjectAction
   | HeaderAppearanceAction
-  | HeaderLayoutAction
