@@ -32,6 +32,7 @@ subgraph src["src"]
     src_model_textElementStyle_ts["textElementStyle.ts"]
     src_model_elementCreation_ts["elementCreation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
+    src_model_headerElement_ts["headerElement.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
     src_model_projectColorEntries_ts["projectColorEntries.ts"]
     src_model_createEditorProject_ts["createEditorProject.ts"]
@@ -53,6 +54,7 @@ subgraph src["src"]
       src_components_canvas_canvasElementKeyboard_ts["canvasElementKeyboard.ts"]
       src_components_canvas_EditorCanvasElementContent_tsx["EditorCanvasElementContent.tsx"]
       src_components_canvas_ButtonElementContent_tsx["ButtonElementContent.tsx"]
+      src_components_canvas_HeaderElementContent_tsx["HeaderElementContent.tsx"]
       src_components_canvas_ImageElementContent_tsx["ImageElementContent.tsx"]
       src_components_canvas_useImageCropTransform_ts["useImageCropTransform.ts"]
       src_components_canvas_TextElementEditor_tsx["TextElementEditor.tsx"]
@@ -87,6 +89,7 @@ subgraph src["src"]
       src_components_sidebar_ElementsPanel_tsx["ElementsPanel.tsx"]
       src_components_sidebar_ButtonLibraryPanel_tsx["ButtonLibraryPanel.tsx"]
       src_components_sidebar_ImageImportControl_tsx["ImageImportControl.tsx"]
+      src_components_sidebar_HeaderCreationControl_tsx["HeaderCreationControl.tsx"]
     end
     subgraph src_components_toolbar["toolbar"]
       src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
@@ -194,12 +197,16 @@ src_state_useElementCreation_ts-->src_state_isValidElementCreationRequest_ts
 src_state_useElementCreation_ts-->src_state_useEditorProject_ts
 src_state_isValidElementCreationRequest_ts-->src_assets_buttons_buttonAssetCatalog_ts
 src_state_isValidElementCreationRequest_ts-->src_model_elementCreation_ts
+src_state_isValidElementCreationRequest_ts-->src_model_headerElement_ts
 src_state_isValidElementCreationRequest_ts-->src_model_imageAsset_ts
 src_assets_buttons_buttonAssetCatalog_ts-->src_model_buttonAsset_ts
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_dark_rounded_svg
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_outline_rounded_svg
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_primary_rounded_svg
 src_assets_buttons_buttonAssetCatalog_ts-->src_assets_buttons_secondary_rounded_svg
+src_state_useElementDeletion_ts-->src_assets_images_useImageAssetStore_ts
+src_state_useElementDeletion_ts-->src_model_editorProject_ts
+src_state_useElementDeletion_ts-->src_model_imageAsset_ts
 src_state_useElementDeletion_ts-->src_state_useEditorProject_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
 src_state_useImageProperties_ts-->src_model_imagePresentation_ts
@@ -240,10 +247,13 @@ src_components_canvas_canvasElementKeyboard_ts-->src_model_elementLayout_ts
 src_components_canvas_canvasElementKeyboard_ts-->src_model_imagePresentation_ts
 src_components_canvas_EditorCanvasElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_ButtonElementContent_tsx
+src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_HeaderElementContent_tsx
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_ImageElementContent_tsx
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_TextElementEditor_tsx
 src_components_canvas_ButtonElementContent_tsx-->src_assets_buttons_buttonAssetCatalog_ts
 src_components_canvas_ButtonElementContent_tsx-->src_model_editorProject_ts
+src_components_canvas_HeaderElementContent_tsx-->src_assets_images_useImageAssetStore_ts
+src_components_canvas_HeaderElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_ImageElementContent_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_canvas_ImageElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_ImageElementContent_tsx-->src_model_imagePresentation_ts
@@ -311,6 +321,7 @@ src_components_sidebar_SidebarPanels_tsx-->src_model_elementCreation_ts
 src_components_sidebar_SidebarPanels_tsx-->src_types_editor_ts
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ColorsPanel_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ElementsPanel_tsx
+src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_HeaderCreationControl_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_ColorsPanel_tsx-->src_model_projectColorEntries_ts
 src_components_sidebar_ColorsPanel_tsx-->src_state_useEditorProject_ts
@@ -334,6 +345,12 @@ src_components_sidebar_ImageImportControl_tsx-->src_model_elementCreation_ts
 src_components_sidebar_ImageImportControl_tsx-->src_model_imageAsset_ts
 src_components_sidebar_ImageImportControl_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_assets_images_prepareImageFile_ts-->src_model_imageAsset_ts
+src_components_sidebar_HeaderCreationControl_tsx-->src_assets_images_prepareImageFile_ts
+src_components_sidebar_HeaderCreationControl_tsx-->src_assets_images_useImageAssetStore_ts
+src_components_sidebar_HeaderCreationControl_tsx-->src_model_elementCreation_ts
+src_components_sidebar_HeaderCreationControl_tsx-->src_model_headerElement_ts
+src_components_sidebar_HeaderCreationControl_tsx-->src_model_imageAsset_ts
+src_components_sidebar_HeaderCreationControl_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts
