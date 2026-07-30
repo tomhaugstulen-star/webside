@@ -1,11 +1,42 @@
 :root {
-  --app-bg: #f6f2ef;
-  --panel: #fffdfb;
-  --border: #e5dfda;
-  --border-strong: #d7cec7;
-  --text: #171717;
-  --muted: #65615e;
-  --accent: #8f432f;
+  --portal-background: #f6efe6;
+  --portal-shell-surface: #faf6f1;
+  --portal-toolbar-surface: #f6efe6;
+  --portal-rail-surface: #f6efe6;
+  --portal-left-panel-surface: #faf6f1;
+  --portal-right-panel-surface: #faf6f1;
+  --portal-workspace-surface: #f6efe6;
+  --portal-control-surface: #fffdfa;
+  --portal-control-subtle: #faf6f1;
+  --portal-control-hover: #fff1e8;
+  --portal-control-selected: #ffe8da;
+  --portal-control-disabled: #f0ebe5;
+  --portal-border: #e6ded2;
+  --portal-border-strong: #cbbfb1;
+  --portal-text: #1f1f1f;
+  --portal-text-muted: #6b6f76;
+  --portal-accent: #e25a1c;
+  --portal-accent-hover: #c94c16;
+  --portal-accent-soft: #ffe8da;
+  --portal-focus-ring: rgba(226, 90, 28, 0.3);
+  --portal-danger: #a13c2f;
+  --portal-danger-hover: #842f27;
+  --portal-danger-soft: #f8e6e1;
+  --portal-warning: #9b5d17;
+  --portal-warning-soft: #fbefdd;
+  --portal-success: #2e7d32;
+  --portal-success-soft: #e7f3e8;
+  --portal-icon-blue: #2f6db6;
+  --portal-icon-green: #2e7d32;
+  --portal-icon-purple: #7e3fa8;
+  --portal-icon-orange: #e07a24;
+  --app-bg: var(--portal-background);
+  --panel: var(--portal-control-surface);
+  --border: var(--portal-border);
+  --border-strong: var(--portal-border-strong);
+  --text: var(--portal-text);
+  --muted: var(--portal-text-muted);
+  --accent: var(--portal-accent);
   --outer-gap: 18px;
   --toolbar-height: 84px;
   --rail-width: 124px;
@@ -15,7 +46,9 @@
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -28,10 +61,10 @@ button {
   height: 100vh;
   min-width: 1180px;
   overflow: hidden;
-  color: var(--text);
+  color: var(--portal-text);
   background:
-    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.95), transparent 38%),
-    linear-gradient(180deg, #faf7f5 0%, var(--app-bg) 100%);
+    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.76), transparent 38%),
+    linear-gradient(180deg, var(--portal-shell-surface) 0%, var(--portal-background) 100%);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -42,10 +75,10 @@ button {
   display: flex;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid rgba(222, 214, 208, 0.72);
+  border: 1px solid var(--portal-border);
   border-radius: 16px;
-  background: rgba(255, 252, 249, 0.56);
-  box-shadow: 0 8px 30px rgba(84, 58, 43, 0.05);
+  background: var(--portal-shell-surface);
+  box-shadow: 0 10px 32px rgba(54, 68, 82, 0.08);
 }
 
 @media (max-width: 1320px) {

@@ -1,8 +1,6 @@
 # Plan for Website-editoren
 
-Dette dokumentet oppsummerer produktretningen, implementert grunnlag, leveransestatus og den låste videre rekkefølgen.
-
-Detaljert faseomfang og akseptansekriterier ligger i `docs/WORK_PLAN.md`.
+Dette dokumentet oppsummerer produktretningen, implementert grunnlag, gjeldende leveransestatus og den låste videre rekkefølgen. Detaljert faseomfang og akseptansekriterier ligger i `docs/WORK_PLAN.md`.
 
 ## Produktdefinisjon
 
@@ -14,6 +12,7 @@ Portalen skal brukes til å:
 - administrere sider, seksjoner, Header, Hero og elementer
 - navigere raskt mellom prosjektinnhold og verktøy
 - lagre og sikkerhetskopiere prosjekter lokalt
+- gjenopprette etter feil eller krasj
 - forhåndsvise nettsiden lokalt
 - bruke OpenAI som kontrollert meddesigner i siste hovedfase
 
@@ -23,38 +22,41 @@ Offentlig publisering, hosting, domener og produksjonsdeployment er fjernet fra 
 
 ```text
 siste fullførte produksjonsfase på main: 14 – korrigeringslinjer og snapping
-main mergecommit: 0122605b60808689cdda7cb1601eb3342680f88c
-source branch-head: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
-GitHub-sak #34: lukket som fullført
-pull request #39: merget
+main ved fase-15-branchstart: 20b14af77365c4df912d0b3584a1a503cf0cec59
+aktiv produksjonsfase: 15 – duse portalfarger og tydelig visuell struktur
+aktiv branch: feature/phase-15-portal-colors
+verifisert branch-head: 7ea58a500b500efb884544751f0913a1a07cf285
+GitHub-sak #42: åpen til merge
+pull request #43: draft etter slutt-audit, ikke merget
 prosjektskjema: versjon 9
 framtidsrettet kodeaudit: fullført
 automatisk sluttkontroll: bestått
 filstørrelseskontroll: bestått
-manuell fase-14-regresjon: fullført og godkjent
-lokal main: synkronisert og clean på 0122605
-aktiv produksjonsfase: ingen
-neste planlagte fase: 15 – duse portalfarger og tydelig visuell struktur
-fase 15: ikke startet
+visuell fase-15-regresjon: godkjent
+neste planlagte fase etter merge: 16 – automatisert testgrunnlag
 ```
+
+Fase 15 er ferdig implementert og verifisert på featurebranchen. Den registreres først som fullført på `main` når PR #43 er merget og faktisk mergecommit er dokumentert.
 
 ## Implementert editorgrunnlag
 
 - blankt PC- og Telefon-lerret
-- toppmeny, venstremeny og høyremeny
+- toppmeny, venstremeny, venstrepanel og høyrepanel
 - Seksjon, Bilde, Tekst, Knapp og Header
 - stabil prosjektmodell med sentral state
 - markering, flytting og størrelsesendring
+- tastaturflytting og tastaturresize der elementtypen tillater det
 - låsing for Seksjon, Bilde, Tekst og Knapp
 - kontrollert tekstredigering og eksterne lenker
 - sikker sletting
-- bundlet SVG-knappbibliotek
+- bundlet SVG-knappbibliotek med stabile asset-ID-er
 - lokal bilde- og logoimport
 - transient ressurslager med kontrollert Object URL-livssyklus
 - bildeutsnitt, zoom, alternativ tekst og metadata
 - side- og elementfarger
 - Seksjon- og Header-ramme
 - korrigeringslinjer og snapping ved pekerflytting
+- semantisk portaltema med tydelige interaksjonstilstander
 
 ## Gjeldende portalstruktur
 
@@ -66,7 +68,7 @@ Elementer
 Innstillinger
 ```
 
-Gjeldende ansvarsdeling:
+Ansvarsdeling:
 
 ```text
 Venstremeny = opprette elementer, velge fil/design og vise prosjektoversikt
@@ -76,39 +78,108 @@ Ressurslag = eie transient fil og Object URL
 Prosjekt   = eie serialiserbare verdier
 ```
 
-Portalstrukturen skal utvides i fase 18 med oversikt, sider/navigasjon, Hero/seksjoner, filer/bilder, navigator og hurtigsøk.
+Portalstrukturen utvides i fase 18 med oversikt, sider/navigasjon, Hero/seksjoner, filer/bilder, navigator og hurtigsøk.
+
+## Fase 15 – visuell portalstruktur
+
+### Låst palett
+
+```text
+portal/header        #F6EFE6
+panel                #FAF6F1
+aktiv bakgrunn       #FFE8DA
+kant                 #E6DED2
+aktiv oransje        #E25A1C
+mørk tekst           #1F1F1F
+sekundær tekst       #6B6F76
+blå ikon             #2F6DB6
+grønn ikon           #2E7D32
+lilla ikon           #7E3FA8
+oransje ikon         #E07A24
+```
+
+Den røde topplinjen i brukerens referanseskjermbilde tilhører nettleserens dev-miljø og er ikke en del av editorens design.
+
+### Visuell betydning
+
+- Prosjekt bruker blått ikon.
+- Farger bruker grønt ikon.
+- Logo og header bruker lilla ikon.
+- Elementer bruker oransje ikon.
+- Innstillinger bruker nøytral mørk ikonfarge.
+- Seksjon bruker blått ikon.
+- Bilde bruker grønt ikon.
+- Tekst bruker lilla ikon.
+- Knapp bruker oransje ikon.
+- valgt verktøy bruker aktiv oransje med lys oransje bakgrunn
+- hover er synlig, men dempet
+- fokus er tydelig for tastaturnavigasjon
+- disabled er lesbart uten å se aktivt ut
+- fare, advarsel og suksess har egne semantiske roller
+
+### Teknisk retning
+
+Portaltemaet eies av semantiske CSS-tokens i `editor-base.css`. Kontrollstiler bruker tokenroller fremfor dupliserte tilfeldige fargeverdier.
+
+Kompatibilitetsaliasene `--text`, `--muted`, `--accent`, `--border` og `--border-strong` beholdes foreløpig fordi eldre stilfiler fortsatt bruker dem. Nye portalstiler skal bruke de eksplisitte `--portal-*`-rollene. Aliasene skal ikke fjernes før restbruken er kartlagt og migrert kontrollert.
+
+Ikonfarger er bundet til eksplisitte variantklasser, ikke DOM-rekkefølge:
+
+```text
+rail-button--files
+rail-button--design
+rail-button--media
+rail-button--elements
+rail-button--settings
+
+element-card--section
+element-card--image
+element-card--text
+element-card--button
+```
+
+Dette gjør menyen og elementbiblioteket robuste når nye punkter senere legges til eller rekkefølgen endres.
+
+### Bevarte grenser
+
+- ingen prosjektmodellendring
+- ingen skjemaversjonsendring
+- ingen reducer- eller stateendring
+- ingen endring i elementoppretting eller eventflyt
+- ingen importgrafendring
+- høyrepanelet er fortsatt 320 px
+- høyrepanelet er overlay under 1680 px
+- høyrepanelet reserverer plass ved 1680 px og bredere
+- venstrepanelets åpne-/lukkelogikk er uendret
+- `prefers-reduced-motion` er bevart
+- nettsideprosjektets egne farger er uendret
+
+### Verifisert kontroll på `7ea58a5`
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 118 moduler, 341 avhengigheter, 0 brudd
+Vite: 127 moduler transformert
+CSS: 45.36 kB, gzip 7.34 kB
+JavaScript: 280.72 kB, gzip 83.19 kB
+produksjonsbuild: bestått på 197 ms
+git diff --check: ingen feil
+git status --short: clean
+produksjonsfiler >= 250 linjer: 0
+```
+
+Arkitekturrapportene er ikke regenerert fordi ingen import eller modulgrense er endret.
 
 ## To separate navigasjonssystemer
 
 ### Arbeidsportalens navigasjon
 
-Brukes for å finne:
-
-- prosjekter
-- sider
-- elementer
-- paneler
-- verktøy
-- innstillinger
-- senere AI-assistent
-
-Denne navigasjonen er editor-UI og inngår ikke i nettsideprosjektets innhold.
+Brukes for å finne prosjekter, sider, elementer, paneler, verktøy og innstillinger. Denne navigasjonen er editor-UI og inngår ikke i nettsideprosjektets innhold.
 
 ### Nettsidens navigasjon
 
-Vises i nettstedets Header og lagres som prosjektdata.
-
-Den skal senere støtte:
-
-- interne sider
-- seksjoner
-- eksterne lenker
-- aktivt menypunkt
-- handlingsknapp
-- ett nivå med undermeny
-- horisontal meny
-- kompakt rullegardin/hamburgermeny
-- automatisk responsiv meny
+Vises i nettstedets Header og lagres som prosjektdata. Den skal senere støtte interne sider, seksjoner, eksterne lenker, aktivt menypunkt, handlingsknapp, ett nivå undermeny og automatisk responsiv meny.
 
 ## Header
 
@@ -127,64 +198,11 @@ Gjeldende oppførsel:
 - ingen låsing eller låsestatus
 - bakgrunn, tekstfarge, fontfamilie, fontstørrelse og ramme
 
-Senere Header-leveranser bygger:
-
-- nettstedets menynavigasjon
-- automatisk, horisontal eller kompakt meny
-- redigering av logo, navn og undertittel etter oppretting
-- nettstednivå kontra sidenivå
-
-## Fase 14 – korrigeringslinjer og snapping
-
-Fase 14 er fullført og merget til `main`.
-
-Levert:
-
-- bare pekerflytting bruker snapping; resize- og tastatursnapping er utsatt
-- Seksjon, Bilde, Tekst og Knapp kan flyttes og snappe på begge akser
-- Header kan ikke flyttes, men kan brukes som snapmål
-- andre synlige elementer gir venstre/midt/høyre og topp/midt/bunn
-- lerretet gir horisontal og vertikal midtlinje
-- snapgrensen er 6 px i lerretskoordinater
-- nærmeste treff velges separat per akse
-- midtanker vinner ved lik avstand
-- guider vises bare mens snap er aktivt
-- låste synlige elementer kan være mål
-- skjulte elementer og aktivt element er ikke mål
-- mål og lerretsmål fryses ved pekerstart
-- alignmentdata lagres ikke i prosjektet
-- auto-scroll, clamping, pointercancel og tapt pointer capture er kontrollert
-- Header er fast ved `x = 0, y = 0`
-- Header-fontstørrelse er varig og validert fra 12 til 96 px
-
-Slutt-auditen fjernet overflødig Header- og previewlogikk, normaliserte Header-layout før validering og reduserte importgrafen med én avhengighet.
-
-Verifisert automatisk kontroll på `28da295`:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 118 moduler, 341 avhengigheter, ingen brudd
-Vite: 127 moduler transformert
-CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.63 kB, gzip 83.17 kB
-produksjonsbuild: bestått på 216 ms
-produksjonsfiler på eller over 250 linjer: 0
-```
-
-Manuell regresjon ble fullført og godkjent i PC- og Telefon-visning, inkludert alle flyttbare elementtyper, låste mål, Header, lerretsmidt, auto-scroll, clamping, resize og tastatur uten snapping samt målrettet Header-regresjon etter slutt-auditen.
-
-Leveransereferanser:
-
-```text
-GitHub-sak: #34 – lukket
-pull request: #39 – merget
-mergecommit: 0122605b60808689cdda7cb1601eb3342680f88c
-```
+Senere Header-leveranser bygger nettstedets menynavigasjon, automatisk/horizontal/kompakt meny, redigering etter oppretting og nettstednivå kontra sidenivå.
 
 ## Hero
 
-Hero er nå låst som en egen senere hovedleveranse og skal ikke falle ut av planen igjen.
+Hero er låst som en egen senere hovedleveranse.
 
 Første planlagte retning:
 
@@ -192,8 +210,7 @@ Første planlagte retning:
 - full bredde som standard
 - plassert under Header som standard
 - bakgrunnsbilde eller bakgrunnsfarge
-- kontrollert bildeutsnitt
-- valgfritt fargeoverlegg
+- kontrollert bildeutsnitt og valgfritt fargeoverlegg
 - hovedoverskrift og undertittel
 - én eller to knapper
 - interne og eksterne lenker
@@ -202,33 +219,9 @@ Første planlagte retning:
 
 Endelig Hero-modell låses før fase 21 starter.
 
-## Visuell portalretning
-
-Portalen skal få dempede, harmoniske farger som skiller:
-
-- toppmeny
-- venstremeny
-- åpent venstrepanel
-- høyrepanel
-- arbeidsområde
-- nettsidelerret
-- aktive og valgte tilstander
-
-Dette er editorutseende og skal ikke endre nettsideprosjektets egne farger.
-
 ## Lokal drift og data
 
-Planen beholder:
-
-- flere lokale prosjekter
-- prosjektoversikt
-- autolagring
-- manuell lagring
-- snapshots
-- krasjgjenoppretting
-- sikkerhetskopi til prosjektfil
-- kontrollert import og migrering
-- lokal fullskjermsforhåndsvisning
+Planen beholder flere lokale prosjekter, prosjektoversikt, autolagring, manuell lagring, snapshots, krasjgjenoppretting, sikkerhetskopi, prosjektimport og lokal fullskjermsforhåndsvisning.
 
 Planen inneholder ikke offentlig publisering.
 
@@ -241,13 +234,12 @@ Planlagt bruk:
 - tekst og omskriving
 - fargepaletter og designinspirasjon
 - bildegenerering til valgte felt
-- Hero-generator
-- seksjonsgenerator
+- Hero- og seksjonsgenerator
 - side- og navigasjonsforslag
 - komplette sideutkast
 - konsistenskontroll
 
-AI-flyt:
+AI-endringer skal alltid følge:
 
 ```text
 Forslag
@@ -258,13 +250,13 @@ Forslag
   -> én historikkhandling
 ```
 
-API-nøkkel skal ikke ligge i Vite- eller browserkode. En lokal sikker server-side grense brukes når fasen starter.
+API-nøkkel skal aldri ligge i Vite- eller browserkode.
 
 ## Låst videre rekkefølge
 
 ```text
 fase 14  Korrigeringslinjer og snapping – fullført
-fase 15  Duse portalfarger og tydelig visuell struktur
+fase 15  Duse portalfarger og tydelig visuell struktur – klar for merge
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk

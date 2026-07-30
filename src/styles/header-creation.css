@@ -6,7 +6,7 @@
 .header-creation-control__field {
   display: grid;
   gap: 7px;
-  color: #393431;
+  color: var(--portal-text);
   font-size: 13px;
   font-weight: 650;
 }
@@ -16,18 +16,23 @@
   height: 42px;
   box-sizing: border-box;
   padding: 0 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 9px;
-  color: #292624;
-  background: #ffffff;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   font: inherit;
   font-weight: 500;
+}
+
+.header-creation-control__field input:hover:not(:disabled) {
+  border-color: var(--portal-accent);
+  background: var(--portal-control-hover);
 }
 
 .header-creation-control__field input:focus-visible,
 .header-creation-control__logo-button:focus-visible,
 .header-creation-control__submit:focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
 }
 
@@ -43,7 +48,7 @@
 .header-creation-control__file-name {
   margin: -8px 0 0;
   overflow: hidden;
-  color: var(--muted);
+  color: var(--portal-text-muted);
   font-size: 12px;
   line-height: 1.4;
   text-overflow: ellipsis;
@@ -51,19 +56,25 @@
 }
 
 .header-creation-control__submit {
-  border-color: #55443c;
-  background: #55443c;
+  border-color: var(--portal-accent-hover);
+  background: var(--portal-accent);
+}
+
+.header-creation-control__submit:hover:not(:disabled) {
+  background: var(--portal-accent-hover);
 }
 
 .header-creation-control__error {
   margin: 0;
-  color: #9c2f24;
+  color: var(--portal-danger);
   font-size: 13px;
   line-height: 1.45;
 }
 
 .header-creation-control button:disabled,
 .header-creation-control input:disabled {
+  color: var(--portal-text-muted);
+  background: var(--portal-control-disabled);
+  border-color: var(--portal-border);
   cursor: not-allowed;
-  opacity: 0.62;
 }

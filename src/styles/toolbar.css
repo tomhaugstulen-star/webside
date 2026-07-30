@@ -8,13 +8,12 @@
   align-items: center;
   column-gap: 20px;
   padding: 0 20px;
-  border: 1px solid rgba(217, 207, 199, 0.78);
+  border: 1px solid var(--portal-border);
   border-radius: 16px;
-  background: rgba(255, 253, 251, 0.96);
-  box-shadow: 0 8px 28px rgba(87, 58, 42, 0.07);
+  background: color-mix(in srgb, var(--portal-toolbar-surface) 94%, white);
+  box-shadow: 0 8px 28px rgba(55, 63, 82, 0.1);
   backdrop-filter: blur(16px);
 }
-
 .top-toolbar__brand,
 .top-toolbar__viewport,
 .top-toolbar__history,
@@ -22,27 +21,23 @@
   display: flex;
   align-items: center;
 }
-
 .top-toolbar__brand {
   gap: 12px;
 }
-
 .brand-mark {
   width: 38px;
   height: 38px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: var(--accent);
-  background: #fff4ee;
-  border: 1px solid #efd4c7;
+  color: var(--portal-accent);
+  background: var(--portal-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--portal-accent) 24%, white);
 }
-
 .brand-mark svg {
   width: 25px;
   height: 25px;
 }
-
 .brand-name {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 25px;
@@ -50,7 +45,6 @@
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
-
 .page-selector {
   height: 48px;
   display: flex;
@@ -58,32 +52,28 @@
   justify-content: space-between;
   gap: 20px;
   padding: 0 15px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 10px;
-  color: #202020;
-  background: rgba(255, 255, 255, 0.78);
+  color: var(--portal-text);
+  background: color-mix(in srgb, var(--portal-control-surface) 88%, transparent);
   cursor: pointer;
   font-size: 15px;
 }
-
 .page-selector:hover,
 .toolbar-action:hover,
 .toolbar-icon-button:hover:not(:disabled) {
-  border-color: var(--border-strong);
-  background: #ffffff;
+  border-color: var(--portal-border-strong);
+  background: var(--portal-control-hover);
 }
-
 .page-selector svg {
   width: 18px;
   height: 18px;
 }
-
 .top-toolbar__viewport {
   justify-self: center;
   align-self: stretch;
   gap: 0;
 }
-
 .viewport-button,
 .toolbar-icon-button,
 .main-menu-button {
@@ -91,38 +81,36 @@
   background: transparent;
   cursor: pointer;
 }
-
 .viewport-button {
   width: 72px;
   height: 100%;
   display: grid;
   place-items: center;
-  color: #1f1f1f;
+  color: var(--portal-text);
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 }
-
-.viewport-button[aria-pressed='true'] {
-  color: var(--accent);
-  background: linear-gradient(180deg, rgba(251, 233, 225, 0.82), rgba(251, 239, 233, 0.54));
-  border-left-color: #f0d8cc;
-  border-right-color: #f0d8cc;
+.viewport-button:hover:not([aria-pressed='true']) {
+  color: var(--portal-accent);
+  background: color-mix(in srgb, var(--portal-control-hover) 72%, transparent);
 }
-
+.viewport-button[aria-pressed='true'] {
+  color: var(--portal-accent);
+  background: var(--portal-control-selected);
+  border-left-color: color-mix(in srgb, var(--portal-accent) 26%, white);
+  border-right-color: color-mix(in srgb, var(--portal-accent) 26%, white);
+}
 .viewport-button:first-child[aria-pressed='true'] {
   border-radius: 11px 0 0 11px;
 }
-
 .viewport-button:last-child[aria-pressed='true'] {
   border-radius: 0 11px 11px 0;
 }
-
 .top-toolbar__history {
   gap: 8px;
   padding-left: 16px;
-  border-left: 1px solid #eee8e4;
+  border-left: 1px solid var(--portal-border);
 }
-
 .toolbar-icon-button {
   width: 42px;
   height: 42px;
@@ -130,19 +118,17 @@
   place-items: center;
   border: 1px solid transparent;
   border-radius: 9px;
-  color: #181818;
+  color: var(--portal-text);
 }
-
 .toolbar-icon-button:disabled {
-  color: #aaa5a1;
+  color: color-mix(in srgb, var(--portal-text-muted) 58%, white);
+  background: transparent;
   cursor: default;
 }
-
 .top-toolbar__actions {
   justify-content: flex-end;
   gap: 12px;
 }
-
 .toolbar-action,
 .publish-button {
   height: 48px;
@@ -157,55 +143,52 @@
   font-weight: 600;
   white-space: nowrap;
 }
-
 .toolbar-action {
-  border: 1px solid var(--border);
-  color: #262321;
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--portal-border);
+  color: var(--portal-text);
+  background: color-mix(in srgb, var(--portal-control-surface) 84%, transparent);
 }
-
 .publish-button {
-  border: 1px solid #683129;
+  border: 1px solid var(--portal-accent-hover);
   color: #ffffff;
-  background: linear-gradient(180deg, #744039 0%, #572b28 100%);
-  box-shadow: 0 8px 18px rgba(90, 43, 37, 0.18);
+  background: linear-gradient(180deg, var(--portal-accent) 0%, var(--portal-accent-hover) 100%);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--portal-accent) 24%, transparent);
 }
-
 .publish-button:hover {
-  background: linear-gradient(180deg, #81493f 0%, #60302c 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--portal-accent) 86%, white) 0%,
+    var(--portal-accent-hover) 100%
+  );
 }
-
 .main-menu-wrap {
   position: relative;
   margin-left: 12px;
 }
-
 .main-menu-button {
   width: 50px;
   height: 50px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: #1e1e1e;
-  background: #f6efeb;
+  color: var(--portal-text);
+  background: var(--portal-control-subtle);
 }
-
 .main-menu-button:hover {
-  background: #efe4de;
+  color: var(--portal-accent);
+  background: var(--portal-control-hover);
 }
-
 .main-menu-popover {
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
   width: 220px;
   padding: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 18px 44px rgba(68, 47, 37, 0.16);
+  background: var(--portal-control-surface);
+  box-shadow: 0 18px 44px rgba(44, 58, 72, 0.18);
 }
-
 .main-menu-popover button {
   width: 100%;
   height: 38px;
@@ -213,26 +196,32 @@
   border: 0;
   border-radius: 8px;
   text-align: left;
-  color: #292623;
+  color: var(--portal-text);
   background: transparent;
   cursor: pointer;
   font-size: 13px;
 }
-
 .main-menu-popover button:hover {
-  background: #f6f1ee;
+  background: var(--portal-control-hover);
 }
-
+.page-selector:focus-visible,
+.viewport-button:focus-visible,
+.toolbar-icon-button:focus-visible,
+.toolbar-action:focus-visible,
+.publish-button:focus-visible,
+.main-menu-button:focus-visible,
+.main-menu-popover button:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
+}
 @media (max-width: 1320px) {
   .top-toolbar {
     grid-template-columns: auto 180px minmax(150px, 1fr) auto auto;
     column-gap: 12px;
   }
-
   .toolbar-action span {
     display: none;
   }
-
   .toolbar-action {
     width: 48px;
     padding: 0;

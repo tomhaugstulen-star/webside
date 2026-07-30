@@ -111,7 +111,7 @@ export function ImageImportControl({
         onChange={handleFileChange}
       />
       <button
-        className="element-card"
+        className="element-card element-card--image"
         type="button"
         disabled={busy}
         aria-describedby={errorMessage ? errorId : undefined}

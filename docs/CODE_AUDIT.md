@@ -1,144 +1,176 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den framtidsrettede auditen av fase 14 – korrigeringslinjer og snapping – slik leveransen ble merget til `main` 30. juli 2026.
+Dette dokumentet beskriver den framtidsrettede auditen av fase 15 – duse portalfarger og tydelig visuell struktur – på featurebranchen før merge til `main`.
 
 ## Leveransestatus
 
 ```text
-fullført fase: 14 – korrigeringslinjer og snapping
-source branch-head: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
-pull request: #39 – merget
-mergecommit på main: 0122605b60808689cdda7cb1601eb3342680f88c
-GitHub-sak: #34 – lukket som fullført
+siste fullførte fase på main: 14 – korrigeringslinjer og snapping
+aktiv fase: 15 – duse portalfarger og tydelig visuell struktur
+branch: feature/phase-15-portal-colors
+verifisert branch-head: 7ea58a500b500efb884544751f0913a1a07cf285
+pull request: #43 – draft etter audit, ikke merget
+GitHub-sak: #42 – åpen til merge
 prosjektskjema: versjon 9
 ```
 
-Auditen omfatter alle produksjonsfiler endret i fase 14, deres modell- og state-avhengigheter, arkitekturrapportene og autoritativ dokumentasjon.
+Auditen omfatter alle produksjonsfiler endret i fase 15, samspillet mellom portaltema og nettsideprosjektets designverdier, CSS-vedlikehold, komponentklassifisering, filstørrelser, dependency-graf og autoritativ dokumentasjon.
 
-## Arkitekturretning
+## Arkitekturgrenser
 
-- `EditorProject` er eneste varige sannhetskilde.
-- Reduceren er siste valideringsgrense.
-- DOM, CSS, guider, pekerøkter og preview er transient rendering/state.
-- Header er én egen sammensatt elementtype.
-- Headerbredde avledes fra aktivt lerret.
-- Headerposisjon er deterministisk `x = 0, y = 0`.
-- Alignment-mål bygges fra prosjektmodellen og viewportverdier, ikke DOM-geometri.
-- Bilderessurslageret eier `File` og Object URL.
+Fase 15 er et editor-UI-tema og skal ikke flytte ansvar mellom lag.
+
+Følgende grenser er kontrollert og bevart:
+
+- `EditorProject` er fortsatt eneste varige sannhetskilde.
+- Reduceren er fortsatt siste valideringsgrense.
+- Portaltema, hover, fokus, disabled og panelbakgrunner er transient rendering.
+- Ingen portalverdi lagres i prosjektmodellen.
+- Ingen action, reducer, hook eller validator er lagt til eller endret.
+- Ingen skjemaversjon er endret.
+- Ingen import er lagt til, fjernet eller flyttet.
+- Bilderessurslageret eier fortsatt `File` og Object URL.
+- Nettsideprosjektets egne farger eies fortsatt av prosjektdata og prosjektspesifikke renderingsstiler.
+
+## Endringsomfang
+
+Fase 15 endrer portalstiler for:
+
+- toppmeny
+- venstre rail
+- åpent venstrepanel
+- høyrepanel
+- arbeidsområde
+- kontrollflater
+- hover, fokus og disabled
+- advarsel, sletting og suksess
+- ikonfarger i venstremeny og elementbibliotek
+
+Tre TSX-filer er endret kun for eksplisitte CSS-variantklasser:
+
+```text
+src/components/sidebar/LeftSidebar.tsx
+src/components/sidebar/ElementsPanel.tsx
+src/components/sidebar/ImageImportControl.tsx
+```
+
+Det er ingen endring i props, state, eventflyt, elementoppretting eller modellkobling.
 
 ## Auditfunn og rettelser
 
-### 1. Headerens topposisjon var ikke konsekvent i alle lag
+### 1. Ikonfarger var koblet til DOM-rekkefølge
 
-Etter produktendringen ble Header rendret fast ved `y = 0`, men eldre kodeveier kunne fortsatt bruke lagret `position.y`:
+Første implementasjon brukte `nth-child` for å gi hovedverktøy og elementkort egne ikonfarger.
 
-- ny Header kunne beregne en automatisk y-posisjon
-- Header-layoutcommit kunne beholde innsendt y
-- snapping kunne bruke lagret y for Header som mål
-- avledet lerretshøyde kunne bruke lagret y
-- plassering av nye elementer kunne bruke et foreldet Header-span
+Risiko:
 
-Dette kunne gitt uenighet mellom rendering, snapmål, lerretshøyde og serialisert layout.
+- et nytt menypunkt kunne forskyve alle etterfølgende farger
+- endret rekkefølge kunne gi feil semantisk farge
+- CSS-en beskrev posisjon i stedet for verktøyets identitet
+- regresjonen ville være lett å overse fordi funksjonaliteten fortsatt virket
 
-Rettet i:
+Rettelse:
 
-- `src/model/createEditorElement.ts`
-- `src/state/setElementDesktopLayout.ts`
-- `src/components/canvas/getAlignmentTargets.ts`
-- `src/components/canvas/getCanvasContentHeight.ts`
-- `src/model/findElementCreationPosition.ts`
+```text
+rail-button--files
+rail-button--design
+rail-button--media
+rail-button--elements
+rail-button--settings
 
-Gjeldende invariant:
+element-card--section
+element-card--image
+element-card--text
+element-card--button
+```
 
-- ny Header opprettes ved `x = 0, y = 0`
-- Header-layout normaliseres før validering og lagring
-- serialisert Headerbredde er stabil, mens synlig bredde avledes fra aktivt lerret
-- rendering og avledede layoutberegninger bruker samme topposisjon
-- bare høyde kan endres
+Variantene settes eksplisitt fra eksisterende typede verktøy- og elementverdier. Fargene er dermed robuste mot senere utvidelser og omorganisering.
 
-### 2. Header-flytting var blokkert for høyt i laget
+### 2. Semantiske tokens og kompatibilitetsaliaser
 
-UI-et hindret flytting, men lavnivåfunksjoner kunne fortsatt produsere et flyttet Header-layout dersom de senere ble brukt feil.
+Fase 15 innfører eksplisitte `--portal-*`-roller for:
 
-Rettet slik at Header-flytting avvises i flere uavhengige lag:
+- flater
+- kontroller
+- tekst
+- border
+- fokus
+- disabled
+- fare
+- advarsel
+- suksess
+- ikonvarianter
 
-- canvas-elementets pointerstart
-- pointer-transform-hooken før pointer capture
-- ren pointer-layoutfunksjon
-- tastaturhåndtering
-- layoutcommit normaliserer alltid posisjonen
+Eksisterende aliaser beholdes foreløpig:
 
-Dette reduserer risikoen for regresjon når canvas-komponentene senere bygges om.
+```text
+--text
+--muted
+--accent
+--border
+--border-strong
+--panel
+--app-bg
+```
 
-### 3. Overflødig snapping- og previewkobling
+Dette er bevisst kompatibilitet, ikke et nytt parallelt temasystem. Flere eldre stilfiler bruker fortsatt aliasene. De skal ikke fjernes før all restbruk er kartlagt og migrert i en egen kontrollert opprydding.
 
-Følgende ble fjernet under slutt-auditen:
+Nye portalstiler skal foretrekke eksplisitte `--portal-*`-roller.
 
-- et dødt Header-flagg i snap-motoren
-- unødvendig avhengighet fra move-preview til hele `EditorElement`
-- unødvendig Header-plasseringsberegning ved oppretting
-- en umulig låsttilstand og teksten «Lås opp headeren» i Header-fontpanelet
+### 3. Nettsideprosjektets farger er avgrenset
 
-Move-preview bruker nå bare element-ID, layout, snapmål og lerretsbredde. Importgrafen ble redusert med én avhengighet.
+`project-colors.css` er endret bare for editorens kontrollgruppe, overskrift og skillelinjer. Ingen lagret sidebakgrunn, Seksjon-bakgrunn, tekstfarge, Header-farge eller knappdesign er endret.
 
-### 4. Alignment-motoren er transient og avgrenset
+I `canvas.css` er bare arbeidsområdets portalbakgrunn endret. `.canvas-page` og elementenes prosjektstyrte designverdier er utenfor temaet.
+
+### 4. Panel- og layoutinvarianter er bevart
 
 Kontrollert:
 
-- ingen snappingverdi eller visningsinnstilling lagres i prosjektet
-- snapmål fryses ved pekerstart
-- lerretsbredde, lerretshøyde og midtpunkter fryses i pekerøkten
-- aktivt element ekskluderes
-- skjulte elementer ekskluderes
-- låste synlige elementer beholdes som mål
-- X og Y velges uavhengig
-- 6 px terskel brukes i lerretskoordinater
-- center/start/end-prioritet er deterministisk
-- guider fjernes ved commit, cancel og tapt pointer capture
-- resizepreview inneholder ingen guider
-- tastaturflytting er ikke koblet til snapping
+- høyrepanelet er fortsatt 320 px bredt
+- under 1680 px er høyrepanelet overlay
+- ved 1680 px og bredere reserveres plass
+- venstrepanelets bredde og åpne-/lukkelogikk er uendret
+- portaltemaet endrer ikke canvasberegninger
+- `prefers-reduced-motion` er bevart
+- alignment-guider og markeringer bruker eksisterende rendering
 
-### 5. Header-fontstørrelse er varig og validert
+### 5. Interaksjonstilstander er samlet
 
-Kontrollert kjede:
+Tidligere dupliserte hvite kontrollflater, fokusfarger og statusfarger er erstattet med semantiske roller.
 
-- `HeaderAppearance.fontSize`
-- standard 24 px
-- validering mot felles `textFontSizes`
-- typet action `set-header-font-size`
-- hook og reducerkontroll
-- høyrepanel med 12–96 px
-- CSS-rendering av navn og relativ undertittel
-- skjemaversjon 9
+Kontrollert:
 
-Det finnes ingen import- eller migreringsmotor ennå. Framtidig import av versjon 8 må legge til standard `fontSize: 24` eller avvise prosjektet kontrollert.
+- hover er synlig uten å bli dominant
+- valgt tilstand er tydelig
+- tastaturfokus bruker felles fokus-ring
+- disabled er lesbart og ser ikke aktivt ut
+- fare, advarsel og suksess kan skilles
+- slettingsdialogen beholder tydelig farehierarki
 
-### 6. Tekstboksbakgrunn mangler i modellen
+### 6. Eksisterende kjente modellgap er ikke blandet inn
 
-Tekstboksens hvite bakgrunn er fortsatt hardkodet CSS og finnes ikke som varig prosjektdata. Dette spores separat i GitHub-sak #35 og ble ikke blandet inn i fase 14.
+Følgende er fortsatt separate saker og ble ikke skjult implementert i fase 15:
+
+- issue #35: tekstboksbakgrunn som varig prosjektdata
+- issue #36: editor-only elementgrense
+- issue #37: elementnotat og høyrepanelmodell
+- issue #38: like mellomrom og fordelingsguider
+- issue #3: senere mobile designkontroller
+
+Tekstboksens hvite bakgrunn er fortsatt et dokumentert modellgap og håndteres i fase 17.
 
 ## Filstørrelser
 
-Repositoryomfattende lokal kontroll på siste branch-head viste ingen produksjonsfiler på eller over 250 linjer.
+Repositoryomfattende lokal kontroll på `7ea58a5` ga ingen produksjonsfiler på eller over 250 linjer.
 
-Største berørte produksjonsfiler etter slutt-auditen:
-
-```text
-useElementPointerTransform.ts    249
-EditorCanvasElement.tsx          243
-snapElementMove.ts               194
-EditorCanvas.tsx                 168
-editorProjectReducer.ts          203
-reduceHeaderAppearanceAction.ts  173
-textElementStyle.ts              154
-getAlignmentTargets.ts           137
-```
+`toolbar.css` er holdt under den aktive terskelen. Fase 15 har ikke flyttet nytt funksjonelt ansvar inn i stilfilen; endringen normaliserer eksisterende visuelle regler.
 
 Genererte filer `architecture.json` og `docs/dependency-graph.mmd` vurderes ikke etter produksjonsgrensen.
 
 ## Arkitekturrapporter
 
-Fase 14 endret grafen fra 113 moduler / 324 avhengigheter til:
+Dependency-grafen er uendret:
 
 ```text
 118 moduler
@@ -146,55 +178,61 @@ Fase 14 endret grafen fra 113 moduler / 324 avhengigheter til:
 0 dependency-brudd
 ```
 
-Rapportene ble regenerert etter at den overflødige typeavhengigheten ble fjernet.
+Rapportene er ikke regenerert fordi fase 15 ikke endrer import- eller modulgrafen. De tre TSX-endringene legger bare til CSS-klassenavn og introduserer ingen import.
 
 ## Siste automatiske kontroll
 
-Brukerens terminaloutput på branch-head `28da295` bekreftet:
+Brukerens terminaloutput på branch-head `7ea58a5` bekreftet:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 118 moduler, 341 avhengigheter, ingen brudd
+Dependency Cruiser: 118 moduler, 341 avhengigheter, 0 brudd
 Vite: 127 moduler transformert
-CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.63 kB, gzip 83.17 kB
-produksjonsbuild: bestått på 216 ms
-git diff --check: ingen feil
+CSS: 45.36 kB, gzip 7.34 kB
+JavaScript: 280.72 kB, gzip 83.19 kB
+produksjonsbuild: bestått på 197 ms
+git diff --check origin/main...HEAD: ingen feil
+git status --short: clean
 produksjonsfiler >= 250 linjer: 0
-git status --short: clean etter commit og push
 ```
-
-LF/CRLF-varslene under generering var forventede Windows-varsler og ikke diff-feil.
 
 ## Manuell kontroll
 
-Godkjent av brukeren i PC- og Telefon-visning:
+Brukeren godkjente den reviderte paletten og den visuelle retningen.
 
-- elementkanter og elementmidtpunkter på begge akser
-- horisontal og vertikal lerretsmidt
-- samtidig snapping på begge akser
-- Seksjon, Bilde, Tekst og Knapp som aktive elementer
-- låste synlige elementer som snapmål
-- aktivt element ekskludert som eget mål
-- Header som fast, fullbredde snapmål
-- Header-høyde og fontstørrelse gjennom viewport-bytte
-- nye elementer opprettet under Header
-- pointer sluppet utenfor vinduet uten hengende guider eller flyttemodus
-- auto-scroll uten hopp eller feil commit
-- resize uten snapping eller guider
-- tastaturflytting uten snapping eller guider
-- clamping ved alle lerretsgrenser
-- målrettet regresjon etter slutt-auditen av Header-drag, vanlige piltaster, `Ctrl + pil opp/ned`, høydehåndtak og snapping mot Header
+Kontrollert i den visuelle regresjonen:
 
-Skjulte elementer kan ikke styres fra dagens UI. Ekskluderingen er derfor kodeverifisert i `getAlignmentTargets()`.
+- toppmeny og portalflater kan skilles
+- hovedikonene er lettere å skille
+- aktiv PC-/Telefon-tilstand er tydelig
+- aktiv venstremenyknapp er tydelig
+- venstre rail og åpent panel har ulike roller
+- høyrepanelets kontroller er lesbare
+- arbeidsområdet kan skilles fra nettsidelerretet
+- prosjektets egne farger er uendret
+- fare-, advarsel- og fokusuttrykk er tydelige
 
-Lokal lagring og gjenoppretting finnes ikke ennå og var ikke et akseptansepunkt for fase 14.
+Den røde topplinjen i referanseskjermbildet tilhører nettleserens dev-miljø og inngår ikke i editorens design.
 
-## Merge-resultat
+## PR-kontroll
 
-PR #39 ble merget med eksplisitt brukergodkjenning. Issue #34 ble automatisk lukket som fullført. Brukerens lokale `main` ble deretter fast-forward-synkronisert og bekreftet clean på mergecommit `0122605`.
+PR #43 er satt tilbake til draft etter auditrettelsen fordi den oppdaterte branch-headen måtte gjennom ny lokal sluttkontroll. Den kontrollen er nå bestått.
+
+Før PR-en markeres klar for merge skal følgende kontrolleres på nytt mot siste dokumentcommit:
+
+- faktisk PR-head og base
+- full changed-file-liste
+- mergebarhet
+- CI/status
+- reviews og kommentarer
+- åpne review-tråder
+- at dokumentendringene ikke introduserer diff-feil
 
 ## Konklusjon
 
-Fase 14 er ferdig levert på `main`. Det finnes ingen kjent funksjons-, arkitektur-, dependency- eller filstørrelsesblokkerer fra leveransen. Neste produksjonsfase er fase 15, men den er ikke startet og skal få eget låst omfang og egen branch.
+Det finnes ingen kjent funksjons-, modell-, state-, dependency- eller filstørrelsesblokkerer i fase 15.
+
+Den eneste framtidsrettede vedlikeholdsrisikoen som ble funnet – rekkefølgeavhengige ikonfarger – er rettet med eksplisitte semantiske variantklasser.
+
+Fase 15 er teknisk og visuelt klar for endelig PR-kontroll. Den er ikke fullført på `main` før PR #43 er merget etter eksplisitt brukergodkjenning.

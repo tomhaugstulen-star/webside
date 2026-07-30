@@ -11,7 +11,7 @@
 .button-properties__field {
   display: grid;
   gap: 7px;
-  color: var(--text);
+  color: var(--portal-text);
   font-size: 14px;
   font-weight: 600;
 }
@@ -21,10 +21,10 @@
   width: 100%;
   min-height: 40px;
   box-sizing: border-box;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--portal-border-strong);
   border-radius: 8px;
-  color: var(--text);
-  background: #ffffff;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   font: inherit;
   font-weight: 500;
 }
@@ -41,27 +41,36 @@
 .button-properties input:hover:not(:disabled),
 .button-properties select:hover:not(:disabled),
 .button-properties__submit:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
+}
+
+.button-properties input:hover:not(:disabled),
+.button-properties select:hover:not(:disabled) {
+  background: var(--portal-control-hover);
+}
+
+.button-properties__submit:hover:not(:disabled) {
+  background: var(--portal-accent-hover);
 }
 
 .button-properties input:focus-visible,
 .button-properties select:focus-visible,
 .button-properties__submit:focus-visible {
-  outline: 3px solid rgba(143, 67, 47, 0.24);
+  outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
 }
 
 .button-properties input[aria-invalid='true'] {
-  border-color: #a13c2f;
+  border-color: var(--portal-danger);
 }
 
 .button-properties__submit {
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--portal-accent);
   border-radius: 8px;
   color: #ffffff;
-  background: var(--accent);
+  background: var(--portal-accent);
   font: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -79,8 +88,10 @@
 .button-properties input:disabled,
 .button-properties select:disabled,
 .button-properties__submit:disabled {
+  color: var(--portal-text-muted);
+  background: var(--portal-control-disabled);
+  border-color: var(--portal-border);
   cursor: not-allowed;
-  opacity: 0.58;
 }
 
 .button-properties__help,
@@ -95,17 +106,21 @@
 
 .button-properties__help,
 .button-properties__locked-note {
-  color: var(--muted);
+  color: var(--portal-text-muted);
 }
 
-.button-properties__error,
-.button-properties__warning {
-  color: #8d2f24;
+.button-properties__error {
+  color: var(--portal-danger);
   font-weight: 600;
 }
 
+.button-properties__warning {
+  color: var(--portal-warning);
+  font-weight: 650;
+}
+
 .button-properties__saved {
-  color: #35634b;
+  color: var(--portal-success);
   font-weight: 700;
 }
 
