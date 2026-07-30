@@ -5,18 +5,19 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 ## Gjeldende arbeidsstatus
 
 ```text
-aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
-branch: feature/project-colors
-GitHub-sak: #28
-PR: #29 – åpen, ikke draft
+siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
+GitHub-sak: #28 – lukket som fullført
+PR: #29 – merget
+mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
-implementering: ferdig
-framtidsrettet sluttaudit: ferdig
+implementering og framtidsrettet sluttaudit: ferdig
 PC og Telefon: godkjent
 rammebredde: Ingen eller 1–10 px
 automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
-merge: ikke godkjent eller utført
+lokal main: brukeren har bekreftet clean tree etter merge
+aktiv docs-branch: docs/phase-12-handover
+neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
 ```
 
 Faktisk branch-, PR- og `main`-HEAD leses alltid fra Git.
@@ -33,6 +34,8 @@ JavaScript: 264.52 kB, gzip 79.47 kB
 produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
+
+Nye produksjonsendringer krever ny komplett kontroll.
 
 ## Implementert editorgrunnlag
 
@@ -66,6 +69,8 @@ Elementer -> Knapp  åpner internt SVG-designbibliotek
 Elementer -> Bilde  åpner lokal filvelger
 Farger             viser konkrete fargeegenskaper på aktiv side
 ```
+
+`Logo og header` er neste planlagte produksjonsområde, men produkt- og modellomfanget er ikke låst.
 
 ## Fast ansvarsdeling
 
@@ -191,9 +196,13 @@ Tomt lerret     -> høyremeny lukkes
 - redusert bevegelse respekteres
 - Seksjon viser egen `Ramme`-del
 
-## Arkitekturgrenser
+## Arkitektur- og filstørrelsesgrenser
 
-- alle nye og berørte produksjonsfiler i fase 12 er under 250 linjer
+- 250 linjer er aktiv terskel for ansvarstrekk
+- 300 linjer er hard unntaksgrense
+- linjetall kontrolleres før en stor fil utvides og igjen før PR
+- filer deles etter reelt ansvar, ikke mekanisk
+- alle nye og berørte produksjonsfiler i fase 12 var under 250 linjer
 - `RightPropertiesPanel.tsx` forblir komposisjon
 - fargeoversikten er avledet fra aktiv side
 - reduceren er siste valideringsgrense
@@ -223,4 +232,19 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Fase 13 startes ikke før PR #29 er kontrollert, fase 12 er merget etter eksplisitt godkjenning og lokal `main` er oppdatert.
+## Neste planleggingssteg
+
+Før fase 13-kode skal følgende avklares sammen med brukeren:
+
+- om header er en egen elementtype, en Seksjon med generert innhold eller en sammensatt prosjektstruktur
+- feltene for navn, undertittel og logo
+- logoens asset-ID, ressurslager og serialiserbare metadata
+- forholdet til eksisterende Bilde-, Tekst- og Seksjon-modeller
+- venstre- og høyremenyansvar
+- standard- og minimumsstørrelser
+- PC/Telefon-arv og responsive verdier
+- farger og tekststil
+- lagrekkefølge, låsing, sletting og tilgjengelighet
+- om varige modellendringer krever skjemaversjon 8
+
+Fase 13 starter først etter at post-merge-dokumentasjonen er merget, lokal `main` er oppdatert, omfanget er låst og en ny feature-branch er opprettet.

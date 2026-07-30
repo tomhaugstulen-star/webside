@@ -254,6 +254,8 @@ Fargekontrollen deles med `Farger`. Seksjon-handlinger går gjennom `useSectionA
 - `RightPropertiesPanel.tsx` forblir komposisjon
 - elementspesifikke kontroller ligger i egne filer
 - 250 linjer er aktiv terskel
+- 300 linjer er hard unntaksgrense
+- linjetall kontrolleres før en stor fil utvides og igjen før PR
 - høyremenyen skal ikke eie prosjektimport, ressursbuffer eller historikk
 - senere prosjektbytte må avstemme ressursbufferen uten at panelet får ansvar for dette
 - viewport-spesifikke mobilverdier skal håndteres i state-laget, ikke som lokale panelkopier
@@ -283,4 +285,4 @@ produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
 
-Arkitekturrapportene ble regenerert og committet i `1963088`. Implementeringen ligger i PR #29 og merges bare etter eksplisitt godkjenning.
+Arkitekturrapportene ble regenerert og committet i `1963088`. Implementeringen ble merget til `main` gjennom PR #29 i mergecommit `a781b85a718ed6e5254530849299db8dfff3dfb6`.

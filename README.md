@@ -35,6 +35,7 @@ main
   -> implementering
   -> framtidsrettet audit
   -> automatiske og manuelle kontroller
+  -> filstørrelseskontroll
   -> arkitekturrapporter og dokumentasjon
   -> PR-kontroll
   -> eksplisitt mergegodkjenning
@@ -44,17 +45,17 @@ main
 ## Gjeldende prosjektstatus
 
 ```text
-aktiv fase: 12 – prosjektfarger og Seksjon-rammer
-branch: feature/project-colors
-GitHub-sak: #28
-PR: #29 – åpen, ikke draft
+siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
+GitHub-sak: #28 – lukket som fullført
+PR: #29 – merget
+mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
-implementering: ferdig
-manuell PC- og Telefon-test: godkjent
-rammebredde: Ingen eller 1–10 px
+implementering, audit og manuell test: godkjent
 automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
-merge: ikke godkjent eller utført
+lokal main: brukeren har bekreftet clean tree etter merge
+aktiv docs-branch: docs/phase-12-handover
+neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
 ```
 
 Faktisk branch-, PR- og `main`-HEAD skal alltid leses fra Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
@@ -71,6 +72,8 @@ JavaScript: 264.52 kB, gzip 79.47 kB
 produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
+
+Nye produksjonsendringer krever ny komplett kontroll. Tallene over dokumenterer bare siste verifiserte fase-12-head.
 
 ## Implementert funksjonalitet
 
@@ -179,8 +182,10 @@ Crop-grunnrammen for versjon 6 er låst til 240 × 160 px og forblir invariant i
 
 - 250 linjer er aktiv terskel for ansvarstrekk.
 - 300 linjer er hard unntaksgrense.
-- alle nye og berørte produksjonsfiler i fase 12 er under 250 linjer
-- `reduceColorProjectAction.ts` er 156 linjer
+- linjetall kontrolleres før en stor fil utvides og igjen før PR
+- filer deles etter reelt ansvar, ikke mekanisk
+- alle nye og berørte produksjonsfiler i fase 12 var under 250 linjer
+- `reduceColorProjectAction.ts` var 156 linjer
 - `RightPropertiesPanel.tsx` skal forbli komposisjon
 
 ## Autoritativ dokumentrekkefølge

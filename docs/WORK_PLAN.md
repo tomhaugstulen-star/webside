@@ -12,7 +12,7 @@ For hver avgrensede del:
 4. Definer brukerhandlinger, varig state og transient state.
 5. Lås produkt-, validerings- og designvalg før produksjonskode.
 6. Implementer bare avtalt omfang.
-7. Trekk ut ansvar før en kildefil passerer 250 linjer.
+7. Kontroller filstørrelser og trekk ut ansvar før en kildefil passerer 250 linjer.
 8. Gjennomfør framtidsrettet kodeaudit.
 9. Kjør automatiske kontroller etter siste produksjonsendring.
 10. Test PC, Telefon, peker og tastatur der det er relevant.
@@ -35,22 +35,22 @@ git diff --check
 ## 2. Gjeldende status
 
 ```text
-aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
-branch: feature/project-colors
-GitHub-sak: #28
-PR: #29 – åpen, ikke draft
-base main: 504b6d66670eb4a10f929e5addf6c56b00782487
+siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
+GitHub-sak: #28 – lukket som fullført
+produksjons-PR: #29 – merget
+mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
-implementering: ferdig
-manuell PC- og Telefon-test: godkjent
-rammebredde: Ingen eller 1–10 px
-framtidsrettet sluttaudit: ferdig
+implementering, audit og manuell test: godkjent
 automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
-merge: ikke godkjent eller utført
+lokal main: brukeren har bekreftet clean tree etter merge
+aktiv docs-branch: docs/phase-12-handover
+dokumentasjons-PR: #30 – åpen og ikke draft
+PR #30 omfang: åtte Markdown-filer, ingen produksjonskode eller arkitekturrapporter
+neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
 ```
 
-Faktisk branch-, PR- og `main`-HEAD leses fra GitHub/Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
+Head-SHA, mergebarhet, reviews, tråder og CI/status for PR #30 skal leses på nytt fra GitHub før merge. Faktisk branch-, PR- og `main`-HEAD leses fra GitHub/Git. Commitnumre i dokumentasjonen er kontrollpunkter, ikke permanente forventede topper.
 
 ## 3. Siste verifiserte automatiske kontroll
 
@@ -67,7 +67,7 @@ produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
 
-`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`.
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`, som inngikk i PR #29.
 
 ## 4. Fase 12 – implementert funksjonsomfang
 
@@ -124,34 +124,40 @@ Detaljene står i `docs/PROJECT_COLORS.md`.
 - fase 10: SVG-knappbibliotek – PR #21
 - dokumentasjonsstatus – PR #22 og PR #24
 - fase 11A: bildeimport, ramme og utsnitt – PR #26
-
-Fase 12 er ferdig implementert og ligger i PR #29, men er ikke merget.
+- fase 12: prosjektfarger og Seksjon-rammer – PR #29
 
 ## 7. Neste handling
 
-Kjør på `feature/project-colors`:
+Trekk og kontroller `docs/phase-12-handover` lokalt:
 
 ```powershell
-git pull --ff-only origin feature/project-colors
+git fetch origin
+git switch docs/phase-12-handover
+git pull --ff-only origin docs/phase-12-handover
 git status
-git log -5 --oneline --decorate
+git log -6 --oneline --decorate
 ```
 
-Forventet:
+Kontroller deretter PR #30 med GitHub-connectoren:
 
-- lokal branch trekker de siste statusdokumentene
-- branch er synkronisert med `origin/feature/project-colors`
-- working tree er clean
+1. base `main`
+2. head `docs/phase-12-handover`
+3. head-SHA samsvarer med branch-head
+4. åtte endrede Markdown-filer
+5. ingen produksjonskode eller arkitekturrapporter
+6. mergebarhet er ferdigberegnet
+7. reviews og uløste tråder
+8. CI/statuskontroller
 
-Kontroller deretter PR #29:
+Merge PR #30 bare etter eksplisitt godkjenning.
 
-1. head og base
-2. changed files og samlet diff
-3. mergebarhet
-4. reviews og uløste tråder
-5. CI/statuskontroller
+Etter docs-merge:
 
-Ingen merge uten eksplisitt godkjenning.
+1. oppdater lokal `main`
+2. kontroller clean tree
+3. avgrens fase 13 sammen med brukeren
+4. opprett ny feature-branch fra oppdatert `main`
+5. start ikke produksjonskode før modell, brukerflyt, ressursansvar og responsiv oppførsel er låst
 
 ## 8. Planlagte senere faser
 
@@ -178,8 +184,10 @@ fase 19  forhåndsvisning og publisering
 
 ## 10. Faste tekniske grenser
 
-- 250 linjer er aktiv terskel
+- 250 linjer er aktiv terskel for ansvarstrekk
 - 300 linjer er hard unntaksgrense
+- linjetall kontrolleres før en stor fil utvides og igjen før PR
+- filer deles etter reelt ansvar, ikke mekanisk
 - canvas samler ikke egenskaps-, fil- eller ressursansvar
 - `RightPropertiesPanel.tsx` forblir komposisjon
 - varige data endres bare gjennom validerte reducerhandlinger
