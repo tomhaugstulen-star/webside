@@ -40,16 +40,15 @@ export function setElementDesktopLayout(
     (candidate) => candidate.id === elementId,
   )
 
-  if (
-    !activePage ||
-    !element ||
-    element.locked ||
-    !isValidElementDesktopLayout(element, layout)
-  ) {
+  if (!activePage || !element || element.locked) {
     return state
   }
 
   const persistedLayout = getPersistedLayout(element, layout)
+
+  if (!isValidElementDesktopLayout(element, persistedLayout)) {
+    return state
+  }
 
   if (elementLayoutsEqual(getElementDesktopLayout(element), persistedLayout)) {
     return state
