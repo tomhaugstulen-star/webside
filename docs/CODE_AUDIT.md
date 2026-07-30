@@ -121,11 +121,11 @@ Full repositoryomfattende filstørrelseskontroll må kjøres lokalt på siste br
 
 Alignment-implementasjonen økte grafen fra 113 moduler / 324 avhengigheter til 118 moduler / 342 avhengigheter. Rapportene ble regenerert etter modulendringene.
 
-Senere Header-font- og auditrettelser endret ingen modul- eller importkanter. Det er derfor ikke nødvendig å regenerere rapportene bare for disse endringene, men `git diff` og `npm run architecture:check` skal fortsatt verifiseres på siste branch-head.
+Senere Header-font-, audit- og dokumentasjonsrettelser endret ingen modul- eller importkanter. Det er derfor ikke nødvendig å regenerere rapportene bare for disse endringene, men `git diff` og `npm run architecture:check` skal fortsatt verifiseres på siste branch-head.
 
 ## Siste automatiske kontroll
 
-Brukerens terminaloutput på commit `b05baf0` bekreftet:
+Brukerens terminaloutput på commit `8893a9c` bekreftet:
 
 ```text
 ESLint: bestått
@@ -133,31 +133,46 @@ TypeScript: bestått
 Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
 Vite: 127 moduler transformert
 CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.85 kB, gzip 83.22 kB
-produksjonsbuild: bestått på 195 ms
+JavaScript: 280.88 kB, gzip 83.22 kB
+produksjonsbuild: bestått på 198 ms
 ```
 
-Fem produksjonsrettelser er lagt til etter denne kontrollen. Resultatet kan derfor ikke brukes som endelig branch-status. Ny `npm run check` er obligatorisk.
+Senere commits fram til `6f2799e` endret bare dokumentasjon. Produksjonskoden og importgrafen er uendret, men en endelig lokal `npm run check` på siste branch-head er fortsatt obligatorisk før PR.
 
 ## Manuell kontroll
 
-Godkjent:
+Godkjent av brukeren i PC- og Telefon-visning:
 
 - elementkanter og elementmidtpunkter på begge akser
 - horisontal og vertikal lerretsmidt
 - samtidig snapping på begge akser
-- Header fast øverst og full bredde
-- Header-fontstørrelse og beholdt verdi
-
-Gjenstår:
-
-- låste mål, skjulte elementer og selv-ekskludering
 - Seksjon, Bilde, Tekst og Knapp som aktive elementer
-- pointercancel, tapt pointer capture og auto-scroll
-- uendret resize- og tastaturoppførsel
-- clamp ved lerretsgrenser
-- regresjon av opprettingsposisjon etter Header-normalisering
+- låste synlige elementer som snapmål
+- aktivt element ekskludert som eget mål
+- Header som fast, fullbredde snapmål
+- Header-høyde og fontstørrelse gjennom viewport-bytte
+- nye elementer opprettet under Header
+- pointer sluppet utenfor vinduet uten hengende guider eller flyttemodus
+- auto-scroll uten hopp eller feil commit
+- resize uten snapping eller guider
+- tastaturflytting uten snapping eller guider
+- clamping ved alle lerretsgrenser
+- samme grunnregler i PC og Telefon
+
+Skjulte elementer kan ikke styres fra dagens UI. Ekskluderingen er derfor kodeverifisert i `getAlignmentTargets()` og inngår ikke som en utestet synlig kontroll.
+
+Lokal lagring og gjenoppretting finnes ikke ennå og er ikke et akseptansepunkt for fase 14.
+
+## Gjenstående før PR
+
+1. Pull siste remote-head lokalt.
+2. Kjør `npm run check` på siste branch-head.
+3. Kjør `git diff --check`.
+4. Kjør repositoryomfattende filstørrelseskontroll.
+5. Bekreft clean working tree og eksakt HEAD.
+6. Opprett og gjennomgå PR, CI, reviews og tråder.
+7. Merge aldri uten eksplisitt `godkjent`.
 
 ## Konklusjon
 
-Auditen fant ett reelt layoutavvik og rettet det i alle identifiserte lesere og skrivere. Ingen kjent arkitektur- eller filstørrelsesblokkerer er funnet i branch-diffen. Branchen er likevel ikke klar for PR før ny full automatisk kontroll, repositoryomfattende filstørrelseskontroll og resterende manuell regresjon er bestått.
+Ingen kjent funksjons-, arkitektur- eller filstørrelsesblokkerer er funnet i branch-diffen. Den manuelle fase-14-regresjonen er fullført og godkjent. Branchen er klar for endelig lokal branch-head-kontroll før PR.
