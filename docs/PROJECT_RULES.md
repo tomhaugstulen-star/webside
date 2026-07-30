@@ -28,11 +28,11 @@ Gjeldende status:
 aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
 GitHub-sak: #28
+PR: #29 – åpen, ikke draft
 prosjektskjema: versjon 7
 implementering og manuell test: godkjent
-automatiske kontroller etter siste 10 px-endring: gjenstår
-arkitekturrapporter: må regenereres
-PR: ikke opprettet
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
 merge: ikke godkjent eller utført
 ```
 
@@ -282,7 +282,7 @@ npm run architecture:diagram
 git diff --check
 ```
 
-Siste komplette kontroll før 10 px-utvidelsen:
+Siste verifiserte kontroll:
 
 ```text
 ESLint: bestått
@@ -291,7 +291,8 @@ Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
 Vite: 111 moduler transformert
 CSS: 33.62 kB, gzip 6.34 kB
 JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 189 ms
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
-Ny komplett kontroll og regenererte arkitekturrapporter kreves før PR. Ingen merge uten eksplisitt godkjenning.
+Arkitekturrapportene ble regenerert og committet i `1963088`. PR #29 kontrolleres før merge. Ingen merge uten eksplisitt godkjenning.
