@@ -23,42 +23,49 @@ Det utvikles aldri direkte på `main`. Ikke merge uten eksplisitt godkjenning. I
 
 1. `docs/NEXT_CHAT_PROMPT.md`
 2. `docs/WORK_PLAN.md`
-3. `docs/EDITOR_PLANNING.md`
-4. `docs/PROJECT_RULES.md`
-5. `README.md`
-6. `docs/ELEMENT_MODEL.md`
-7. `docs/RIGHT_PROPERTIES_PANEL.md`
-8. `docs/CODE_AUDIT.md`
-9. relevante øvrige fasedokumenter
+3. `docs/PROJECT_COLORS.md`
+4. `docs/EDITOR_PLANNING.md`
+5. `docs/PROJECT_RULES.md`
+6. `README.md`
+7. `docs/ELEMENT_MODEL.md`
+8. `docs/RIGHT_PROPERTIES_PANEL.md`
+9. `docs/CODE_AUDIT.md`
+10. relevante øvrige fasedokumenter
 
 ## Gjeldende status
 
 ```text
-siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
-GitHub-sak: #25 – lukket som fullført
-PR: #26 – merget
-mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
-prosjektskjema: versjon 6
-lokal main: synkronisert og clean
-arkitekturrapporter: regenerert etter sluttaudit, ingen diff
-neste produksjonsfase: ikke valgt
+aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
+branch: feature/project-colors
+GitHub-sak: #28
+PR: #29 – åpen, ikke draft
+base main: 504b6d66670eb4a10f929e5addf6c56b00782487
+prosjektskjema: versjon 7
+implementering: ferdig
+manuell PC- og Telefon-test: godkjent
+rammebredde: Ingen eller 1–10 px
+framtidsrettet sluttaudit: ferdig
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
+merge: ikke godkjent eller utført
 ```
 
-Faktisk `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Commitnummeret over er et historisk kontrollpunkt for fase 11A, ikke en permanent forventet topp-commit.
+Faktisk feature-, PR- og `main`-HEAD skal alltid kontrolleres fra GitHub/Git. Commitnumrene over er kontrollpunkter, ikke permanente forventede topper.
 
-## Siste verifiserte kvalitetskontroll
-
-Brukerens lokale terminaloutput etter den endelige kodeauditen bekreftet:
+## Siste verifiserte kontroll
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
-Vite: 100 moduler transformert
-CSS: 30.95 kB, gzip 6.04 kB
-JavaScript: 258.38 kB, gzip 78.09 kB
-produksjonsbuild: bestått på 185 ms
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
+
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`.
 
 ## Implementert funksjonalitet
 
@@ -72,68 +79,49 @@ produksjonsbuild: bestått på 185 ms
 - sikker sletting
 - bundlet SVG-knappbibliotek
 - lokal bildeimport for PNG, JPEG og WebP
-- transient ressursbuffer for `File` og Object URL
-- stabil bilde-`assetId` og serialiserbar metadata
-- alt-tekst, `Hele bildet` og `Juster utsnitt`
-- zoom, reset, pekerdrag og tastaturstyrt motivflytting
-- åtte resizegrep innenfor bilderammen
-- Seksjon rendret bak Bilde, Tekst og Knapp
-- crop-resize med stasjonært motiv og fast motsatt kant
-- kontrollert fallback ved manglende ressurs
+- transient bilderessursbuffer
+- separat bilderamme og crop-transform
+- prosjektfarger for aktiv side
+- sidebakgrunn
+- Seksjon-bakgrunn
+- Seksjon-ramme med Ingen eller 1–10 px og egen farge
+- tekstfarge
+- låste fargekontroller
+- samme farger på PC og Telefon
 
-## Autoritative bildegrenser
+Knapper beholder ferdig SVG-fargedesign og inngår ikke i `Farger`. Bilder har ingen prosjektfarge.
 
-```text
-maks filstørrelse: 10 MB
-maks dekodet pikselmengde: 40 megapiksler
-maks bredde eller høyde: 16 384 px
-crop-grunnramme for skjemaversjon 6: 240 × 160 px
-zoom: 1..3
-offsetX og offsetY: -1..1
-```
-
-Crop-grunnrammen er en skjemainvariant. Senere endring av standardstørrelsen for nye bilder skal ikke endre versjon-6-transformer. En annen grunnmodell krever ny skjemaversjon og migrering.
-
-## Bildeinteraksjon
+## Autoritativ fargemodell
 
 ```text
-Hele bildet     viser hele motivet proporsjonalt og sentrert
-Juster utsnitt  fyller rammen uten tomrom
-vanlig dra      flytter motivet
-Shift + dra     flytter hele rammen
-Alt + piltast   flytter motivet 4 px
-Shift+Alt+pil   flytter motivet 20 px
-piltast         flytter elementet
-Ctrl/Cmd + pil  endrer størrelse fra nedre høyre hjørne
+EditorColor: kanonisk #RRGGBB
+side: appearance.backgroundColor
+Seksjon: appearance.backgroundColor
+Seksjon: appearance.frame.width = 0..10
+Seksjon: appearance.frame.color
+Tekst: textStyle.color
 ```
 
-Ved crop-resize:
+`Farger` er en avledet oversikt, ikke lagret palett. Hver kontroll muterer bare én konkret egenskap. Like fargeverdier kobler ikke elementer sammen.
 
-- motivets størrelse og absolutte plassering beholdes
-- bare den aktive rammekanten flyttes
-- motsatt kant står fast
-- ny normalisert offset beregnes mot ny ramme
-- ramme og transform lagres atomisk
+Rammefargen i høyremenyen og `Farger` skriver til samme prosjektverdi. Når bredden er `0`, skjules rammefargen fra oversikten, men lagret farge beholdes.
 
-## Sluttauditens viktigste rettelser
+## State- og arkitekturgrenser
 
-- crop-invarianter håndheves i modell og reducer
-- `Alt + piltast` fungerer etter bruk av zoomkontrollen
-- nettleserhistorikk stoppes for `Alt + venstre/høyre`
-- Seksjon rendres deterministisk bak forgrunnsinnhold
-- bilderammen har ingen motstridende regel i `canvas.css`
-- grep og treffområder ligger innenfor bilderammen
-- import avsluttes sikkert ved feil og panel-unmount
-- metadata kontrolleres mot faktisk fil
-- dekodet bildestørrelse er begrenset
-- crop-grunnskala er låst til skjemaversjon 6
-- alle berørte kildefiler er under 250 linjer
+- alle varige endringer går gjennom typede, validerte reducerhandlinger
+- ugyldige, låste og uendrede handlinger returnerer samme state
+- `updatedAt` endres bare ved gyldig reell mutasjon
+- DOM og CSS er ikke permanent fargelagring
+- selection-outline og tekstens editorgrense er ikke publiserbare rammer
+- fargeendringer påvirker ikke geometri, crop, lagrekkefølge eller ressursstate
+- `RightPropertiesPanel.tsx` forblir komposisjon
+- alle nye og berørte produksjonsfiler er under 250 linjer
 
 ## Obligatoriske grenser for senere arbeid
 
 ### Prosjektimport
 
-Valider hele prosjektobjektet og skjemaversjonen før `replace-project`. Ikke stol på TypeScript-typen for eksterne data.
+Valider hele prosjektobjektet og skjemaversjonen før `replace-project`. Versjon 6 må migreres eller avvises kontrollert. Ikke stol på TypeScript-typen for eksterne data.
 
 ### Prosjektbytte
 
@@ -145,7 +133,7 @@ Historikk inneholder bare serialiserbar prosjektstate. `File`, Object URL og akt
 
 ### Mobiloverstyringer
 
-Bruk viewport-spesifikke geometrihandlinger. Ikke skriv mobilendringer inn i desktopfeltet.
+Bruk viewport-spesifikke handlinger. Farger er felles i versjon 7; responsive fargeoverstyringer krever eksplisitt senere modellstøtte.
 
 ### Autolagring
 
@@ -153,26 +141,33 @@ Lagre gyldige prosjektmutasjoner, ikke transient editor- eller ressursstate.
 
 ## Første oppgave i neste chat
 
-Fase 11A skal ikke implementeres på nytt. Ikke start fase 12 eller en annen produksjonsfase uten at brukeren velger den eksplisitt.
-
-Kontroller først repoets faktiske status:
+Fase 12 skal ikke implementeres på nytt. Trekk siste branch og kontroller PR #29:
 
 ```powershell
 cd C:\Users\tomha\Desktop\website
 git fetch origin
-git switch main
-git pull --ff-only origin main
+git switch feature/project-colors
+git pull --ff-only origin feature/project-colors
 git status
 git log -6 --oneline --decorate
 ```
 
-Forventet utgangspunkt etter fase 11A:
+Forventet:
 
-- lokal `main` er synkronisert med `origin/main`
+- branch er synkronisert med `origin/feature/project-colors`
 - working tree er clean
-- mergecommit `f5e4657` finnes i historikken
-- ingen feature-branch startes før neste fase er valgt og omfanget er låst
+- de siste statusdokumentene finnes på lokal branch
 
-Velg deretter neste produksjonsfase sammen med brukeren. Opprett alltid en ny branch fra oppdatert `main` før kode eller dokumentendringer.
+Kontroller deretter med GitHub-connectoren:
+
+1. PR #29 har base `main` og head `feature/project-colors`
+2. PR-en er åpen og ikke draft
+3. head-SHA samsvarer med branch-head
+4. changed files og samlet diff er som forventet
+5. mergebarhet er ferdigberegnet
+6. reviews og uløste tråder er kontrollert
+7. CI/statuskontroller er kontrollert
+8. merge bare etter brukerens eksplisitte ord `godkjent`
+9. oppdater lokal `main` etter merge
 
 ---

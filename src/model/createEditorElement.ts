@@ -8,6 +8,7 @@ import {
   DEFAULT_IMAGE_MODE,
   DEFAULT_IMAGE_TRANSFORM,
 } from './imagePresentation'
+import { DEFAULT_SECTION_APPEARANCE } from './sectionAppearance'
 import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
 
 type CreateEditorElementInput = {
@@ -33,7 +34,14 @@ export function createEditorElement({
 
   switch (request.kind) {
     case 'section':
-      return { ...common, kind: 'section' }
+      return {
+        ...common,
+        kind: 'section',
+        appearance: {
+          backgroundColor: DEFAULT_SECTION_APPEARANCE.backgroundColor,
+          frame: { ...DEFAULT_SECTION_APPEARANCE.frame },
+        },
+      }
     case 'image':
       return {
         ...common,

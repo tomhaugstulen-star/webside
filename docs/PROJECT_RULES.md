@@ -25,13 +25,15 @@ Regler:
 Gjeldende status:
 
 ```text
-siste fullførte leveranse: fase 11A – bildeimport, ramme og utsnitt
-GitHub-sak: #25 – lukket som fullført
-PR: #26 – merget
-mergecommit på main: f5e46577a15b548fc6c0140cd05b13ae554a6b76
-prosjektskjema: versjon 6
-lokal main: synkronisert og clean
-neste produksjonsfase: ikke valgt
+aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
+branch: feature/project-colors
+GitHub-sak: #28
+PR: #29 – åpen, ikke draft
+prosjektskjema: versjon 7
+implementering og manuell test: godkjent
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
+merge: ikke godkjent eller utført
 ```
 
 ## 2. Filstørrelser og ansvar
@@ -47,21 +49,22 @@ neste produksjonsfase: ikke valgt
 - motstridende regler for samme komponent skal ikke fordeles mellom generelle og spesifikke stilark
 - tilfeldig generell `features`-mappe eller samlefil skal ikke innføres
 
-Etter fase-11A-auditen:
+Etter fase-12-auditen:
 
 ```text
-alle berørte kildefiler: under 250 linjer
-EditorCanvasElement.tsx: under 200 linjer
-useElementPointerTransform.ts: 218 linjer
-imagePresentation.ts: 236 innholdslinjer
-ImageImportControl.tsx: 133 linjer
+alle nye og berørte produksjonsfiler: under 250 linjer
+reduceColorProjectAction.ts: 156 linjer
+projectColorEntries.ts: under 100 linjer
+ColorsPanel.tsx: under 100 linjer
+FramePropertiesSection.tsx: under 100 linjer
 ```
 
 ## 3. Autoritativ prosjektmodell
 
 - `EditorProject` eier alle varige prosjektdata
-- gjeldende prosjektskjema er versjon 6
+- gjeldende prosjektskjema er versjon 7
 - DOM-en er ikke permanent lagring
+- CSS er ikke permanent fargelagring
 - Object URL er ikke prosjektdata
 - ID-er er stabile og kryptografisk generert
 - reduceren er deterministisk for samme state og action
@@ -76,6 +79,7 @@ versjon 3  tekststil
 versjon 4  elementlenke
 versjon 5  knappasset, knappetekst og knappelenke
 versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
+versjon 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 ```
 
 ## 4. Varig og transient state
@@ -83,9 +87,11 @@ versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
 Varig prosjektdata omfatter:
 
 - sider og elementer
+- sidebakgrunn
 - responsiv geometri og synlighet
 - låsestatus
-- tekstinnhold, tekststil og lenke
+- Seksjon-bakgrunn og ramme
+- tekstinnhold, tekststil, tekstfarge og lenke
 - knappens asset-ID og label
 - bildets asset-ID, metadata, alt-tekst, modus og transform
 - tidsstempler
@@ -99,6 +105,7 @@ Transient state omfatter:
 - filvelger og feedback
 - `File`, Object URL og ressurskart
 - fokus, hover og animasjon
+- avledede fargegrupper i UI
 
 Transient state skal ikke serialiseres, publiseres eller inngå direkte i historikk eller autolagring.
 
@@ -114,17 +121,45 @@ Reducergrensene avviser:
 - feil elementtype
 - låst element
 - ugyldig eller ikke-finit verdi
+- ugyldig eller ikke-kanonisk farge
+- rammebredde utenfor `0–10`
 - ukjent knappasset-ID
 - ugyldig bildeasset eller metadata
 - ukjent visningsmodus
 - ugyldig transform
 - crop-ramme som ikke kan fylles ved aktuell zoom
-- inkonsistent ramme og transform
+- inkonsistent bilderamme og transform
 - uendret data
 
 Ved avvisning returneres samme state og `updatedAt` endres ikke.
 
-## 6. Elementstørrelser og layout
+## 6. Prosjektfarger og rammer
+
+Autoritativ fargemodell:
+
+```text
+EditorColor = #RRGGBB
+sidebakgrunn = page.appearance.backgroundColor
+Seksjon-bakgrunn = section.appearance.backgroundColor
+Seksjon-rammebredde = 0..10
+Seksjon-rammefarge = section.appearance.frame.color
+tekstfarge = text.textStyle.color
+```
+
+Regler:
+
+- `Farger` avledes fra aktiv side og lagres ikke som egen palett
+- hver kontroll muterer bare én konkret egenskap
+- like fargeverdier kobler ikke elementer sammen
+- rammefargen vises i `Farger` bare når bredden er større enn `0`
+- rammefargen beholdes når bredden settes til `0`
+- høyremeny og venstremeny skriver til samme verdi
+- selection-outline og tekstens editorgrense er ikke publiserbare rammer
+- knapper beholder ferdig SVG-fargedesign
+- bilder har ingen prosjektfarge
+- fargene er felles for PC og Telefon i versjon 7
+
+## 7. Elementstørrelser og layout
 
 Standard- og minimumsstørrelser har én modellkilde.
 
@@ -149,11 +184,10 @@ Knapp    80 × 36 px
 - normalt pekerslipp gir én commit
 - `pointercancel` og tapt capture forkaster draft
 - låste elementer kan markeres, men ikke muteres
+- Seksjon-rammen bruker `box-sizing: border-box` og endrer ikke ytre størrelse
 - lerretshøyde er avledet visning og lagres ikke
 
-## 7. Bildeimport og ressurslivssyklus
-
-Støttede filer:
+## 8. Bildeimport og ressurslivssyklus
 
 ```text
 PNG
@@ -164,8 +198,6 @@ maks 40 megapiksler
 maks 16 384 px per side
 ```
 
-Regler:
-
 - type, filstørrelse, filnavn, dekoding og dimensjoner valideres før oppretting
 - avbrutt filvalg muterer ikke prosjekt eller `updatedAt`
 - import etter panel-unmount oppretter ikke ressurs eller element
@@ -175,43 +207,7 @@ Regler:
 - provider-unmount tilbakekaller alle gjenværende URL-er
 - manglende ressurs gir kontrollert fallback
 
-## 8. Bilderamme og utsnitt
-
-Bilderammen og motivet er separate konsepter.
-
-### Hele bildet
-
-- viser hele motivet proporsjonalt
-- sentrerer motivet
-- tillater tomrom ved ulikt sideforhold
-- beholder lagret crop-transform
-
-### Juster utsnitt
-
-- fyller rammen uten tomrom
-- bevarer sideforhold
-- zoom normaliseres til `1..3`
-- offset normaliseres til `-1..1`
-- rammen kan ikke være større enn motivet ved aktuell zoom
-- overgang fra stor contain-ramme gir gyldig crop-ramme
-- reset bruker minimum zoom og sentrert motiv
-
-### Versjon-6-invariant
-
-```text
-IMAGE_CROP_BASE_FRAME_SIZE_V6 = 240 × 160 px
-```
-
-Denne verdien skal ikke endres fordi standardstørrelsen for nye bilder endres. En ny crop-grunnmodell krever ny skjemaversjon og migrering.
-
-### Rammeresize
-
-- åtte grep ligger innenfor rammen
-- aktiv kant flyttes
-- motsatt kant står fast
-- motivets størrelse og absolutte plassering beholdes
-- ny normalisert offset beregnes mot ny ramme
-- ramme og transform lagres atomisk
+Crop-grunnrammen for versjon 6 er fortsatt `240 × 160 px`. Endring krever ny skjemaversjon og migrering.
 
 ## 9. Interaksjon og tilgjengelighet
 
@@ -229,14 +225,14 @@ Delete              åpner slettebekreftelse
 
 - låste elementer kan fokuseres og inspiseres
 - tekstredigering skiller objektmarkering fra innholdsredigering
-- tilgjengelige navn beskriver innhold og relevante snarveier
+- native fargekontroller har tilgjengelige navn og synlig fokus
 - feil og status bruker riktige live-regionroller
 - `prefers-reduced-motion` respekteres
 
 ## 10. Menyansvar
 
 ```text
-Venstremeny = opprette elementer og velge fil eller design
+Venstremeny = opprette elementer, velge fil/design og vise prosjektoversikt
 Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere og transformere
 Ressurslag = eie transient bildefil og renderings-URL
@@ -248,8 +244,9 @@ Høyremenyen følger `selectedElementId`, eier ingen separat elementkopi og mute
 
 - Telefon arver desktopverdier når mobiloverstyring mangler
 - dagens UI oppretter ikke mobiloverstyringer
-- innhold, stil, lenker, låsestatus og bildeutsnitt er foreløpig felles
+- innhold, stil, lenker, låsestatus, farger og bildeutsnitt er foreløpig felles
 - senere mobiloverstyringer må bruke viewport-spesifikke actions
+- responsive farger krever eksplisitt modellstøtte
 - mobilendringer skal ikke skrives inn i desktopfeltet
 
 ## 12. Krav til senere faser
@@ -258,8 +255,8 @@ Høyremenyen følger `selectedElementId`, eier ingen separat elementkopi og mute
 
 - valider hele eksterne prosjektobjektet før `replace-project`
 - krev kjent skjemaversjon
-- valider unike ID-er, sider, uniontyper, layout og bildeinvarianter
-- migrer eller avvis ukjent skjema kontrollert
+- valider unike ID-er, sider, uniontyper, layout, farger og bildeinvarianter
+- migrer eller avvis versjon 6 og ukjent skjema kontrollert
 
 ### Prosjektbytte
 
@@ -285,16 +282,17 @@ npm run architecture:diagram
 git diff --check
 ```
 
-Siste verifiserte produksjonskontroll:
+Siste verifiserte kontroll:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
-Vite: 100 moduler transformert
-CSS: 30.95 kB, gzip 6.04 kB
-JavaScript: 258.38 kB, gzip 78.09 kB
-produksjonsbuild: bestått på 185 ms
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
-Arkitekturrapportene ble regenerert etter sluttauditen og ga ingen diff. Fase 11A ble deretter merget etter eksplisitt godkjenning. Neste produksjonsfase krever ny branch fra oppdatert `main` og nytt låst omfang.
+Arkitekturrapportene ble regenerert og committet i `1963088`. PR #29 kontrolleres før merge. Ingen merge uten eksplisitt godkjenning.

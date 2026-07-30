@@ -1,10 +1,37 @@
 import type { ButtonAssetId } from '../model/buttonAsset'
 import type { ElementCreationRequest } from '../model/elementCreation'
+import type { EditorColor } from '../model/editorColor'
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
 import type { ImageMode, ImageTransform } from '../model/imagePresentation'
+import type { SectionFrameWidth } from '../model/sectionAppearance'
 import type { TextElementStylePatch } from '../model/textElementStyle'
+
+export type ColorProjectAction =
+  | {
+      type: 'set-active-page-background-color'
+      color: EditorColor
+      updatedAt: string
+    }
+  | {
+      type: 'set-section-background-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
+  | {
+      type: 'set-section-frame-width'
+      elementId: string
+      width: SectionFrameWidth
+      updatedAt: string
+    }
+  | {
+      type: 'set-section-frame-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
 
 export type EditorProjectAction =
   | { type: 'replace-project'; project: EditorProject }
@@ -87,3 +114,4 @@ export type EditorProjectAction =
       transform: ImageTransform
       updatedAt: string
     }
+  | ColorProjectAction

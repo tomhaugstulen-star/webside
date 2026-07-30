@@ -23,7 +23,7 @@ Tomt lerret     -> høyremeny lukkes
 ## 2. Fast ansvarsdeling
 
 ```text
-Venstremeny = opprette elementer og velge fil eller design
+Venstremeny = opprette elementer, velge fil/design og vise prosjektoversikt
 Høyremeny  = egenskaper og handlinger for markert element
 Lerretet   = redigere innhold og transformere elementer
 Ressurslag = eie transient bildefil og Object URL
@@ -47,7 +47,7 @@ Varige endringer sendes som typede intensjoner til state-laget.
 Egenskaper
 <elementtype>
 
-Seksjon -> Element
+Seksjon -> Ramme -> Element
 Bilde   -> Bilde -> Element
 Tekst   -> Tekstutseende -> Lenke -> Element
 Knapp   -> Knapp -> Lenke -> Element
@@ -61,7 +61,40 @@ Status: Låst / Ulåst
 Slett <elementtype>
 ```
 
-## 4. Bildekontroller
+## 4. Seksjon og ramme
+
+Markert Seksjon viser:
+
+```text
+Ramme
+Tykkelse
+  Ingen
+  1 px
+  2 px
+  ...
+  10 px
+Farge
+  fargefirkant
+  #RRGGBB
+Element
+Status
+Slett seksjon
+```
+
+Regler:
+
+- rammebredden valideres til `0–10`
+- `0` vises som `Ingen`
+- etikettene `1–10 px` genereres fra samme modellverdier som validatoren
+- rammen ligger innenfor Seksjonens lagrede størrelse
+- rammefargen beholdes når bredden settes til `0`
+- høyremenyens fargekontroll og `Farger` skriver til samme prosjektverdi
+- låst Seksjon kan inspiseres, men kontrollene er deaktivert
+- reduceren avviser ugyldige, låste og uendrede handlinger
+
+Seksjon-bakgrunn endres fra `Farger`, ikke fra en separat høyremenyverdi.
+
+## 5. Bildekontroller
 
 Markert bilde viser:
 
@@ -107,7 +140,7 @@ Visningsbytte går gjennom en typet reducerhandling. Overgang til crop normalise
 - reset sentrerer motivet og bruker minimum gyldig zoom
 - låst bilde kan ikke endre zoom eller resettes
 
-### Interaksjonshjelp
+### Interaksjon
 
 ```text
 vanlig dra      flytter motivet
@@ -116,51 +149,22 @@ Alt + piltast   flytter motivet 4 px
 Shift+Alt+pil   flytter motivet 20 px
 ```
 
-`Alt + piltast` virker også etter bruk av zoomkontrollen. Snarveien blokkeres i tekstfelt og dialoger.
+Rammeresize skjer på lerretet med åtte grep innenfor bilderammen. Aktiv kant flyttes, motsatt kant står fast, motivets størrelse og absolutte plassering beholdes, og ramme og transform lagres atomisk.
 
-### Rammeresize
+## 6. Tekstegenskaper
 
-Rammeresize skjer på lerretet, ikke i høyremenyen.
-
-- åtte grep ligger innenfor bilderammen
-- aktiv kant flyttes
-- motsatt kant står fast
-- motivets størrelse og absolutte plassering beholdes
-- ramme og korrigert transform lagres atomisk
-
-### Filmetadata og ressursstatus
-
-Panelet viser:
-
-- filnavn
-- original pikselstørrelse
-- filstørrelse
-- varsel ved manglende ressurs
-
-Autoritative importgrenser:
-
-```text
-PNG, JPEG eller WebP
-maks 10 MB
-maks 40 megapiksler
-maks 16 384 px per side
-```
-
-Manglende ressurs bruker `role="alert"` og kontrollert fallback på lerretet.
-
-## 5. Tekstegenskaper
-
-Markert tekstboks viser tekstutseende:
+Markert tekstboks viser:
 
 - font
 - størrelse
-- stil
+- fet/kursiv
 - justering
 - linjehøyde
+- lenke
 
-Tekstinnhold redigeres på lerretet. Høyremenyen endrer egenskaper for hele tekstboksen. Låste tekstbokser kan inspiseres, men ikke endres.
+Tekstinnhold redigeres på lerretet. Tekstfarge endres fra `Farger` og lagres i samme `TextElementStyle` som øvrig tekstutseende. Låste tekstbokser kan inspiseres, men ikke endres.
 
-## 6. Lenkeegenskaper
+## 7. Lenkeegenskaper
 
 Tekst og knapp bruker samme lenkeseksjon:
 
@@ -175,7 +179,7 @@ Nettadresse
 
 Bare absolutte `http://`- og `https://`-adresser godtas. Lenker aktiveres aldri i editormodus.
 
-## 7. Knappkontroller
+## 8. Knappkontroller
 
 Markert knapp viser:
 
@@ -187,7 +191,9 @@ Markert knapp viser:
 
 Knappetekst trimmes. Tom tekst avvises. Design valideres mot statisk asset-katalog. Låste knapper kan inspiseres, men ikke endres.
 
-## 8. Selection og drafts
+Knappens farger følger ferdig SVG-design. Fase 12 legger ikke til fargeoverstyringer i høyremenyen.
+
+## 9. Selection og drafts
 
 ```text
 selectedElementId -> selectedElement -> RightPropertiesPanel
@@ -198,15 +204,7 @@ selectedElementId -> selectedElement -> RightPropertiesPanel
 - lokale drafts er transient state
 - ny markering gir korrekt draft for nytt element
 
-## 9. Samspill med lerretet
-
-Ved klikk i høyremenyen under tekstredigering:
-
-1. tekstfeltet mister fokus
-2. blur-mekanismen committer draften
-3. tekstøkten avsluttes
-4. elementmarkeringen beholdes
-5. panelet leser oppdatert element fra sentral state
+Ved klikk i høyremenyen under tekstredigering committer blur-mekanismen tekstdraften, avslutter tekstøkten og beholder elementmarkeringen.
 
 Bilderamme og motiv redigeres på lerretet. Høyremenyen dupliserer ikke live-preview eller pekerstate.
 
@@ -215,6 +213,9 @@ Bilderamme og motiv redigeres på lerretet. Høyremenyen dupliserer ikke live-pr
 ```text
 RightPropertiesPanel.tsx
   komposisjon etter elementtype
+
+FramePropertiesSection.tsx
+  Seksjon-rammebredde og rammefarge
 
 ImagePropertiesSection.tsx
   alt-tekst, visning, zoom, reset og metadata
@@ -232,26 +233,19 @@ DeleteElementSection.tsx
   sletting
 ```
 
-Bildehandlinger går gjennom:
-
-```text
-reduceImageProjectAction.ts
-setImageAltText.ts
-setImageMode.ts
-setImageTransform.ts
-setImageDesktopFrame.ts
-```
+Fargekontrollen deles med `Farger`. Seksjon-handlinger går gjennom `useSectionAppearance` og den validerte fargereduceren.
 
 ## 11. Tilgjengelighet
 
 - paneloverskrift brukes med `aria-labelledby`
 - skjult innhold rendres ikke uten markert element
 - felt har labels
+- native fargekontroll har tilgjengelig navn og nåværende farge
+- fokusmarkering er synlig
 - fieldset og legend grupperer bildevisning
 - feil bruker `role="alert"`
 - lagringsfeedback bruker `role="status"`
 - zoom har label og synlig verdi
-- hjelpetekst beskriver tastatur og peker
 - låste kontroller er deaktivert
 - redusert bevegelse respekteres
 
@@ -263,27 +257,30 @@ setImageDesktopFrame.ts
 - høyremenyen skal ikke eie prosjektimport, ressursbuffer eller historikk
 - senere prosjektbytte må avstemme ressursbufferen uten at panelet får ansvar for dette
 - viewport-spesifikke mobilverdier skal håndteres i state-laget, ikke som lokale panelkopier
+- responsive farger krever eksplisitt senere modell- og actionstøtte
 
 ## 13. Verifisering
 
-Manuelt godkjent:
+Manuelt godkjent på PC og Telefon:
 
-- alt-tekst
-- `Hele bildet` og `Juster utsnitt`
-- zoom og reset
-- motivdrag og tastaturstyring
-- rammeresize fra alle kanter og hjørner
-- grep innenfor rammen
-- stasjonært motiv ved crop-resize
-- låsing, sletting og fallback
-- PC og Telefon
+- Seksjon-ramme `Ingen` og `1–10 px`
+- rammefarge synkronisert med `Farger`
+- rammen endrer ikke elementets ytre størrelse
+- låsing
+- tekst-, knapp- og bildeegenskaper
+- crop, zoom, sletting og fallback
 
-Siste automatiske kontroll:
+Siste verifiserte automatiske kontroll:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 91 moduler, 237 avhengigheter, ingen brudd
-Vite: 100 moduler transformert
-produksjonsbuild: bestått på 185 ms
+Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
+Vite: 111 moduler transformert
+CSS: 33.62 kB, gzip 6.34 kB
+JavaScript: 264.52 kB, gzip 79.47 kB
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
+
+Arkitekturrapportene ble regenerert og committet i `1963088`. Implementeringen ligger i PR #29 og merges bare etter eksplisitt godkjenning.

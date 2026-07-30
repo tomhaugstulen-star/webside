@@ -59,7 +59,10 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
     viewport,
     layoutPreview,
   )
-  const pageStyle: CSSProperties = contentHeight > 0 ? { height: contentHeight } : {}
+  const pageStyle: CSSProperties = {
+    backgroundColor: activePage.appearance.backgroundColor,
+    ...(contentHeight > 0 ? { height: contentHeight } : {}),
+  }
   const renderElements = orderElementsForRendering(activePage.elements)
 
   const handlePreviewLayoutChange = (preview: ElementLayoutPreview | null) => {

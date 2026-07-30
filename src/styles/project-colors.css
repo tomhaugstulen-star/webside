@@ -1,0 +1,57 @@
+.colors-panel__groups {
+  display: grid;
+  gap: 16px;
+}
+
+.colors-panel__group {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.colors-panel__group-heading {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  border-bottom: 1px solid #eee8e4;
+  background: #fcfaf8;
+}
+
+.colors-panel__group-heading h3 {
+  margin: 0;
+}
+
+.colors-panel__group-heading span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.colors-panel__fields {
+  display: grid;
+}
+
+.colors-panel__fields .color-swatch-input {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 62px;
+  padding: 0 16px;
+}
+
+.colors-panel__fields .color-swatch-input + .color-swatch-input {
+  border-top: 1px solid #eee8e4;
+}
+
+.colors-panel__fields .color-swatch-input__control {
+  justify-content: flex-end;
+}
+
+.colors-panel__fields .color-swatch-input__value {
+  min-width: 66px;
+  text-align: right;
+}

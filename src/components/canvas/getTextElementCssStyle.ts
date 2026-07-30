@@ -26,5 +26,6 @@ export function getTextElementCssStyle(
     fontStyle: textStyle.fontStyle,
     textAlign: textStyle.textAlign,
     lineHeight: textStyle.lineHeight,
+    color: textStyle.color,
   }
 }
