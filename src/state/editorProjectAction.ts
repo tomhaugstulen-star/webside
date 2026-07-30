@@ -10,6 +10,7 @@ import type { SectionFrameWidth } from '../model/sectionAppearance'
 import type {
   TextElementStylePatch,
   TextFontFamily,
+  TextFontSize,
 } from '../model/textElementStyle'
 
 export type ColorProjectAction =
@@ -54,6 +55,12 @@ export type HeaderAppearanceAction =
       type: 'set-header-font-family'
       elementId: string
       fontFamily: TextFontFamily
+      updatedAt: string
+    }
+  | {
+      type: 'set-header-font-size'
+      elementId: string
+      fontSize: TextFontSize
       updatedAt: string
     }
   | {
