@@ -3,6 +3,7 @@ import { ButtonPropertiesSection } from './ButtonPropertiesSection'
 import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
+import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
@@ -41,6 +42,10 @@ export function RightPropertiesPanel({
             <p className="right-properties-panel__element-type">
               {elementKindLabels[element.kind]}
             </p>
+
+            {element.kind === 'header' && (
+              <HeaderFontPropertiesSection element={element} />
+            )}
 
             {(element.kind === 'section' || element.kind === 'header') && (
               <FramePropertiesSection element={element} />
