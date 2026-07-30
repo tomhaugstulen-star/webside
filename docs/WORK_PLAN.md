@@ -150,19 +150,20 @@ OpenAI-integrasjonen skal bruke en lokal serverprosess eller tilsvarende sikker 
 ## Leveransestatus
 
 ```text
-siste fullførte produksjonsfase på main: 14 – korrigeringslinjer og snapping
-main ved fase-15-branchstart: 20b14af77365c4df912d0b3584a1a503cf0cec59
-prosjektskjema: versjon 9
-aktiv produksjonsfase: 15 – duse portalfarger og tydelig visuell struktur
-aktiv branch: feature/phase-15-portal-colors
+siste fullførte produksjonsfase på main: 15 – duse portalfarger og tydelig visuell struktur
+source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
 verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
-pull request: #43 – draft, ikke merget
-GitHub-sak: #42 – åpen til merge
+pull request: #43 – merget
+mergecommit på main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
+GitHub-sak: #42 – lukket som fullført
+prosjektskjema: versjon 9
 framtidsrettet kodeaudit: fullført
 automatisk sluttkontroll: bestått
 filstørrelseskontroll: bestått
 visuell regresjon: godkjent
-neste planlagte fase etter merge: 16 – automatisert testgrunnlag
+aktiv produksjonsfase: ingen
+neste planlagte fase: 16 – automatisert testgrunnlag
+fase 16: ikke startet
 ```
 
 Fase 14 leverte:
@@ -194,13 +195,13 @@ produksjonsfiler på eller over 250 linjer: 0
 
 Hele den relevante manuelle regresjonen ble godkjent i PC- og Telefon-visning. PR #39 ble merget etter eksplisitt brukergodkjenning, og brukerens lokale `main` ble synkronisert og bekreftet clean på mergecommit `0122605`.
 
-Fase 15 er implementert og verifisert på featurebranchen. Den er ikke fullført på `main` før PR #43 er merget og faktisk mergecommit er dokumentert.
+Fase 15 er fullført og merget til `main` via PR #43. Faktisk mergecommit er `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Ingen produksjonsfase er aktiv; neste planlagte fase er fase 16.
 
 ## Låst roadmap
 
 ```text
 fase 14  Korrigeringslinjer og snapping – fullført
-fase 15  Duse portalfarger og tydelig visuell struktur – klar for endelig PR-kontroll
+fase 15  Duse portalfarger og tydelig visuell struktur – fullført
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
@@ -225,7 +226,7 @@ Rekkefølgen er låst fordi hver fase bygger nødvendig grunnlag for senere fase
 
 ### Status
 
-Implementert, visuelt godkjent, auditert og automatisk verifisert på produksjons-head `7ea58a5`. Avventer siste dokument-/PR-kontroll og eksplisitt mergegodkjenning.
+Fullført og merget til `main` via PR #43 på mergecommit `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Produksjonskoden ble visuelt godkjent, framtidsrettet auditert og automatisk verifisert på `7ea58a5`.
 
 ### Formål
 

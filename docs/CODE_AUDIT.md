@@ -1,17 +1,19 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den framtidsrettede auditen av fase 15 – duse portalfarger og tydelig visuell struktur – på featurebranchen før merge til `main`.
+Dette dokumentet beskriver den framtidsrettede auditen av fase 15 – duse portalfarger og tydelig visuell struktur – slik leveransen ble merget til `main` 31. juli 2026.
 
 ## Leveransestatus
 
 ```text
-siste fullførte fase på main: 14 – korrigeringslinjer og snapping
-aktiv fase: 15 – duse portalfarger og tydelig visuell struktur
-branch: feature/phase-15-portal-colors
-verifisert branch-head: 7ea58a500b500efb884544751f0913a1a07cf285
-pull request: #43 – draft etter audit, ikke merget
-GitHub-sak: #42 – åpen til merge
+fullført fase på main: 15 – duse portalfarger og tydelig visuell struktur
+source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
+verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
+pull request: #43 – merget
+mergecommit på main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
+GitHub-sak: #42 – lukket som fullført
 prosjektskjema: versjon 9
+aktiv produksjonsfase: ingen
+neste planlagte fase: 16 – automatisert testgrunnlag
 ```
 
 Auditen omfatter alle produksjonsfiler endret i fase 15, samspillet mellom portaltema og nettsideprosjektets designverdier, CSS-vedlikehold, komponentklassifisering, filstørrelser, dependency-graf og autoritativ dokumentasjon.
@@ -215,19 +217,22 @@ Kontrollert i den visuelle regresjonen:
 
 Den røde topplinjen i referanseskjermbildet tilhører nettleserens dev-miljø og inngår ikke i editorens design.
 
-## PR-kontroll
+## Merge-resultat
 
-PR #43 er satt tilbake til draft etter auditrettelsen fordi den oppdaterte branch-headen måtte gjennom ny lokal sluttkontroll. Den kontrollen er nå bestått.
+PR #43 ble kontrollert mot head `7a4e688`, markert klar for review og merget etter eksplisitt brukergodkjenning.
 
-Før PR-en markeres klar for merge skal følgende kontrolleres på nytt mot siste dokumentcommit:
+Kontrollert før merge:
 
-- faktisk PR-head og base
-- full changed-file-liste
-- mergebarhet
-- CI/status
-- reviews og kommentarer
-- åpne review-tråder
-- at dokumentendringene ikke introduserer diff-feil
+- PR-en var mergebar
+- full changed-file-liste var gjennomgått
+- ingen GitHub Actions- eller CI-kjøringer var konfigurert
+- ingen reviews forelå
+- ingen kommentarer forelå
+- ingen åpne review-tråder forelå
+- lokal branch var synkronisert og clean
+- dokumentdiffen hadde ingen `git diff --check`-feil
+
+GitHub opprettet mergecommit `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Issue #42 ble automatisk lukket som fullført.
 
 ## Konklusjon
 
@@ -235,4 +240,4 @@ Det finnes ingen kjent funksjons-, modell-, state-, dependency- eller filstørre
 
 Den eneste framtidsrettede vedlikeholdsrisikoen som ble funnet – rekkefølgeavhengige ikonfarger – er rettet med eksplisitte semantiske variantklasser.
 
-Fase 15 er teknisk og visuelt klar for endelig PR-kontroll. Den er ikke fullført på `main` før PR #43 er merget etter eksplisitt brukergodkjenning.
+Fase 15 er fullført på `main`. Det finnes ingen kjent funksjons-, modell-, state-, dependency-, dokumentasjons- eller filstørrelsesblokkerer fra leveransen. Neste planlagte produksjonsfase er fase 16 – automatisert testgrunnlag.
