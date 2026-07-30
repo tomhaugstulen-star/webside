@@ -7,8 +7,11 @@ import { useEditorProject } from './useEditorProject'
 
 export function useProjectColors() {
   const { dispatch } = useEditorProject()
-  const { updateHeaderTextColor, updateHeaderFrameColor } =
-    useHeaderAppearance()
+  const {
+    updateHeaderBackgroundColor,
+    updateHeaderTextColor,
+    updateHeaderFrameColor,
+  } = useHeaderAppearance()
   const { updateSectionBackgroundColor, updateSectionFrameColor } =
     useSectionAppearance()
   const { updateTextElementStyle } = useTextElementStyle()
@@ -50,6 +53,7 @@ export function useProjectColors() {
     updateSectionBackgroundColor,
     updateSectionFrameColor,
     updateTextColor,
+    updateHeaderBackgroundColor,
     updateHeaderTextColor,
     updateHeaderFrameColor,
   }
