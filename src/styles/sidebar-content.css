@@ -13,16 +13,16 @@
 
 .panel-intro {
   margin: -14px 0 26px;
-  color: var(--muted);
+  color: var(--portal-text-muted);
   font-size: 14px;
   line-height: 1.55;
 }
 
 .setting-group {
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--portal-control-surface);
 }
 
 .setting-group h3 {
@@ -37,15 +37,15 @@
   justify-content: space-between;
   padding: 0 18px;
   border: 0;
-  border-top: 1px solid #eee8e4;
-  color: #2b2927;
-  background: #ffffff;
+  border-top: 1px solid var(--portal-border);
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   cursor: pointer;
   font-size: 14px;
 }
 
 .setting-row:hover {
-  background: #fbf7f4;
+  background: var(--portal-control-hover);
 }
 
 .panel-tip {
@@ -55,10 +55,10 @@
   gap: 12px;
   align-items: start;
   padding: 20px;
-  border: 1px solid #eadbd2;
+  border: 1px solid color-mix(in srgb, var(--portal-warning) 28%, white);
   border-radius: 12px;
-  color: #393431;
-  background: linear-gradient(135deg, #f7ebe4 0%, #f5e5dc 100%);
+  color: var(--portal-text);
+  background: var(--portal-warning-soft);
 }
 
 .panel-tip__icon {
@@ -67,8 +67,8 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: var(--accent);
-  background: #fff8f4;
+  color: var(--portal-warning);
+  background: color-mix(in srgb, var(--portal-warning-soft) 66%, white);
 }
 
 .panel-tip p {
@@ -85,13 +85,17 @@
   justify-content: center;
   gap: 10px;
   margin-bottom: 24px;
-  border: 1px solid #7c3c2f;
+  border: 1px solid var(--portal-accent-hover);
   border-radius: 10px;
   color: #ffffff;
-  background: #7d4032;
+  background: var(--portal-accent);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+}
+
+.primary-panel-button:hover:not(:disabled) {
+  background: var(--portal-accent-hover);
 }
 
 .primary-panel-button svg {
@@ -107,21 +111,21 @@
   justify-content: center;
   gap: 9px;
   padding: 24px;
-  border: 1px dashed #d8cec8;
+  border: 1px dashed var(--portal-border-strong);
   border-radius: 12px;
-  color: #76706c;
+  color: var(--portal-text-muted);
   text-align: center;
-  background: #fcfaf8;
+  background: var(--portal-control-subtle);
 }
 
 .empty-library svg {
   width: 38px;
   height: 38px;
-  color: #aa9d95;
+  color: var(--portal-accent);
 }
 
 .empty-library strong {
-  color: #373330;
+  color: var(--portal-text);
   font-size: 14px;
 }
 
@@ -144,19 +148,27 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 12px;
-  color: #35312e;
-  background: #ffffff;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   cursor: pointer;
   font-size: 13px;
 }
 
-.element-card:hover {
-  border-color: #c8afa2;
-  box-shadow: 0 8px 18px rgba(80, 56, 43, 0.07);
+.element-card:hover:not(:disabled) {
+  border-color: var(--portal-accent);
+  background: var(--portal-control-hover);
+  box-shadow: 0 8px 18px rgba(54, 68, 82, 0.1);
+}
+
+.setting-row:focus-visible,
+.primary-panel-button:focus-visible,
+.element-card:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
 }
 
 .element-card svg {
-  color: #8e5a49;
+  color: var(--portal-accent);
 }
