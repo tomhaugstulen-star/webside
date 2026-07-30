@@ -52,12 +52,13 @@ export function getNextPointerLayout(
   delta: CanvasPosition,
 ): ElementLayout {
   if (interaction.mode === 'move') {
-    const moveDelta =
-      element.kind === 'header' ? { x: 0, y: delta.y } : delta
+    if (element.kind === 'header') {
+      return interaction.initialLayout
+    }
 
     return moveElementLayout(
       interaction.initialLayout,
-      moveDelta,
+      delta,
       interaction.canvasWidth,
     )
   }
