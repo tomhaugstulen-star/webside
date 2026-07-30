@@ -15,6 +15,7 @@ export const IMAGE_CROP_BASE_FRAME_SIZE_V6 = {
   height: 160,
 } as const satisfies ElementSize
 
+export const HEADER_SERIALIZED_WIDTH = 960
 export const HEADER_DEFAULT_HEIGHT = 88
 export const HEADER_MINIMUM_HEIGHT = 70
 export const HEADER_MAXIMUM_HEIGHT = 100
@@ -24,7 +25,7 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
   image: { ...IMAGE_CROP_BASE_FRAME_SIZE_V6 },
   text: { width: 240, height: 96 },
   button: { width: 160, height: 48 },
-  header: { width: 960, height: HEADER_DEFAULT_HEIGHT },
+  header: { width: HEADER_SERIALIZED_WIDTH, height: HEADER_DEFAULT_HEIGHT },
 }
 
 const minimumElementSizes: Record<ElementKind, ElementSize> = {
