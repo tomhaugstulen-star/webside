@@ -10,7 +10,7 @@
 .text-properties__field {
   display: grid;
   gap: 7px;
-  color: var(--text);
+  color: var(--portal-text);
   font-size: 14px;
   font-weight: 600;
 }
@@ -20,10 +20,10 @@
   min-height: 40px;
   box-sizing: border-box;
   padding: 0 36px 0 12px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--portal-border-strong);
   border-radius: 8px;
-  color: var(--text);
-  background: #ffffff;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   font: inherit;
   font-weight: 500;
   cursor: pointer;
@@ -31,14 +31,15 @@
 
 .text-properties select:hover:not(:disabled),
 .text-properties__button-group button:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
+  background: var(--portal-control-hover);
 }
 
 .text-properties select:focus-visible,
 .text-properties__button-group button:focus-visible {
-  outline: 3px solid rgba(143, 67, 47, 0.24);
+  outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
 }
 
 .text-properties__button-group {
@@ -54,10 +55,10 @@
 .text-properties__button-group button {
   min-height: 40px;
   padding: 0 10px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--portal-border-strong);
   border-radius: 8px;
-  color: var(--text);
-  background: #ffffff;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   font: inherit;
   font-size: 13px;
   font-weight: 650;
@@ -65,20 +66,22 @@
 }
 
 .text-properties__button-group button[aria-pressed='true'] {
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
   color: #ffffff;
-  background: var(--accent);
+  background: var(--portal-accent);
 }
 
 .text-properties select:disabled,
 .text-properties__button-group button:disabled {
+  color: var(--portal-text-muted);
+  background: var(--portal-control-disabled);
+  border-color: var(--portal-border);
   cursor: not-allowed;
-  opacity: 0.58;
 }
 
 .text-properties__locked-note {
   margin: 14px 0 0;
-  color: var(--muted);
+  color: var(--portal-text-muted);
   font-size: 13px;
   line-height: 1.45;
 }
