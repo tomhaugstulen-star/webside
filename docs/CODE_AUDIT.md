@@ -9,10 +9,10 @@ fase: 13 – Logo og header
 branch: feature/logo-header
 GitHub-sak: #31
 prosjektskjema: versjon 8
-funksjonell manuell test: godkjent
-dokumentasjon: oppdatert og konsolidert
+funksjonell manuell test: gjenstår
+dokumentasjon: korrigert mot faktisk kontrollstatus
 kodeopprydding: gjennomført
-automatisk sluttkontroll etter opprydding: gjenstår
+automatisk sluttkontroll etter pointer-preview-rettelse: bestått
 PR: ikke opprettet
 ```
 
@@ -69,7 +69,7 @@ Tiltak:
 
 - rene delta-, layout- og cropberegninger er trukket ut i `elementPointerTransform.ts`
 - hooken er redusert til 204 linjer
-- den nye rene hjelpefilen er 96 linjer
+- den nye rene hjelpefilen er 97 linjer
 
 ### 5. Canvas-stilarket lå på filstørrelsesgrensen
 
@@ -79,6 +79,17 @@ Tiltak:
 
 - `canvas.css` inneholder nå grunnlayout og elementbasis, 129 linjer
 - `canvas-interaction.css` inneholder resizegrep, objektverktøy, markering og transformtilstander, 120 linjer
+
+### 6. Header kunne gli horisontalt under pointer-preview
+
+Den varige layoutcommiten normaliserte `x = 0`, men pointer-preview sendte tidligere både horisontalt og vertikalt delta til den generelle flyttelogikken. Header kunne derfor gli sideveis under drag og hoppe tilbake ved slipp.
+
+Tiltak:
+
+- pointer-preview normaliserer Header-delta til `{ x: 0, y: delta.y }`
+- andre elementtyper beholder fri todimensjonal flytting
+- varig Header-layout normaliserer fortsatt `x = 0` som siste modellgrense
+- full automatisk kontroll og arkitekturrapporter er kjørt på nytt
 
 ## Headerinvarianter
 
@@ -124,26 +135,29 @@ EditorCanvasElement.tsx         224
 useElementPointerTransform.ts   204
 canvas.css                      129
 canvas-interaction.css          120
-elementPointerTransform.ts       96
+elementPointerTransform.ts       97
 ```
 
 Alle er under aktiv terskel på 250 linjer.
 
 ## Gjenstående kontroll
 
-Etter at de siste kildefilene er trukket lokalt skal følgende kjøres:
+Følgende er verifisert fra brukerens terminaloutput etter siste produksjonsendring:
 
-```powershell
-npm run check
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status --short
-git diff --stat
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
+Vite: 122 moduler transformert
+CSS: 36.54 kB, gzip 6.80 kB
+JavaScript: 275.77 kB, gzip 81.66 kB
+produksjonsbuild: bestått på 192 ms
+arkitekturrapporter: regenerert
+git diff --check: ingen whitespace-feil
 ```
 
-Deretter skal Header, Seksjon, Bilde, Tekst og Knapp regresjonstestes. Arkitekturrapportene og kontrolltallene oppdateres først etter faktisk terminaloutput.
+Manuell regresjon av Header, Seksjon, Bilde, Tekst og Knapp gjenstår før PR.
 
 ## Konklusjon
 
-Ingen kjent statisk blokkerer står igjen etter kodeauditen. Merge er fortsatt blokkert til ny automatisk kontroll, regenererte arkitekturrapporter, PR-inspeksjon og eksplisitt brukergodkjenning er fullført.
+Ingen kjent statisk blokkerer står igjen etter pointer-preview-rettelsen. Merge er fortsatt blokkert til manuell regresjon, full diffkontroll, PR-inspeksjon og eksplisitt brukergodkjenning er fullført.

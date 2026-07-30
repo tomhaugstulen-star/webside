@@ -37,6 +37,7 @@ hard unntaksgrense: 300 linjer
 - Reduceren er siste valideringsgrense.
 - Ugyldige, låste og uendrede handlinger returnerer samme state.
 - `updatedAt` endres bare ved gyldig reell mutasjon.
+- Låseendringer beregnes fra reducerens nyeste state, ikke fra en mulig foreldet UI-verdi.
 
 Skjemahistorikk:
 
@@ -83,6 +84,9 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - Elementer kan overlappe; andre elementer flyttes ikke automatisk.
 - Lerretshøyde er avledet visning og lagres ikke.
 - Pekerpreview er transient; normalt pekerslipp gir én varig commit.
+- Pekertransformer bruker pointer capture gjennom hele den aktive pekerøkten.
+- Preview-delta inkluderer endringer i lerretets scrollposisjon.
+- Auto-scroll kan flytte scrollcontaineren, men skriver ikke prosjektstate før transformen committes.
 - `pointercancel` og tapt pointer capture forkaster preview.
 
 ## Farger og rammer

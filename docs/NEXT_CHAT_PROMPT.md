@@ -47,7 +47,7 @@ branch: feature/logo-header
 GitHub-sak: #31 – åpen
 base main: 9937e4fd785da9cbd171443ea4f1d93041a8b326
 prosjektskjema: versjon 8
-manuell funksjonstest: godkjent
+manuell funksjonstest: gjenstår
 framtidsrettet kodeaudit og opprydding: gjennomført
 PR: ikke opprettet
 merge: ikke godkjent
@@ -65,8 +65,8 @@ TypeScript: bestått
 Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
 Vite: 122 moduler transformert
 CSS: 36.54 kB, gzip 6.80 kB
-JavaScript: 275.73 kB, gzip 81.65 kB
-produksjonsbuild: bestått på 198 ms
+JavaScript: 275.77 kB, gzip 81.66 kB
+produksjonsbuild: bestått på 192 ms
 architecture.json: regenerert
 docs/dependency-graph.mmd: regenerert
 git diff --check: ingen whitespace-feil
@@ -124,6 +124,7 @@ Utenfor fase 13:
 - nye Header-elementer lagrer `x = 0`
 - Header-layoutcommits normaliserer `x = 0` og kanonisk serialisert bredde
 - rene pekerberegninger ligger i `elementPointerTransform.ts`
+- Headerens pointer-preview låser horisontalt delta til `x = 0` under drag
 - `useElementPointerTransform.ts` er redusert til 204 linjer
 - canvas-stiler er delt mellom grunnlayout og interaksjon
 - alle kjente berørte produksjonsfiler er under 250 linjer
@@ -132,28 +133,22 @@ Utenfor fase 13:
 
 ## Neste handling
 
-Trekk siste dokumentasjonsretting lokalt:
-
-```powershell
-git pull --ff-only origin feature/logo-header
-```
-
-Vent på hele outputen. Kontroller deretter at slettede dokumentreferanser og foreldet fase-12-status ikke finnes:
-
-```powershell
-git grep -n -E 'docs/(PROJECT_COLORS|DRAG_RESIZE|OBJECT_LOCKING)\.md|docs/phase-12-handover|feature/project-colors|aktiv docs-branch|omfang ikke låst|prosjektskjema: versjon 7|Gjeldende skjemaversjon er 7|EDITOR_PROJECT_SCHEMA_VERSION = 7'
-```
-
-Forventet resultat er ingen treff.
-
-Deretter kontrolleres:
+Kontroller først den faktiske lokale differansen:
 
 ```powershell
 git status --short
+git diff --check
 git diff --stat
+git diff -- src/components/canvas/elementPointerTransform.ts
 ```
 
-Arkitekturrapportene skal committes og pushes. Dersom dokumentasjonsrettingen kom remote etter siste lokale kontroll, trenger ikke `npm run check` kjøres på nytt fordi rettingen bare endrer Markdown. `git diff --check` skal likevel kjøres etter siste lokale commitklargjøring.
+Kontroller deretter foreldede referanser. Handover-filen ekskluderes fordi kontrollkommandoen inneholder søkeuttrykkene:
+
+```powershell
+git grep -n -E 'docs/(PROJECT_COLORS|DRAG_RESIZE|OBJECT_LOCKING)\.md|widthMode|width-mode' -- . ':(exclude)docs/NEXT_CHAT_PROMPT.md'
+```
+
+Forventet resultat er ingen treff.
 
 ## Obligatorisk kort regresjonstest
 

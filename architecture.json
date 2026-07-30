@@ -264,23 +264,6 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../../assets/images/useImageAssetStore",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/assets/images/useImageAssetStore.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "../../model/editorProject",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -552,46 +535,6 @@
       "valid": true
     },
     {
-      "source": "src/assets/images/useImageAssetStore.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./imageAssetStoreContext",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/assets/images/imageAssetStoreContext.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/components/editor/EditorShell.tsx",
-        "src/state/useElementDeletion.ts",
-        "src/components/canvas/HeaderElementContent.tsx",
-        "src/components/canvas/ImageElementContent.tsx",
-        "src/components/properties/ImagePropertiesSection.tsx",
-        "src/components/sidebar/ImageImportControl.tsx",
-        "src/components/sidebar/HeaderCreationControl.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
       "source": "src/model/editorProject.ts",
       "dependencies": [
         {
@@ -777,6 +720,7 @@
         "src/components/canvas/useImageCropTransform.ts",
         "src/components/canvas/getElementAppearanceCssStyle.ts",
         "src/components/canvas/useElementPointerTransform.ts",
+        "src/components/canvas/elementPointerTransform.ts",
         "src/components/canvas/getCanvasContentHeight.ts",
         "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
         "src/components/properties/RightPropertiesPanel.tsx",
@@ -853,7 +797,8 @@
         "src/model/editorProject.ts",
         "src/model/imagePresentation.ts",
         "src/model/elementLayout.ts",
-        "src/model/createEditorElement.ts"
+        "src/model/createEditorElement.ts",
+        "src/state/setElementDesktopLayout.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -1117,6 +1062,7 @@
         "src/components/canvas/ImageElementContent.tsx",
         "src/components/canvas/useImageCropTransform.ts",
         "src/components/canvas/useElementPointerTransform.ts",
+        "src/components/canvas/elementPointerTransform.ts",
         "src/components/properties/ImagePropertiesSection.tsx",
         "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/model/createEditorElement.ts",
@@ -1693,6 +1639,7 @@
         "src/components/canvas/ElementSelectionToolbar.tsx",
         "src/components/canvas/ImageResizeHandles.tsx",
         "src/components/canvas/useElementPointerTransform.ts",
+        "src/components/canvas/elementPointerTransform.ts",
         "src/state/setImageDesktopFrame.ts",
         "src/state/setElementDesktopLayout.ts"
       ],
@@ -2174,6 +2121,45 @@
       ],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/assets/images/useImageAssetStore.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/useElementDeletion.ts",
+        "src/components/canvas/HeaderElementContent.tsx",
+        "src/components/canvas/ImageElementContent.tsx",
+        "src/components/properties/ImagePropertiesSection.tsx",
+        "src/components/sidebar/ImageImportControl.tsx",
+        "src/components/sidebar/HeaderCreationControl.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -3662,6 +3648,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "src/model/imagePresentation.ts",
@@ -3706,6 +3693,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./elementPointerTransform",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/elementPointerTransform.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -3724,6 +3728,75 @@
     {
       "source": "src/components/canvas/autoScrollCanvas.ts",
       "dependencies": [],
+      "dependents": [
+        "src/components/canvas/useElementPointerTransform.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/elementPointerTransform.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/imagePresentation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/imagePresentation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "src/components/canvas/useElementPointerTransform.ts"
       ],
@@ -7426,6 +7499,23 @@
         },
         {
           "dynamic": false,
+          "module": "../model/elementDimensions",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/elementDimensions.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../model/elementLayout",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -7702,8 +7792,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 112,
-    "totalDependenciesCruised": 320,
+    "totalCruised": 113,
+    "totalDependenciesCruised": 324,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
