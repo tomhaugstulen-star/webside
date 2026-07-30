@@ -1,6 +1,6 @@
 # Mobiltilpasset design og viewport-overstyringer
 
-Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt leveranse og endrer ikke dagens midlertidige responsive oppførsel.
+Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er planlagt som fase 23 og endrer ikke dagens midlertidige responsive oppførsel.
 
 ## 1. Formål
 
@@ -8,9 +8,24 @@ Brukeren skal kunne lage ett desktop-oppsett og deretter tilpasse utvalgte egens
 
 Målet er ikke to uavhengige nettsider. Mobil skal arve desktop som standard og bare lagre eksplisitte forskjeller.
 
-Planlagt branch opprettes først når leveransen velges eksplisitt.
+Planlagt branch opprettes først når fase 23 velges eksplisitt.
 
-## 2. Dagens midlertidige oppførsel
+## 2. Avhengigheter før fase 23
+
+Mobilfasen starter først etter at disse leveransene er stabile:
+
+- portalens visuelle struktur
+- automatisert testgrunnlag
+- tekstboksbakgrunn og kjente modellgap
+- arbeidsportalnavigator og hurtigsøk
+- sider, seksjons-ID-er og navigasjonsmodell
+- nettstedets Header og menynavigasjon
+- Hero
+- Header-redigering og nettstedstruktur
+
+Mobilfasen skal utvide ferdige elementmodeller. Den skal ikke brukes til å improvisere manglende Header-, Hero- eller navigasjonsarkitektur.
+
+## 3. Dagens midlertidige oppførsel
 
 Før denne leveransen er implementert:
 
@@ -23,7 +38,7 @@ Før denne leveransen er implementert:
 
 Denne oppførselen er kontrollert som midlertidig grunnlag. Den skal ikke videreføres som endelig responsiv redigering.
 
-## 3. Anbefalt arvemodell
+## 4. Anbefalt arvemodell
 
 Desktop er grunnlaget.
 
@@ -31,7 +46,7 @@ For hver responsiv egenskap gjelder:
 
 - manglende `mobile`-verdi betyr **Arver fra PC**
 - eksplisitt `mobile`-verdi betyr **Eget mobiloppsett**
-- første relevant redigering i Telefon oppretter en mobiloverstyring
+- første relevante redigering i Telefon oppretter en mobiloverstyring
 - senere desktopendringer påvirker bare mobilverdier som fortsatt arves
 - eksplisitte mobiloverstyringer beholdes når desktop endres
 - handlingen **Bruk PC-oppsett** fjerner mobiloverstyringen og gjenoppretter arv
@@ -45,9 +60,9 @@ type ResponsiveValue<T> = {
 }
 ```
 
-## 4. Første versjon av mobiloverstyringer
+## 5. Første versjon av mobiloverstyringer
 
-Første versjon for frie elementer bør støtte:
+Første versjon for frie elementer skal støtte:
 
 - posisjon
 - bredde og høyde
@@ -62,14 +77,42 @@ Disse egenskapene vurderes senere og skal ikke blandes inn uten egen beslutning:
 - bildebeskjæring
 - innholdsrekkefølge
 
-Header krever en eksplisitt regel:
+## 6. Header og nettstedmeny
+
+Header har låste grunnregler:
 
 - `x = 0` og `y = 0` er faste i alle viewporter
 - synlig bredde avledes fra aktiv viewport
 - første mobilversjon kan vurdere egen høyde og synlighet
-- fri posisjon eller bredde for Header krever en ny produktmodell
+- fri posisjon eller bredde krever en ny produktmodell
 
-## 5. Brukergrensesnitt
+Nettstedets meny skal allerede støtte:
+
+- automatisk responsiv modus
+- alltid horisontal modus
+- alltid kompakt modus
+
+Mobilfasen skal:
+
+- bevare valgt menymodus
+- bruke dokumentert brytepunkt i automatisk modus
+- sikre tastatur- og fokusoppførsel i kompakt meny
+- ikke opprette en separat meny med parallelle data
+
+## 7. Hero
+
+Hero-modellen bygges før mobilfasen.
+
+Mobilfasen kan bare overstyre egenskaper som Hero-modellen eksplisitt tillater, for eksempel:
+
+- høyde
+- synlighet
+- tekstjustering
+- eventuelt bildeutsnitt dersom dette låses som del av mobilomfanget
+
+Hero skal beholde sine grunninvarianter, som full bredde eller fast plassering under Header, dersom disse er låst i fase 21.
+
+## 8. Brukergrensesnitt
 
 Telefon-visningen skal tydelig vise om valgt element:
 
@@ -86,7 +129,9 @@ Nødvendige handlinger:
 
 Det skal ikke være uklart om en endring påvirker PC, Telefon eller begge.
 
-## 6. Viewport-bevisste prosjektmutasjoner
+Portalens side-/elementnavigator skal vise skjult mobilstatus og gi en kontrollert vei tilbake til skjulte elementer.
+
+## 9. Viewport-bevisste prosjektmutasjoner
 
 Dagens action `set-element-desktop-layout` er midlertidig og må erstattes eller suppleres av en viewport-bevisst action.
 
@@ -106,8 +151,9 @@ Reducerregler:
 - ukjent, låst, ugyldig eller uendret layout ignoreres
 - transient pointer-preview forblir utenfor `EditorProject`
 - Headerens fast-topp- og fullbreddeinvariant håndheves uavhengig av viewport
+- Hero-invarianten håndheves uavhengig av viewport
 
-## 7. Oppretting av nye elementer
+## 10. Oppretting av nye elementer
 
 Før implementering må én regel velges og dokumenteres:
 
@@ -120,7 +166,9 @@ Det skal ikke opprettes bare-mobil-elementer uten en egen produktbeslutning.
 
 Header opprettes alltid med fast `x = 0, y = 0` og kan ikke få en mobilposisjon.
 
-## 8. Skjuling
+Hero opprettes gjennom sin egen modell og får bare mobilverdier som er tillatt av den modellen.
+
+## 11. Skjuling
 
 Mobilskjuling skal bruke den responsive synlighetsverdien, ikke slette elementet.
 
@@ -128,31 +176,35 @@ Før funksjonen bygges må dette avklares:
 
 - om et skjult valgt element mister markeringen straks
 - hvordan brukeren finner og viser et skjult element igjen
-- om et framtidig lagpanel kan markere skjulte elementer
+- hvordan navigatoren markerer skjulte elementer
 - om bare-mobil-synlighet støttes i første versjon
 
-## 9. Historikk og lagring
+## 12. Historikk og lagring
 
-Når historikk og autolagring finnes:
+Når fase 24 og 25 finnes:
 
 - én ferdig mobiltransform er én prosjektendring
 - oppretting av en mobiloverstyring er en varig prosjektmutasjon
 - reset til PC-oppsett er en varig prosjektmutasjon
 - transient preview og alignment-guider inngår ikke i historikk eller lagring
-- eksport og import må bevare både arv og eksplisitte mobilverdier
+- prosjektformat og sikkerhetskopi bevarer både arv og eksplisitte mobilverdier
 
-## 10. Forhåndsvisning og publisering
+## 13. Lokal forhåndsvisning
 
-Editor, forhåndsvisning og publisert side skal tolke samme prosjektmodell likt.
+Produktet skal ikke publisere nettsiden offentlig.
 
-Publisering skal generere:
+Editor og lokal forhåndsvisning skal tolke samme prosjektmodell likt.
+
+Lokal forhåndsvisning skal bruke:
 
 - desktopregler som grunnlag
-- én kontrollert media query for mobiloverstyringer
+- én kontrollert media query eller tilsvarende samlet mobilregel
+- samme Header-menylogikk som editoren
+- samme Hero-regler som editoren
 - ingen tilfeldige inline-stiler eller mange separate `<style>`-blokker
 - ingen standardbruk av `!important`
 
-## 11. Akseptansekriterier
+## 14. Akseptansekriterier
 
 Leveransen er ikke ferdig før dette er bekreftet:
 
@@ -166,10 +218,13 @@ Leveransen er ikke ferdig før dette er bekreftet:
 - peker og tastatur bruker samme viewport-bevisste layoutregler
 - desktop og mobil har samme clamping- og minimumsmålregler der de gjelder
 - Header forblir fast øverst og full bredde
-- historikk og lagring kan senere behandle én ferdig transform som én endring
+- automatisk eller kompakt Header-meny fungerer korrekt
+- Hero beholder sine låste invarianter
+- historikk og lagring behandler én ferdig transform som én endring
+- lokal forhåndsvisning viser samme responsive resultat
 - `npm run check` og separate desktop-/mobiltester er bestått
 
-## 12. Ikke del av leveransen uten ny beslutning
+## 15. Ikke del av leveransen uten ny beslutning
 
 - flere selvstendige mobilbrytepunkter
 - nettbrett som egen redigeringsmodus
@@ -179,11 +234,13 @@ Leveransen er ikke ferdig før dette er bekreftet:
 - bare-mobil-elementer
 - generell CSS-editor
 - fri mobilposisjon eller bredde for Header
+- en egen parallell mobilmenymodell
 
-## 13. Avhengigheter
+## 16. Avhengigheter
 
-Leveransen bygges først etter ny eksplisitt godkjenning. Den må lese og bevare grensene i:
+Fasen bygges først etter ny eksplisitt godkjenning. Den må lese og bevare grensene i:
 
+- `docs/WORK_PLAN.md`
 - `docs/RESPONSIVE_DESIGN.md`
 - `docs/ELEMENT_MODEL.md`
 - `docs/PROJECT_RULES.md`
