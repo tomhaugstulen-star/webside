@@ -721,6 +721,8 @@
         "src/components/canvas/getElementAppearanceCssStyle.ts",
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/canvas/elementPointerTransform.ts",
+        "src/components/canvas/getAlignmentTargets.ts",
+        "src/components/canvas/getPointerMovePreview.ts",
         "src/components/canvas/getCanvasContentHeight.ts",
         "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
         "src/components/properties/RightPropertiesPanel.tsx",
@@ -1632,6 +1634,7 @@
       ],
       "dependents": [
         "src/state/editorProjectAction.ts",
+        "src/components/canvas/alignmentGuideTypes.ts",
         "src/components/canvas/canvasLayoutPreview.ts",
         "src/components/canvas/EditorCanvasElement.tsx",
         "src/state/useElementLayout.ts",
@@ -1640,6 +1643,9 @@
         "src/components/canvas/ImageResizeHandles.tsx",
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/canvas/elementPointerTransform.ts",
+        "src/components/canvas/getAlignmentTargets.ts",
+        "src/components/canvas/getPointerMovePreview.ts",
+        "src/components/canvas/snapElementMove.ts",
         "src/state/setImageDesktopFrame.ts",
         "src/state/setElementDesktopLayout.ts"
       ],
@@ -2375,6 +2381,23 @@
         },
         {
           "dynamic": false,
+          "module": "./AlignmentGuideOverlay",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/AlignmentGuideOverlay.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./canvasLayoutPreview",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -2440,7 +2463,42 @@
       "valid": true
     },
     {
-      "source": "src/components/canvas/canvasLayoutPreview.ts",
+      "source": "src/components/canvas/AlignmentGuideOverlay.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./alignmentGuideTypes",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/alignmentGuideTypes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/EditorCanvas.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/alignmentGuideTypes.ts",
       "dependencies": [
         {
           "dynamic": false,
@@ -2462,9 +2520,67 @@
         }
       ],
       "dependents": [
+        "src/components/canvas/AlignmentGuideOverlay.tsx",
+        "src/components/canvas/canvasLayoutPreview.ts",
+        "src/components/canvas/useElementPointerTransform.ts",
+        "src/components/canvas/getAlignmentTargets.ts",
+        "src/components/canvas/getPointerMovePreview.ts",
+        "src/components/canvas/snapElementMove.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/canvasLayoutPreview.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./alignmentGuideTypes",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/alignmentGuideTypes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
         "src/components/canvas/EditorCanvas.tsx",
         "src/components/canvas/EditorCanvasElement.tsx",
         "src/components/canvas/useElementPointerTransform.ts",
+        "src/components/canvas/getPointerMovePreview.ts",
         "src/components/canvas/getCanvasContentHeight.ts"
       ],
       "orphan": false,
@@ -2795,6 +2911,7 @@
       ],
       "dependents": [
         "src/components/canvas/EditorCanvasElement.tsx",
+        "src/components/canvas/getAlignmentTargets.ts",
         "src/components/canvas/getCanvasContentHeight.ts"
       ],
       "orphan": false,
@@ -3661,6 +3778,24 @@
         },
         {
           "dynamic": false,
+          "module": "./alignmentGuideTypes",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/alignmentGuideTypes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./autoScrollCanvas",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -3683,7 +3818,6 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "type-only",
             "import"
           ],
           "resolved": "src/components/canvas/canvasLayoutPreview.ts",
@@ -3704,6 +3838,40 @@
             "import"
           ],
           "resolved": "src/components/canvas/elementPointerTransform.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./getAlignmentTargets",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/getAlignmentTargets.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./getPointerMovePreview",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/getPointerMovePreview.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3799,6 +3967,252 @@
       ],
       "dependents": [
         "src/components/canvas/useElementPointerTransform.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/getAlignmentTargets.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/resolveResponsiveValue",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/resolveResponsiveValue.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./alignmentGuideTypes",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/alignmentGuideTypes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/useElementPointerTransform.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/getPointerMovePreview.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./alignmentGuideTypes",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/alignmentGuideTypes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./canvasLayoutPreview",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/canvasLayoutPreview.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./snapElementMove",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/snapElementMove.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/useElementPointerTransform.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/canvas/snapElementMove.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/elementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./alignmentGuideTypes",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/components/canvas/alignmentGuideTypes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/getPointerMovePreview.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -7792,8 +8206,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 113,
-    "totalDependenciesCruised": 324,
+    "totalCruised": 118,
+    "totalDependenciesCruised": 342,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
