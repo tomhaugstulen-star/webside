@@ -25,10 +25,11 @@ hard unntaksgrense: 300 linjer
 - Canvas eier ikke filvalg eller ressurslagring.
 - CSS deles etter editorområde og komponentansvar.
 - Ingen tilfeldig samlemappe eller samlefil opprettes.
+- Genererte arkitekturrapporter omfattes ikke av produksjonsfilgrensen.
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er versjon 8.
+- Gjeldende prosjektskjema er versjon 9.
 - `EditorProject` eier alle varige, serialiserbare prosjektdata.
 - DOM og CSS er rendering, ikke permanent lagring.
 - `File`, Blob, Object URL og lokal filsti er ikke prosjektdata.
@@ -37,9 +38,9 @@ hard unntaksgrense: 300 linjer
 - Reduceren er siste valideringsgrense.
 - Ugyldige, låste og uendrede handlinger returnerer samme state.
 - `updatedAt` endres bare ved gyldig reell mutasjon.
-- Låseendringer beregnes fra reducerens nyeste state, ikke fra en mulig foreldet UI-verdi.
+- Låseendringer beregnes fra reducerens nyeste state.
 - Header opprettes med `locked: false`, eksponerer ingen låsekontroll og avvises av låsereduceren.
-- Framtidig prosjektimport må avvise eller normalisere Header med `locked: true`.
+- Framtidig prosjektimport må validere eller migrere hele prosjektet før `replace-project`.
 
 Skjemahistorikk:
 
@@ -52,6 +53,7 @@ Skjemahistorikk:
 6  bildeasset, metadata, alternativ tekst, visning og utsnitt
 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 8  Header med logo, tekst, utseende og ramme
+9  Header-fontstørrelse
 ```
 
 ## Varig og transient state
@@ -61,16 +63,19 @@ Varig:
 - prosjekt, sider og elementer
 - posisjon, størrelse og synlighet
 - låsestatus for Seksjon, Bilde, Tekst og Knapp
-- Headerens kompatibilitetsfelt `locked`, alltid `false` i dagens opprettings- og reducerflyt
+- Headerens kompatibilitetsfelt `locked`, alltid `false` i dagens flyt
 - side- og elementutseende
 - tekst, lenker og asset-ID-er
 - bilde- og logometadata
+- Header-fontfamilie og fontstørrelse
 - tidsstempler
 
 Transient:
 
 - markering og åpne paneler
-- pekerøkter og preview
+- pekerøkter og layoutpreview
+- alignment-mål og aktive guider
+- fryste lerretsmål under pekerøkt
 - lokale drafts og valideringsfeedback
 - filvelger
 - `File`, Object URL og ressurskart
@@ -81,10 +86,11 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 ## Element- og layoutregler
 
 - Seksjon, Bilde, Tekst og Knapp bruker fri todimensjonal geometri.
-- Header rendres alltid fra `x = 0` til hele den synlige sidebredden.
-- Header kan bare flyttes vertikalt.
+- Header opprettes, lagres og rendres ved `x = 0, y = 0`.
+- Header følger hele den synlige sidebredden.
+- Header kan ikke flyttes med peker eller tastatur.
 - Headerhøyde valideres til 70–100 px.
-- Headerens lagrede horisontale felt normaliseres deterministisk og er ikke brukerredigerbare.
+- Headerens serialiserte bredde er kanonisk og ikke brukerredigerbar.
 - Header er ikke låsbar og viser ikke låsestatus.
 - Elementer kan overlappe; andre elementer flyttes ikke automatisk.
 - Lerretshøyde er avledet visning og lagres ikke.
@@ -94,6 +100,22 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - Auto-scroll kan flytte scrollcontaineren, men skriver ikke prosjektstate før transformen committes.
 - `pointercancel` og tapt pointer capture forkaster preview.
 
+## Korrigeringslinjer og snapping
+
+- Snapping gjelder bare pekerflytting i fase 14.
+- Resize og tastatur bruker ikke snapping.
+- Aktivt element kan bruke start-, center- og end-anker på begge akser.
+- Mål er andre synlige elementer og lerretsmidt.
+- Låste elementer kan være mål.
+- Skjulte elementer og aktivt element er ikke mål.
+- Header kan være mål, men ikke aktivt flytteelement.
+- Snapgrensen er 6 px i lerretskoordinater.
+- X og Y velges uavhengig.
+- Nærmeste treff vinner; midtanker har prioritet ved lik avstand.
+- Snapmål og lerretsmål fryses ved pekerstart.
+- Guider finnes bare mens et snap er aktivt.
+- Ingen alignment-verdi lagres i prosjektmodellen.
+
 ## Farger og rammer
 
 - `EditorColor` er kanonisk `#RRGGBB`.
@@ -102,9 +124,11 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - `Farger` avledes fra aktiv side og lagres ikke som egen palett.
 - Seksjon og Header kan ha bakgrunn og ramme.
 - Tekst og Header har tekstfarge.
-- Headerens navn og undertittel deler font og tekstfarge.
+- Headerens navn og undertittel deler fontfamilie og tekstfarge.
+- Header-fontstørrelse er en validert verdi fra 12 til 96 px.
 - Knapper beholder ferdig SVG-fargedesign.
 - Bilder har ingen prosjektfarge.
+- Tekstboksbakgrunn finnes ikke som varig modellverdi i versjon 9; gapet spores i sak #35.
 
 ## Bilde- og logoressurser
 
@@ -142,7 +166,8 @@ Prosjekt   = eie serialiserbare verdier
 
 - Telefon arver desktopverdier når mobiloverstyring mangler.
 - Dagens UI oppretter ikke mobiloverstyringer.
-- Header følger aktiv sidebredde i begge visninger og deler y/høyde foreløpig.
+- Header følger aktiv sidebredde og fast topposisjon i begge visninger.
+- Headerens høyde er foreløpig felles for PC og Telefon.
 - Senere mobilendringer må bruke eksplisitte viewport-spesifikke actions.
 - Mobilendringer skal ikke skrives inn i desktopfeltet ved en feil.
 
