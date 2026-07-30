@@ -2,7 +2,7 @@ import type { ButtonAssetId } from './buttonAsset'
 import type { ElementKind } from './editorProject'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 
-export type StandardElementKind = Exclude<ElementKind, 'image' | 'button'>
+export type StandardElementKind = Exclude<ElementKind, 'image' | 'button' | 'header'>
 
 export type ElementCreationRequest =
   | {
@@ -16,4 +16,11 @@ export type ElementCreationRequest =
   | {
       kind: 'button'
       assetId: ButtonAssetId
+    }
+  | {
+      kind: 'header'
+      logoAssetId: ImageAssetId
+      logoAssetMetadata: ImageAssetMetadata
+      siteName: string
+      subtitle: string
     }
