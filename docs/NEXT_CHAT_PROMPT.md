@@ -132,27 +132,43 @@ Utenfor fase 13:
 - issue #31 er synkronisert med faktisk omfang
 
 ## Neste handling
+
 Gjennomfør den obligatoriske manuelle regresjonstesten nedenfor.
 
 Når testen er godkjent, kontrolleres clean tree, branch-synkronisering, full diff mot `main` og samsvar med issue #31 før PR opprettes.
-## Obligatorisk kort regresjonstest
+
+## Obligatorisk manuell regresjonstest
 
 Kontroller:
 
-- Header full bredde i PC og Telefon
-- bare vertikal flytting
-- høyde 70–100 px
-- panel lukkes under transform og åpnes fra `Egenskaper`
-- font, bakgrunn, tekstfarge og ramme
-- låsing og sletting
-- Seksjon, Bilde, Tekst og Knapp fungerer som før
+- Header er full bredde i PC
+- Header er full bredde i Telefon
+- Header kan bare flyttes vertikalt
+- Header beveger seg ikke sideveis under selve drag-previewen
+- høyden stopper ved 70 og 100 px
+- høyrepanelet lukkes under transform
+- `Egenskaper` åpner panelet igjen
+- font fungerer
+- bakgrunnsfarge fungerer
+- tekstfarge fungerer
+- ramme `Ingen` og 1–10 px fungerer
+- rammefarge vises bare når rammen er aktiv
+- låsing hindrer endringer
+- sletting fjerner Header og riktig logoasset
+- delte Bilde-assets skades ikke
+- Seksjon fungerer som før
+- Bilde fungerer som før
+- Tekst fungerer som før
+- Knapp fungerer som før
+- valgt Header har synlig markering innenfor elementet
+- tastaturfokus er fortsatt tydelig
 
 ## Før PR
 
 - clean tree og synkronisert branch
 - arkitekturrapporter committet
 - alle berørte filer under 250 linjer
-- ingen gamle width-mode-referanser
+- ingen foreldede breddekontrakter
 - ingen foreldede dokumentreferanser
 - ingen duplisert ressursopprydding
 - samlet diff kontrollert mot `main`
