@@ -1,195 +1,163 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den framtidsrettede auditen av fase 13.
+Dette dokumentet beskriver framtidsrettet audit av den aktive `feature/alignment-guides`-branchen per 30. juli 2026.
 
 ## Leveransestatus
 
 ```text
-fase: 13 – Logo og header
-GitHub-sak: #31 – lukket som fullført
-pull request: #32 – merget
-mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
-prosjektskjema: versjon 8
-funksjonell manuell test: godkjent
-dokumentasjon: synkronisert med faktisk kontrollstatus
-kodeopprydding: gjennomført
-automatisk sluttkontroll etter siste produksjonsendring: bestått
+aktiv fase: 14 – korrigeringslinjer og snapping
+branch: feature/alignment-guides
+base origin/main: ff39d8df7d59843c796616ad7d56cf00a41236f8
+GitHub-sak: #34 – åpen
+pull request: ikke opprettet
+prosjektskjema: versjon 9
 ```
+
+Fase-14-koden og de etterfølgende Header-korreksjonene er gjennomgått mot `main`. Auditen omfatter alle produksjonsfiler endret på branchen, deres modell- og state-avhengigheter, arkitekturrapportene og autoritativ dokumentasjon.
 
 ## Arkitekturretning
 
 - `EditorProject` er eneste varige sannhetskilde.
-- Header er én egen sammensatt elementtype.
-- Filvalg ligger i venstremenyen.
-- Egenskaper ligger i høyremenyen.
-- Lerretet rendrer og transformerer.
-- Bilderessurslageret eier `File` og Object URL.
 - Reduceren er siste valideringsgrense.
-- Headerbredde avledes fra aktivt lerret og lagres ikke fra DOM.
+- DOM, CSS, guider, pekerøkter og preview er transient rendering/state.
+- Header er én egen sammensatt elementtype.
+- Headerbredde avledes fra aktivt lerret.
+- Headerposisjon er deterministisk `x = 0, y = 0`.
+- Alignment-mål bygges fra prosjektmodellen og viewportverdier, ikke DOM-geometri.
+- Bilderessurslageret eier `File` og Object URL.
 
-## Auditfunn og tiltak
+## Auditfunn
 
-### 1. Duplisert ressursopprydding ved sletting
+### 1. Headerens topposisjon var ikke konsekvent i alle lag
 
-`EditorShell` og `useElementDeletion` forsøkte begge å rydde bilderessurser. Dette ga to ansvarssteder og kunne senere skape ulik behandling av Bilde og Header.
+Etter produktendringen ble Header rendret fast ved `y = 0`, men flere eldre kodeveier kunne fortsatt bruke lagret `position.y`:
 
-Tiltak:
+- ny Header ble opprettet ved en automatisk funnet y-posisjon
+- Header-layoutcommit beholdt innsendt y
+- snapping brukte lagret y for Header som mål
+- avledet lerretshøyde brukte lagret y
+- plassering av nye elementer brukte lagret Header-span
 
-- all ressursopprydding ligger nå i `useElementDeletion`
-- delte asset-ID-er kontrolleres på tvers av Bilde og Header
-- `EditorShell` håndterer bare dialog- og paneltilstand
+Konsekvens:
 
-### 2. Oppretting kunne rapportere suksess før alle reducerforutsetninger var kontrollert
+- synlig Header og snapmål kunne være uenige
+- lerretshøyde kunne bli for stor
+- nye elementer kunne plasseres ut fra en usynlig gammel Header-posisjon
+- serialisert Header-layout kunne bryte den nye fast-topp-invarianten
 
-`useElementCreation` returnerte `true` etter dispatch når requesten var gyldig, uten å kontrollere aktiv side eller en ekstrem ID-kollisjon. For filbaserte elementer kunne dette i teorien etterlate en registrert ressurs.
+Rettet i:
 
-Tiltak:
+- `src/model/createEditorElement.ts`
+- `src/state/setElementDesktopLayout.ts`
+- `src/components/canvas/getAlignmentTargets.ts`
+- `src/components/canvas/getCanvasContentHeight.ts`
+- `src/model/findElementCreationPosition.ts`
 
-- aktiv side kontrolleres før dispatch
-- generert element-ID kontrolleres mot hele prosjektet
-- `false` returneres før ressursen beholdes dersom oppretting ikke kan gjennomføres
-- reduceren beholder de samme kontrollene som siste grense
+Gjeldende regel:
 
-### 3. Headerens lagrede x-verdi var ikke i samsvar med fullbredde-regelen
+- ny Header opprettes ved `x = 0, y = 0`
+- Header-layoutcommit serialiserer `x = 0, y = 0`
+- rendering og alle avledede layoutberegninger bruker samme topposisjon
+- bare høyde kan endres
 
-Header ble rendret ved `x = 0`, men tidligere oppretting kunne lagre standardposisjonen `x = 24`.
+### 2. Alignment-motoren er transient og avgrenset
 
-Tiltak:
+Kontrollert:
 
-- nye Header-elementer opprettes med `x = 0`
-- varige Header-layoutcommits normaliserer `x = 0`
-- lagret bredde normaliseres til én kanonisk skjemaverdi
-- synlig bredde fortsetter å følge aktivt lerret
+- ingen ny prosjekt- eller innstillingsverdi er lagt til
+- snapmål fryses ved pekerstart
+- lerretsbredde, lerretshøyde og midtpunkter fryses i pekerøkten
+- aktivt element ekskluderes
+- skjulte elementer ekskluderes
+- låste elementer beholdes som mål
+- X og Y velges uavhengig
+- 6 px terskel brukes i lerretskoordinater
+- center/start/end-prioritet er deterministisk
+- guider fjernes ved commit, cancel og tapt pointer capture
+- resizepreview inneholder ingen guider
+- tastaturflytting er ikke koblet til snapping
 
-### 4. Pekerhooken lå på filstørrelsesgrensen
+### 3. Header-fontstørrelse er varig og validert
 
-`useElementPointerTransform.ts` var 247 linjer og blandet React-livssyklus med rene transformberegninger.
+Kontrollert kjede:
 
-Tiltak:
+- `HeaderAppearance.fontSize`
+- standard 24 px
+- validering mot felles `textFontSizes`
+- typet action `set-header-font-size`
+- hook og reducerkontroll
+- høyrepanel med 12–96 px
+- CSS-rendering av navn og relativ undertittel
+- skjemaversjon 9
 
-- rene delta-, layout- og cropberegninger er trukket ut i `elementPointerTransform.ts`
-- hooken er redusert til 204 linjer
-- den nye rene hjelpefilen er 97 linjer
+Det finnes ingen import- eller migreringsmotor ennå. Framtidig import av versjon 8 må legge til standard `fontSize: 24` eller avvise prosjektet kontrollert.
 
-### 5. Canvas-stilarket lå på filstørrelsesgrensen
+### 4. Tekstboksbakgrunn mangler i modellen
 
-`canvas.css` var 248 linjer og blandet grunnlayout med interaksjonsstiler.
-
-Tiltak:
-
-- `canvas.css` inneholder nå grunnlayout og elementbasis
-- `canvas-interaction.css` inneholder resizegrep, objektverktøy, markering og transformtilstander
-
-### 6. Header kunne gli horisontalt under pointer-preview
-
-Den varige layoutcommiten normaliserte `x = 0`, men pointer-preview sendte tidligere både horisontalt og vertikalt delta til den generelle flyttelogikken.
-
-Tiltak:
-
-- pointer-preview normaliserer Header-delta til `{ x: 0, y: delta.y }`
-- andre elementtyper beholder fri todimensjonal flytting
-- varig Header-layout normaliserer fortsatt `x = 0` som siste modellgrense
-
-### 7. Header-låsing var ikke ønsket produktoppførsel
-
-Header arver `locked` fra versjon-8-basemodellen, men Header skal ikke ha låsing.
-
-Tiltak:
-
-- objektverktøyet viser ikke låseknapp for Header
-- høyrepanelet viser ikke `Låst/Ulåst` for Header
-- `toggleElementLock` avviser Header som siste stategrense
-- Seksjon, Bilde, Tekst og Knapp beholder eksisterende låsing
-- nye Header-elementer opprettes fortsatt med `locked: false` for skjemakompatibilitet
-- framtidig prosjektimport må avvise eller normalisere Header med `locked: true`
-
-### 8. Header-opprettingen hadde en ekstra avslutningscallback
-
-Den generelle opprettingsflyten lukket allerede venstrepanelet. Header-komponenten kalte i tillegg `onCreated()` etter vellykket oppretting.
-
-Tiltak:
-
-- den ekstra `onCreated`-callbacken er fjernet
-- venstrepanelet lukkes bare av den felles opprettingsflyten
-- `registeredAssetId` nullstilles straks prosjektet har overtatt logoressursen
-- catch-blokken rydder bare en ressurs som fortsatt eies av den lokale opprettingsøkten
-
-## Headerinvarianter
-
-- skjemaversjon 8
-- logoasset og metadata er serialiserbare
-- `File`, Blob, Object URL og lokal filsti er transient
-- navn er normalisert, obligatorisk og maks 80 tegn
-- undertittel er normalisert, valgfri og maks 120 tegn
-- full aktiv sidebredde
-- horisontal flytting og resizing er blokkert
-- høyde 70–100 px
-- navn og undertittel deler font og tekstfarge
-- Header eksponerer ikke låsing eller låsestatus
-- reduceren avviser Header-låsehandlinger
-- ugyldige og uendrede handlinger returnerer samme state
-
-## Ressurslivssyklus
-
-Auditen bekrefter:
-
-- fil og metadata kontrolleres ved registrering
-- mislykket oppretting rydder registrert ressurs
-- vellykket Header-oppretting overfører ressursansvar før lokal UI-opprydding
-- sletting rydder bare asset som ikke lenger refereres
-- deling mellom Bilde og Header støttes
-- provider-unmount tilbakekaller gjenværende Object URL-er
-- ingen Object URL lagres i prosjektmodellen
-
-Logo- eller tekstbytte etter oppretting er ikke del av fase 13. Det finnes derfor ingen delvis implementert bytteflyt som kan etterlate foreldede ressurser.
-
-## Responsiv grense
-
-- Headerbredde måles med `ResizeObserver` og er transient rendering.
-- Y og høyde lagres foreløpig i desktopverdien.
-- Telefon arver disse verdiene.
-- Fase 15 må innføre viewport-spesifikke actions før mobilverdier kan redigeres.
+Tekstboksens hvite bakgrunn er fortsatt hardkodet CSS og finnes ikke som varig prosjektdata. Dette er registrert i GitHub-sak #35 og er ikke blandet inn i fase 14.
 
 ## Filstørrelser
 
-Siste Header-låse- og opprettingsopprydding:
+Alle produksjonsfiler endret på branchen som er lest under auditen er under aktiv terskel på 250 linjer.
+
+Største kontrollerte filer:
 
 ```text
-HeaderCreationControl.tsx       224
-EditorCanvasElement.tsx         223
-RightPropertiesPanel.tsx        105
-SidebarPanels.tsx                95
-ElementSelectionToolbar.tsx      83
-toggleElementLock.ts             40
+EditorCanvasElement.tsx          245
+useElementPointerTransform.ts    245
+snapElementMove.ts               192
+EditorCanvas.tsx                 168
+editorProjectAction.ts           163
+textElementStyle.ts              154
+reduceHeaderAppearanceAction.ts  155
+getAlignmentTargets.ts           137
 ```
 
-Alle produksjonsfiler ble kontrollert på lokal `main` etter merge:
+Genererte filer `architecture.json` og `docs/dependency-graph.mmd` vurderes ikke etter produksjonsgrensen.
 
-```text
-filer på eller over 250 linjer: 0
-filer på eller over 300 linjer: 0
-working tree: clean
-```
+Full repositoryomfattende filstørrelseskontroll må kjøres lokalt på siste branch-head før PR.
 
-## Verifisert kontroll
+## Arkitekturrapporter
 
-Brukerens terminaloutput etter siste produksjonsendring på `8c7c7a0` bekrefter:
+Alignment-implementasjonen økte grafen fra 113 moduler / 324 avhengigheter til 118 moduler / 342 avhengigheter. Rapportene ble regenerert etter modulendringene.
+
+Senere Header-font- og auditrettelser endret ingen modul- eller importkanter. Det er derfor ikke nødvendig å regenerere rapportene bare for disse endringene, men `git diff` og `npm run architecture:check` skal fortsatt verifiseres på siste branch-head.
+
+## Siste automatiske kontroll
+
+Brukerens terminaloutput på commit `b05baf0` bekreftet:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
-Vite: 122 moduler transformert
-CSS: 36.54 kB, gzip 6.80 kB
-JavaScript: 275.80 kB, gzip 81.65 kB
-produksjonsbuild: bestått på 206 ms
-working tree: clean før og etter kontroll
+Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
+Vite: 127 moduler transformert
+CSS: 36.85 kB, gzip 6.87 kB
+JavaScript: 280.85 kB, gzip 83.22 kB
+produksjonsbuild: bestått på 195 ms
 ```
 
-Manuell regresjon av Header, logooppretting, objektverktøy, høyrepanel, font, ramme, farger, sletting, delt asset-livssyklus og eksisterende låsing for andre elementtyper er godkjent av brukeren.
+Fem produksjonsrettelser er lagt til etter denne kontrollen. Resultatet kan derfor ikke brukes som endelig branch-status. Ny `npm run check` er obligatorisk.
+
+## Manuell kontroll
+
+Godkjent:
+
+- elementkanter og elementmidtpunkter på begge akser
+- horisontal og vertikal lerretsmidt
+- samtidig snapping på begge akser
+- Header fast øverst og full bredde
+- Header-fontstørrelse og beholdt verdi
+
+Gjenstår:
+
+- låste mål, skjulte elementer og selv-ekskludering
+- Seksjon, Bilde, Tekst og Knapp som aktive elementer
+- pointercancel, tapt pointer capture og auto-scroll
+- uendret resize- og tastaturoppførsel
+- clamp ved lerretsgrenser
+- regresjon av opprettingsposisjon etter Header-normalisering
 
 ## Konklusjon
 
-Fase 13 er merget til `main` gjennom PR #32. Issue #31 er lukket som fullført. Ingen kjent kode-, funksjons-, filstørrelses- eller ressursblokkerer står igjen fra leveransen.
-
-Fase 14 skal ikke startes før korrigeringslinjenes produktoppførsel, snappinggrense, ytelsesmodell og responsivitet er avklart.
+Auditen fant ett reelt layoutavvik og rettet det i alle identifiserte lesere og skrivere. Ingen kjent arkitektur- eller filstørrelsesblokkerer er funnet i branch-diffen. Branchen er likevel ikke klar for PR før ny full automatisk kontroll, repositoryomfattende filstørrelseskontroll og resterende manuell regresjon er bestått.
