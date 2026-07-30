@@ -36,6 +36,7 @@ GitHub-sak: #31 – Implement logo and header element
 base: main på 9937e4fd785da9cbd171443ea4f1d93041a8b326
 prosjektskjema: versjon 8
 manuell funksjonstest: godkjent
+kodeaudit og opprydding: gjennomført
 PR: ikke opprettet
 merge: ikke godkjent
 ```
@@ -52,7 +53,7 @@ Implementert omfang:
 - låsing, markering og sikker sletting
 - egenskapspanel som kan lukkes under transform og åpnes igjen fra objektverktøyet
 
-## Siste verifiserte kontroll før sluttaudit
+## Siste verifiserte kontroll før avsluttende opprydding
 
 ```text
 ESLint: bestått
@@ -66,18 +67,29 @@ git diff --check: ingen whitespace-feil
 arkitekturrapporter: regenerert og committet i 1587d76
 ```
 
-Disse tallene gjelder før den avsluttende kodeoppryddingen. Ny produksjonsendring krever ny komplett kontroll.
+Disse tallene gjelder før siste produksjonsopprydding og kan ikke brukes som sluttbevis.
+
+## Gjennomført avsluttende opprydding
+
+- duplisert ressursopprydding er fjernet fra `EditorShell`
+- `useElementDeletion` eier opprydding for både Bilde og Header
+- elementoppretting kontrollerer aktiv side og ID-kollisjon før suksess rapporteres
+- Header opprettes og lagres med normalisert horisontal geometri
+- pekerberegninger er trukket ut av React-hooken
+- canvas-stiler er delt etter grunnlayout og interaksjon
+- alle kjente berørte produksjonsfiler er under 250 linjer
+- tre fullt foreldede fasefiler er slettet
+- issue #31 er synkronisert med faktisk omfang
 
 ## Gjenstående før PR
 
-- fjerne duplisert ressursopprydding ved sletting
-- normalisere Headerens lagrede horisontale geometri
-- dele filer som ligger på 250-linjersgrensen etter reelt ansvar
-- ferdigstille kodeaudit og dokumentasjon
-- regenerere arkitekturrapporter etter oppryddingen
-- kjøre ny komplett kontroll
-- kontrollere filstørrelser og samlet diff
-- opprette og inspisere PR
+- trekk remote-endringene lokalt
+- kjør ny komplett automatisk kontroll
+- regenerer arkitekturrapporter
+- kontroller stale dokumentreferanser med `git grep`
+- gjennomfør kort regresjonstest
+- kontroller filstørrelser og samlet diff
+- opprett og inspiser PR
 
 ## Senere faser
 
