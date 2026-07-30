@@ -62,7 +62,6 @@
 }
 
 .header-element__subtitle {
-  opacity: 0.72;
   font-size: clamp(11px, 1.2vw, 14px);
   line-height: 1.2;
 }
