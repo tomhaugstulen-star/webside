@@ -38,6 +38,8 @@ hard unntaksgrense: 300 linjer
 - Ugyldige, låste og uendrede handlinger returnerer samme state.
 - `updatedAt` endres bare ved gyldig reell mutasjon.
 - Låseendringer beregnes fra reducerens nyeste state, ikke fra en mulig foreldet UI-verdi.
+- Header opprettes med `locked: false`, eksponerer ingen låsekontroll og avvises av låsereduceren.
+- Framtidig prosjektimport må avvise eller normalisere Header med `locked: true`.
 
 Skjemahistorikk:
 
@@ -57,7 +59,9 @@ Skjemahistorikk:
 Varig:
 
 - prosjekt, sider og elementer
-- posisjon, størrelse, synlighet og låsestatus
+- posisjon, størrelse og synlighet
+- låsestatus for Seksjon, Bilde, Tekst og Knapp
+- Headerens kompatibilitetsfelt `locked`, alltid `false` i dagens opprettings- og reducerflyt
 - side- og elementutseende
 - tekst, lenker og asset-ID-er
 - bilde- og logometadata
@@ -81,6 +85,7 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - Header kan bare flyttes vertikalt.
 - Headerhøyde valideres til 70–100 px.
 - Headerens lagrede horisontale felt normaliseres deterministisk og er ikke brukerredigerbare.
+- Header er ikke låsbar og viser ikke låsestatus.
 - Elementer kan overlappe; andre elementer flyttes ikke automatisk.
 - Lerretshøyde er avledet visning og lagres ikke.
 - Pekerpreview er transient; normalt pekerslipp gir én varig commit.
@@ -117,6 +122,7 @@ maks 16 384 px per side
 - Fil og metadata valideres før elementoppretting.
 - Ressurslageret kontrollerer faktisk fil mot metadata.
 - Mislykket oppretting rydder registrert ressurs.
+- Etter vellykket Header-oppretting overføres eierskapet til logoressursen før lokal UI-opprydding.
 - Sletting fjerner en ressurs bare når ingen andre elementer refererer til asset-ID-en.
 - Deling kontrolleres på tvers av Bilde og Header.
 - Provider-unmount tilbakekaller alle gjenværende Object URL-er.

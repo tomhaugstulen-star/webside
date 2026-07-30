@@ -7,7 +7,8 @@ Lokal webside-editor bygget med React, TypeScript og Vite.
 Editoren har separate visninger for PC og Telefon og støtter:
 
 - Seksjon, Bilde, Tekst, Knapp og Header
-- markering, flytting, størrelsesendring, låsing og sikker sletting
+- markering, flytting, størrelsesendring og sikker sletting
+- låsing for Seksjon, Bilde, Tekst og Knapp
 - tekstredigering, tekststil, tekstfarge og eksterne lenker
 - bundlet SVG-knappbibliotek
 - lokal bildeimport for PNG, JPEG og WebP
@@ -16,7 +17,7 @@ Editoren har separate visninger for PC og Telefon og støtter:
 - Seksjon- og Header-ramme
 - Header med logo, navn og undertittel
 
-Headeren følger hele den synlige sidebredden. Den kan flyttes vertikalt og justeres mellom 70 og 100 px høyde. Horisontal plassering og bredde redigeres ikke.
+Headeren følger hele den synlige sidebredden. Den kan flyttes vertikalt og justeres mellom 70 og 100 px høyde. Horisontal plassering og bredde redigeres ikke. Header eksponerer ikke låsing eller låsestatus.
 
 ## Repo og lokal mappe
 
@@ -62,9 +63,11 @@ main
 aktiv produksjonsfase: fase 13 – Logo og header
 branch: feature/logo-header
 GitHub-sak: #31
+pull request: #32 – åpen, ikke draft
 prosjektskjema: versjon 8
-status: automatisk kontroll bestått etter Header pointer-preview-rettelse; manuell regresjon gjenstår
-neste kontroll: manuell regresjon, full diff og PR-klargjøring
+automatisk kontroll: bestått etter siste produksjonsendring
+manuell regresjon: godkjent
+neste kontroll: PR-diff, mergebarhet, reviews, tråder og CI
 ```
 
 Ingen merge utføres uten eksplisitt godkjenning.
@@ -75,6 +78,7 @@ Ingen merge utføres uten eksplisitt godkjenning.
 - 300 linjer er hard unntaksgrense
 - varige data endres bare gjennom validerte reducerhandlinger
 - ugyldige, låste og uendrede handlinger returnerer samme state
+- Header-låsehandlinger avvises; Header opprettes med `locked: false`
 - `updatedAt` endres bare ved en gyldig reell prosjektmutasjon
 - `File`, Blob, Object URL og lokal filsti lagres ikke i prosjektmodellen
 - Telefon arver desktopverdier inntil egne mobiloverstyringer bygges

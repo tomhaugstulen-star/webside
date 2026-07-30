@@ -8,12 +8,13 @@ Dette dokumentet beskriver den framtidsrettede auditen av fase 13.
 fase: 13 – Logo og header
 branch: feature/logo-header
 GitHub-sak: #31
+pull request: #32 – åpen, ikke draft
 prosjektskjema: versjon 8
-funksjonell manuell test: gjenstår
-dokumentasjon: korrigert mot faktisk kontrollstatus
+funksjonell manuell test: godkjent
+dokumentasjon: synkronisert med faktisk kontrollstatus
 kodeopprydding: gjennomført
-automatisk sluttkontroll etter pointer-preview-rettelse: bestått
-PR: ikke opprettet
+automatisk sluttkontroll etter siste produksjonsendring: bestått
+merge: ikke godkjent
 ```
 
 ## Arkitekturretning
@@ -77,8 +78,8 @@ Tiltak:
 
 Tiltak:
 
-- `canvas.css` inneholder nå grunnlayout og elementbasis, 129 linjer
-- `canvas-interaction.css` inneholder resizegrep, objektverktøy, markering og transformtilstander, 120 linjer
+- `canvas.css` inneholder nå grunnlayout og elementbasis
+- `canvas-interaction.css` inneholder resizegrep, objektverktøy, markering og transformtilstander
 
 ### 6. Header kunne gli horisontalt under pointer-preview
 
@@ -89,7 +90,30 @@ Tiltak:
 - pointer-preview normaliserer Header-delta til `{ x: 0, y: delta.y }`
 - andre elementtyper beholder fri todimensjonal flytting
 - varig Header-layout normaliserer fortsatt `x = 0` som siste modellgrense
-- full automatisk kontroll og arkitekturrapporter er kjørt på nytt
+
+### 7. Header-låsing var ikke ønsket produktoppførsel
+
+Header arver `locked` fra versjon-8-basemodellen, men brukeren besluttet at Header ikke skal ha låsing.
+
+Tiltak:
+
+- objektverktøyet viser ikke låseknapp for Header
+- høyrepanelet viser ikke `Låst/Ulåst` for Header
+- `toggleElementLock` avviser Header som siste stategrense
+- Seksjon, Bilde, Tekst og Knapp beholder eksisterende låsing
+- nye Header-elementer opprettes fortsatt med `locked: false` for skjemakompatibilitet
+- framtidig prosjektimport må avvise eller normalisere Header med `locked: true`
+
+### 8. Header-opprettingen hadde en ekstra avslutningscallback
+
+Den generelle opprettingsflyten lukket allerede venstrepanelet. Header-komponenten kalte i tillegg `onCreated()` etter vellykket oppretting. En senere feil i denne ekstra callbacken kunne utløse catch-blokken etter at prosjektet allerede eide Headeren.
+
+Tiltak:
+
+- den ekstra `onCreated`-callbacken er fjernet
+- venstrepanelet lukkes bare av den felles opprettingsflyten
+- `registeredAssetId` nullstilles straks prosjektet har overtatt logoressursen
+- catch-blokken rydder bare en ressurs som fortsatt eies av den lokale opprettingsøkten
 
 ## Headerinvarianter
 
@@ -102,7 +126,8 @@ Tiltak:
 - horisontal flytting og resizing er blokkert
 - høyde 70–100 px
 - navn og undertittel deler font og tekstfarge
-- låst Header kan ikke muteres
+- Header eksponerer ikke låsing eller låsestatus
+- reduceren avviser Header-låsehandlinger
 - ugyldige og uendrede handlinger returnerer samme state
 
 ## Ressurslivssyklus
@@ -111,6 +136,7 @@ Auditen bekrefter:
 
 - fil og metadata kontrolleres ved registrering
 - mislykket oppretting rydder registrert ressurs
+- vellykket Header-oppretting overfører ressursansvar før lokal UI-opprydding
 - sletting rydder bare asset som ikke lenger refereres
 - deling mellom Bilde og Header støttes
 - provider-unmount tilbakekaller gjenværende Object URL-er
@@ -127,22 +153,22 @@ Logo- eller tekstbytte etter oppretting er ikke del av fase 13. Det finnes derfo
 
 ## Filstørrelser
 
-Største berørte produksjonsfiler etter opprydding:
+Siste Header-låse- og opprettingsopprydding:
 
 ```text
-HeaderCreationControl.tsx       228
-EditorCanvasElement.tsx         224
-useElementPointerTransform.ts   204
-canvas.css                      129
-canvas-interaction.css          120
-elementPointerTransform.ts       97
+HeaderCreationControl.tsx       224
+EditorCanvasElement.tsx         223
+RightPropertiesPanel.tsx        105
+SidebarPanels.tsx                95
+ElementSelectionToolbar.tsx      83
+toggleElementLock.ts             40
 ```
 
 Alle er under aktiv terskel på 250 linjer.
 
-## Gjenstående kontroll
+## Verifisert kontroll
 
-Følgende er verifisert fra brukerens terminaloutput etter siste produksjonsendring:
+Brukerens terminaloutput etter siste produksjonsendring på `8c7c7a0` bekrefter:
 
 ```text
 ESLint: bestått
@@ -150,14 +176,13 @@ TypeScript: bestått
 Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
 Vite: 122 moduler transformert
 CSS: 36.54 kB, gzip 6.80 kB
-JavaScript: 275.77 kB, gzip 81.66 kB
-produksjonsbuild: bestått på 192 ms
-arkitekturrapporter: regenerert
-git diff --check: ingen whitespace-feil
+JavaScript: 275.80 kB, gzip 81.65 kB
+produksjonsbuild: bestått på 206 ms
+working tree: clean før og etter kontroll
 ```
 
-Manuell regresjon av Header, Seksjon, Bilde, Tekst og Knapp gjenstår før PR.
+Manuell regresjon av Header, logooppretting, objektverktøy, høyrepanel, font, ramme, farger, sletting, delt asset-livssyklus og eksisterende låsing for andre elementtyper er godkjent av brukeren.
 
 ## Konklusjon
 
-Ingen kjent statisk blokkerer står igjen etter pointer-preview-rettelsen. Merge er fortsatt blokkert til manuell regresjon, full diffkontroll, PR-inspeksjon og eksplisitt brukergodkjenning er fullført.
+Ingen kjent kode- eller funksjonsblokkerer står igjen. PR #32 må fortsatt kontrolleres for samlet diff, mergebarhet, reviews, uløste tråder og CI. Merge er blokkert til brukeren gir eksplisitt godkjenning.

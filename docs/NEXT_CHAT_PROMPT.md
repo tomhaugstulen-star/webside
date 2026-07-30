@@ -44,20 +44,22 @@ Foreldede fasefiler som var fullt innarbeidet i dokumentene over er slettet. Ikk
 ```text
 aktiv fase: 13 – Logo og header
 branch: feature/logo-header
-GitHub-sak: #31 – åpen
+branch-head før dokumentasjonssynk: 8c7c7a0e68e2385a1564fe6fcd8d7750ffdccf73
+GitHub-sak: #31
+pull request: #32 – åpen, ikke draft
 base main: 9937e4fd785da9cbd171443ea4f1d93041a8b326
 prosjektskjema: versjon 8
-manuell funksjonstest: gjenstår
+manuell funksjonstest: godkjent
 framtidsrettet kodeaudit og opprydding: gjennomført
-PR: ikke opprettet
+automatisk sluttkontroll: bestått etter siste produksjonsendring
 merge: ikke godkjent
 ```
 
-Faktisk branch-head og `origin/main` skal leses på nytt før PR.
+Faktisk branch-head, PR-head og `origin/main` skal leses på nytt før enhver mergevurdering.
 
 ## Siste verifiserte automatiske kontroll
 
-Brukerens lokale terminaloutput etter avsluttende kodeopprydding bekreftet:
+Brukerens lokale terminaloutput etter siste produksjonsendring bekreftet:
 
 ```text
 ESLint: bestått
@@ -65,14 +67,13 @@ TypeScript: bestått
 Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
 Vite: 122 moduler transformert
 CSS: 36.54 kB, gzip 6.80 kB
-JavaScript: 275.77 kB, gzip 81.66 kB
-produksjonsbuild: bestått på 192 ms
-architecture.json: regenerert
-docs/dependency-graph.mmd: regenerert
-git diff --check: ingen whitespace-feil
+JavaScript: 275.80 kB, gzip 81.65 kB
+produksjonsbuild: bestått på 206 ms
+working tree før kontroll: clean
+working tree etter målrettet grep: clean
 ```
 
-LF til CRLF-advarslene for de to genererte arkitekturrapportene er forventede Windows-linjesluttadvarsler, ikke whitespace-feil.
+Arkitekturrapportene ble regenerert etter pointer-preview-rettelsen. Siste Header-låseopprydding endret ingen import- eller avhengighetskanter.
 
 ## Implementert Header
 
@@ -86,7 +87,8 @@ Header er én egen sammensatt elementtype med:
 - felles tekstfarge
 - felles font
 - ramme `Ingen` eller 1–10 px
-- låsing og sikker sletting
+- markering og sikker sletting
+- ingen låseknapp eller låsestatus
 
 Layout:
 
@@ -104,8 +106,17 @@ Panel:
 - markering og panelåpen tilstand er separate
 - panelet lukkes under transform
 - `Egenskaper` i objektverktøyet åpner det igjen
-- Header viser font, ramme, status og sletting i høyremenyen
+- Header viser font, ramme og sletting i høyremenyen
+- Header viser ikke `Låst/Ulåst`
 - bakgrunn, tekstfarge og aktiv rammefarge vises i `Farger`
+
+Låsegrense:
+
+- Seksjon, Bilde, Tekst og Knapp beholder eksisterende låsing
+- Header opprettes med `locked: false` av hensyn til versjon-8-modellen
+- objektverktøyet eksponerer ikke Header-låsing
+- `toggleElementLock` avviser Header
+- framtidig prosjektimport må avvise eller normalisere Header med `locked: true`
 
 Utenfor fase 13:
 
@@ -127,53 +138,40 @@ Utenfor fase 13:
 - Headerens pointer-preview låser horisontalt delta til `x = 0` under drag
 - `useElementPointerTransform.ts` er redusert til 204 linjer
 - canvas-stiler er delt mellom grunnlayout og interaksjon
+- Header-låseknappen og låsestatusen er fjernet
+- låsereduceren avviser Header
+- ekstra `onCreated`-callback etter Header-oppretting er fjernet
+- venstrepanelet lukkes bare av felles opprettingsflyt
+- logoressursansvar overføres før lokal UI-opprydding
 - alle kjente berørte produksjonsfiler er under 250 linjer
-- foreldet og duplisert dokumentasjon er fjernet
-- issue #31 er synkronisert med faktisk omfang
+- issue #31 og PR #32 samsvarer med faktisk omfang
+
+## Manuelt godkjent
+
+Brukeren har godkjent:
+
+- full bredde i PC og Telefon
+- bare vertikal flytting
+- stabil pointer-preview uten sideveis hopp
+- høyde 70–100 px
+- panel lukkes under transform og åpnes fra `Egenskaper`
+- font, bakgrunn, tekstfarge og ramme
+- logooppretting og ressursbevaring
+- ingen Header-låseknapp eller låsestatus
+- sikker sletting og delt asset-kontroll
+- eksisterende låsing for Seksjon, Bilde, Tekst og Knapp
+- regresjon av Seksjon, Bilde, Tekst og Knapp
 
 ## Neste handling
 
-Gjennomfør den obligatoriske manuelle regresjonstesten nedenfor.
+Gjennomgå PR #32 før merge:
 
-Når testen er godkjent, kontrolleres clean tree, branch-synkronisering, full diff mot `main` og samsvar med issue #31 før PR opprettes.
-
-## Obligatorisk manuell regresjonstest
-
-Kontroller:
-
-- Header er full bredde i PC
-- Header er full bredde i Telefon
-- Header kan bare flyttes vertikalt
-- Header beveger seg ikke sideveis under selve drag-previewen
-- høyden stopper ved 70 og 100 px
-- høyrepanelet lukkes under transform
-- `Egenskaper` åpner panelet igjen
-- font fungerer
-- bakgrunnsfarge fungerer
-- tekstfarge fungerer
-- ramme `Ingen` og 1–10 px fungerer
-- rammefarge vises bare når rammen er aktiv
-- låsing hindrer endringer
-- sletting fjerner Header og riktig logoasset
-- delte Bilde-assets skades ikke
-- Seksjon fungerer som før
-- Bilde fungerer som før
-- Tekst fungerer som før
-- Knapp fungerer som før
-- valgt Header har synlig markering innenfor elementet
-- tastaturfokus er fortsatt tydelig
-
-## Før PR
-
-- clean tree og synkronisert branch
-- arkitekturrapporter committet
-- alle berørte filer under 250 linjer
-- ingen foreldede breddekontrakter
-- ingen foreldede dokumentreferanser
-- ingen duplisert ressursopprydding
-- samlet diff kontrollert mot `main`
-- issue #31 samsvarer med faktisk omfang
-- PR opprettes ikke som draft
-- merge utføres bare etter brukerens eksplisitte godkjenning
+- kontroller full diff mot `main`
+- kontroller at PR er mergebar
+- kontroller reviews og requested changes
+- kontroller uløste reviewtråder
+- kontroller CI/status checks; repoet hadde ingen status checks på siste commit før PR
+- kontroller at branch-head og PR-head samsvarer
+- merge ikke uten brukerens eksplisitte `godkjent`
 
 ---

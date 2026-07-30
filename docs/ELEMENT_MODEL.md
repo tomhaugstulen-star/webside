@@ -72,6 +72,8 @@ type EditorElement =
 
 Telefon arver desktopverdien når `mobile` mangler. Dagens UI oppretter ikke mobiloverstyringer.
 
+`locked` beholdes som felles versjon-8-data. Seksjon, Bilde, Tekst og Knapp kan endre feltet gjennom eksisterende låseflyt. Header er ikke låsbar: nye Header-elementer opprettes med `locked: false`, objektverktøyet og høyrepanelet eksponerer ingen låsing, og reduceren avviser `toggle-element-lock` for Header. Framtidig prosjektimport må avvise eller kontrollert normalisere en Header med `locked: true` før prosjektbytte.
+
 ## Seksjon
 
 ```ts
@@ -167,6 +169,8 @@ Regler:
 - maksimumshøyde er 100 px
 - Telefon arver desktop y/høyde inntil fase 15
 - navn og undertittel deler font og tekstfarge
+- Header eksponerer ikke låsing eller låsestatus
+- Header-låsehandlinger avvises ved reducergrensen
 
 Baseelementet krever fortsatt `position.desktop.x` og `size.desktop.width`. For Header er disse horisontale feltene deterministiske, normaliseres av modell/state-laget og brukes ikke som fri brukerredigerbar bredde.
 
@@ -206,7 +210,8 @@ Reducerhandlinger krever:
 - aktiv side
 - eksisterende element på aktiv side
 - riktig elementtype
-- ulåst element ved mutasjon
+- ulåst element ved mutasjon for elementtyper som støtter låsing
+- Header-låsehandlinger avvises uavhengig av UI
 - gyldig og kanonisk verdi
 - gyldig layout og størrelsesintervall
 - faktisk endring
@@ -216,6 +221,7 @@ Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
+- prosjektimport avviser eller normaliserer Header med `locked: true`
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions

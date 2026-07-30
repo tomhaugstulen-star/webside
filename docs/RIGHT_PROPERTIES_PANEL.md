@@ -18,7 +18,8 @@ Egenskaper      -> objektverktøyet åpner panelet igjen
 - egen vertikal scrolling
 - 180 ms animasjon
 - `prefers-reduced-motion` respekteres
-- låste elementer kan inspiseres, men ikke muteres
+- låsbare elementer kan inspiseres når de er låst, men ikke muteres
+- Header er ikke låsbar og viser ikke låsestatus
 
 Markering og panelåpen tilstand er separate transiente UI-verdier. Panelet eier ingen kopi av elementet.
 
@@ -52,14 +53,15 @@ Knapp   -> Knapp -> Lenke -> Element
 Header  -> Font -> Ramme -> Element
 ```
 
-Felles `Element`-seksjon viser låsestatus og sikker sletting.
+Felles `Element`-seksjon viser sikker sletting. Låsestatus vises bare for Seksjon, Bilde, Tekst og Knapp.
 
 ## Seksjon og Header-ramme
 
 - tykkelse `Ingen` eller 1–10 px
 - rammefarge beholdes når tykkelsen settes til `Ingen`
-- kontrollen er deaktivert for låst element
-- reduceren avviser ugyldige, låste og uendrede handlinger
+- kontrollen er deaktivert for låst Seksjon
+- Header-kontrollen er aktiv fordi Header ikke kan låses
+- reduceren avviser ugyldige og uendrede handlinger
 - Seksjon og Header bruker samme generelle rammeverdier og validering
 
 Bakgrunn og tekstfarge endres i `Farger`, ikke som parallelle verdier i høyremenyen.
@@ -70,10 +72,9 @@ Markert Header viser:
 
 - font for navn og undertittel
 - rammetykkelse og rammefarge
-- låsestatus
 - sikker sletting
 
-Headerens innhold, logo, bakgrunn og tekstfarge redigeres ikke fra en separat lokal panelkopi. Fase 13 har ikke en funksjon for å bytte logo eller tekst etter oppretting.
+Header viser ikke låseknapp eller `Låst/Ulåst`. Headerens innhold, logo, bakgrunn og tekstfarge redigeres ikke fra en separat lokal panelkopi. Fase 13 har ikke en funksjon for å bytte logo eller tekst etter oppretting.
 
 ## Bilde
 
@@ -99,7 +100,7 @@ Knapp viser knappetekst, design og lenke. Asset-ID valideres mot det bundlete bi
 - felt har labels og synlig fokus
 - feil bruker `role="alert"`
 - status bruker `role="status"`
-- låste kontroller er deaktivert
+- låste kontroller er deaktivert for låsbare elementer
 - redusert bevegelse respekteres
 
 ## Arkitekturgrense

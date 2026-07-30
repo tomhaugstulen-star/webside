@@ -8,11 +8,12 @@ Dette dokumentet viser implementert grunnlag, aktiv fase og senere leveranser.
 aktiv fase: 13 – Logo og header
 branch: feature/logo-header
 GitHub-sak: #31
+pull request: #32 – åpen, ikke draft
 prosjektskjema: versjon 8
-manuell funksjonstest: gjenstår
+manuell funksjonstest: godkjent
 kodeaudit og dokumentasjonsopprydding: gjennomført
-automatisk sluttkontroll: bestått etter Header pointer-preview-rettelse
-PR: ikke opprettet
+automatisk sluttkontroll: bestått etter siste produksjonsendring
+merge: ikke godkjent
 ```
 
 ## Implementert editorgrunnlag
@@ -21,7 +22,8 @@ PR: ikke opprettet
 - toppmeny, venstremeny og høyremeny
 - Seksjon, Bilde, Tekst, Knapp og Header
 - stabil prosjektmodell med sentral state
-- markering, flytting, størrelsesendring og låsing
+- markering, flytting og størrelsesendring
+- låsing for Seksjon, Bilde, Tekst og Knapp
 - kontrollert tekstredigering og eksterne lenker
 - sikker sletting
 - bundlet SVG-knappbibliotek
@@ -60,6 +62,8 @@ Oppretting:
 - lokal PNG-, JPEG- eller WebP-logo
 - eksisterende bildevalidering og ressurslager gjenbrukes
 - Header opprettes først når tekst og fil er gyldige
+- vellykket oppretting overfører eierskap til logoressursen før lokal UI-opprydding
+- venstrepanelet lukkes gjennom den felles opprettingsflyten, ikke en ekstra Header-callback
 
 Oppførsel:
 
@@ -68,7 +72,9 @@ Oppførsel:
 - bare vertikal flytting
 - pointer-preview holder Header ved `x = 0` under hele dragoperasjonen
 - høyde 70–100 px, standard 88 px
-- markering, låsing og sletting som ett element
+- markering og sikker sletting som ett element
+- ingen låseknapp eller låsestatus
+- låsereduceren avviser Header
 - egenskapspanel kan lukkes under transform og åpnes fra objektverktøyet
 
 Utseende:
@@ -86,12 +92,34 @@ Utseende:
 - Header y og høyde er foreløpig felles for PC og Telefon.
 - Egne mobiloverstyringer bygges først i fase 15.
 
+## Verifisert fase-13-kontroll
+
+Automatisk:
+
+- ESLint bestått
+- TypeScript bestått
+- Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
+- Vite: 122 moduler transformert
+- produksjonsbuild bestått på 206 ms
+- alle seks filer i siste opprydding er under 250 linjer
+
+Manuelt:
+
+- Header og logooppretting godkjent
+- PC- og Telefon-visning godkjent
+- pointer- og tastaturregler godkjent
+- font, farger og ramme godkjent
+- sikker sletting og delt asset-livssyklus godkjent
+- Header uten låsing godkjent
+- låsing for øvrige elementtyper godkjent
+- Seksjon, Bilde, Tekst og Knapp regresjonstestet
+
 ## Gjenstående før fase 13 kan merges
-- kontroller clean tree og branch-synkronisering
-- gjennomfør full manuell regresjonstest
-- gjennomgå full diff mot `main` og issue #31
-- opprett og inspiser PR
+
+- inspiser full PR-diff mot `main` og issue #31
+- kontroller mergebarhet, reviews, uløste tråder og CI
 - innhent eksplisitt mergegodkjenning
+
 ## Senere faser
 
 ```text
