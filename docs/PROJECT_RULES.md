@@ -1,6 +1,6 @@
 # Prosjektregler
 
-Dette dokumentet fastsetter varige arbeids-, modell- og arkitekturgrenser.
+Dette dokumentet fastsetter varige arbeids-, produkt-, modell- og arkitekturgrenser.
 
 ## Branch og merge
 
@@ -10,6 +10,34 @@ Dette dokumentet fastsetter varige arbeids-, modell- og arkitekturgrenser.
 - Ingen funksjon for en senere fase legges inn skjult.
 - Ingen branch merges uten eksplisitt brukergodkjenning.
 - Lokal kontrollstatus påstås bare når terminaloutput er vist.
+- Låst roadmap i `docs/WORK_PLAN.md` endres bare gjennom eksplisitt produktbeslutning.
+
+## Produktgrense
+
+- Website-editoren er en lokal arbeidsportal på brukerens egen PC.
+- Offentlig publisering, hosting, domeneoppsett og produksjonsdeployment er ikke del av produktet.
+- Lokal forhåndsvisning, prosjektlagring, sikkerhetskopi, import og gjenoppretting er del av produktretningen.
+- En framtidig `Publiser`-handling skal ikke innføres; lokal visning bruker `Forhåndsvis` eller tilsvarende.
+- Produktet skal kunne håndtere flere lokale nettsideprosjekter kontrollert.
+
+## To navigasjonssystemer
+
+Arbeidsportalens navigasjon og nettsidens navigasjon er forskjellige ansvar.
+
+Arbeidsportalens navigasjon:
+
+- åpner prosjekter, sider, elementer, paneler, verktøy og innstillinger
+- er editor-UI
+- serialiseres ikke som nettsideinnhold
+
+Nettsidens navigasjon:
+
+- vises i nettstedets Header
+- peker til stabile side-ID-er, seksjons-ID-er eller eksterne URL-er
+- er varig prosjektdata
+- valideres gjennom modell og reducer
+
+Ingen UI-komponent skal bruke portalmenyen som kilde for nettstedets meny eller motsatt.
 
 ## Filstørrelse og ansvar
 
@@ -41,6 +69,7 @@ hard unntaksgrense: 300 linjer
 - Låseendringer beregnes fra reducerens nyeste state.
 - Header opprettes med `locked: false`, eksponerer ingen låsekontroll og avvises av låsereduceren.
 - Framtidig prosjektimport må validere eller migrere hele prosjektet før `replace-project`.
+- Side- og seksjonslenker skal bruke stabile ID-er, ikke bare visningsnavn eller ukontrollerte tekst-URL-er.
 
 Skjemahistorikk:
 
@@ -68,6 +97,7 @@ Varig:
 - tekst, lenker og asset-ID-er
 - bilde- og logometadata
 - Header-fontfamilie og fontstørrelse
+- framtidige side-, seksjons- og navigasjonsmål
 - tidsstempler
 
 Transient:
@@ -77,9 +107,12 @@ Transient:
 - alignment-mål og aktive guider
 - fryste lerretsmål under pekerøkt
 - lokale drafts og valideringsfeedback
+- portalens åpne meny, kommandofelt og fokus
+- kompakt Header-meny åpen/lukket
 - filvelger
 - `File`, Object URL og ressurskart
 - dialoger, fokus, hover og animasjon
+- AI-forslag som ikke er godkjent
 
 Transient state serialiseres ikke og inngår ikke direkte i historikk eller autolagring.
 
@@ -92,6 +125,7 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - Headerhøyde valideres til 70–100 px.
 - Headerens serialiserte bredde er kanonisk og ikke brukerredigerbar.
 - Header er ikke låsbar og viser ikke låsestatus.
+- Hero skal senere bygges som en egen sammensatt elementtype, ikke skjult som en uformell gruppe løse elementer.
 - Elementer kan overlappe; andre elementer flyttes ikke automatisk.
 - Lerretshøyde er avledet visning og lagres ikke.
 - Pekerpreview er transient; normalt pekerslipp gir én varig commit.
@@ -115,6 +149,14 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - Snapmål og lerretsmål fryses ved pekerstart.
 - Guider finnes bare mens et snap er aktivt.
 - Ingen alignment-verdi lagres i prosjektmodellen.
+
+## Portaldesign
+
+- Portalens visuelle områder skal bruke semantiske designtokens.
+- Dempede farger skal skille toppmeny, venstremeny, venstrepanel, høyrepanel, arbeidsområde og lerret.
+- Portaltema endrer ikke nettsideprosjektets egne farger.
+- Valgt, aktiv, hover, fokus, disabled, advarsel og sletting skal ha tydelige tilstander.
+- Tilgjengelig kontrast og synlig fokus prioriteres foran dekorativ likhet.
 
 ## Farger og rammer
 
@@ -151,6 +193,7 @@ maks 16 384 px per side
 - Deling kontrolleres på tvers av Bilde og Header.
 - Provider-unmount tilbakekaller alle gjenværende Object URL-er.
 - Ressursopprydding skal ha ett ansvarssted; UI-skallet skal ikke duplisere den.
+- Framtidige AI-genererte bilder skal valideres, lagres lokalt og få stabil asset-ID før prosjektet kan referere til dem.
 
 ## Menyansvar
 
@@ -162,6 +205,8 @@ Ressurslag = eie transient fil og Object URL
 Prosjekt   = eie serialiserbare verdier
 ```
 
+Framtidig portalnavigator og `Ctrl + K` skal lese eksisterende state og actions, ikke opprette parallelle kopier av prosjektet.
+
 ## Responsiv grense
 
 - Telefon arver desktopverdier når mobiloverstyring mangler.
@@ -170,6 +215,30 @@ Prosjekt   = eie serialiserbare verdier
 - Headerens høyde er foreløpig felles for PC og Telefon.
 - Senere mobilendringer må bruke eksplisitte viewport-spesifikke actions.
 - Mobilendringer skal ikke skrives inn i desktopfeltet ved en feil.
+- Nettstedets meny skal senere ha eksplisitt automatisk, horisontal eller kompakt modus.
+
+## Lokal lagring og prosjektfiler
+
+- Autolagring reagerer bare på gyldige prosjektmutasjoner.
+- Transient preview, åpne menyer og ikke-godkjente AI-forslag lagres ikke.
+- Prosjektfiler må valideres og eventuelt migreres før aktivt prosjekt byttes.
+- Ugyldig import skal ikke mutere aktivt prosjekt.
+- Lokal maskinsti lagres ikke i prosjektdata eller sikkerhetskopi.
+- Offentlig publiseringsformat er ikke et produktkrav.
+
+## OpenAI-grense
+
+- OpenAI bygges først i den låste siste hovedfasen.
+- API-nøkkel skal aldri ligge i browser-, Vite- eller annen klientkode.
+- En lokal server-side prosess på samme PC håndterer API-kall.
+- Nøkkel lastes fra miljøvariabel eller tilsvarende sikker lokal konfigurasjon.
+- Gjeldende offisielle OpenAI API og SDK vurderes på nytt når fasen starter.
+- AI-respons behandles som et forslag, ikke som prosjektstate.
+- Forslag valideres mot egne typer og eksisterende modellgrenser.
+- Brukeren ser og godkjenner endringen før reducerhandlinger sendes.
+- Et godkjent AI-forslag skal kunne angres som én samlet historikkhandling.
+- Mislykket eller avvist AI-forslag skal ikke mutere prosjekt eller ressurser.
+- AI skal ikke generere og injisere ukontrollert React-, CSS- eller prosjektkode.
 
 ## Kvalitetskontroll
 
