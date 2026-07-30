@@ -28,11 +28,14 @@ import { useElementPointerTransform } from './useElementPointerTransform'
 type EditorCanvasElementProps = {
   element: EditorElement
   viewport: ViewportMode
+  canvasWidth: number
   selected: boolean
   editing: boolean
   canvasRef: RefObject<HTMLDivElement | null>
   scrollContainerRef: RefObject<HTMLDivElement | null>
   onSelect: (elementId: string) => void
+  onOpenProperties: () => void
+  onCloseProperties: () => void
   onStartTextEditing: (elementId: string) => void
   onFinishTextEditing: (elementId: string) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
@@ -41,11 +44,14 @@ type EditorCanvasElementProps = {
 export function EditorCanvasElement({
   element,
   viewport,
+  canvasWidth,
   selected,
   editing,
   canvasRef,
   scrollContainerRef,
   onSelect,
+  onOpenProperties,
+  onCloseProperties,
   onStartTextEditing,
   onFinishTextEditing,
   onPreviewLayoutChange,
@@ -55,10 +61,21 @@ export function EditorCanvasElement({
     useElementLayout()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
-  const initialLayout: ElementLayout = {
-    position: resolveResponsiveValue(element.position, viewport),
-    size: resolveResponsiveValue(element.size, viewport),
-  }
+  const resolvedPosition = resolveResponsiveValue(element.position, viewport)
+  const resolvedSize = resolveResponsiveValue(element.size, viewport)
+  const fullWidthHeader =
+    element.kind === 'header' &&
+    element.widthMode === 'full' &&
+    canvasWidth > 0
+  const initialLayout: ElementLayout = fullWidthHeader
+    ? {
+        position: { x: 0, y: resolvedPosition.y },
+        size: { width: canvasWidth, height: resolvedSize.height },
+      }
+    : {
+        position: resolvedPosition,
+        size: resolvedSize,
+      }
   const {
     layout,
     imageTransform,
@@ -75,6 +92,8 @@ export function EditorCanvasElement({
     canvasRef,
     scrollContainerRef,
     onSelect,
+    onTransformStart: onCloseProperties,
+    onClickWithoutTransform: onOpenProperties,
     onCommitLayout: commitElementDesktopLayout,
     onCommitImageFrame: commitImageDesktopFrame,
     onPreviewLayoutChange,
@@ -95,7 +114,9 @@ export function EditorCanvasElement({
     width: layout.size.width,
     height: layout.size.height,
     ...getElementAppearanceCssStyle(element),
-    ...(element.kind === 'text' ? getTextElementCssStyle(element.textStyle) : {}),
+    ...(element.kind === 'text'
+      ? getTextElementCssStyle(element.textStyle)
+      : {}),
   }
   const transformClass = transformMode
     ? ` canvas-element--transforming canvas-element--${transformMode}`
@@ -109,8 +130,10 @@ export function EditorCanvasElement({
       element,
       selected,
       initialLayout,
-      canvasWidth: canvasRef.current?.clientWidth ?? 0,
+      canvasWidth,
       onSelect,
+      onOpenProperties,
+      onCloseProperties,
       onStartTextEditing,
       onCommitLayout: commitElementDesktopLayout,
       onCommitImageFrame: commitImageDesktopFrame,
@@ -155,7 +178,9 @@ export function EditorCanvasElement({
         onPointerMove={isTextEditing ? undefined : handlePointerMove}
         onPointerUp={isTextEditing ? undefined : handlePointerUp}
         onPointerCancel={isTextEditing ? undefined : handlePointerCancel}
-        onLostPointerCapture={isTextEditing ? undefined : handleLostPointerCapture}
+        onLostPointerCapture={
+          isTextEditing ? undefined : handleLostPointerCapture
+        }
         onDoubleClick={isTextEditing ? undefined : handleDoubleClick}
         onKeyDown={isTextEditing ? undefined : handleKeyDown}
       >
@@ -165,28 +190,33 @@ export function EditorCanvasElement({
           selected={selected}
           frameSize={layout.size}
           onSelect={onSelect}
-          onCommitText={(content) => commitTextElementContent(element.id, content)}
+          onCommitText={(content) =>
+            commitTextElementContent(element.id, content)
+          }
           onFinishTextEditing={finishTextEditing}
         />
-        {selected && !element.locked && !isTextEditing && (
-          element.kind === 'image' ? (
+        {selected && !element.locked && !isTextEditing &&
+          (element.kind === 'image' ? (
             <ImageResizeHandles onPointerDown={handleResizePointerDown} />
           ) : (
             <span
-              className="canvas-element__resize-handle"
+              className={`canvas-element__resize-handle${fullWidthHeader ? ' canvas-element__resize-handle--vertical' : ''}`}
               aria-hidden="true"
               onPointerDown={(event) =>
-                handleResizePointerDown('south-east', event)
+                handleResizePointerDown(
+                  fullWidthHeader ? 'south' : 'south-east',
+                  event,
+                )
               }
             />
-          )
-        )}
+          ))}
       </div>
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
           elementId={element.id}
           locked={element.locked}
           layout={layout}
+          onOpenProperties={onOpenProperties}
         />
       )}
     </>
