@@ -7,16 +7,16 @@ Dette dokumentet beskriver det implementerte omfanget og de tekniske grensene fo
 ```text
 fase: 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
-GitHub-sak: #28
-PR: #29 – åpen, ikke draft
-base main: 504b6d66670eb4a10f929e5addf6c56b00782487
+GitHub-sak: #28 – lukket som fullført
+PR: #29 – merget
+mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
 implementering: ferdig
 manuell PC- og Telefon-test: godkjent
 automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
 sluttaudit: ferdig
-merge: ikke godkjent eller utført
+lokal main: brukeren har bekreftet clean tree etter merge
 ```
 
 ## Funksjonelt omfang
@@ -128,7 +128,7 @@ produksjonsbuild: bestått på 192 ms
 git diff --check: ingen whitespace-feil
 ```
 
-`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`.
+`architecture.json` og `docs/dependency-graph.mmd` ble regenerert og committet i `1963088`, som inngikk i PR #29.
 
 ## Manuell godkjenning
 
@@ -145,10 +145,8 @@ Godkjent på PC og Telefon:
 - utelatelse av Knapp og Bilde
 - uendret bilde-, tekst-, knapp-, flytte- og resizefunksjonalitet
 
-## Gjenstående før merge
+## Avslutning
 
-1. trekk siste dokumentcommit lokalt
-2. kontroller `git status`, branch-head og clean tree
-3. kontroller PR #29: changed files, mergebarhet, reviews og CI
-4. merge bare etter eksplisitt brukergodkjenning
-5. oppdater lokal `main` etter merge
+Fase 12 ble merget etter framtidsrettet audit, beståtte automatiske kontroller, godkjent manuell PC- og Telefon-test, regenererte arkitekturrapporter, kontrollert PR og eksplisitt brukergodkjenning.
+
+Ingen kjent statisk blokkerer gjenstår fra fase 12. Senere arbeid skal bygge videre fra oppdatert `main` og respektere modell-, state-, ressurs- og filstørrelsesgrensene i dette dokumentet.
