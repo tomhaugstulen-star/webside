@@ -79,6 +79,11 @@ export function useElementPointerTransform({
     if (event.button !== 0) return
     onSelect(element.id)
 
+    if (mode === 'move' && element.kind === 'header') {
+      onClickWithoutTransform()
+      return
+    }
+
     if (element.locked) {
       onClickWithoutTransform()
       return
@@ -86,6 +91,7 @@ export function useElementPointerTransform({
 
     const canvas = canvasRef.current
     const scrollContainer = scrollContainerRef.current
+
     if (!canvas || !scrollContainer || canvas.clientWidth <= 0) {
       onClickWithoutTransform()
       return
@@ -139,6 +145,7 @@ export function useElementPointerTransform({
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const interaction = interactionRef.current
     const scrollContainer = scrollContainerRef.current
+
     if (
       !interaction ||
       interaction.pointerId !== event.pointerId ||
@@ -159,7 +166,7 @@ export function useElementPointerTransform({
     const nextPreview =
       interaction.mode === 'move'
         ? getPointerMovePreview({
-            element,
+            elementId: element.id,
             layout: nextLayout,
             targets: alignmentTargetsRef.current,
             canvasWidth: interaction.canvasWidth,
@@ -185,6 +192,7 @@ export function useElementPointerTransform({
     publishDraftPreview(null)
 
     if (!commit || !interaction || !finalLayout) return
+
     if (elementLayoutsEqual(interaction.initialLayout, finalLayout)) {
       onClickWithoutTransform()
       return
