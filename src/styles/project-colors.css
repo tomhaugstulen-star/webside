@@ -5,9 +5,9 @@
 
 .colors-panel__group {
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--portal-control-surface);
 }
 
 .colors-panel__group-heading {
@@ -17,8 +17,8 @@
   justify-content: space-between;
   gap: 12px;
   padding: 0 16px;
-  border-bottom: 1px solid #eee8e4;
-  background: #fcfaf8;
+  border-bottom: 1px solid var(--portal-border);
+  background: var(--portal-control-subtle);
 }
 
 .colors-panel__group-heading h3 {
@@ -26,7 +26,7 @@
 }
 
 .colors-panel__group-heading span {
-  color: var(--muted);
+  color: var(--portal-text-muted);
   font-size: 12px;
   font-weight: 650;
 }
@@ -44,7 +44,7 @@
 }
 
 .colors-panel__fields .color-swatch-input + .color-swatch-input {
-  border-top: 1px solid #eee8e4;
+  border-top: 1px solid var(--portal-border);
 }
 
 .colors-panel__fields .color-swatch-input__control {
