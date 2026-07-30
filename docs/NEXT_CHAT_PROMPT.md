@@ -13,7 +13,7 @@ GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
 ```
 
-Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer bare for lokale `git`- og `npm`-kontroller som connectoren ikke kan utføre.
+Bruk GitHub-connectoren til remote-operasjoner. Gi eksakte PowerShell-kommandoer bare for lokale `git`- og `npm`-kontroller som connectoren ikke kan utføre.
 
 ## Ufravikelig arbeidsmåte
 
@@ -25,11 +25,15 @@ Bruk GitHub-connectoren til remote-operasjoner og eksakte PowerShell-kommandoer 
 - ingen merge uten eksplisitt `godkjent`
 - ikke start senere fase automatisk
 - ikke endre låst roadmap uten eksplisitt produktbeslutning
-- gjennomfør kodeaudit og filstørrelseskontroll før PR
+- gjennomfør framtidsrettet kodeaudit og filstørrelseskontroll før PR
 - kontroller PR-diff, mergebarhet, CI, reviews og åpne tråder
 - aktive produksjonsfiler bør være under 250 linjer; 300 er hard unntaksgrense
+- regenerer `architecture.json` og `docs/dependency-graph.mmd` når importgrafen endres
+- hold dokumentasjonen synkronisert og fjern foreldet status
 
 ## Autoritativ dokumentasjon
+
+Les i denne rekkefølgen før ny produksjonsfase:
 
 1. `docs/WORK_PLAN.md`
 2. `docs/PROJECT_RULES.md`
@@ -68,41 +72,54 @@ Arbeidsportalens navigasjon og nettsidens Header-navigasjon er to separate syste
 ## Gjeldende status
 
 ```text
-siste fullførte produksjonsfase på main: 13 – Logo og header
-aktiv produksjonsfase: 14 – korrigeringslinjer og snapping
-aktiv branch: feature/alignment-guides
-base origin/main ved fase-start: ff39d8df7d59843c796616ad7d56cf00a41236f8
-GitHub-sak: #34 – åpen
-pull request: ikke opprettet
+siste fullførte produksjonsfase på main: 14 – korrigeringslinjer og snapping
+main mergecommit: 0122605b60808689cdda7cb1601eb3342680f88c
+source branch-head for fase 14: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
+GitHub-sak #34: lukket som fullført
+pull request #39: merget
 prosjektskjema: versjon 9
+aktiv produksjonsfase: ingen
+aktiv produksjonsbranch: ingen
+neste planlagte fase: 15 – duse portalfarger og tydelig visuell struktur
+fase 15: ikke startet
 ```
 
-Faktisk remote-head og `origin/main` skal alltid leses på nytt før nye operasjoner.
+Brukeren har lokalt:
 
-Ved siste GitHub-kontroll var branchen foran `main` og 0 commits bak. Det finnes ingen PR for branchen.
+```text
+branch: main
+HEAD: 0122605
+origin/main: 0122605
+working tree: clean
+```
 
-## Implementert fase 14
+Faktisk remote-head og lokal status skal likevel alltid leses på nytt før nye operasjoner.
+
+## Fullført fase 14
+
+Fase 14 er levert på `main` og omfatter:
 
 - pekerflytting for Seksjon, Bilde, Tekst og Knapp
 - venstre/midt/høyre og topp/midt/bunn mot andre synlige elementer
 - horisontal og vertikal lerretsmidt
 - 6 px snapgrense i lerretskoordinater
-- X og Y velges uavhengig
-- nærmeste treff per akse
-- midtanker prioriteres ved lik avstand
-- guider vises bare mens snap er aktiv
-- låste synlige elementer kan være mål
-- skjulte elementer og aktivt element ekskluderes
-- Header og Seksjon kan være mål
-- mål og lerretsmål fryses ved pekerstart
-- alignment preview er transient
-- guider ryddes ved commit, cancel og tapt pointer capture
-- auto-scroll er beholdt
-- resize og tastatur snapping er ikke implementert
+- uavhengig valg på X- og Y-akse
+- nærmeste gyldige treff per akse
+- midtanker prioritert ved lik avstand
+- guider bare mens et snapptreff er aktivt
+- låste synlige elementer som mål
+- skjulte elementer og aktivt element ekskludert
+- Header og Seksjon som mål
+- mål og lerretsmål frosset ved pekerstart
+- transient alignment-preview
+- opprydding ved commit, cancel og tapt pointer capture
+- bevart auto-scroll og clamping
+- ingen resize- eller tastatursnapping i denne fasen
 
-## Header-invariant i fase 14
+## Header-invariant
 
-- én sammensatt `HeaderEditorElement`
+Header er én sammensatt `HeaderEditorElement` med disse reglene:
+
 - fast ved `x = 0, y = 0`
 - full aktiv lerretsbredde
 - ingen peker- eller tastaturflytting
@@ -114,18 +131,70 @@ Ved siste GitHub-kontroll var branchen foran `main` og 0 commits bak. Det finnes
 - kan velges og åpne egenskaper
 - kan brukes som snapmål
 - nye elementer opprettes under Header
+- låsehandlinger avvises
 
-Header-invarianten er rettet i alle identifiserte kodeveier:
+Header-invarianten håndheves i UI-, pointer-, tastatur-, layout- og commitlaget. Relevant kode:
 
-- `src/model/createEditorElement.ts`
+- `src/components/canvas/EditorCanvasElement.tsx`
+- `src/components/canvas/useElementPointerTransform.ts`
+- `src/components/canvas/elementPointerTransform.ts`
+- `src/components/canvas/canvasElementKeyboard.ts`
 - `src/state/setElementDesktopLayout.ts`
+- `src/model/createEditorElement.ts`
 - `src/components/canvas/getAlignmentTargets.ts`
 - `src/components/canvas/getCanvasContentHeight.ts`
 - `src/model/findElementCreationPosition.ts`
 
+## Slutt-audit av fase 14
+
+Slutt-auditen fjernet og rettet:
+
+- lavnivåmulighet for vertikal Header-flytting
+- dødt Header-flagg i snap-motoren
+- unødvendig kobling fra move-preview til hele elementobjektet
+- validering av Header før layoutnormalisering
+- unødvendig Header-plasseringsberegning
+- umulig låsttilstand i Header-fontpanelet
+- én overflødig importavhengighet
+
+Arkitekturgraf etter opprydding:
+
+```text
+118 moduler
+341 avhengigheter
+0 dependency-brudd
+```
+
+## Siste verifiserte lokale automatiske kontroll
+
+Brukerens terminaloutput på branch-head `28da295`:
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 118 moduler, 341 avhengigheter, ingen brudd
+Vite: 127 moduler transformert
+CSS: 36.85 kB, gzip 6.87 kB
+JavaScript: 280.63 kB, gzip 83.17 kB
+produksjonsbuild: bestått på 216 ms
+git diff --check: ingen feil
+produksjonsfiler på eller over 250 linjer: 0
+git status --short: clean etter commit og push
+```
+
+De største berørte produksjonsfilene etter oppryddingen var:
+
+```text
+useElementPointerTransform.ts    249 linjer
+EditorCanvasElement.tsx          243 linjer
+snapElementMove.ts               194 linjer
+```
+
+GitHub-repoet har ingen PR-utløst Actions-kjøring for denne leveransen. Lokal `npm run check` er derfor den dokumenterte automatiske kontrollen.
+
 ## Manuell fase-14-regresjon
 
-Brukeren har godkjent hele den relevante manuelle testen:
+Brukeren godkjente hele den relevante testen i PC- og Telefon-visning:
 
 - elementkanter og elementmidtpunkter på begge akser
 - horisontal og vertikal lerretsmidt
@@ -134,72 +203,30 @@ Brukeren har godkjent hele den relevante manuelle testen:
 - låste synlige elementer som snapmål
 - aktivt element ekskludert som eget mål
 - Header som fast, fullbredde snapmål
-- Header-høyde og fontstørrelse gjennom PC/Telefon-bytte
+- Header-høyde og fontstørrelse gjennom viewport-bytte
 - nye elementer opprettet under Header
 - pointer sluppet utenfor vinduet uten hengende guider
 - auto-scroll uten hopp eller feil commit
 - resizing uten snapping eller guider
 - tastaturflytting uten snapping eller guider
 - clamping ved alle lerretsgrenser
-- PC- og Telefon-visning
+- Header kunne ikke dras eller flyttes med vanlige piltaster etter slutt-auditen
+- `Ctrl + pil opp/ned` endret bare Header-høyden
+- vanlige elementer snappet fortsatt mot elementer, lerretsmidt og Header
 
 Skjulte elementer kan ikke styres fra dagens UI. Ekskluderingen er kodeverifisert i `getAlignmentTargets()`.
 
-Lokal lagring finnes ikke ennå og var derfor ikke et akseptansepunkt for fase 14.
+Lokal lagring finnes ikke ennå og var ikke et akseptansepunkt for fase 14.
 
-## Siste verifiserte lokale automatiske kontroll
+## Godkjente separate saker
 
-Brukerens terminaloutput på commit `8893a9c`:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 118 moduler, 342 avhengigheter, ingen brudd
-Vite: 127 moduler transformert
-CSS: 36.85 kB, gzip 6.87 kB
-JavaScript: 280.88 kB, gzip 83.22 kB
-produksjonsbuild: bestått på 198 ms
-git status --short: ingen output
-```
-
-Senere commits var dokumentasjonssynk og endret ikke produksjonskode eller importgraf.
-
-Remote audit av endrede produksjonsfiler viste:
-
-```text
-EditorCanvasElement.tsx          243 linjer
-useElementPointerTransform.ts    243 linjer
-snapElementMove.ts               190 linjer
-filer på eller over 250 linjer: 0
-filer på eller over 300 linjer: 0
-```
-
-## Gjenstående før PR
-
-Brukeren skal bare gjøre den lokale delen connectoren ikke kan utføre:
-
-1. pull siste remote-head
-2. kjør `npm run check`
-3. kjør `git diff --check`
-4. kjør repositoryomfattende filstørrelseskontroll
-5. bekreft `git status --short` uten output og eksakt HEAD
-
-Deretter skal assistenten:
-
-1. verifisere remote branch og diff på nytt
-2. kontrollere at dokumentasjonen er synkronisert
-3. opprette PR først når sluttkontrollen er bestått
-4. kontrollere PR-diff, mergebarhet, CI, reviews og tråder
-5. aldri merge uten eksplisitt `godkjent`
-
-## Godkjente separate saker etter fase 14
+Disse sakene er åpne og skal ikke blandes sammen uten eksplisitt plan:
 
 ### Sak #35 – tekstboksbakgrunn
 
 - lagret og validert bakgrunnsfarge for tekstbokser
 - vis `Bakgrunn` og `Tekstfarge` i Farger-panelet
 - egen modell-/schema-leveranse
-- ikke bland inn i `feature/alignment-guides`
 
 ### Sak #36 – editor-only elementgrense
 
@@ -207,17 +234,15 @@ Deretter skal assistenten:
 - gjelder også Seksjon og Header når designramme er `0 / Ingen`
 - ingen prosjektdata, schema eller layoutendring
 - ingen grense i lokal forhåndsvisning
-- egen liten visuell branch
 
 ### Sak #37 – elementnotat og ryddet høyrepanel
 
-Dette er eksplisitt godkjent av brukeren og skal tas på egen branch etter fase 14:
+Eksplisitt godkjent produktbeslutning:
 
 - vanlig klikk på element åpner vanlige egenskaper
 - flytende `Egenskaper`-knapp endres til `Notat`
 - `Notat` åpner elementets interne arbeidsmerknad i høyrepanelet
-- notat lagres per element
-- notat vises aldri på nettsiden eller i forhåndsvisning
+- notat lagres per element og vises aldri på nettsiden eller i forhåndsvisning
 - høyrepanelet skal ikke vise låseknapp eller `Status: Låst/Ulåst`
 - eksisterende låseikon ved elementet beholdes
 - Header er fortsatt ikke låsbar
@@ -231,12 +256,14 @@ Dette er eksplisitt godkjent av brukeren og skal tas på egen branch etter fase 
 - likt faktisk mellomrom mellom tre eller flere elementbokser
 - horisontal og vertikal variant
 - midlertidige editor-only avstandsmarkører
+- snapping til like mellomrom
+- sammenlign faktiske boksgap, ikke bare sentre
 - senere utvidelse av snap-motoren, ikke del av fase 14
 
 ## Låst roadmap
 
 ```text
-fase 14  Fullføre korrigeringslinjer og snapping
+fase 14  Korrigeringslinjer og snapping – fullført
 fase 15  Duse portalfarger og tydelig visuell struktur
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
@@ -255,6 +282,21 @@ fase 29  OpenAI-integrasjon
 ```
 
 Detaljert omfang og avhengigheter ligger i `docs/WORK_PLAN.md`.
+
+## Neste produksjonssteg
+
+Ikke start fase 15 automatisk.
+
+Før oppstart skal du:
+
+1. kontrollere faktisk `main`, lokal status og åpne PR-er
+2. lese fase-15-omfanget i `docs/WORK_PLAN.md`
+3. kontrollere berørte CSS-filer, designtokens og UI-områder
+4. presentere et presist, avgrenset forslag til fase 15
+5. få eksplisitt godkjenning av omfanget
+6. opprette en ny branch fra oppdatert `main`
+
+Fase 15 skal handle om dempede semantiske portalfarger og tydelig visuell struktur. Den skal ikke samtidig implementere portalnavigasjon, lagring, undo/redo, nettsidemeny eller OpenAI.
 
 ## Låst Hero-retning
 
