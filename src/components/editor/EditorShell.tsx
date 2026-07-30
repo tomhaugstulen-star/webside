@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { useElementCreation } from '../../state/useElementCreation'
@@ -27,12 +26,11 @@ export function EditorShell() {
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
-  const { state, activePage } = useEditorProject()
+  const { activePage } = useEditorProject()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
   const { updateImageTransform } = useImageProperties()
-  const { removeImageAsset } = useImageAssetStore()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
     ? activePage.elements.find(
@@ -87,26 +85,8 @@ export function EditorShell() {
       return
     }
 
-    const imageAssetId =
-      deletionTarget.kind === 'image' ? deletionTarget.assetId : null
-    const imageAssetIsShared = imageAssetId
-      ? state.project.pages.some((page) =>
-          page.elements.some(
-            (element) =>
-              element.id !== deletionTarget.id &&
-              element.kind === 'image' &&
-              element.assetId === imageAssetId,
-          ),
-        )
-      : false
-
     deleteElement(deletionRequest.elementId)
     setPropertiesPanelOpen(false)
-
-    if (imageAssetId && !imageAssetIsShared) {
-      removeImageAsset(imageAssetId)
-    }
-
     setDeletionRequest(null)
   }
 
