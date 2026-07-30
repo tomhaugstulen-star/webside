@@ -37,7 +37,7 @@ git diff --check
 ```text
 siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
 GitHub-sak: #28 – lukket som fullført
-PR: #29 – merget
+produksjons-PR: #29 – merget
 mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
 implementering, audit og manuell test: godkjent
@@ -45,6 +45,8 @@ automatiske kontroller: bestått
 arkitekturrapporter: regenerert og committet i 1963088
 lokal main: brukeren har bekreftet clean tree etter merge
 aktiv docs-branch: docs/phase-12-handover
+dokumentasjons-PR: #30 – åpen, ikke draft og mergebar
+PR #30 omfang: åtte Markdown-filer, ingen produksjonskode eller arkitekturrapporter
 neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
 ```
 
@@ -126,7 +128,7 @@ Detaljene står i `docs/PROJECT_COLORS.md`.
 
 ## 7. Neste handling
 
-Fullfør dokumentasjonssynkroniseringen på `docs/phase-12-handover` uten produksjonskode:
+Trekk og kontroller `docs/phase-12-handover` lokalt:
 
 ```powershell
 git fetch origin
@@ -136,7 +138,18 @@ git status
 git log -6 --oneline --decorate
 ```
 
-Kontroller at statusdokumentene beskriver PR #29 som merget og fase 12 som fullført. Kontroller diffen mot `main`, opprett en ren docs-PR og merge den bare etter eksplisitt godkjenning.
+Kontroller deretter PR #30 med GitHub-connectoren:
+
+1. base `main`
+2. head `docs/phase-12-handover`
+3. head-SHA samsvarer med branch-head
+4. åtte endrede Markdown-filer
+5. ingen produksjonskode eller arkitekturrapporter
+6. mergebarhet
+7. reviews og uløste tråder
+8. CI/statuskontroller
+
+Merge PR #30 bare etter eksplisitt godkjenning.
 
 Etter docs-merge:
 
