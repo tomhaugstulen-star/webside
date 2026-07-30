@@ -8,14 +8,14 @@ Dette dokumentet beskriver den framtidsrettede auditen av fase 12 og grensene so
 fase: 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
 GitHub-sak: #28
+PR: #29 – åpen, ikke draft
 prosjektskjema: versjon 7
 implementering: ferdig
 manuell PC- og Telefon-test: godkjent
 rammebredde: Ingen eller 1–10 px
 sluttaudit: ferdig
-automatiske kontroller etter siste 10 px-endring: gjenstår
-arkitekturrapporter: må regenereres
-PR: ikke opprettet
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
 merge: ikke godkjent eller utført
 ```
 
@@ -165,9 +165,9 @@ Godkjent på PC og Telefon:
 - PC og Telefon viser samme farger
 - eksisterende bilde-, tekst-, knapp-, flytte- og resizefunksjonalitet fungerer
 
-## 10. Siste komplette automatiske kontroll
+## 10. Verifisert sluttkontroll
 
-Brukerens lokale terminaloutput før utvidelsen fra 4 til 10 px:
+Brukerens lokale terminaloutput etter siste produksjonsendring:
 
 ```text
 ESLint: bestått
@@ -176,10 +176,11 @@ Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
 Vite: 111 moduler transformert
 CSS: 33.62 kB, gzip 6.34 kB
 JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 189 ms
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
-Ny komplett kontroll etter 10 px-endringen gjenstår.
+Arkitekturrapportene ble regenerert og committet i `1963088`. Lokal branch var synkronisert og clean etter push før de siste statusdokumentene ble lagt til gjennom GitHub-connectoren.
 
 ## 11. Obligatoriske grenser for senere faser
 
@@ -212,12 +213,10 @@ Ny komplett kontroll etter 10 px-endringen gjenstår.
 - reager bare på gyldige prosjektmutasjoner
 - ikke lagre transient editor-, panel- eller ressursstate direkte
 
-## 12. Gjenstående før PR
+## 12. Gjenstående før merge
 
-1. trekk siste feature-branch lokalt
-2. kjør `npm run check` etter 10 px-endringen
-3. regenerer `architecture.json` og `docs/dependency-graph.mmd`
-4. kontroller rapportdiff, `git diff --check` og clean tree
-5. oppdater kontrolltallene dersom den siste outputen endres
-6. opprett og kontroller PR mot `main`
-7. merge bare etter eksplisitt godkjenning
+1. trekk de siste statusdokumentene lokalt
+2. kontroller synkronisert branch og clean tree
+3. kontroller PR #29: changed files, mergebarhet, reviews, tråder og CI
+4. merge bare etter eksplisitt godkjenning
+5. oppdater lokal `main` etter merge
