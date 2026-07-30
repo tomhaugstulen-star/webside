@@ -73,11 +73,15 @@ function includesValue<T extends readonly unknown[]>(values: T, value: unknown) 
   return values.includes(value as T[number])
 }
 
+export function isTextFontFamily(value: unknown): value is TextFontFamily {
+  return includesValue(textFontFamilies, value)
+}
+
 const textElementStyleValidators: Record<
   keyof TextElementStyle,
   (value: unknown) => boolean
 > = {
-  fontFamily: (value) => includesValue(textFontFamilies, value),
+  fontFamily: isTextFontFamily,
   fontSize: (value) => includesValue(textFontSizes, value),
   fontWeight: (value) => includesValue(textFontWeights, value),
   fontStyle: (value) => includesValue(textFontStyles, value),
