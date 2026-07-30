@@ -141,19 +141,19 @@
   gap: 12px;
 }
 
-.element-grid > .element-card:nth-child(1) {
+.element-card--section {
   --element-card-accent: var(--portal-icon-blue);
 }
 
-.element-grid > .image-import-control:nth-child(2) {
+.element-card--image {
   --element-card-accent: var(--portal-icon-green);
 }
 
-.element-grid > .element-card:nth-child(3) {
+.element-card--text {
   --element-card-accent: var(--portal-icon-purple);
 }
 
-.element-grid > .element-card:nth-child(4) {
+.element-card--button {
   --element-card-accent: var(--portal-icon-orange);
 }
 
