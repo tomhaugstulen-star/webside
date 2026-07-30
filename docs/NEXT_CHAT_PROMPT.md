@@ -132,24 +132,9 @@ Utenfor fase 13:
 - issue #31 er synkronisert med faktisk omfang
 
 ## Neste handling
+Gjennomfør den obligatoriske manuelle regresjonstesten nedenfor.
 
-Kontroller først den faktiske lokale differansen:
-
-```powershell
-git status --short
-git diff --check
-git diff --stat
-git diff -- src/components/canvas/elementPointerTransform.ts
-```
-
-Kontroller deretter foreldede referanser. Handover-filen ekskluderes fordi kontrollkommandoen inneholder søkeuttrykkene:
-
-```powershell
-git grep -n -E 'docs/(PROJECT_COLORS|DRAG_RESIZE|OBJECT_LOCKING)\.md|widthMode|width-mode' -- . ':(exclude)docs/NEXT_CHAT_PROMPT.md'
-```
-
-Forventet resultat er ingen treff.
-
+Når testen er godkjent, kontrolleres clean tree, branch-synkronisering, full diff mot `main` og samsvar med issue #31 før PR opprettes.
 ## Obligatorisk kort regresjonstest
 
 Kontroller:
