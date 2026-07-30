@@ -14,6 +14,7 @@ export function ColorsPanel() {
     updateSectionBackgroundColor,
     updateSectionFrameColor,
     updateTextColor,
+    updateHeaderBackgroundColor,
     updateHeaderTextColor,
     updateHeaderFrameColor,
   } = useProjectColors()
@@ -33,6 +34,9 @@ export function ColorsPanel() {
         return
       case 'text-color':
         updateTextColor(target.elementId, value)
+        return
+      case 'header-background':
+        updateHeaderBackgroundColor(target.elementId, value)
         return
       case 'header-text':
         updateHeaderTextColor(target.elementId, value)
