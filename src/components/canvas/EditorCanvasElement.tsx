@@ -63,19 +63,17 @@ export function EditorCanvasElement({
   const visible = resolveResponsiveValue(element.visibility, viewport)
   const resolvedPosition = resolveResponsiveValue(element.position, viewport)
   const resolvedSize = resolveResponsiveValue(element.size, viewport)
-  const fullWidthHeader =
-    element.kind === 'header' &&
-    element.widthMode === 'full' &&
-    canvasWidth > 0
-  const initialLayout: ElementLayout = fullWidthHeader
-    ? {
-        position: { x: 0, y: resolvedPosition.y },
-        size: { width: canvasWidth, height: resolvedSize.height },
-      }
-    : {
-        position: resolvedPosition,
-        size: resolvedSize,
-      }
+  const isHeader = element.kind === 'header'
+  const initialLayout: ElementLayout =
+    isHeader && canvasWidth > 0
+      ? {
+          position: { x: 0, y: resolvedPosition.y },
+          size: { width: canvasWidth, height: resolvedSize.height },
+        }
+      : {
+          position: resolvedPosition,
+          size: resolvedSize,
+        }
   const {
     layout,
     imageTransform,
@@ -200,11 +198,11 @@ export function EditorCanvasElement({
             <ImageResizeHandles onPointerDown={handleResizePointerDown} />
           ) : (
             <span
-              className={`canvas-element__resize-handle${fullWidthHeader ? ' canvas-element__resize-handle--vertical' : ''}`}
+              className={`canvas-element__resize-handle${isHeader ? ' canvas-element__resize-handle--vertical' : ''}`}
               aria-hidden="true"
               onPointerDown={(event) =>
                 handleResizePointerDown(
-                  fullWidthHeader ? 'south' : 'south-east',
+                  isHeader ? 'south' : 'south-east',
                   event,
                 )
               }
