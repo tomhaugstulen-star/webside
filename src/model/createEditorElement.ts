@@ -78,7 +78,9 @@ export function createEditorElement({
         siteName: request.siteName,
         subtitle: request.subtitle,
         appearance: {
+          backgroundColor: DEFAULT_HEADER_APPEARANCE.backgroundColor,
           textColor: DEFAULT_HEADER_APPEARANCE.textColor,
+          fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
           frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
         },
       }
