@@ -60,22 +60,25 @@ main
 ## Gjeldende status
 
 ```text
-aktiv produksjonsfase: fase 13 – Logo og header
-branch: feature/logo-header
-GitHub-sak: #31
-pull request: #32 – åpen, ikke draft
+siste fullførte produksjonsfase: fase 13 – Logo og header
+GitHub-sak: #31 – lukket som fullført
+pull request: #32 – merget
+mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
 prosjektskjema: versjon 8
 automatisk kontroll: bestått etter siste produksjonsendring
 manuell regresjon: godkjent
-neste kontroll: PR-diff, mergebarhet, reviews, tråder og CI
+lokal main: synkronisert og clean
+aktiv dokumentasjonsbranch: docs/record-phase-13-merge
+neste produksjonsfase: ikke startet
 ```
 
-Ingen merge utføres uten eksplisitt godkjenning.
+Fase 14 er neste planlagte kandidat, men omfanget skal låses før en produksjonsbranch opprettes.
 
 ## Tekniske grenser
 
 - 250 linjer er aktiv terskel for ansvarstrekk
 - 300 linjer er hard unntaksgrense
+- ingen produksjonsfiler er på eller over 250 linjer etter fase 13
 - varige data endres bare gjennom validerte reducerhandlinger
 - ugyldige, låste og uendrede handlinger returnerer samme state
 - Header-låsehandlinger avvises; Header opprettes med `locked: false`

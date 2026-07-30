@@ -27,19 +27,18 @@ git status --short
 git diff --stat
 ```
 
-## Gjeldende leveranse
+## Siste fullførte leveranse
 
 ```text
 fase: 13 – Logo og header
-branch: feature/logo-header
-GitHub-sak: #31 – Implement logo and header element
-pull request: #32 – åpen, ikke draft
-base: main på 9937e4fd785da9cbd171443ea4f1d93041a8b326
+GitHub-sak: #31 – lukket som fullført
+pull request: #32 – merget
+mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
 prosjektskjema: versjon 8
 manuell funksjonstest: godkjent
 automatisk kontroll etter siste produksjonsendring: bestått
 kodeaudit og opprydding: gjennomført
-merge: ikke godkjent
+lokal main: synkronisert og clean
 ```
 
 Implementert omfang:
@@ -82,7 +81,7 @@ ElementSelectionToolbar.tsx      83
 toggleElementLock.ts             40
 ```
 
-Alle er under aktiv terskel på 250 linjer.
+Alle produksjonsfiler er kontrollert etter merge. Ingen er på eller over aktiv terskel på 250 linjer, og ingen er på eller over hard unntaksgrense på 300 linjer.
 
 ## Gjennomført avsluttende opprydding
 
@@ -100,7 +99,7 @@ Alle er under aktiv terskel på 250 linjer.
 - logoressursen markeres som overført før lokal UI-opprydding
 - alle kjente berørte produksjonsfiler er under 250 linjer
 - tre fullt foreldede fasefiler er slettet
-- issue #31 og PR #32 samsvarer med faktisk omfang
+- issue #31 og PR #32 er lukket som fullført
 
 ## Manuell regresjon
 
@@ -117,10 +116,21 @@ Brukeren har godkjent:
 - fortsatt fungerende låsing for andre elementtyper
 - regresjon av Seksjon, Bilde, Tekst og Knapp
 
-## Gjenstående før merge
+## Gjeldende dokumentasjonsleveranse
 
-- inspiser samlet PR-diff mot `main`
-- kontroller mergebarhet, reviews, uløste tråder og CI
+```text
+branch: docs/record-phase-13-merge
+base: main på b2e8e05c6daeec494130ce695bc51875d0d949f0
+omfang: bare autoritativ Markdown-status
+produksjonskode: uendret
+arkitekturrapporter: uendret
+```
+
+Før denne dokumentasjonsleveransen merges:
+
+- kontroller at bare avtalte Markdown-filer er endret
+- kontroller `git diff --check`
+- kontroller PR, mergebarhet, reviews og tråder
 - merge bare etter eksplisitt brukergodkjenning
 
 ## Senere faser
@@ -134,4 +144,4 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Ingen senere fase startes automatisk.
+Ingen senere fase startes automatisk. Fase 14 er neste planlagte kandidat, men omfanget må avklares og låses først.

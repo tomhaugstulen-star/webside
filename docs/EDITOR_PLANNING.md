@@ -1,19 +1,21 @@
 # Plan for Website-editoren
 
-Dette dokumentet viser implementert grunnlag, aktiv fase og senere leveranser.
+Dette dokumentet viser implementert grunnlag, siste fullførte fase og senere leveranser.
 
 ## Gjeldende status
 
 ```text
-aktiv fase: 13 – Logo og header
-branch: feature/logo-header
-GitHub-sak: #31
-pull request: #32 – åpen, ikke draft
+siste fullførte produksjonsfase: 13 – Logo og header
+GitHub-sak: #31 – lukket som fullført
+pull request: #32 – merget
+mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
 prosjektskjema: versjon 8
 manuell funksjonstest: godkjent
 kodeaudit og dokumentasjonsopprydding: gjennomført
 automatisk sluttkontroll: bestått etter siste produksjonsendring
-merge: ikke godkjent
+lokal main: synkronisert og clean
+aktiv dokumentasjonsbranch: docs/record-phase-13-merge
+neste produksjonsfase: ikke startet
 ```
 
 ## Implementert editorgrunnlag
@@ -102,6 +104,7 @@ Automatisk:
 - Vite: 122 moduler transformert
 - produksjonsbuild bestått på 206 ms
 - alle seks filer i siste opprydding er under 250 linjer
+- full kontroll etter merge viser ingen produksjonsfiler på eller over 250 eller 300 linjer
 
 Manuelt:
 
@@ -114,11 +117,18 @@ Manuelt:
 - låsing for øvrige elementtyper godkjent
 - Seksjon, Bilde, Tekst og Knapp regresjonstestet
 
-## Gjenstående før fase 13 kan merges
+## Neste produksjonsfase
 
-- inspiser full PR-diff mot `main` og issue #31
-- kontroller mergebarhet, reviews, uløste tråder og CI
-- innhent eksplisitt mergegodkjenning
+Fase 14 – korrigeringslinjer – er neste planlagte kandidat. Den er ikke startet, og følgende må avklares før en feature-branch opprettes:
+
+- hvilke elementkanter og midtpunkter som skal gi linjer
+- om linjene gjelder lerret, andre elementer eller begge
+- terskel for visning og eventuell snapping
+- forskjell mellom visuell veiledning og faktisk posisjonsendring
+- pointer-, tastatur- og responsiv oppførsel
+- ytelsesgrense ved mange elementer
+
+Ingen fase-14-kode skal bygges før produkt- og modellomfanget er godkjent.
 
 ## Senere faser
 
@@ -131,4 +141,4 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Åpne beslutninger for senere faser låses først når den aktuelle fasen starter. De skal ikke bygges inn i fase 13.
+Åpne beslutninger for senere faser låses først når den aktuelle fasen starter.

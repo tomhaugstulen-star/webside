@@ -42,20 +42,20 @@ Foreldede fasefiler som var fullt innarbeidet i dokumentene over er slettet. Ikk
 ## Gjeldende status
 
 ```text
-aktiv fase: 13 – Logo og header
-branch: feature/logo-header
-branch-head før dokumentasjonssynk: 8c7c7a0e68e2385a1564fe6fcd8d7750ffdccf73
-GitHub-sak: #31
-pull request: #32 – åpen, ikke draft
-base main: 9937e4fd785da9cbd171443ea4f1d93041a8b326
+siste fullførte produksjonsfase: 13 – Logo og header
+GitHub-sak: #31 – lukket som fullført
+pull request: #32 – merget
+mergecommit på main: b2e8e05c6daeec494130ce695bc51875d0d949f0
 prosjektskjema: versjon 8
 manuell funksjonstest: godkjent
 framtidsrettet kodeaudit og opprydding: gjennomført
 automatisk sluttkontroll: bestått etter siste produksjonsendring
-merge: ikke godkjent
+lokal main: synkronisert og clean
+aktiv dokumentasjonsbranch: docs/record-phase-13-merge
+neste produksjonsfase: ikke startet
 ```
 
-Faktisk branch-head, PR-head og `origin/main` skal leses på nytt før enhver mergevurdering.
+Faktisk branch-head og `origin/main` skal alltid leses på nytt før nye operasjoner.
 
 ## Siste verifiserte automatiske kontroll
 
@@ -70,10 +70,33 @@ CSS: 36.54 kB, gzip 6.80 kB
 JavaScript: 275.80 kB, gzip 81.65 kB
 produksjonsbuild: bestått på 206 ms
 working tree før kontroll: clean
-working tree etter målrettet grep: clean
+working tree etter målrettet kontroll: clean
 ```
 
 Arkitekturrapportene ble regenerert etter pointer-preview-rettelsen. Siste Header-låseopprydding endret ingen import- eller avhengighetskanter.
+
+## Filstørrelser
+
+Brukeren kontrollerte alle `.ts`, `.tsx` og `.css`-filer på lokal `main` etter merge:
+
+```text
+produksjonsfiler på eller over 250 linjer: 0
+produksjonsfiler på eller over 300 linjer: 0
+working tree: clean
+```
+
+Siste berørte Header-filer:
+
+```text
+HeaderCreationControl.tsx       224
+EditorCanvasElement.tsx         223
+RightPropertiesPanel.tsx        105
+SidebarPanels.tsx                95
+ElementSelectionToolbar.tsx      83
+toggleElementLock.ts             40
+```
+
+Genererte filer som `architecture.json` og `docs/dependency-graph.mmd` vurderes ikke etter 250-linjersregelen.
 
 ## Implementert Header
 
@@ -143,8 +166,7 @@ Utenfor fase 13:
 - ekstra `onCreated`-callback etter Header-oppretting er fjernet
 - venstrepanelet lukkes bare av felles opprettingsflyt
 - logoressursansvar overføres før lokal UI-opprydding
-- alle kjente berørte produksjonsfiler er under 250 linjer
-- issue #31 og PR #32 samsvarer med faktisk omfang
+- issue #31 og PR #32 er fullført
 
 ## Manuelt godkjent
 
@@ -162,16 +184,32 @@ Brukeren har godkjent:
 - eksisterende låsing for Seksjon, Bilde, Tekst og Knapp
 - regresjon av Seksjon, Bilde, Tekst og Knapp
 
-## Neste handling
+## Gjeldende dokumentasjonsleveranse
 
-Gjennomgå PR #32 før merge:
+`docs/record-phase-13-merge` skal bare registrere at fase 13 er merget og klargjøre overleveringen.
 
-- kontroller full diff mot `main`
-- kontroller at PR er mergebar
-- kontroller reviews og requested changes
-- kontroller uløste reviewtråder
-- kontroller CI/status checks; repoet hadde ingen status checks på siste commit før PR
-- kontroller at branch-head og PR-head samsvarer
-- merge ikke uten brukerens eksplisitte `godkjent`
+Kontroller før docs-PR:
+
+- branchen er basert på mergecommit `b2e8e05c6daeec494130ce695bc51875d0d949f0`
+- bare avtalte Markdown-filer er endret
+- ingen produksjonskode, konfigurasjon eller arkitekturrapport er endret
+- `git diff --check` er uten treff
+- PR er ikke draft
+- merge skjer bare etter eksplisitt brukergodkjenning
+
+## Neste produksjonsfase
+
+Fase 14 – korrigeringslinjer – er neste planlagte kandidat, men den er ikke startet.
+
+Før issue eller feature-branch opprettes, må produktomfanget avklares:
+
+- hvilke elementkanter og midtpunkter som skal gi linjer
+- om linjene gjelder lerret, andre elementer eller begge
+- terskel for visning
+- om snapping skal inngå eller om linjene bare er visuelle
+- pointer-, tastatur- og responsiv oppførsel
+- ytelsesgrense ved mange elementer
+
+Ikke implementer fase 14 før disse beslutningene er eksplisitt godkjent.
 
 ---
