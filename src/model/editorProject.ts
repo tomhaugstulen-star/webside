@@ -9,7 +9,7 @@ import type { TextElementStyle } from './textElementStyle'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 7 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 8 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -59,11 +59,20 @@ export type ButtonEditorElement = BaseEditorElement & {
   link: ElementLink
 }
 
+export type HeaderEditorElement = BaseEditorElement & {
+  kind: 'header'
+  logoAssetId: ImageAssetId
+  logoAssetMetadata: ImageAssetMetadata
+  siteName: string
+  subtitle: string
+}
+
 export type EditorElement =
   | SectionEditorElement
   | ImageEditorElement
   | TextEditorElement
   | ButtonEditorElement
+  | HeaderEditorElement
 
 export type EditorPage = {
   id: string
