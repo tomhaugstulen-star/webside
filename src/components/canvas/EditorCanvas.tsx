@@ -1,5 +1,5 @@
 import {
-  useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -79,7 +79,7 @@ export function EditorCanvas({
   }
   const renderElements = orderElementsForRendering(activePage.elements)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current
 
     if (!canvas) {
