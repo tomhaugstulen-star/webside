@@ -23,7 +23,7 @@ import {
   type TransformMode,
 } from './elementPointerTransform'
 import { getAlignmentTargets } from './getAlignmentTargets'
-import { snapElementMove } from './snapElementMove'
+import { getPointerMovePreview } from './getPointerMovePreview'
 
 type ElementPointerTransformOptions = {
   element: EditorElement
@@ -156,20 +156,15 @@ export function useElementPointerTransform({
       scrollContainer.scrollTop,
     )
     const nextLayout = getNextPointerLayout(element, interaction, delta)
-    const snapResult =
-      interaction.mode === 'move' && alignmentTargetsRef.current
-        ? snapElementMove({
+    const nextPreview =
+      interaction.mode === 'move'
+        ? getPointerMovePreview({
+            element,
             layout: nextLayout,
             targets: alignmentTargetsRef.current,
             canvasWidth: interaction.canvasWidth,
-            allowHorizontal: element.kind !== 'header',
           })
-        : { layout: nextLayout, guides: [] }
-    const nextPreview = {
-      elementId: element.id,
-      layout: snapResult.layout,
-      guides: snapResult.guides,
-    }
+        : { elementId: element.id, layout: nextLayout, guides: [] }
 
     if (
       draftPreviewRef.current &&
