@@ -4,8 +4,10 @@ import { useElementLocking } from '../../state/useElementLocking'
 
 type ElementSelectionToolbarProps = {
   elementId: string
+  lockable: boolean
   locked: boolean
   layout: ElementLayout
+  onOpenProperties: () => void
 }
 
 function LockIcon({ locked }: { locked: boolean }) {
@@ -34,8 +36,10 @@ function LockIcon({ locked }: { locked: boolean }) {
 
 export function ElementSelectionToolbar({
   elementId,
+  lockable,
   locked,
   layout,
+  onOpenProperties,
 }: ElementSelectionToolbarProps) {
   const { toggleElementLocked } = useElementLocking()
   const style: CSSProperties = {
@@ -56,15 +60,24 @@ export function ElementSelectionToolbar({
       onPointerDown={stopPointerPropagation}
     >
       <button
-        className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
+        className="canvas-object-toolbar__button canvas-object-toolbar__button--label"
         type="button"
-        aria-label={locked ? 'Lås opp element' : 'Lås element'}
-        aria-pressed={locked}
-        title={locked ? 'Lås opp' : 'Lås'}
-        onClick={() => toggleElementLocked(elementId)}
+        onClick={onOpenProperties}
       >
-        <LockIcon locked={locked} />
+        Egenskaper
       </button>
+      {lockable && (
+        <button
+          className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
+          type="button"
+          aria-label={locked ? 'Lås opp element' : 'Lås element'}
+          aria-pressed={locked}
+          title={locked ? 'Lås opp' : 'Lås'}
+          onClick={() => toggleElementLocked(elementId)}
+        >
+          <LockIcon locked={locked} />
+        </button>
+      )}
     </div>
   )
 }

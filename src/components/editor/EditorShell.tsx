@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { useElementCreation } from '../../state/useElementCreation'
@@ -25,16 +24,18 @@ type DeletionRequest = {
 export function EditorShell() {
   const [activeTool, setActiveTool] = useState<EditorTool | null>(null)
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
+  const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
-  const { state, activePage } = useEditorProject()
+  const { activePage } = useEditorProject()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
   const { updateImageTransform } = useImageProperties()
-  const { removeImageAsset } = useImageAssetStore()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
-    ? activePage.elements.find((element) => element.id === deletionRequest.elementId) ?? null
+    ? activePage.elements.find(
+        (element) => element.id === deletionRequest.elementId,
+      ) ?? null
     : null
 
   const toggleToolPanel = (tool: EditorTool) => {
@@ -84,25 +85,8 @@ export function EditorShell() {
       return
     }
 
-    const imageAssetId =
-      deletionTarget.kind === 'image' ? deletionTarget.assetId : null
-    const imageAssetIsShared = imageAssetId
-      ? state.project.pages.some((page) =>
-          page.elements.some(
-            (element) =>
-              element.id !== deletionTarget.id &&
-              element.kind === 'image' &&
-              element.assetId === imageAssetId,
-          ),
-        )
-      : false
-
     deleteElement(deletionRequest.elementId)
-
-    if (imageAssetId && !imageAssetIsShared) {
-      removeImageAsset(imageAssetId)
-    }
-
+    setPropertiesPanelOpen(false)
     setDeletionRequest(null)
   }
 
@@ -120,6 +104,7 @@ export function EditorShell() {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !deletionDialogOpen) {
         setActiveTool(null)
+        setPropertiesPanelOpen(false)
       }
     }
 
@@ -127,9 +112,12 @@ export function EditorShell() {
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [deletionDialogOpen])
 
+  const visiblePropertiesElement =
+    propertiesPanelOpen && selectedElement ? selectedElement : null
+
   return (
     <div
-      className={`editor-shell${activeTool ? ' editor-shell--panel-open' : ''}${selectedElement ? ' editor-shell--properties-open' : ''}`}
+      className={`editor-shell${activeTool ? ' editor-shell--panel-open' : ''}${visiblePropertiesElement ? ' editor-shell--properties-open' : ''}`}
     >
       <TopToolbar
         pageName={activePage.name}
@@ -143,9 +131,14 @@ export function EditorShell() {
           onPanelAction={closeToolPanel}
           onCreateElement={createElementAndClosePanel}
         />
-        <EditorCanvas viewport={viewport} />
+        <EditorCanvas
+          viewport={viewport}
+          onOpenProperties={() => setPropertiesPanelOpen(true)}
+          onCloseProperties={() => setPropertiesPanelOpen(false)}
+        />
         <RightPropertiesPanel
-          element={selectedElement}
+          element={visiblePropertiesElement}
+          onClose={() => setPropertiesPanelOpen(false)}
           onRequestElementDeletion={requestElementDeletion}
         />
       </div>

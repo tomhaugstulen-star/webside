@@ -1,17 +1,14 @@
-import {
-  elementLayoutsEqual,
-  getElementDesktopLayout,
-  isValidElementDesktopLayout,
-} from '../model/elementLayout'
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
+import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
+import { setElementDesktopLayout } from './setElementDesktopLayout'
 import { setElementLink } from './setElementLink'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementStyle } from './setTextElementStyle'
@@ -22,8 +19,12 @@ export function getInitialEditorProjectState() {
 }
 
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
-  const activePage = state.project.pages.find((page) => page.id === state.activePageId)
-  return activePage?.elements.some((element) => element.id === elementId) ?? false
+  const activePage = state.project.pages.find(
+    (page) => page.id === state.activePageId,
+  )
+  return (
+    activePage?.elements.some((element) => element.id === elementId) ?? false
+  )
 }
 
 function selectedElementExists(state: EditorProjectState) {
@@ -68,7 +69,9 @@ function reduceEditorProjectState(
         return state
       }
 
-      const pageExists = state.project.pages.some((page) => page.id === action.pageId)
+      const pageExists = state.project.pages.some(
+        (page) => page.id === action.pageId,
+      )
 
       if (!pageExists) {
         return state
@@ -114,52 +117,13 @@ function reduceEditorProjectState(
         action.updatedAt,
       )
 
-    case 'set-element-desktop-layout': {
-      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
-      const element = activePage?.elements.find((candidate) => candidate.id === action.elementId)
-
-      if (
-        !activePage ||
-        !element ||
-        element.locked ||
-        !isValidElementDesktopLayout(element, action.layout) ||
-        elementLayoutsEqual(getElementDesktopLayout(element), action.layout)
-      ) {
-        return state
-      }
-
-      const pages = state.project.pages.map((page) =>
-        page.id === state.activePageId
-          ? {
-              ...page,
-              elements: page.elements.map((candidate) =>
-                candidate.id === action.elementId
-                  ? {
-                      ...candidate,
-                      position: {
-                        ...candidate.position,
-                        desktop: { ...action.layout.position },
-                      },
-                      size: {
-                        ...candidate.size,
-                        desktop: { ...action.layout.size },
-                      },
-                    }
-                  : candidate,
-              ),
-            }
-          : page,
+    case 'set-element-desktop-layout':
+      return setElementDesktopLayout(
+        state,
+        action.elementId,
+        action.layout,
+        action.updatedAt,
       )
-
-      return {
-        ...state,
-        project: {
-          ...state.project,
-          pages,
-          updatedAt: action.updatedAt,
-        },
-      }
-    }
 
     case 'toggle-element-lock':
       return toggleElementLock(state, action.elementId, action.updatedAt)
@@ -209,6 +173,13 @@ function reduceEditorProjectState(
     case 'set-section-frame-width':
     case 'set-section-frame-color':
       return reduceColorProjectAction(state, action)
+
+    case 'set-header-background-color':
+    case 'set-header-text-color':
+    case 'set-header-font-family':
+    case 'set-header-frame-width':
+    case 'set-header-frame-color':
+      return reduceHeaderAppearanceAction(state, action)
 
     case 'set-image-alt-text':
     case 'set-image-mode':

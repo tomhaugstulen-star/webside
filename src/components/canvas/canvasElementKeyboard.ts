@@ -24,6 +24,8 @@ type CanvasElementKeyboardOptions = {
   initialLayout: ElementLayout
   canvasWidth: number
   onSelect: (elementId: string) => void
+  onOpenProperties: () => void
+  onCloseProperties: () => void
   onStartTextEditing: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
   onCommitImageFrame: (
@@ -41,6 +43,8 @@ export function handleCanvasElementKeyDown(
     initialLayout,
     canvasWidth,
     onSelect,
+    onOpenProperties,
+    onCloseProperties,
     onStartTextEditing,
     onCommitLayout,
     onCommitImageFrame,
@@ -53,6 +57,7 @@ export function handleCanvasElementKeyDown(
       onStartTextEditing(element.id)
     } else {
       onSelect(element.id)
+      onOpenProperties()
     }
 
     return
@@ -61,6 +66,7 @@ export function handleCanvasElementKeyDown(
   if (event.key === ' ') {
     event.preventDefault()
     onSelect(element.id)
+    onOpenProperties()
     return
   }
 
@@ -74,15 +80,22 @@ export function handleCanvasElementKeyDown(
   onSelect(element.id)
 
   if (element.locked || canvasWidth <= 0) {
+    onOpenProperties()
     return
   }
 
+  const resizing = event.ctrlKey || event.metaKey
+
+  if (element.kind === 'header' && direction.x !== 0) {
+    return
+  }
+
+  onCloseProperties()
   const step = event.shiftKey ? 10 : 1
   const delta = {
     x: direction.x * step,
     y: direction.y * step,
   }
-  const resizing = event.ctrlKey || event.metaKey
   const maximumSize =
     element.kind === 'image' && element.mode === 'crop'
       ? getImageCropSize(element.assetMetadata, element.transform)
@@ -93,7 +106,7 @@ export function handleCanvasElementKeyDown(
         initialLayout,
         delta,
         canvasWidth,
-        'south-east',
+        element.kind === 'header' ? 'south' : 'south-east',
         maximumSize,
       )
     : moveElementLayout(initialLayout, delta, canvasWidth)

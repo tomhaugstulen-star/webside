@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -13,6 +14,8 @@ import { getCanvasContentHeight } from './getCanvasContentHeight'
 
 type EditorCanvasProps = {
   viewport: ViewportMode
+  onOpenProperties: () => void
+  onCloseProperties: () => void
 }
 
 type CanvasPreviewState = {
@@ -41,19 +44,30 @@ function orderElementsForRendering(elements: EditorElement[]) {
   return [...sections, ...foregroundElements]
 }
 
-export function EditorCanvas({ viewport }: EditorCanvasProps) {
+export function EditorCanvas({
+  viewport,
+  onOpenProperties,
+  onCloseProperties,
+}: EditorCanvasProps) {
   const { activePage } = useEditorProject()
-  const { selectedElementId, selectElement, clearSelection } = useElementSelection()
-  const [previewState, setPreviewState] = useState<CanvasPreviewState | null>(null)
-  const [textEditingState, setTextEditingState] = useState<TextEditingState | null>(null)
+  const { selectedElementId, selectElement, clearSelection } =
+    useElementSelection()
+  const [previewState, setPreviewState] =
+    useState<CanvasPreviewState | null>(null)
+  const [textEditingState, setTextEditingState] =
+    useState<TextEditingState | null>(null)
+  const [canvasWidth, setCanvasWidth] = useState(0)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const layoutPreview =
-    previewState?.pageId === activePage.id && previewState.viewport === viewport
+    previewState?.pageId === activePage.id &&
+    previewState.viewport === viewport
       ? previewState.preview
       : null
   const editingElementId =
-    textEditingState?.pageId === activePage.id ? textEditingState.elementId : null
+    textEditingState?.pageId === activePage.id
+      ? textEditingState.elementId
+      : null
   const contentHeight = getCanvasContentHeight(
     activePage.elements,
     viewport,
@@ -65,7 +79,24 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
   }
   const renderElements = orderElementsForRendering(activePage.elements)
 
-  const handlePreviewLayoutChange = (preview: ElementLayoutPreview | null) => {
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current
+
+    if (!canvas) {
+      return
+    }
+
+    const updateCanvasWidth = () => setCanvasWidth(canvas.clientWidth)
+    const observer = new ResizeObserver(updateCanvasWidth)
+    updateCanvasWidth()
+    observer.observe(canvas)
+
+    return () => observer.disconnect()
+  }, [viewport])
+
+  const handlePreviewLayoutChange = (
+    preview: ElementLayoutPreview | null,
+  ) => {
     setPreviewState(
       preview
         ? {
@@ -90,8 +121,13 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
     )
   }
 
+  const clearSelectionAndProperties = () => {
+    clearSelection()
+    onCloseProperties()
+  }
+
   return (
-    <main className="editor-workspace" onPointerDown={clearSelection}>
+    <main className="editor-workspace" onPointerDown={clearSelectionAndProperties}>
       <div className="canvas-stage" ref={scrollContainerRef}>
         <div className="canvas-wrap">
           <div
@@ -105,11 +141,14 @@ export function EditorCanvas({ viewport }: EditorCanvasProps) {
                 key={element.id}
                 element={element}
                 viewport={viewport}
+                canvasWidth={canvasWidth}
                 selected={element.id === selectedElementId}
                 editing={element.id === editingElementId}
                 canvasRef={canvasRef}
                 scrollContainerRef={scrollContainerRef}
                 onSelect={selectElement}
+                onOpenProperties={onOpenProperties}
+                onCloseProperties={onCloseProperties}
                 onStartTextEditing={startTextEditing}
                 onFinishTextEditing={finishTextEditing}
                 onPreviewLayoutChange={handlePreviewLayoutChange}

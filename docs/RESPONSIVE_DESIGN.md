@@ -1,29 +1,8 @@
-# Responsiv design: desktop og mobil
+# Responsiv design
 
-Dette dokumentet beskriver teknisk retning for forskjeller mellom desktop- og mobilvisning.
+Dette dokumentet beskriver gjeldende arv og grensene for senere mobiloverstyringer.
 
-Detaljert fasespesifikasjon:
-
-```text
-docs/MOBILE_DESIGN_CONTROLS.md
-```
-
-Åpen GitHub-sak:
-
-```text
-#3 Plan: viewport-specific mobile design controls
-```
-
-## 1. Hovedprinsipp
-
-- Ferdige nettsider skal bruke CSS media queries.
-- Mobilvisningen skal kunne skjule elementer som fortsatt finnes på desktop.
-- Desktop og mobil skal kunne ha egne verdier for utvalgte egenskaper.
-- Desktop er grunnlaget; mobil arver til en eksplisitt mobiloverstyring finnes.
-- Nøyaktig hvilke egenskaper som kan overstyres bestemmes før mobilkontrollene implementeres.
-- Et foreløpig brytepunkt kan være 768 px, men skal testes før det låses.
-
-## 2. Prosjektdata er hovedkilden
+## Hovedmodell
 
 ```ts
 type ResponsiveViewport = 'desktop' | 'mobile'
@@ -34,214 +13,106 @@ type ResponsiveValue<T> = {
 }
 ```
 
-`EditorProject` er autoritativ kilde. DOM-en er bare rendering av prosjektdataene.
+`EditorProject` er autoritativ. DOM og CSS er rendering.
 
-`ResponsiveViewport` har én autoritativ definisjon i prosjektmodellen. `ViewportMode` er et UI-alias til samme type.
+- Manglende `mobile` betyr arv fra desktop.
+- Reset til desktop skal senere fjerne mobilverdien, ikke kopiere desktop inn i `mobile`.
+- Dagens UI oppretter ikke mobiloverstyringer.
+- Transform i PC- og Telefon-visning endrer derfor den delte desktopgeometrien.
 
-Manglende `mobile`-verdi betyr arv. En reset til desktop skal derfor fjerne mobilverdien, ikke kopiere desktopverdien inn i `mobile`.
+Dette er en kontrollert midlertidig regel fram til fase 15.
 
-## 3. Implementert grunnlag på `main`
-
-Merget funksjonalitet:
-
-- responsive modellfelter for posisjon, størrelse og synlighet
-- desktopverdi med valgfri mobilverdi
-- mobil fallback til desktop
-- skjulte elementer renderer ikke i aktiv viewport
-- delt `resolveResponsiveValue`
-- avledet lerretshøyde basert på synlige elementer
-- nye elementer opprettes med desktopverdier
-- mobil arver nye elementers desktopgeometri
-
-Flytting og resizing ble implementert i `feature/drag-resize` og merget til `main` gjennom PR #4:
-
-- PC- og Telefon-visningen kan brukes til å flytte og resize dagens elementer
-- clamping bruker den synlige lerretsbredden
-- transient preview påvirker avledet lerretshøyde under transform
-- varig layout-commit går foreløpig til desktopgeometrien
-- ingen mobiloverstyring opprettes skjult
-
-`feature/drag-resize` er en historisk branchreferanse, ikke aktiv arbeidsstatus.
-
-## 4. Midlertidig regel før mobilkontroller
-
-Dagens UI kan ikke opprette mobiloverstyringer. Derfor gjelder:
-
-- nye elementer har bare desktopposisjon og desktopstørrelse
-- mobilvisningen arver samme geometri
-- transform i PC- og Telefon-visning endrer den delte desktopgeometrien
-- låsestatus er felles, ikke viewport-spesifikk
-
-Dette er en kontrollert midlertidig regel, ikke endelig responsiv redigering.
-
-Når mobiloverstyringer bygges, må transform-API og reducer-actions bli viewport-bevisste. En mobiltransform skal da ikke utilsiktet overskrive desktopgeometrien.
-
-## 5. Anbefalt arv og overstyring
-
-Den planlagte modellen er:
-
-- **Arver fra PC** når `mobile` mangler
-- **Eget mobiloppsett** når `mobile` finnes
-- første mobilredigering kan opprette mobiloverstyring
-- desktopendringer påvirker arvede mobilverdier
-- desktopendringer overskriver ikke eksplisitte mobilverdier
-- **Bruk PC-oppsett** fjerner mobiloverstyringen
-
-UI-et skal tydelig vise om valgt element arver, har eget mobiloppsett eller er skjult på mobil.
-
-## 6. Krav til `feature/mobile-design-controls`
-
-Fasen må avklare og bygge:
-
-- hvilke egenskaper som kan overstyres på mobil
-- tydelig visning av arv kontra overstyring
-- opprette eller fjerne mobiloverstyring
-- reset til desktopverdi
-- skjul på mobil
-- viewport-bevisst flytting og resizing
-- viewport-bevisst elementoppretting
-- markering av element som er skjult i aktiv visning
-- hvordan historikk og lagring representerer en mobilendring
-
-Første versjon bør minst støtte:
+## Gjeldende responsive verdier
 
 - posisjon
-- bredde og høyde
-- synlighet på mobil
+- størrelse
+- synlighet
 
-Layout-actionen kan ikke fortsette å hete eller oppføre seg som en ren desktop-action når mobilverdier blir redigerbare.
+Foreløpig felles for PC og Telefon:
 
-## 7. Viewport-bevisste mutasjoner
+- innhold og tekststil
+- lenker
+- låsestatus
+- farger og rammer
+- bildeasset, metadata og utsnitt
+- Header-logo, tekst og utseende
 
-En framtidig layout-action må eksplisitt angi viewport.
+## Header
 
-Reducerregler:
+Header har en egen responsiv visningsregel:
 
-- desktop-action endrer bare desktopgeometri
-- mobile-action endrer bare mobilgeometri
-- reset-action fjerner mobilverdier
-- ukjent, låst, ugyldig eller uendret layout ignoreres
-- transient preview holdes utenfor prosjektdata, historikk og lagring
+- rendres alltid ved `x = 0`
+- bruker hele bredden til aktivt PC- eller Telefon-lerret
+- lagrer ikke DOM-målt bredde som prosjektdata
+- kan bare flyttes vertikalt
+- høyde er 70–100 px
+- Telefon arver desktop y/høyde inntil egne mobiloverstyringer bygges
 
-## 8. Lerretshøyde
+Når lerretsbredden endres, oppdateres Headerens renderingsbredde via `ResizeObserver`. Dette er transient visning og muterer ikke prosjektet.
 
-Lerretshøyden er avledet visning og skal ikke lagres i prosjektfilen.
+## Lerretshøyde
 
-Den beregnes fra:
+Lerretshøyden er avledet og lagres ikke. Den beregnes fra:
 
-- elementer som er synlige i aktiv viewport
+- synlige elementer i aktiv viewport
 - mobilverdi når den finnes
 - ellers desktopverdi
-- transient preview for elementet som akkurat flyttes eller resizes
+- transient preview under transform
 - fast luft under nederste element
 
-Ved avbrutt interaksjon fjernes preview uten prosjektmutasjon.
+Avbrutt transform fjerner preview uten prosjektmutasjon.
 
-## 9. Oppretting
+## Fase 15 – mobiloverstyringer
 
-Elementoppretting er foreløpig desktop-autoritativ:
+Før implementering må følgende låses:
 
-- plassering beregnes fra eksisterende desktopverdier
-- størrelse lagres som desktopverdi
-- synlighet lagres som `desktop: true`
-- mobil arver verdiene
-
-Når responsiv redigering bygges, må dette avklares på nytt:
-
+- hvilke egenskaper som kan overstyres
+- tydelig arv kontra eget mobiloppsett
+- opprette og fjerne mobiloverstyring
+- skjul på mobil
+- viewport-bevisst flytting og størrelsesendring
 - oppretting i aktiv viewport
-- bare-mobil-elementer
-- skjulte elementers påvirkning på første ledige plass
-- eksplisitt mobiloverstyring kontra fortsatt arv
+- historikk og autolagring for mobilendringer
 
-Anbefalt første regel er at nye elementer fortsatt opprettes på desktop og arves til mobil. Oppretting i Telefon skal ikke lage en ukjent desktopplassering uten en eksplisitt beslutning.
+Minimum:
 
-Startplassering skal aldri utvikles til generell kollisjonskontroll. Fri overlapping skal fortsatt være mulig.
+- egen mobilposisjon
+- egen mobilbredde og -høyde der elementtypen tillater det
+- egen mobilsynlighet
+- `Bruk PC-oppsett` som fjerner mobiloverstyringen
 
-## 10. Skjule på mobil
+Header må fortsatt være full bredde i aktiv viewport. En framtidig mobiloverstyring for Header gjelder derfor y, høyde og eventuelt synlighet, ikke fri x/bredde, med mindre produktmodellen endres eksplisitt.
 
-Senere skal brukeren kunne velge at et objekt:
+## Viewport-bevisste actions
 
-- vises på desktop og mobil
-- bare vises på desktop
-- eventuelt bare vises på mobil dersom dette godkjennes
+Senere layoutactions må angi viewport:
 
-Før funksjonen bygges må det avklares:
+- desktop-action endrer bare desktop
+- mobile-action endrer bare mobile
+- reset-action fjerner mobile
+- låst, ugyldig og uendret layout ignoreres
+- preview forblir transient
 
-- om skjuling fjerner markering i aktiv viewport
-- hvordan objektverktøy fungerer når valgt element ikke renderer
-- hvordan brukeren finner og viser skjulte elementer igjen
-- om bare-mobil-visning støttes i første versjon
-- hvordan skjulte elementer påvirker opprettingsplassering
+Mobilendringer skal aldri skrives inn i desktopfeltet implisitt.
 
-## 11. CSS-generering
+## Publisering
 
-Editoren skal generere ett kontrollert prosjektstilark fremfor mange tilfeldige `<style>`-elementer.
+Ferdige nettsider skal bruke kontrollert generert CSS:
 
-Stilgeneratoren skal:
-
-1. lese prosjektmodellen
-2. generere desktopregler
-3. generere mobilregler i én samlet media query
-4. bruke stabile element-ID-er eller genererte klassenavn
+1. les prosjektmodellen
+2. generer desktopregler
+3. generer mobilregler i én samlet media query
+4. bruk stabile element-ID-er eller genererte klassenavn
 5. gi samme resultat i editor, forhåndsvisning og eksport
 
 `!important` skal ikke brukes som standard.
 
-## 12. Stabile ID-er
+## Åpne beslutninger
 
-ID-er skal beholdes ved:
+- endelig brytepunkt
+- støtte for bare-mobil-elementer
+- visuell status for arv og overstyring
+- markering av skjulte elementer
+- hvilke stilverdier som eventuelt blir responsive
 
-- automatisk lagring
-- lukking og gjenåpning
-- import
-- forhåndsvisning
-- eksport
-- publisering
-
-`Math.random()` skal ikke brukes som prosjektidentitet.
-
-## 13. Arkitektur
-
-Responsiv funksjonalitet deles i egne ansvar:
-
-- responsive typer og datamodell
-- verdioppløsning og arv
-- viewport-bevisste layout-actions
-- mobilkontroller
-- viewport-bevisst oppretting
-- CSS-generator
-- forhåndsvisning
-- eksport
-
-Dette skal ikke samles i én stor komponent.
-
-## 14. Planlagt branch og sak
-
-```text
-feature/mobile-design-controls
-```
-
-Fasen spores i GitHub-sak `#3` og startes ikke uten ny eksplisitt godkjenning.
-
-## 15. Akseptansekriterier
-
-Minstekravene ligger i `docs/MOBILE_DESIGN_CONTROLS.md` og inkluderer:
-
-- mobiltransform endrer ikke desktop
-- desktopendring overskriver ikke eksplisitt mobiloppsett
-- arv kan gjenopprettes ved å fjerne mobiloverstyring
-- mobilskjuling sletter ikke elementet
-- status for arv, overstyring og skjuling er tydelig
-- peker og tastatur bruker samme viewport-bevisste regler
-
-## 16. Åpne beslutninger
-
-- endelig mobilbrytepunkt
-- egenskaper som kan overstyres utover geometri og synlighet
-- automatisk eller eksplisitt oppretting av første mobiloverstyring
-- støtte for bare-mobil-visning
-- visuell markering av arv og overstyring
-- fri eller delvis arvet mobilplassering
-- markering av skjult element
-- viewport-bevisst opprettingsregel
-- organisering av eksportert HTML og CSS
+Disse beslutningene tilhører fase 15 og bygges ikke inn i fase 13.

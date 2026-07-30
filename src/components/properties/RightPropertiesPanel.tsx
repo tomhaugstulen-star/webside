@@ -3,6 +3,7 @@ import { ButtonPropertiesSection } from './ButtonPropertiesSection'
 import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
+import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
@@ -11,10 +12,12 @@ const elementKindLabels: Record<ElementKind, string> = {
   image: 'Bilde',
   text: 'Tekst',
   button: 'Knapp',
+  header: 'Header',
 }
 
 type RightPropertiesPanelProps = {
   element: EditorElement | null
+  onClose: () => void
   onRequestElementDeletion: (
     element: EditorElement,
     returnFocus: HTMLElement | null,
@@ -23,6 +26,7 @@ type RightPropertiesPanelProps = {
 
 export function RightPropertiesPanel({
   element,
+  onClose,
   onRequestElementDeletion,
 }: RightPropertiesPanelProps) {
   const isOpen = element !== null
@@ -36,12 +40,29 @@ export function RightPropertiesPanel({
       <div className="right-properties-panel__surface">
         {element && (
           <div className="right-properties-panel__content">
-            <h2 id="right-properties-panel-title">Egenskaper</h2>
-            <p className="right-properties-panel__element-type">
-              {elementKindLabels[element.kind]}
-            </p>
+            <div className="right-properties-panel__heading">
+              <div>
+                <h2 id="right-properties-panel-title">Egenskaper</h2>
+                <p className="right-properties-panel__element-type">
+                  {elementKindLabels[element.kind]}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="right-properties-panel__close"
+                aria-label="Lukk egenskaper"
+                title="Lukk"
+                onClick={onClose}
+              >
+                ×
+              </button>
+            </div>
 
-            {element.kind === 'section' && (
+            {element.kind === 'header' && (
+              <HeaderFontPropertiesSection element={element} />
+            )}
+
+            {(element.kind === 'section' || element.kind === 'header') && (
               <FramePropertiesSection element={element} />
             )}
 
@@ -63,12 +84,14 @@ export function RightPropertiesPanel({
 
             <section aria-labelledby="right-properties-panel-element-title">
               <h3 id="right-properties-panel-element-title">Element</h3>
-              <dl className="right-properties-panel__details">
-                <div className="right-properties-panel__detail-row">
-                  <dt>Status:</dt>
-                  <dd>{element.locked ? 'Låst' : 'Ulåst'}</dd>
-                </div>
-              </dl>
+              {element.kind !== 'header' && (
+                <dl className="right-properties-panel__details">
+                  <div className="right-properties-panel__detail-row">
+                    <dt>Status:</dt>
+                    <dd>{element.locked ? 'Låst' : 'Ulåst'}</dd>
+                  </div>
+                </dl>
+              )}
               <DeleteElementSection
                 element={element}
                 onRequestDeletion={onRequestElementDeletion}

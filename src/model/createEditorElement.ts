@@ -4,6 +4,7 @@ import type { ElementCreationRequest } from './elementCreation'
 import type { EditorElement } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
+import { DEFAULT_HEADER_APPEARANCE } from './headerAppearance'
 import {
   DEFAULT_IMAGE_MODE,
   DEFAULT_IMAGE_TRANSFORM,
@@ -23,7 +24,11 @@ export function createEditorElement({
   existingElements,
 }: CreateEditorElementInput): EditorElement {
   const size = getDefaultElementSize(request.kind)
-  const position = findElementCreationPosition(size, existingElements)
+  const creationPosition = findElementCreationPosition(size, existingElements)
+  const position =
+    request.kind === 'header'
+      ? { x: 0, y: creationPosition.y }
+      : creationPosition
   const common = {
     id,
     position: { desktop: position },
@@ -67,6 +72,21 @@ export function createEditorElement({
         assetId: request.assetId,
         label: DEFAULT_BUTTON_LABEL,
         link: { ...NO_ELEMENT_LINK },
+      }
+    case 'header':
+      return {
+        ...common,
+        kind: 'header',
+        logoAssetId: request.logoAssetId,
+        logoAssetMetadata: { ...request.logoAssetMetadata },
+        siteName: request.siteName,
+        subtitle: request.subtitle,
+        appearance: {
+          backgroundColor: DEFAULT_HEADER_APPEARANCE.backgroundColor,
+          textColor: DEFAULT_HEADER_APPEARANCE.textColor,
+          fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
+          frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
+        },
       }
   }
 

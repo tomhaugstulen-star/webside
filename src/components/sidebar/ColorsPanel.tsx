@@ -1,5 +1,8 @@
 import { useId } from 'react'
-import { getProjectColorGroups, type ProjectColorTarget } from '../../model/projectColorEntries'
+import {
+  getProjectColorGroups,
+  type ProjectColorTarget,
+} from '../../model/projectColorEntries'
 import { useEditorProject } from '../../state/useEditorProject'
 import { useProjectColors } from '../../state/useProjectColors'
 import { ColorSwatchInput } from '../colors/ColorSwatchInput'
@@ -11,6 +14,9 @@ export function ColorsPanel() {
     updateSectionBackgroundColor,
     updateSectionFrameColor,
     updateTextColor,
+    updateHeaderBackgroundColor,
+    updateHeaderTextColor,
+    updateHeaderFrameColor,
   } = useProjectColors()
   const idPrefix = useId()
   const groups = getProjectColorGroups(activePage)
@@ -28,6 +34,15 @@ export function ColorsPanel() {
         return
       case 'text-color':
         updateTextColor(target.elementId, value)
+        return
+      case 'header-background':
+        updateHeaderBackgroundColor(target.elementId, value)
+        return
+      case 'header-text':
+        updateHeaderTextColor(target.elementId, value)
+        return
+      case 'header-frame':
+        updateHeaderFrameColor(target.elementId, value)
         return
     }
 

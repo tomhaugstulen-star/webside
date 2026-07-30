@@ -16,11 +16,15 @@ const textFontStacks: Record<TextFontFamily, string> = {
   'courier-new': '"Courier New", Courier, monospace',
 }
 
+export function getTextFontFamilyCssValue(fontFamily: TextFontFamily) {
+  return textFontStacks[fontFamily]
+}
+
 export function getTextElementCssStyle(
   textStyle: TextElementStyle,
 ): CSSProperties {
   return {
-    fontFamily: textFontStacks[textStyle.fontFamily],
+    fontFamily: getTextFontFamilyCssValue(textStyle.fontFamily),
     fontSize: textStyle.fontSize,
     fontWeight: textStyle.fontWeight,
     fontStyle: textStyle.fontStyle,

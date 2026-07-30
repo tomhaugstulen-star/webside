@@ -5,7 +5,7 @@ import { isValidElementCreationRequest } from './isValidElementCreationRequest'
 import { useEditorProject } from './useEditorProject'
 
 export function useElementCreation() {
-  const { dispatch } = useEditorProject()
+  const { state, dispatch } = useEditorProject()
 
   const createElement = useCallback(
     (request: ElementCreationRequest) => {
@@ -13,16 +13,31 @@ export function useElementCreation() {
         return false
       }
 
+      const activePageExists = state.project.pages.some(
+        (page) => page.id === state.activePageId,
+      )
+      if (!activePageExists) {
+        return false
+      }
+
+      const elementId = createStableId()
+      const elementIdExists = state.project.pages.some((page) =>
+        page.elements.some((element) => element.id === elementId),
+      )
+      if (elementIdExists) {
+        return false
+      }
+
       dispatch({
         type: 'add-element-to-active-page',
-        elementId: createStableId(),
+        elementId,
         request,
         updatedAt: new Date().toISOString(),
       })
 
       return true
     },
-    [dispatch],
+    [dispatch, state.activePageId, state.project.pages],
   )
 
   return { createElement }

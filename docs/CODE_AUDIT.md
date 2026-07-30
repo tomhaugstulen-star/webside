@@ -1,230 +1,188 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den framtidsrettede auditen av fase 12 og grensene som skal beskytte senere lagring, import, historikk og responsive utvidelser.
+Dette dokumentet beskriver den framtidsrettede auditen av fase 13.
 
-## 1. Leveransestatus
-
-```text
-fase: 12 – prosjektfarger og Seksjon-rammer
-branch: feature/project-colors
-GitHub-sak: #28 – lukket som fullført
-PR: #29 – merget
-mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
-prosjektskjema: versjon 7
-implementering: ferdig
-manuell PC- og Telefon-test: godkjent
-rammebredde: Ingen eller 1–10 px
-sluttaudit: ferdig
-automatiske kontroller: bestått
-arkitekturrapporter: regenerert og committet i 1963088
-lokal main: brukeren har bekreftet clean tree etter merge
-```
-
-## 2. Arkitekturretning
-
-- `App.tsx` setter sammen providers og editorskall.
-- `EditorShell` eier skalltilstand og hovedkomposisjon.
-- `EditorProject` er autoritativ kilde for varige prosjektdata.
-- reducer-/state-laget er siste valideringsgrense.
-- lerret, høyremeny og venstremeny muterer ikke prosjektdata direkte.
-- fargeoversikten er avledet fra aktiv side og lagres ikke som en separat palett.
-- bildefil og Object URL ligger utenfor `EditorProject`.
-- responsive verdier lagres i prosjektmodellen, ikke i DOM-en.
-- generelle samlemapper og samlefiler skal ikke innføres.
-
-## 3. Filgrenser etter sluttaudit
+## Leveransestatus
 
 ```text
-reduceColorProjectAction.ts: 156 linjer
-projectColorEntries.ts: under 100 linjer
-ColorsPanel.tsx: under 100 linjer
-FramePropertiesSection.tsx: under 100 linjer
-useSectionAppearance.ts: under 100 linjer
-useProjectColors.ts: under 100 linjer
-alle nye og berørte produksjonsfiler: under 250 linjer
+fase: 13 – Logo og header
+branch: feature/logo-header
+GitHub-sak: #31
+pull request: #32 – åpen, ikke draft
+prosjektskjema: versjon 8
+funksjonell manuell test: godkjent
+dokumentasjon: synkronisert med faktisk kontrollstatus
+kodeopprydding: gjennomført
+automatisk sluttkontroll etter siste produksjonsendring: bestått
+merge: ikke godkjent
 ```
 
-250 linjer er aktiv terskel for ansvarstrekk. 300 linjer er hard unntaksgrense. Linjetall skal kontrolleres på nytt før senere PR-er; fase-12-tallene er ikke en varig garanti.
+## Arkitekturretning
 
-## 4. Prosjektskjema og fargemodell
+- `EditorProject` er eneste varige sannhetskilde.
+- Header er én egen sammensatt elementtype.
+- Filvalg ligger i venstremenyen.
+- Egenskaper ligger i høyremenyen.
+- Lerretet rendrer og transformerer.
+- Bilderessurslageret eier `File` og Object URL.
+- Reduceren er siste valideringsgrense.
+- Headerbredde avledes fra aktivt lerret og lagres ikke fra DOM.
 
-Prosjektskjemaet er versjon 7.
+## Auditfunn og tiltak
 
-Versjon 7 legger til:
+### 1. Duplisert ressursopprydding ved sletting
 
-- sidebakgrunn i `EditorPage.appearance`
-- Seksjon-bakgrunn og ramme i `SectionEditorElement.appearance`
-- tekstfarge i eksisterende `TextElementStyle`
+`EditorShell` og `useElementDeletion` forsøkte begge å rydde bilderessurser. Dette ga to ansvarssteder og kunne senere skape ulik behandling av Bilde og Header.
 
-`EditorColor` er kanonisk `#RRGGBB`. Gradienter, alpha og vilkårlige CSS-strenger inngår ikke.
+Tiltak:
 
-Seksjon-rammebredde er en lukket union fra `0` til `10`. `0` betyr `Ingen`. Menyetiketter genereres fra samme verdiliste som validatoren.
+- all ressursopprydding ligger nå i `useElementDeletion`
+- delte asset-ID-er kontrolleres på tvers av Bilde og Header
+- `EditorShell` håndterer bare dialog- og paneltilstand
 
-## 5. State- og reducergrenser
+### 2. Oppretting kunne rapportere suksess før alle reducerforutsetninger var kontrollert
 
-Reducerhandlinger avviser:
+`useElementCreation` returnerte `true` etter dispatch når requesten var gyldig, uten å kontrollere aktiv side eller en ekstrem ID-kollisjon. For filbaserte elementer kunne dette i teorien etterlate en registrert ressurs.
 
-- manglende aktiv side eller element
-- element på feil side
-- feil elementtype
-- låst Seksjon eller Tekst
-- ugyldig eller ikke-kanonisk farge
-- rammebredde utenfor `0–10`
-- uendret data
-- øvrige eksisterende layout-, knapp- og bildebrudd
+Tiltak:
 
-Ved avvisning returneres samme state. Prosjektet og `updatedAt` endres ikke.
+- aktiv side kontrolleres før dispatch
+- generert element-ID kontrolleres mot hele prosjektet
+- `false` returneres før ressursen beholdes dersom oppretting ikke kan gjennomføres
+- reduceren beholder de samme kontrollene som siste grense
 
-Fargehandlingene delegeres til `reduceColorProjectAction.ts`; den sentrale reduceren beholder komposisjonsansvar.
+### 3. Headerens lagrede x-verdi var ikke i samsvar med fullbredde-regelen
 
-Transient markering, pekerøkter, preview, drafts, panelstate, fargegrupper, filvelger, `File`, Object URL, fokus, hover, feedback og dialogstate serialiseres ikke.
+Header ble rendret ved `x = 0`, men tidligere oppretting kunne lagre standardposisjonen `x = 24`.
 
-## 6. Auditfunn og konklusjoner
+Tiltak:
 
-### Funn 1: farger lå tidligere i CSS
+- nye Header-elementer opprettes med `x = 0`
+- varige Header-layoutcommits normaliserer `x = 0`
+- lagret bredde normaliseres til én kanonisk skjemaverdi
+- synlig bredde fortsetter å følge aktivt lerret
 
-Side-, Seksjon- og tekstfarger er nå eksplisitte serialiserbare prosjektverdier. CSS og DOM er ikke lenger autoritativ fargekilde.
+### 4. Pekerhooken lå på filstørrelsesgrensen
 
-### Funn 2: en global palett ville koblet uavhengige elementer
+`useElementPointerTransform.ts` var 247 linjer og blandet React-livssyklus med rene transformberegninger.
 
-`Farger` avledes som én oppføring per konkret side-, element- og egenskapsmål. Like fargeverdier oppretter ingen kobling eller global erstatning.
+Tiltak:
 
-### Funn 3: avledet oversikt kunne blitt duplisert state
+- rene delta-, layout- og cropberegninger er trukket ut i `elementPointerTransform.ts`
+- hooken er redusert til 204 linjer
+- den nye rene hjelpefilen er 97 linjer
 
-Fargegruppene bygges fra aktiv side og stabile element-ID-er ved rendering. Oppretting, sletting, låsing og ramme av/på gjenspeiles uten separat lagring.
+### 5. Canvas-stilarket lå på filstørrelsesgrensen
 
-### Funn 4: høyre- og venstremeny kunne fått ulike verdier
+`canvas.css` var 248 linjer og blandet grunnlayout med interaksjonsstiler.
 
-Begge menyene bruker den samme prosjektverdien og samme delte fargekontroll. Det finnes ingen separat rammefarge for hvert panel.
+Tiltak:
 
-### Funn 5: rammebredde og etiketter kunne komme ut av synk
+- `canvas.css` inneholder nå grunnlayout og elementbasis
+- `canvas-interaction.css` inneholder resizegrep, objektverktøy, markering og transformtilstander
 
-Verdiene `0–10` ligger i én modelliste. UI mapper `0` til `Ingen` og øvrige verdier dynamisk til pikseltekst.
+### 6. Header kunne gli horisontalt under pointer-preview
 
-### Funn 6: publiserbar ramme kunne blandes med editorgrenser
+Den varige layoutcommiten normaliserte `x = 0`, men pointer-preview sendte tidligere både horisontalt og vertikalt delta til den generelle flyttelogikken. Header kunne derfor gli sideveis under drag og hoppe tilbake ved slipp.
 
-Seksjon-rammen beregnes fra prosjektmodellen. Selection-outline og tekstens stiplede editorgrense forblir editorhjelp og serialiseres ikke.
+Tiltak:
 
-### Funn 7: bred ramme kunne endre elementgeometri
+- pointer-preview normaliserer Header-delta til `{ x: 0, y: delta.y }`
+- andre elementtyper beholder fri todimensjonal flytting
+- varig Header-layout normaliserer fortsatt `x = 0` som siste modellgrense
 
-`box-sizing: border-box` gjør at rammen opptar plass innenfor elementets lagrede bredde og høyde. Farge- og rammeendringer muterer ikke layout.
+### 7. Header-låsing var ikke ønsket produktoppførsel
 
-### Funn 8: låste elementer kunne omgås via `Farger`
+Header arver `locked` fra versjon-8-basemodellen, men brukeren besluttet at Header ikke skal ha låsing.
 
-Låste grupper vises for oversikt, men kontrollene er deaktivert. Reduceren avviser fortsatt mutasjon dersom UI-grensen omgås.
+Tiltak:
 
-### Funn 9: knappefarger kunne få konkurrerende modeller
+- objektverktøyet viser ikke låseknapp for Header
+- høyrepanelet viser ikke `Låst/Ulåst` for Header
+- `toggleElementLock` avviser Header som siste stategrense
+- Seksjon, Bilde, Tekst og Knapp beholder eksisterende låsing
+- nye Header-elementer opprettes fortsatt med `locked: false` for skjemakompatibilitet
+- framtidig prosjektimport må avvise eller normalisere Header med `locked: true`
 
-Knapper beholder ferdig SVG-fargedesign. Fase 12 legger ikke CSS-overstyringer oppå assetene og oppretter ingen knappefarge i prosjektmodellen.
+### 8. Header-opprettingen hadde en ekstra avslutningscallback
 
-### Funn 10: bilder kunne feilaktig opptre i fargeoversikten
+Den generelle opprettingsflyten lukket allerede venstrepanelet. Header-komponenten kalte i tillegg `onCreated()` etter vellykket oppretting. En senere feil i denne ekstra callbacken kunne utløse catch-blokken etter at prosjektet allerede eide Headeren.
 
-Bilder har ingen prosjektfarge og utelates. Bilderessurslager, crop og import berøres ikke.
+Tiltak:
 
-### Funn 11: responsive farger kunne bli implisitte
+- den ekstra `onCreated`-callbacken er fjernet
+- venstrepanelet lukkes bare av den felles opprettingsflyten
+- `registeredAssetId` nullstilles straks prosjektet har overtatt logoressursen
+- catch-blokken rydder bare en ressurs som fortsatt eies av den lokale opprettingsøkten
 
-Versjon 7 lagrer farger felles for PC og Telefon. Eventuelle responsive farger krever eksplisitt senere modell, validering og viewport-spesifikke actions.
+## Headerinvarianter
 
-### Funn 12: framtidig import må håndtere versjon 6
+- skjemaversjon 8
+- logoasset og metadata er serialiserbare
+- `File`, Blob, Object URL og lokal filsti er transient
+- navn er normalisert, obligatorisk og maks 80 tegn
+- undertittel er normalisert, valgfri og maks 120 tegn
+- full aktiv sidebredde
+- horisontal flytting og resizing er blokkert
+- høyde 70–100 px
+- navn og undertittel deler font og tekstfarge
+- Header eksponerer ikke låsing eller låsestatus
+- reduceren avviser Header-låsehandlinger
+- ugyldige og uendrede handlinger returnerer samme state
 
-Det finnes ennå ingen import- eller migreringsmotor. Framtidig import må migrere eller avvise versjon 6 kontrollert og validere alle nye appearance- og fargefelt før `replace-project`.
+## Ressurslivssyklus
 
-## 7. Rendering og ansvarsdeling
+Auditen bekrefter:
 
-- sidebakgrunn rendres fra `EditorPage.appearance`
-- Seksjon-bakgrunn og ramme rendres gjennom en ren stilfunksjon
-- tekstfarge inngår i eksisterende tekststilfunksjon
-- `EditorCanvasElement.tsx` eier ikke fargevalidering
-- `RightPropertiesPanel.tsx` forblir komposisjon
-- `ColorsPanel.tsx` avleder visning og sender intensjoner gjennom hooks
-- reduceren er autoritativ for gyldighet og faktisk mutasjon
+- fil og metadata kontrolleres ved registrering
+- mislykket oppretting rydder registrert ressurs
+- vellykket Header-oppretting overfører ressursansvar før lokal UI-opprydding
+- sletting rydder bare asset som ikke lenger refereres
+- deling mellom Bilde og Header støttes
+- provider-unmount tilbakekaller gjenværende Object URL-er
+- ingen Object URL lagres i prosjektmodellen
 
-## 8. Tilgjengelighet
+Logo- eller tekstbytte etter oppretting er ikke del av fase 13. Det finnes derfor ingen delvis implementert bytteflyt som kan etterlate foreldede ressurser.
 
-- fargekontrollen bruker native `input type="color"`
-- kontrollen har tilgjengelig navn med nåværende farge
-- fokusmarkering er synlig
-- låste kontroller er deaktivert
-- gruppen viser låsestatus
-- panelet forblir åpent etter fargeendring
-- `prefers-reduced-motion` for eksisterende panelanimasjon respekteres
+## Responsiv grense
 
-## 9. Manuell godkjenning
+- Headerbredde måles med `ResizeObserver` og er transient rendering.
+- Y og høyde lagres foreløpig i desktopverdien.
+- Telefon arver disse verdiene.
+- Fase 15 må innføre viewport-spesifikke actions før mobilverdier kan redigeres.
 
-Godkjent på PC og Telefon:
+## Filstørrelser
 
-- blank side viser bare sidebakgrunn
-- sidebakgrunn endres uavhengig
-- flere Seksjoner kan ha samme farge og endres uavhengig
-- ramme `Ingen` skjuler rammeoppføringen i `Farger`
-- ramme `1–10 px` rendres innenfor elementet
-- rammefarge synkroniseres mellom høyremeny, `Farger` og lerret
-- tekstfarge endrer bare konkret Tekst-element
-- låste Seksjoner og Tekster kan ikke endres
-- slettede elementer fjernes fra oversikten
-- Knapp og Bilde vises ikke i `Farger`
-- PC og Telefon viser samme farger
-- eksisterende bilde-, tekst-, knapp-, flytte- og resizefunksjonalitet fungerer
+Siste Header-låse- og opprettingsopprydding:
 
-## 10. Verifisert sluttkontroll
+```text
+HeaderCreationControl.tsx       224
+EditorCanvasElement.tsx         223
+RightPropertiesPanel.tsx        105
+SidebarPanels.tsx                95
+ElementSelectionToolbar.tsx      83
+toggleElementLock.ts             40
+```
 
-Brukerens lokale terminaloutput etter siste produksjonsendring:
+Alle er under aktiv terskel på 250 linjer.
+
+## Verifisert kontroll
+
+Brukerens terminaloutput etter siste produksjonsendring på `8c7c7a0` bekrefter:
 
 ```text
 ESLint: bestått
 TypeScript: bestått
-Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
-Vite: 111 moduler transformert
-CSS: 33.62 kB, gzip 6.34 kB
-JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 192 ms
-git diff --check: ingen whitespace-feil
+Dependency Cruiser: 113 moduler, 324 avhengigheter, ingen brudd
+Vite: 122 moduler transformert
+CSS: 36.54 kB, gzip 6.80 kB
+JavaScript: 275.80 kB, gzip 81.65 kB
+produksjonsbuild: bestått på 206 ms
+working tree: clean før og etter kontroll
 ```
 
-Arkitekturrapportene ble regenerert og committet i `1963088`, som inngikk i PR #29. De siste committene før merge endret bare autoritativ dokumentasjon; produksjonskoden og rapportene var uendret etter den verifiserte kontrollen.
+Manuell regresjon av Header, logooppretting, objektverktøy, høyrepanel, font, ramme, farger, sletting, delt asset-livssyklus og eksisterende låsing for andre elementtyper er godkjent av brukeren.
 
-## 11. Obligatoriske grenser for senere faser
+## Konklusjon
 
-### Prosjektimport
-
-- valider hele prosjektobjektet før `replace-project`
-- krev kjent skjemaversjon
-- migrer eller avvis versjon 6 kontrollert
-- valider sideutseende, Seksjon-utseende, rammebredde og alle farger
-- ikke la importert metadata opprette Object URL uten en faktisk validert fil
-
-### Prosjektbytte
-
-- avstem eller tøm bilderessursbufferen
-- tilbakekall URL-er som ikke lenger tilhører aktivt prosjekt
-
-### Angre og gjør om
-
-- historikk inneholder bare serialiserbar prosjektstate
-- `File`, Object URL og aktive pekerøkter skal aldri inngå
-
-### Mobiloverstyringer
-
-- bruk viewport-spesifikke geometrihandlinger
-- responsive farger krever eksplisitte actions og modellfelt
-- ikke skriv mobilendringer inn i desktopfeltet
-
-### Autolagring
-
-- reager bare på gyldige prosjektmutasjoner
-- ikke lagre transient editor-, panel- eller ressursstate direkte
-
-## 12. Auditkonklusjon
-
-Fase 12 ble merget etter:
-
-- framtidsrettet statisk audit av produksjonsendringene
-- kontroll av filstørrelser og ansvar
-- bestått `npm run check`
-- godkjent manuell PC- og Telefon-test
-- regenererte og kontrollerte arkitekturrapporter
-- synkronisert og clean feature-branch
-- kontrollert PR-head, base, changed files, reviews, tråder og CI-status
-- eksplisitt brukergodkjenning
-
-Ingen kjent statisk blokkerer gjenstår fra fase 12. Neste produksjonsfase skal starte på en ny branch fra oppdatert `main` etter at post-merge-dokumentasjonen er synkronisert.
+Ingen kjent kode- eller funksjonsblokkerer står igjen. PR #32 må fortsatt kontrolleres for samlet diff, mergebarhet, reviews, uløste tråder og CI. Merge er blokkert til brukeren gir eksplisitt godkjenning.

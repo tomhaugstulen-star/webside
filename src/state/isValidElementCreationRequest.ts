@@ -1,6 +1,10 @@
 import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import {
+  isValidHeaderSiteName,
+  isValidHeaderSubtitle,
+} from '../model/headerElement'
+import {
   isImageAssetId,
   isValidImageAssetMetadata,
 } from '../model/imageAsset'
@@ -19,6 +23,13 @@ export function isValidElementCreationRequest(
       )
     case 'button':
       return findButtonAsset(request.assetId) !== null
+    case 'header':
+      return (
+        isImageAssetId(request.logoAssetId) &&
+        isValidImageAssetMetadata(request.logoAssetMetadata) &&
+        isValidHeaderSiteName(request.siteName) &&
+        isValidHeaderSubtitle(request.subtitle)
+      )
   }
 
   const unhandledRequest: never = request

@@ -1,4 +1,5 @@
 import {
+  getMaximumElementSize as getConfiguredMaximumElementSize,
   getMinimumElementSize as getConfiguredMinimumElementSize,
   type ElementKind,
   type ElementSize,
@@ -63,13 +64,20 @@ export function resizeElementLayout(
   maximumSize?: ElementSize,
 ): ElementLayout {
   const minimumSize = getElementMinimumSize(kind)
+  const configuredMaximumSize = getConfiguredMaximumElementSize(kind)
   const maximumWidth = Math.max(
     minimumSize.width,
-    maximumSize?.width ?? Number.POSITIVE_INFINITY,
+    Math.min(
+      maximumSize?.width ?? Number.POSITIVE_INFINITY,
+      configuredMaximumSize?.width ?? Number.POSITIVE_INFINITY,
+    ),
   )
   const maximumHeight = Math.max(
     minimumSize.height,
-    maximumSize?.height ?? Number.POSITIVE_INFINITY,
+    Math.min(
+      maximumSize?.height ?? Number.POSITIVE_INFINITY,
+      configuredMaximumSize?.height ?? Number.POSITIVE_INFINITY,
+    ),
   )
   let left = initialLayout.position.x
   let top = initialLayout.position.y
@@ -128,6 +136,7 @@ export function elementLayoutsEqual(first: ElementLayout, second: ElementLayout)
 
 export function isValidElementLayout(kind: ElementKind, layout: ElementLayout) {
   const minimumSize = getElementMinimumSize(kind)
+  const maximumSize = getConfiguredMaximumElementSize(kind)
   const values = [
     layout.position.x,
     layout.position.y,
@@ -140,7 +149,9 @@ export function isValidElementLayout(kind: ElementKind, layout: ElementLayout) {
     layout.position.x >= 0 &&
     layout.position.y >= 0 &&
     layout.size.width >= minimumSize.width &&
-    layout.size.height >= minimumSize.height
+    layout.size.height >= minimumSize.height &&
+    layout.size.width <= (maximumSize?.width ?? Number.POSITIVE_INFINITY) &&
+    layout.size.height <= (maximumSize?.height ?? Number.POSITIVE_INFINITY)
   )
 }
 

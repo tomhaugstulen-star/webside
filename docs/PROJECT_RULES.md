@@ -1,199 +1,114 @@
 # Prosjektregler
 
-Dette dokumentet fastsetter arbeidsmåte, arkitekturgrenser og produktansvar for Website-editoren.
+Dette dokumentet fastsetter varige arbeids-, modell- og arkitekturgrenser.
 
-## 1. Repo- og branchkontroll
+## Branch og merge
 
-Faktisk branch- og `main`-HEAD leses alltid fra Git.
+- Det utvikles aldri direkte på `main`.
+- Hver avgrenset leveranse bruker egen feature- eller docs-branch.
+- Faktisk branch, `origin/main`, PR-head og clean tree leses fra Git eller GitHub.
+- Ingen funksjon for en senere fase legges inn skjult.
+- Ingen branch merges uten eksplisitt brukergodkjenning.
+- Lokal kontrollstatus påstås bare når terminaloutput er vist.
 
-```powershell
-git fetch origin
-git status
-git log -6 --oneline --decorate
-```
-
-Regler:
-
-- utvikling skjer aldri direkte på `main`
-- hver funksjon eller dokumentasjonsfase har en avgrenset branch
-- `main` skal være stabil
-- branchen synkroniseres kontrollert dersom den ligger bak `main`
-- ingen skjult funksjonalitet for senere faser legges inn
-- merge krever eksplisitt brukergodkjenning
-- ny produksjonsbranch starter først etter godkjent merge og oppdatert lokal `main`
-- lokal teststatus og clean tree bekreftes bare fra faktisk terminaloutput
-
-Gjeldende status:
+## Filstørrelse og ansvar
 
 ```text
-siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
-GitHub-sak: #28 – lukket som fullført
-PR: #29 – merget
-mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
-prosjektskjema: versjon 7
-implementering, audit og manuell test: godkjent
-automatiske kontroller: bestått
-arkitekturrapporter: regenerert og committet i 1963088
-lokal main: brukeren har bekreftet clean tree etter merge
-aktiv docs-branch: docs/phase-12-handover
-neste produksjonsfase: fase 13 – Logo og header, omfang ikke låst
+aktiv terskel: 250 linjer
+hard unntaksgrense: 300 linjer
 ```
 
-## 2. Filstørrelser og ansvar
+- Filer deles etter reelt modell-, state-, hook-, UI- eller stilansvar.
+- `App.tsx` setter bare sammen providers og hovedskall.
+- `EditorShell` koordinerer skalltilstand og komposisjon.
+- `RightPropertiesPanel.tsx` forblir komposisjon.
+- Canvas eier ikke filvalg eller ressurslagring.
+- CSS deles etter editorområde og komponentansvar.
+- Ingen tilfeldig samlemappe eller samlefil opprettes.
 
-- 250 linjer er aktiv terskel for ansvarstrekk
-- 300 linjer er hard unntaksgrense
-- linjetall kontrolleres før en stor fil utvides og igjen før PR
-- filer deles etter ansvar, ikke tilfeldig eller mekanisk
-- `App.tsx` setter bare sammen hovedproviders og skall
-- `EditorShell` koordinerer skalltilstand og komposisjon
-- `RightPropertiesPanel.tsx` forblir komposisjon
-- canvas eier ikke filvalg eller ressurslagring
-- store CSS-filer deles etter editorområde
-- motstridende regler for samme komponent skal ikke fordeles mellom generelle og spesifikke stilark
-- tilfeldig generell `features`-mappe eller samlefil skal ikke innføres
+## Autoritativ prosjektmodell
 
-Etter fase-12-auditen:
-
-```text
-alle nye og berørte produksjonsfiler: under 250 linjer
-reduceColorProjectAction.ts: 156 linjer
-projectColorEntries.ts: under 100 linjer
-ColorsPanel.tsx: under 100 linjer
-FramePropertiesSection.tsx: under 100 linjer
-```
-
-Disse tallene skal kontrolleres på nytt etter senere endringer.
-
-## 3. Autoritativ prosjektmodell
-
-- `EditorProject` eier alle varige prosjektdata
-- gjeldende prosjektskjema er versjon 7
-- DOM-en er ikke permanent lagring
-- CSS er ikke permanent fargelagring
-- Object URL er ikke prosjektdata
-- ID-er er stabile og kryptografisk generert
-- reduceren er deterministisk for samme state og action
-- `updatedAt` endres bare ved reell og gyldig prosjektmutasjon
+- Gjeldende prosjektskjema er versjon 8.
+- `EditorProject` eier alle varige, serialiserbare prosjektdata.
+- DOM og CSS er rendering, ikke permanent lagring.
+- `File`, Blob, Object URL og lokal filsti er ikke prosjektdata.
+- ID-er er stabile og kryptografisk generert.
+- Alle varige endringer går gjennom typede reducerhandlinger.
+- Reduceren er siste valideringsgrense.
+- Ugyldige, låste og uendrede handlinger returnerer samme state.
+- `updatedAt` endres bare ved gyldig reell mutasjon.
+- Låseendringer beregnes fra reducerens nyeste state, ikke fra en mulig foreldet UI-verdi.
+- Header opprettes med `locked: false`, eksponerer ingen låsekontroll og avvises av låsereduceren.
+- Framtidig prosjektimport må avvise eller normalisere Header med `locked: true`.
 
 Skjemahistorikk:
 
 ```text
-versjon 1  grunnmodell
-versjon 2  tekstinnhold
-versjon 3  tekststil
-versjon 4  elementlenke
-versjon 5  knappasset, knappetekst og knappelenke
-versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
-versjon 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
+1  grunnmodell
+2  tekstinnhold
+3  tekststil
+4  elementlenke
+5  knappasset, knappetekst og knappelenke
+6  bildeasset, metadata, alternativ tekst, visning og utsnitt
+7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
+8  Header med logo, tekst, utseende og ramme
 ```
 
-## 4. Varig og transient state
+## Varig og transient state
 
-Varig prosjektdata omfatter:
+Varig:
 
-- sider og elementer
-- sidebakgrunn
-- responsiv geometri og synlighet
-- låsestatus
-- Seksjon-bakgrunn og ramme
-- tekstinnhold, tekststil, tekstfarge og lenke
-- knappens asset-ID og label
-- bildets asset-ID, metadata, alt-tekst, modus og transform
+- prosjekt, sider og elementer
+- posisjon, størrelse og synlighet
+- låsestatus for Seksjon, Bilde, Tekst og Knapp
+- Headerens kompatibilitetsfelt `locked`, alltid `false` i dagens opprettings- og reducerflyt
+- side- og elementutseende
+- tekst, lenker og asset-ID-er
+- bilde- og logometadata
 - tidsstempler
 
-Transient state omfatter:
+Transient:
 
-- markering og aktivt verktøy
+- markering og åpne paneler
 - pekerøkter og preview
-- åpne paneler og dialoger
-- redigerings- og formulardrafts
-- filvelger og feedback
+- lokale drafts og valideringsfeedback
+- filvelger
 - `File`, Object URL og ressurskart
-- fokus, hover og animasjon
-- avledede fargegrupper i UI
+- dialoger, fokus, hover og animasjon
 
-Transient state skal ikke serialiseres, publiseres eller inngå direkte i historikk eller autolagring.
+Transient state serialiseres ikke og inngår ikke direkte i historikk eller autolagring.
 
-## 5. State- og reducergrenser
+## Element- og layoutregler
 
-Alle varige endringer går gjennom typede actions.
+- Seksjon, Bilde, Tekst og Knapp bruker fri todimensjonal geometri.
+- Header rendres alltid fra `x = 0` til hele den synlige sidebredden.
+- Header kan bare flyttes vertikalt.
+- Headerhøyde valideres til 70–100 px.
+- Headerens lagrede horisontale felt normaliseres deterministisk og er ikke brukerredigerbare.
+- Header er ikke låsbar og viser ikke låsestatus.
+- Elementer kan overlappe; andre elementer flyttes ikke automatisk.
+- Lerretshøyde er avledet visning og lagres ikke.
+- Pekerpreview er transient; normalt pekerslipp gir én varig commit.
+- Pekertransformer bruker pointer capture gjennom hele den aktive pekerøkten.
+- Preview-delta inkluderer endringer i lerretets scrollposisjon.
+- Auto-scroll kan flytte scrollcontaineren, men skriver ikke prosjektstate før transformen committes.
+- `pointercancel` og tapt pointer capture forkaster preview.
 
-Reducergrensene avviser:
+## Farger og rammer
 
-- manglende aktiv side eller element
-- element på feil side
-- duplisert element-ID
-- feil elementtype
-- låst element
-- ugyldig eller ikke-finit verdi
-- ugyldig eller ikke-kanonisk farge
-- rammebredde utenfor `0–10`
-- ukjent knappasset-ID
-- ugyldig bildeasset eller metadata
-- ukjent visningsmodus
-- ugyldig transform
-- crop-ramme som ikke kan fylles ved aktuell zoom
-- inkonsistent bilderamme og transform
-- uendret data
+- `EditorColor` er kanonisk `#RRGGBB`.
+- Rammebredde er `0–10`, der `0` betyr `Ingen`.
+- Rammefarge beholdes når rammen slås av.
+- `Farger` avledes fra aktiv side og lagres ikke som egen palett.
+- Seksjon og Header kan ha bakgrunn og ramme.
+- Tekst og Header har tekstfarge.
+- Headerens navn og undertittel deler font og tekstfarge.
+- Knapper beholder ferdig SVG-fargedesign.
+- Bilder har ingen prosjektfarge.
 
-Ved avvisning returneres samme state og `updatedAt` endres ikke.
+## Bilde- og logoressurser
 
-## 6. Prosjektfarger og rammer
-
-Autoritativ fargemodell:
-
-```text
-EditorColor = #RRGGBB
-sidebakgrunn = page.appearance.backgroundColor
-Seksjon-bakgrunn = section.appearance.backgroundColor
-Seksjon-rammebredde = 0..10
-Seksjon-rammefarge = section.appearance.frame.color
-tekstfarge = text.textStyle.color
-```
-
-Regler:
-
-- `Farger` avledes fra aktiv side og lagres ikke som egen palett
-- hver kontroll muterer bare én konkret egenskap
-- like fargeverdier kobler ikke elementer sammen
-- rammefargen vises i `Farger` bare når bredden er større enn `0`
-- rammefargen beholdes når bredden settes til `0`
-- høyremeny og venstremeny skriver til samme verdi
-- selection-outline og tekstens editorgrense er ikke publiserbare rammer
-- knapper beholder ferdig SVG-fargedesign
-- bilder har ingen prosjektfarge
-- fargene er felles for PC og Telefon i versjon 7
-
-## 7. Elementstørrelser og layout
-
-Standard- og minimumsstørrelser har én modellkilde.
-
-```text
-Standard:
-Seksjon  320 × 180 px
-Bilde    240 × 160 px
-Tekst    240 × 96 px
-Knapp    160 × 48 px
-
-Minimum:
-Seksjon  160 × 90 px
-Bilde    120 × 80 px
-Tekst    120 × 48 px
-Knapp    80 × 36 px
-```
-
-- elementer kan overlappe
-- andre elementer flyttes ikke automatisk
-- flytting og resizing beregnes av rene modellfunksjoner
-- pekerbevegelse bruker transient preview
-- normalt pekerslipp gir én commit
-- `pointercancel` og tapt capture forkaster draft
-- låste elementer kan markeres, men ikke muteres
-- Seksjon-rammen bruker `box-sizing: border-box` og endrer ikke ytre størrelse
-- lerretshøyde er avledet visning og lagres ikke
-
-## 8. Bildeimport og ressurslivssyklus
+Støttede filer:
 
 ```text
 PNG
@@ -204,101 +119,42 @@ maks 40 megapiksler
 maks 16 384 px per side
 ```
 
-- type, filstørrelse, filnavn, dekoding og dimensjoner valideres før oppretting
-- avbrutt filvalg muterer ikke prosjekt eller `updatedAt`
-- import etter panel-unmount oppretter ikke ressurs eller element
-- ressurslageret kontrollerer faktisk fil mot metadata
-- mislykket oppretting rydder registrert ressurs
-- sletting tilbakekaller URL når asset ikke deles
-- provider-unmount tilbakekaller alle gjenværende URL-er
-- manglende ressurs gir kontrollert fallback
+- Fil og metadata valideres før elementoppretting.
+- Ressurslageret kontrollerer faktisk fil mot metadata.
+- Mislykket oppretting rydder registrert ressurs.
+- Etter vellykket Header-oppretting overføres eierskapet til logoressursen før lokal UI-opprydding.
+- Sletting fjerner en ressurs bare når ingen andre elementer refererer til asset-ID-en.
+- Deling kontrolleres på tvers av Bilde og Header.
+- Provider-unmount tilbakekaller alle gjenværende Object URL-er.
+- Ressursopprydding skal ha ett ansvarssted; UI-skallet skal ikke duplisere den.
 
-Crop-grunnrammen for versjon 6 er fortsatt `240 × 160 px`. Endring krever ny skjemaversjon og migrering.
-
-## 9. Interaksjon og tilgjengelighet
-
-```text
-Enter / mellomrom  markerer fokusert element
-piltast             flytter ulåst element
-Shift + piltast     flytter 10 px
-Ctrl/Cmd + piltast  endrer størrelse
-Alt + piltast       flytter crop-motiv 4 px
-Shift+Alt+piltast   flytter crop-motiv 20 px
-vanlig dra på crop  flytter motivet
-Shift + dra         flytter hele rammen
-Delete              åpner slettebekreftelse
-```
-
-- låste elementer kan fokuseres og inspiseres
-- tekstredigering skiller objektmarkering fra innholdsredigering
-- native fargekontroller har tilgjengelige navn og synlig fokus
-- feil og status bruker riktige live-regionroller
-- `prefers-reduced-motion` respekteres
-
-## 10. Menyansvar
+## Menyansvar
 
 ```text
 Venstremeny = opprette elementer, velge fil/design og vise prosjektoversikt
 Høyremeny  = egenskaper og handlinger for markert element
-Lerretet   = redigere og transformere
-Ressurslag = eie transient bildefil og renderings-URL
+Lerretet   = redigere innhold og transformere elementer
+Ressurslag = eie transient fil og Object URL
+Prosjekt   = eie serialiserbare verdier
 ```
 
-Høyremenyen følger `selectedElementId`, eier ingen separat elementkopi og muterer ikke prosjektdata direkte.
+## Responsiv grense
 
-## 11. Responsiv grense
+- Telefon arver desktopverdier når mobiloverstyring mangler.
+- Dagens UI oppretter ikke mobiloverstyringer.
+- Header følger aktiv sidebredde i begge visninger og deler y/høyde foreløpig.
+- Senere mobilendringer må bruke eksplisitte viewport-spesifikke actions.
+- Mobilendringer skal ikke skrives inn i desktopfeltet ved en feil.
 
-- Telefon arver desktopverdier når mobiloverstyring mangler
-- dagens UI oppretter ikke mobiloverstyringer
-- innhold, stil, lenker, låsestatus, farger og bildeutsnitt er foreløpig felles
-- senere mobiloverstyringer må bruke viewport-spesifikke actions
-- responsive farger krever eksplisitt modellstøtte
-- mobilendringer skal ikke skrives inn i desktopfeltet
-
-## 12. Krav til senere faser
-
-### Prosjektimport
-
-- valider hele eksterne prosjektobjektet før `replace-project`
-- krev kjent skjemaversjon
-- valider unike ID-er, sider, uniontyper, layout, farger og bildeinvarianter
-- migrer eller avvis versjon 6 og ukjent skjema kontrollert
-
-### Prosjektbytte
-
-- avstem eller tøm ressursbufferen
-- tilbakekall foreldede Object URL-er
-
-### Angre og gjør om
-
-- historikk lagrer bare serialiserbar prosjektstate
-- `File`, Object URL og aktive interaksjoner inngår ikke
-
-### Autolagring
-
-- reager på gyldige prosjektmutasjoner
-- transient editor- og ressursstate lagres ikke direkte
-
-## 13. Kvalitetskrav
+## Kvalitetskontroll
 
 ```powershell
 npm run check
 npm run architecture:json
 npm run architecture:diagram
 git diff --check
+git status --short
+git diff --stat
 ```
 
-Siste verifiserte kontroll:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
-Vite: 111 moduler transformert
-CSS: 33.62 kB, gzip 6.34 kB
-JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 192 ms
-git diff --check: ingen whitespace-feil
-```
-
-Arkitekturrapportene ble regenerert og committet i `1963088`, som inngikk i PR #29. Fase 12 er merget. Post-merge-dokumentasjonen ferdigstilles på `docs/phase-12-handover` før fase 13 avgrenses.
+Før PR kontrolleres også filstørrelser, framtidige import-/historikkgrenser, ressurslivssyklus, tilgjengelighet, regresjoner, PR-diff, mergebarhet, reviews, uløste tråder og CI.
