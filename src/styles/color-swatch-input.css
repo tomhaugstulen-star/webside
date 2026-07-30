@@ -1,7 +1,7 @@
 .color-swatch-input {
   display: grid;
   gap: 7px;
-  color: var(--text);
+  color: var(--portal-text);
   font-size: 14px;
   font-weight: 600;
 }
@@ -18,9 +18,9 @@
   box-sizing: border-box;
   flex: 0 0 auto;
   padding: 3px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--portal-border-strong);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--portal-control-surface);
   cursor: pointer;
 }
 
@@ -35,22 +35,25 @@
 }
 
 .color-swatch-input input[type='color']:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
+  background: var(--portal-control-hover);
 }
 
 .color-swatch-input input[type='color']:focus-visible {
-  outline: 3px solid rgba(143, 67, 47, 0.24);
+  outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
 }
 
 .color-swatch-input input[type='color']:disabled {
+  background: var(--portal-control-disabled);
+  border-color: var(--portal-border);
   cursor: not-allowed;
-  opacity: 0.58;
+  opacity: 0.72;
 }
 
 .color-swatch-input__value {
-  color: var(--muted);
+  color: var(--portal-text-muted);
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 13px;
   font-weight: 600;
