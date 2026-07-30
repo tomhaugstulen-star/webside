@@ -1,6 +1,6 @@
 # Mobiltilpasset design og viewport-overstyringer
 
-Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt fase og endrer ikke dagens midlertidige responsive oppførsel.
+Dette dokumentet fastsetter retningen for responsiv redigering i Website-editoren. Det er en planlagt leveranse og endrer ikke dagens midlertidige responsive oppførsel.
 
 ## 1. Formål
 
@@ -8,23 +8,18 @@ Brukeren skal kunne lage ett desktop-oppsett og deretter tilpasse utvalgte egens
 
 Målet er ikke to uavhengige nettsider. Mobil skal arve desktop som standard og bare lagre eksplisitte forskjeller.
 
-Planlagt branch:
-
-```text
-feature/mobile-design-controls
-```
-
-Branchen er ikke aktiv før fasen er eksplisitt valgt og godkjent.
+Planlagt branch opprettes først når leveransen velges eksplisitt.
 
 ## 2. Dagens midlertidige oppførsel
 
-Før denne fasen er implementert:
+Før denne leveransen er implementert:
 
 - PC og Telefon renderer samme desktopgeometri når ingen mobilverdi finnes
 - flytting og resizing i Telefon-visning committer til desktopgeometrien
 - en endring i Telefon påvirker derfor også PC
 - ingen mobiloverstyring opprettes skjult
-- Header følger full aktiv lerretsbredde og deler foreløpig y og høyde med desktop
+- Header følger full aktiv lerretsbredde og fast topposisjon
+- Headerens høyde og typografi er foreløpig felles for PC og Telefon
 
 Denne oppførselen er kontrollert som midlertidig grunnlag. Den skal ikke videreføres som endelig responsiv redigering.
 
@@ -52,7 +47,7 @@ type ResponsiveValue<T> = {
 
 ## 4. Første versjon av mobiloverstyringer
 
-Første versjon bør støtte:
+Første versjon for frie elementer bør støtte:
 
 - posisjon
 - bredde og høyde
@@ -67,7 +62,12 @@ Disse egenskapene vurderes senere og skal ikke blandes inn uten egen beslutning:
 - bildebeskjæring
 - innholdsrekkefølge
 
-Header krever en eksplisitt regel fordi synlig bredde er full viewportbredde. Før fase 15 må det avgjøres om bare y og høyde kan overstyres på mobil, mens bredden fortsatt avledes.
+Header krever en eksplisitt regel:
+
+- `x = 0` og `y = 0` er faste i alle viewporter
+- synlig bredde avledes fra aktiv viewport
+- første mobilversjon kan vurdere egen høyde og synlighet
+- fri posisjon eller bredde for Header krever en ny produktmodell
 
 ## 5. Brukergrensesnitt
 
@@ -80,7 +80,7 @@ Telefon-visningen skal tydelig vise om valgt element:
 Nødvendige handlinger:
 
 - **Lag eget mobiloppsett** eller automatisk oppretting ved første mobilendring
-- **Bruk PC-oppsett** for å fjerne posisjons- og størrelsesoverstyringen
+- **Bruk PC-oppsett** for å fjerne overstyringen
 - **Skjul på mobil**
 - **Vis på mobil** eller reset til arvet synlighet
 
@@ -105,7 +105,7 @@ Reducerregler:
 - reset-action fjerner mobilverdiene i stedet for å kopiere desktopverdien
 - ukjent, låst, ugyldig eller uendret layout ignoreres
 - transient pointer-preview forblir utenfor `EditorProject`
-- Headerens fullbreddeinvariant må håndheves uavhengig av viewport
+- Headerens fast-topp- og fullbreddeinvariant håndheves uavhengig av viewport
 
 ## 7. Oppretting av nye elementer
 
@@ -117,6 +117,8 @@ Før implementering må én regel velges og dokumenteres:
 Første alternativ er enklest og mest forutsigbart. Andre alternativ krever en tydelig regel for hvor elementet skal ligge på desktop.
 
 Det skal ikke opprettes bare-mobil-elementer uten en egen produktbeslutning.
+
+Header opprettes alltid med fast `x = 0, y = 0` og kan ikke få en mobilposisjon.
 
 ## 8. Skjuling
 
@@ -136,7 +138,7 @@ Når historikk og autolagring finnes:
 - én ferdig mobiltransform er én prosjektendring
 - oppretting av en mobiloverstyring er en varig prosjektmutasjon
 - reset til PC-oppsett er en varig prosjektmutasjon
-- transient preview inngår ikke i historikk eller lagring
+- transient preview og alignment-guider inngår ikke i historikk eller lagring
 - eksport og import må bevare både arv og eksplisitte mobilverdier
 
 ## 10. Forhåndsvisning og publisering
@@ -152,7 +154,7 @@ Publisering skal generere:
 
 ## 11. Akseptansekriterier
 
-Fasen er ikke ferdig før dette er bekreftet:
+Leveransen er ikke ferdig før dette er bekreftet:
 
 - et element uten mobiloverstyring følger desktopendringer
 - første mobilendring kan opprette eget mobiloppsett
@@ -163,11 +165,11 @@ Fasen er ikke ferdig før dette er bekreftet:
 - status for arv, overstyring og skjuling er tydelig
 - peker og tastatur bruker samme viewport-bevisste layoutregler
 - desktop og mobil har samme clamping- og minimumsmålregler der de gjelder
-- Header beholder fullbreddeinvarianten
+- Header forblir fast øverst og full bredde
 - historikk og lagring kan senere behandle én ferdig transform som én endring
 - `npm run check` og separate desktop-/mobiltester er bestått
 
-## 12. Ikke del av fasen uten ny beslutning
+## 12. Ikke del av leveransen uten ny beslutning
 
 - flere selvstendige mobilbrytepunkter
 - nettbrett som egen redigeringsmodus
@@ -176,10 +178,11 @@ Fasen er ikke ferdig før dette er bekreftet:
 - AI-generert mobiloppsett
 - bare-mobil-elementer
 - generell CSS-editor
+- fri mobilposisjon eller bredde for Header
 
 ## 13. Avhengigheter
 
-Fasen bygges først etter ny eksplisitt godkjenning. Den må lese og bevare grensene i:
+Leveransen bygges først etter ny eksplisitt godkjenning. Den må lese og bevare grensene i:
 
 - `docs/RESPONSIVE_DESIGN.md`
 - `docs/ELEMENT_MODEL.md`
