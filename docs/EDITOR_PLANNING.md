@@ -8,20 +8,20 @@ Dette dokumentet samler bekreftede produktkrav, implementert grunnlag og planlag
 aktiv leveranse: fase 12 – prosjektfarger og Seksjon-rammer
 branch: feature/project-colors
 GitHub-sak: #28
+PR: #29 – åpen, ikke draft
 prosjektskjema: versjon 7
 implementering: ferdig
 framtidsrettet sluttaudit: ferdig
 PC og Telefon: godkjent
 rammebredde: Ingen eller 1–10 px
-automatiske kontroller etter siste 10 px-endring: gjenstår
-arkitekturrapporter: må regenereres
-PR: ikke opprettet
+automatiske kontroller: bestått
+arkitekturrapporter: regenerert og committet i 1963088
 merge: ikke godkjent eller utført
 ```
 
-Faktisk branch- og `main`-HEAD leses alltid fra Git.
+Faktisk branch-, PR- og `main`-HEAD leses alltid fra Git.
 
-## Siste komplette kontroll før 10 px-utvidelsen
+## Siste verifiserte kontroll
 
 ```text
 ESLint: bestått
@@ -30,7 +30,8 @@ Dependency Cruiser: 102 moduler, 274 avhengigheter, ingen brudd
 Vite: 111 moduler transformert
 CSS: 33.62 kB, gzip 6.34 kB
 JavaScript: 264.52 kB, gzip 79.47 kB
-produksjonsbuild: bestått på 189 ms
+produksjonsbuild: bestått på 192 ms
+git diff --check: ingen whitespace-feil
 ```
 
 ## Implementert editorgrunnlag
@@ -222,4 +223,4 @@ fase 18  åpne og importere prosjekt
 fase 19  forhåndsvisning og publisering
 ```
 
-Fase 13 startes ikke før fase 12 er kontrollert, merget etter eksplisitt godkjenning og lokal `main` er oppdatert.
+Fase 13 startes ikke før PR #29 er kontrollert, fase 12 er merget etter eksplisitt godkjenning og lokal `main` er oppdatert.
