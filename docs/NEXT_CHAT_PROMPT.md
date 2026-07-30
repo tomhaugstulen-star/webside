@@ -50,16 +50,22 @@ Les deretter relevant produksjonskode før du foreslår modell eller implementas
 ```text
 siste fullførte produksjonsfase: fase 12 – prosjektfarger og Seksjon-rammer
 GitHub-sak: #28 – lukket som fullført
-PR: #29 – merget
+produksjons-PR: #29 – merget
 mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
 lokal main: brukeren har bekreftet clean tree etter merge
+aktiv docs-branch: docs/phase-12-handover
+dokumentasjons-PR: #30 – åpen, ikke draft og mergebar
+PR #30 head: 513352413c574eb9d9a570328573c986c9054acb
+PR #30 omfang: åtte Markdown-filer, ingen produksjonskode eller arkitekturrapporter
 neste produksjonsfase: fase 13 – Logo og header, men omfanget er ikke låst
 ```
 
 PR #29 ble kontrollert som mergebar før merge. Den hadde 37 endrede filer, ingen reviewinnsigelser, ingen uløste reviewtråder og ingen GitHub Actions-kjøringer for headen.
 
-Faktisk `origin/main`, lokal branch og commit-topper skal alltid kontrolleres på nytt. Commitnumrene over er historiske kontrollpunkter, ikke en erstatning for Git-kontroll.
+PR #30 synkroniserer bare post-merge-status og overlevering. Den skal kontrolleres på nytt før merge og merges bare etter eksplisitt brukergodkjenning.
+
+Faktisk `origin/main`, lokal branch, PR-status og commit-topper skal alltid kontrolleres på nytt. Commitnumrene over er historiske kontrollpunkter, ikke en erstatning for Git-kontroll.
 
 ## Siste verifiserte produksjonskontroll
 
@@ -80,18 +86,19 @@ git diff --check: ingen whitespace-feil
 
 Ikke bruk disse tallene som bevis for senere endringer. Nye produksjonsendringer krever ny komplett kontroll.
 
-## Dokumentasjonsbranch som er opprettet
+## Dokumentasjonsleveransen
 
 ```text
 branch: docs/phase-12-handover
-base: merget main etter PR #29
-formål: synkronisere post-merge-status og overlevering
-produksjonskode: skal ikke endres
+PR: #30 – Synchronize documentation after phase 12 merge
+base: main på a781b85 da PR-en ble opprettet
+head: 513352413c574eb9d9a570328573c986c9054acb ved siste kontroll
+changed files: 8 Markdown-filer
+produksjonskode: ingen endring
+arkitekturrapporter: ingen endring
 ```
 
-Denne branchen ble opprettet fordi statusblokkene som ble merget sammen med PR #29 naturlig beskrev PR-en som åpen før selve mergehandlingen. Før fase 13 startes skal dokumentene beskrive fase 12 som merget og `main` som gjeldende grunnlag.
-
-Dokumenter som skal kontrolleres på docs-branchen:
+Dokumentene på branchen beskriver fase 12 som merget og `main` som gjeldende produksjonsgrunnlag:
 
 - `docs/NEXT_CHAT_PROMPT.md`
 - `docs/WORK_PLAN.md`
@@ -102,7 +109,7 @@ Dokumenter som skal kontrolleres på docs-branchen:
 - `docs/CODE_AUDIT.md`
 - `docs/RIGHT_PROPERTIES_PANEL.md`
 
-Ikke omskriv tekniske detaljer uten grunn. Endre bare pre-merge-status, neste handling og nødvendige overleveringsopplysninger. Opprett deretter en ren docs-PR mot `main`. Merge krever eksplisitt godkjenning.
+Ikke legg produksjonskode eller fase-13-planlegging inn i PR #30. Den er en ren post-merge-dokumentasjonssynkronisering.
 
 ## Implementert editorgrunnlag
 
@@ -213,7 +220,7 @@ Regler:
 - Ingen ny eller berørt produksjonsfil skal passere 300 linjer.
 - Dokumenter eventuelle bevisste unntak før merge.
 
-Bruk PowerShell for en målrettet kontroll av berørte kildefiler, for eksempel:
+Bruk PowerShell for en målrettet kontroll av berørte kildefiler:
 
 ```powershell
 $changed = git diff --name-only origin/main...HEAD |
@@ -279,7 +286,7 @@ git diff --stat
 ```text
 lint
 TypeScript
-authority/Dependency Cruiser
+Dependency Cruiser
 produksjonsbuild
 ```
 
@@ -342,7 +349,7 @@ git log -6 --oneline --decorate
 
 Forventet historisk kontrollpunkt på `main` er mergecommit `a781b85`, men stol på faktisk Git-output dersom `main` har flyttet seg.
 
-2. Kontroller docs-branchen:
+2. Trekk docs-branchen lokalt:
 
 ```powershell
 git switch docs/phase-12-handover
@@ -351,13 +358,24 @@ git status
 git log -6 --oneline --decorate
 ```
 
-3. Les dokumentene i autoritativ rekkefølge og synkroniser bare post-merge-status. Ingen produksjonskode skal endres på docs-branchen.
+3. Kontroller at working tree er clean og at lokal head samsvarer med `origin/docs/phase-12-handover`.
 
-4. Kontroller diffen mot `main`, opprett en docs-PR og merge den bare etter eksplisitt godkjenning.
+4. Kontroller PR #30 med GitHub-connectoren:
 
-5. Oppdater lokal `main` etter docs-merge.
+- base `main`
+- head `docs/phase-12-handover`
+- head-SHA samsvarer med branch-head
+- åtte endrede Markdown-filer
+- ingen produksjonskode eller arkitekturrapporter
+- mergebarhet
+- reviews og uløste tråder
+- CI/statuskontroller
 
-6. Først deretter avgrenses fase 13 – Logo og header sammen med brukeren.
+5. Merge PR #30 bare etter brukerens eksplisitte godkjenning.
+
+6. Oppdater lokal `main` og bekreft clean tree etter merge.
+
+7. Først deretter avgrenses fase 13 – Logo og header sammen med brukeren.
 
 ## Avgrensning som må avklares før fase 13-kode
 
