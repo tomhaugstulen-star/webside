@@ -5,6 +5,7 @@ export const elementKindLabels: Record<EditorElement['kind'], string> = {
   image: 'Bilde',
   text: 'Tekstboks',
   button: 'Knapp',
+  header: 'Header',
 }
 
 function summarizeText(value: string) {
@@ -29,6 +30,14 @@ function getElementSummary(element: EditorElement) {
   if (element.kind === 'button') {
     const summary = summarizeText(element.label)
     return summary ? `Knappetekst: ${summary}.` : 'Knapp uten tekst.'
+  }
+
+  if (element.kind === 'header') {
+    const siteName = summarizeText(element.siteName)
+    const subtitle = summarizeText(element.subtitle)
+    return subtitle
+      ? `Header for ${siteName}. Undertittel: ${subtitle}.`
+      : `Header for ${siteName}.`
   }
 
   return `${elementKindLabels[element.kind]}.`
