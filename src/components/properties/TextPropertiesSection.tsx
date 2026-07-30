@@ -9,17 +9,7 @@ import {
   type TextLineHeight,
 } from '../../model/textElementStyle'
 import { useTextElementStyle } from '../../state/useTextElementStyle'
-
-const fontLabels: Record<TextFontFamily, string> = {
-  system: 'System',
-  arial: 'Arial',
-  verdana: 'Verdana',
-  tahoma: 'Tahoma',
-  'trebuchet-ms': 'Trebuchet MS',
-  georgia: 'Georgia',
-  'times-new-roman': 'Times New Roman',
-  'courier-new': 'Courier New',
-}
+import { textFontFamilyLabels } from './textFontFamilyLabels'
 
 const alignmentLabels: Record<TextAlignment, string> = {
   left: 'Venstre',
@@ -69,7 +59,7 @@ export function TextPropertiesSection({ element }: TextPropertiesSectionProps) {
           >
             {textFontFamilies.map((fontFamily) => (
               <option key={fontFamily} value={fontFamily}>
-                {fontLabels[fontFamily]}
+                {textFontFamilyLabels[fontFamily]}
               </option>
             ))}
           </select>
