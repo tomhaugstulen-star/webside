@@ -1,76 +1,61 @@
 # Element- og prosjektmodell
 
-Dette dokumentet beskriver den autoritative prosjektmodellen for Website-editoren.
+Dette dokumentet beskriver den autoritative serialiserbare modellen.
 
-## 1. Gjeldende skjemaversjon
+## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 7
+EDITOR_PROJECT_SCHEMA_VERSION = 8
 ```
 
 ```text
-versjon 1  grunnmodell for prosjekt, sider og elementer
-versjon 2  varig tekstinnhold
-versjon 3  varig tekststil
-versjon 4  varig elementlenke
-versjon 5  stabilt knappasset, knappetekst og knappelenke
-versjon 6  bildeasset, metadata, alternativ tekst, visningsmodus og utsnitt
-versjon 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
+1  grunnmodell for prosjekt, sider og elementer
+2  tekstinnhold
+3  tekststil
+4  elementlenke
+5  knappasset, knappetekst og knappelenke
+6  bildeasset, metadata, alternativ tekst, visning og utsnitt
+7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
+8  Header med logo, tekst, utseende og ramme
 ```
 
-Det finnes ennå ingen prosjektfilimport eller migreringsmotor. Framtidig import må migrere eller avvise versjon 6 kontrollert før `replace-project`.
+Det finnes ennå ingen prosjektimport eller migreringsmotor. Framtidig import må validere hele versjon-8-objektet før `replace-project`, og eldre versjoner må migreres eller avvises kontrollert.
 
-## 2. Prosjektstruktur
+## Prosjektstruktur
 
-```text
-EditorProject
-  schemaVersion
-  id
-  name
+```ts
+type EditorProject = {
+  schemaVersion: 8
+  id: string
+  name: string
   pages: EditorPage[]
-    id
-    name
-    slug
-    appearance
-    elements: EditorElement[]
-  createdAt
-  updatedAt
+  createdAt: string
+  updatedAt: string
+}
+
+type EditorPage = {
+  id: string
+  name: string
+  slug: string
+  appearance: PageAppearance
+  elements: EditorElement[]
+}
 ```
 
 Et nytt prosjekt starter med én blank side kalt `Forside`.
 
-Prosjektmodellen er flat. En Seksjon eier ikke elementer som ligger visuelt over den. Rendering plasserer Seksjon bak Bilde, Tekst og Knapp uten å endre lagret elementrekkefølge.
-
-## 3. Farger
+## Felles elementdata
 
 ```ts
-type EditorColor = string // kanonisk #RRGGBB
-```
-
-Gyldige farger:
-
-- seks heksadesimale sifre
-- ledende `#`
-- normalisert til store bokstaver
-- ingen alpha
-- ingen gradient
-- ingen vilkårlig CSS-streng
-
-```ts
-type PageAppearance = {
-  backgroundColor: EditorColor
+type ResponsiveValue<T> = {
+  desktop: T
+  mobile?: T
 }
-```
 
-Standard sidebakgrunn er `#FFFFFF`.
-
-## 4. Felles elementdata
-
-```ts
 type BaseEditorElement = {
   id: string
-  position: ResponsiveValue<CanvasPosition>
-  size: ResponsiveValue<ElementSize>
+  position: ResponsiveValue<{ x: number; y: number }>
+  size: ResponsiveValue<{ width: number; height: number }>
   visibility: ResponsiveValue<boolean>
   locked: boolean
 }
@@ -82,43 +67,27 @@ type EditorElement =
   | ImageEditorElement
   | TextEditorElement
   | ButtonEditorElement
+  | HeaderEditorElement
 ```
 
-## 5. Elementtyper
+Telefon arver desktopverdien når `mobile` mangler. Dagens UI oppretter ikke mobiloverstyringer.
 
-### Seksjon
+## Seksjon
 
 ```ts
-type SectionFrameWidth =
-  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
-
-type SectionFrame = {
-  width: SectionFrameWidth
-  color: EditorColor
-}
-
-type SectionAppearance = {
-  backgroundColor: EditorColor
-  frame: SectionFrame
-}
-
 type SectionEditorElement = BaseEditorElement & {
   kind: 'section'
-  appearance: SectionAppearance
+  appearance: {
+    backgroundColor: EditorColor
+    frame: ElementFrame
+  }
 }
 ```
 
-Standard:
+Standardstørrelse: `320 × 180 px`  
+Minimum: `160 × 90 px`
 
-```text
-bakgrunn: #FFFDFB
-rammebredde: 0
-rammefarge: #D8CEC8
-```
-
-`0` betyr `Ingen`. Rammefargen beholdes selv om bredden er `0`. Rammen ligger innenfor elementets lagrede størrelse.
-
-### Bilde
+## Bilde
 
 ```ts
 type ImageEditorElement = BaseEditorElement & {
@@ -131,37 +100,14 @@ type ImageEditorElement = BaseEditorElement & {
 }
 ```
 
-```ts
-type ImageAssetMetadata = {
-  fileName: string
-  mimeType: 'image/png' | 'image/jpeg' | 'image/webp'
-  byteSize: number
-  width: number
-  height: number
-}
+Standardstørrelse: `240 × 160 px`  
+Minimum: `120 × 80 px`
 
-type ImageTransform = {
-  zoom: number
-  offsetX: number
-  offsetY: number
-}
-```
+Crop-grunnrammen for versjon 6 forblir `240 × 160 px`. Endring krever ny skjemaversjon og migrering.
 
-Nye bilder starter med tom alternativ tekst, `contain`, zoom `1` og sentrert offset.
-
-### Tekst
+## Tekst
 
 ```ts
-type TextElementStyle = {
-  fontFamily: TextFontFamily
-  fontSize: TextFontSize
-  fontWeight: TextFontWeight
-  fontStyle: TextFontStyle
-  textAlign: TextAlignment
-  lineHeight: TextLineHeight
-  color: EditorColor
-}
-
 type TextEditorElement = BaseEditorElement & {
   kind: 'text'
   content: string
@@ -170,9 +116,10 @@ type TextEditorElement = BaseEditorElement & {
 }
 ```
 
-Standard tekstfarge er `#625C58`.
+Standardstørrelse: `240 × 96 px`  
+Minimum: `120 × 48 px`
 
-### Knapp
+## Knapp
 
 ```ts
 type ButtonEditorElement = BaseEditorElement & {
@@ -183,198 +130,93 @@ type ButtonEditorElement = BaseEditorElement & {
 }
 ```
 
-Knapper bruker ferdig SVG-fargedesign. Fargene er del av det valgte assetet og overstyres ikke av prosjektfargemodellen.
+Standardstørrelse: `160 × 48 px`  
+Minimum: `80 × 36 px`
 
-## 6. Prosjektfargeoversikt
+Knapper bruker ferdig SVG-fargedesign.
 
-`Farger` er avledet UI og lagres ikke i prosjektet.
+## Header
 
-Oversikten avledes fra aktiv side:
+```ts
+type HeaderEditorElement = BaseEditorElement & {
+  kind: 'header'
+  logoAssetId: ImageAssetId
+  logoAssetMetadata: ImageAssetMetadata
+  siteName: string
+  subtitle: string
+  appearance: HeaderAppearance
+}
 
-```text
-Bakgrunn
-  Sidebakgrunn
-Element N
-  Bakgrunn
-  Ramme      bare når width > 0
-Tekst N
-  Tekstfarge
-```
-
-Bilde og Knapp oppretter ingen fargeoppføring. Nummerering avledes fra elementrekkefølgen og lagres ikke.
-
-Hver oppføring peker til stabil side- eller element-ID og én konkret egenskap. Like fargeverdier kobler ikke elementer sammen.
-
-## 7. Stabile asset-ID-er
-
-### Knapp
-
-- peker til en statisk katalog som bundles av Vite
-- prosjektet lagrer ikke filsti, rå SVG eller Vite-URL
-- ukjent ID gir kontrollert fallback
-
-### Bilde
-
-- kryptografisk UUID-basert identitet
-- nøkkel til et separat transient ressurslager
-- prosjektet lagrer ikke filsti, `File`, Blob eller Object URL
-- manglende ressurs gir kontrollert fallback
-
-## 8. Bilderessurslager
-
-```text
-ImageAssetId -> {
-  file: File
-  objectUrl: string
-  metadata: ImageAssetMetadata
+type HeaderAppearance = {
+  backgroundColor: EditorColor
+  textColor: EditorColor
+  fontFamily: TextFontFamily
+  frame: ElementFrame
 }
 ```
 
 Regler:
 
-- fil og metadata har samme filnavn, MIME-type og byte-størrelse
-- samme `assetId` registreres ikke to ganger
-- Object URL tilbakekalles ved ressursfjerning
-- alle URL-er tilbakekalles ved provider-unmount
-- sletting fjerner ressursen bare når asset ikke deles
-- mislykket elementoppretting rydder registrert ressurs
-- import etter panel-unmount oppretter ikke ressurs eller element
+- `siteName` er obligatorisk, normalisert og maks 80 tegn
+- `subtitle` er valgfri, normalisert og maks 120 tegn
+- logo bruker samme validerte metadata og transiente ressurslager som Bilde
+- Header rendres alltid ved `x = 0` og med aktiv lerretsbredde
+- brukeren kan bare endre `y` og høyde
+- standardhøyde er 88 px
+- minimumshøyde er 70 px
+- maksimumshøyde er 100 px
+- Telefon arver desktop y/høyde inntil fase 15
+- navn og undertittel deler font og tekstfarge
 
-Ressursbufferen gjelder bare aktiv nettleserøkt.
+Baseelementet krever fortsatt `position.desktop.x` og `size.desktop.width`. For Header er disse horisontale feltene deterministiske, normaliseres av modell/state-laget og brukes ikke som fri brukerredigerbar bredde.
 
-## 9. Bildevalidering og transform
-
-```text
-format: PNG, JPEG eller WebP
-maks filstørrelse: 10 MB
-maks dekodet pikselmengde: 40 megapiksler
-maks bredde eller høyde: 16 384 px
-zoom: 1..3
-offsetX og offsetY: -1..1
-```
-
-`contain` viser hele motivet proporsjonalt. `crop` fyller rammen uten tomrom og bevarer sideforhold.
-
-Versjon-6-transformen er definert mot:
-
-```text
-IMAGE_CROP_BASE_FRAME_SIZE_V6 = 240 × 160 px
-```
-
-Denne verdien forblir en skjemainvariant også i versjon 7. Endring krever ny skjemaversjon og migrering.
-
-Ved crop-rammeresize flyttes aktiv kant, motsatt kant står fast, motivets størrelse og absolutte plassering beholdes, og ramme og transform lagres atomisk.
-
-## 10. Elementstørrelser
-
-```text
-Standard:
-Seksjon  320 × 180 px
-Bilde    240 × 160 px
-Tekst    240 × 96 px
-Knapp    160 × 48 px
-
-Minimum:
-Seksjon  160 × 90 px
-Bilde    120 × 80 px
-Tekst    120 × 48 px
-Knapp    80 × 36 px
-```
-
-## 11. Responsive verdier
+## Farge og ramme
 
 ```ts
-type ResponsiveValue<T> = {
-  desktop: T
-  mobile?: T
+type EditorColor = string // kanonisk #RRGGBB
+
+type ElementFrame = {
+  width: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  color: EditorColor
 }
 ```
 
-Når mobilverdien mangler, arver Telefon desktopverdien.
+- `0` betyr `Ingen`
+- rammefargen beholdes når bredden settes til `0`
+- rammen ligger innenfor elementets ytre størrelse
+- `Farger` er avledet UI og lagres ikke som egen palett
+- Seksjon og Header viser bakgrunn og eventuell rammefarge
+- Tekst og Header viser tekstfarge
 
-Responsive verdier:
+## Asset-ID og ressurslager
 
-- posisjon
-- størrelse
-- synlighet
+Prosjektet lagrer stabil asset-ID og serialiserbar metadata. Følgende lagres ikke:
 
-Foreløpig felles for PC og Telefon:
+- `File`
+- Blob
+- Object URL
+- lokal filsti
 
-- side- og elementfarger
-- Seksjon-ramme
-- låsestatus
-- tekstinnhold og tekststil
-- elementlenke
-- knappdata
-- bildeasset, metadata, alt-tekst, modus og transform
+Det transiente ressurslageret eier faktisk fil og Object URL. Sletting fjerner ressursen bare når ingen Bilde- eller Header-elementer refererer til asset-ID-en.
 
-Responsive farger krever eksplisitt senere modellstøtte.
+## Reducergrenser
 
-## 12. Sentral state og reducergrenser
-
-Varige mutasjoner går gjennom typede actions for blant annet:
-
-- opprette og slette element
-- endre desktopgeometri
-- endre låsestatus
-- endre sidebakgrunn
-- endre Seksjon-bakgrunn, rammebredde og rammefarge
-- endre tekst, stil, tekstfarge og lenke
-- endre knappetekst og design
-- endre bildealternativ tekst, visning og transform
-- endre crop-ramme og transform atomisk
-
-Reducergrensene krever:
+Reducerhandlinger krever:
 
 - aktiv side
 - eksisterende element på aktiv side
 - riktig elementtype
 - ulåst element ved mutasjon
-- gyldig kanonisk farge
-- rammebredde innenfor `0–10`
-- gyldige øvrige verdier og metadata
+- gyldig og kanonisk verdi
+- gyldig layout og størrelsesintervall
 - faktisk endring
 
 Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
 
-## 13. Varig og transient state
+## Senere utvidelser
 
-Varig:
-
-- prosjekt, sider og elementer
-- geometri, synlighet og låsestatus
-- sideutseende, Seksjon-utseende og tekstfarge
-- innhold, stil, lenker og asset-ID-er
-- bildemetadata, modus og transform
-- tidsstempler
-
-Transient:
-
-- markering
-- pekerøkter og preview
-- redigeringsøkter og drafts
-- avledede fargegrupper
-- `File`, Object URL og ressurskart
-- paneler, dialoger, fokus og feedback
-
-## 14. Krav til senere utvidelser
-
-### Prosjektimport
-
-Hele prosjektet må valideres før `replace-project`. Kjent skjemaversjon, unike ID-er, sider, farger, elementunion, layout og bildeinvarianter må kontrolleres samlet. Versjon 6 må migreres eller avvises kontrollert.
-
-### Prosjektbytte
-
-Bilderessursbufferen må avstemmes eller tømmes, og foreldede Object URL-er må tilbakekalles.
-
-### Historikk
-
-Angre/gjør om lagrer bare serialiserbar prosjektstate. `File`, Object URL og aktive interaksjoner skal aldri inngå.
-
-### Mobiloverstyringer
-
-Egne mobilgeometrier og eventuelle framtidige mobilfarger må bruke viewport-spesifikke actions.
-
-### Autolagring
-
-Autolagring skal trigges av gyldig prosjektstate, ikke transient editor- eller ressursstate.
+- prosjektimport validerer hele skjemaet før prosjektbytte
+- prosjektbytte avstemmer eller tømmer ressurslageret
+- historikk lagrer bare serialiserbar prosjektstate
+- mobiloverstyringer bruker viewport-spesifikke actions
+- autolagring reagerer på gyldige prosjektmutasjoner, ikke transient state
