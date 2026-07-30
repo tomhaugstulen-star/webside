@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { EditorElement } from '../../model/editorProject'
+import { getTextFontFamilyCssValue } from './getTextElementCssStyle'
 
 export function getElementAppearanceCssStyle(
   element: EditorElement,
@@ -15,7 +16,9 @@ export function getElementAppearanceCssStyle(
 
   if (element.kind === 'header') {
     return {
+      backgroundColor: element.appearance.backgroundColor,
       color: element.appearance.textColor,
+      fontFamily: getTextFontFamilyCssValue(element.appearance.fontFamily),
       borderColor: element.appearance.frame.color,
       borderStyle: 'solid',
       borderWidth: element.appearance.frame.width,
