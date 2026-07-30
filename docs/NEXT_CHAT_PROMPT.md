@@ -55,15 +55,14 @@ mergecommit på main: a781b85a718ed6e5254530849299db8dfff3dfb6
 prosjektskjema: versjon 7
 lokal main: brukeren har bekreftet clean tree etter merge
 aktiv docs-branch: docs/phase-12-handover
-dokumentasjons-PR: #30 – åpen, ikke draft og mergebar
-PR #30 head: 513352413c574eb9d9a570328573c986c9054acb
+dokumentasjons-PR: #30 – åpen og ikke draft
 PR #30 omfang: åtte Markdown-filer, ingen produksjonskode eller arkitekturrapporter
 neste produksjonsfase: fase 13 – Logo og header, men omfanget er ikke låst
 ```
 
 PR #29 ble kontrollert som mergebar før merge. Den hadde 37 endrede filer, ingen reviewinnsigelser, ingen uløste reviewtråder og ingen GitHub Actions-kjøringer for headen.
 
-PR #30 synkroniserer bare post-merge-status og overlevering. Den skal kontrolleres på nytt før merge og merges bare etter eksplisitt brukergodkjenning.
+PR #30 synkroniserer bare post-merge-status og overlevering. Head-SHA, mergebarhet, reviews, tråder og CI/status skal leses på nytt fra GitHub før merge. Ikke stol på en tidligere head eller en mergeability-verdi mens GitHub beregner status etter nye commits.
 
 Faktisk `origin/main`, lokal branch, PR-status og commit-topper skal alltid kontrolleres på nytt. Commitnumrene over er historiske kontrollpunkter, ikke en erstatning for Git-kontroll.
 
@@ -92,7 +91,7 @@ Ikke bruk disse tallene som bevis for senere endringer. Nye produksjonsendringer
 branch: docs/phase-12-handover
 PR: #30 – Synchronize documentation after phase 12 merge
 base: main på a781b85 da PR-en ble opprettet
-head: 513352413c574eb9d9a570328573c986c9054acb ved siste kontroll
+head: skal leses fra GitHub ved kontroll
 changed files: 8 Markdown-filer
 produksjonskode: ingen endring
 arkitekturrapporter: ingen endring
@@ -367,7 +366,7 @@ git log -6 --oneline --decorate
 - head-SHA samsvarer med branch-head
 - åtte endrede Markdown-filer
 - ingen produksjonskode eller arkitekturrapporter
-- mergebarhet
+- mergebarhet er ferdigberegnet
 - reviews og uløste tråder
 - CI/statuskontroller
 
