@@ -4,12 +4,14 @@ import type { ElementLayoutPreview } from './canvasLayoutPreview'
 import { snapElementMove } from './snapElementMove'
 
 type GetPointerMovePreviewOptions = {
+  elementId: string
   layout: ElementLayout
   targets: AlignmentTargets | null
   canvasWidth: number
 }
 
 export function getPointerMovePreview({
+  elementId,
   layout,
   targets,
   canvasWidth,
@@ -23,7 +25,7 @@ export function getPointerMovePreview({
     : { layout, guides: [] }
 
   return {
-    elementId: '',
+    elementId,
     layout: snapResult.layout,
     guides: snapResult.guides,
   }
