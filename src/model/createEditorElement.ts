@@ -85,6 +85,7 @@ export function createEditorElement({
           backgroundColor: DEFAULT_HEADER_APPEARANCE.backgroundColor,
           textColor: DEFAULT_HEADER_APPEARANCE.textColor,
           fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
+          fontSize: DEFAULT_HEADER_APPEARANCE.fontSize,
           frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
         },
       }
