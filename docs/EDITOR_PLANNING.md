@@ -21,22 +21,23 @@ Offentlig publisering, hosting, domener og produksjonsdeployment er fjernet fra 
 ## Gjeldende status
 
 ```text
-siste fullførte produksjonsfase på main: 14 – korrigeringslinjer og snapping
-main ved fase-15-branchstart: 20b14af77365c4df912d0b3584a1a503cf0cec59
-aktiv produksjonsfase: 15 – duse portalfarger og tydelig visuell struktur
-aktiv branch: feature/phase-15-portal-colors
-verifisert branch-head: 7ea58a500b500efb884544751f0913a1a07cf285
-GitHub-sak #42: åpen til merge
-pull request #43: draft etter slutt-audit, ikke merget
+siste fullførte produksjonsfase på main: 15 – duse portalfarger og tydelig visuell struktur
+source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
+verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
+pull request #43: merget
+mergecommit på main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
+GitHub-sak #42: lukket som fullført
 prosjektskjema: versjon 9
 framtidsrettet kodeaudit: fullført
 automatisk sluttkontroll: bestått
 filstørrelseskontroll: bestått
 visuell fase-15-regresjon: godkjent
-neste planlagte fase etter merge: 16 – automatisert testgrunnlag
+aktiv produksjonsfase: ingen
+neste planlagte fase: 16 – automatisert testgrunnlag
+fase 16: ikke startet
 ```
 
-Fase 15 er ferdig implementert og verifisert på featurebranchen. Den registreres først som fullført på `main` når PR #43 er merget og faktisk mergecommit er dokumentert.
+Fase 15 er fullført på `main`. PR #43 ble merget etter eksplisitt brukergodkjenning på mergecommit `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Ingen produksjonsfase er aktiv.
 
 ## Implementert editorgrunnlag
 
@@ -256,7 +257,7 @@ API-nøkkel skal aldri ligge i Vite- eller browserkode.
 
 ```text
 fase 14  Korrigeringslinjer og snapping – fullført
-fase 15  Duse portalfarger og tydelig visuell struktur – klar for merge
+fase 15  Duse portalfarger og tydelig visuell struktur – fullført
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
