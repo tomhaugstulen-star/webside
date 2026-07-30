@@ -63,7 +63,8 @@ aktiv produksjonsfase: fase 13 – Logo og header
 branch: feature/logo-header
 GitHub-sak: #31
 prosjektskjema: versjon 8
-status: funksjonelt godkjent, dokumentasjon og sluttaudit pågår
+status: funksjonelt godkjent, kodeaudit og dokumentasjonsopprydding gjennomført
+neste kontroll: ny lokal npm- og arkitekturkontroll
 ```
 
 Ingen merge utføres uten eksplisitt godkjenning.
