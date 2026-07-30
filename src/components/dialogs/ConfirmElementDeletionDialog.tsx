@@ -11,6 +11,7 @@ const deletionTitles: Record<ElementKind, string> = {
   image: 'Slett bildet?',
   text: 'Slett tekstboksen?',
   button: 'Slett knappen?',
+  header: 'Slett headeren?',
 }
 
 type ConfirmElementDeletionDialogProps = {
