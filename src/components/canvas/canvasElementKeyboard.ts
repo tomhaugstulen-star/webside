@@ -24,6 +24,8 @@ type CanvasElementKeyboardOptions = {
   initialLayout: ElementLayout
   canvasWidth: number
   onSelect: (elementId: string) => void
+  onOpenProperties: () => void
+  onCloseProperties: () => void
   onStartTextEditing: (elementId: string) => void
   onCommitLayout: (elementId: string, layout: ElementLayout) => void
   onCommitImageFrame: (
@@ -41,6 +43,8 @@ export function handleCanvasElementKeyDown(
     initialLayout,
     canvasWidth,
     onSelect,
+    onOpenProperties,
+    onCloseProperties,
     onStartTextEditing,
     onCommitLayout,
     onCommitImageFrame,
@@ -53,6 +57,7 @@ export function handleCanvasElementKeyDown(
       onStartTextEditing(element.id)
     } else {
       onSelect(element.id)
+      onOpenProperties()
     }
 
     return
@@ -61,6 +66,7 @@ export function handleCanvasElementKeyDown(
   if (event.key === ' ') {
     event.preventDefault()
     onSelect(element.id)
+    onOpenProperties()
     return
   }
 
@@ -74,9 +80,11 @@ export function handleCanvasElementKeyDown(
   onSelect(element.id)
 
   if (element.locked || canvasWidth <= 0) {
+    onOpenProperties()
     return
   }
 
+  onCloseProperties()
   const step = event.shiftKey ? 10 : 1
   const delta = {
     x: direction.x * step,
@@ -87,13 +95,17 @@ export function handleCanvasElementKeyDown(
     element.kind === 'image' && element.mode === 'crop'
       ? getImageCropSize(element.assetMetadata, element.transform)
       : undefined
+  const resizeHandle =
+    element.kind === 'header' && element.widthMode === 'full'
+      ? 'south'
+      : 'south-east'
   const nextLayout = resizing
     ? resizeElementLayout(
         element.kind,
         initialLayout,
         delta,
         canvasWidth,
-        'south-east',
+        resizeHandle,
         maximumSize,
       )
     : moveElementLayout(initialLayout, delta, canvasWidth)
