@@ -4,6 +4,7 @@ import type { ElementCreationRequest } from './elementCreation'
 import type { EditorElement } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
+import { DEFAULT_HEADER_APPEARANCE } from './headerAppearance'
 import {
   DEFAULT_IMAGE_MODE,
   DEFAULT_IMAGE_TRANSFORM,
@@ -76,6 +77,10 @@ export function createEditorElement({
         logoAssetMetadata: { ...request.logoAssetMetadata },
         siteName: request.siteName,
         subtitle: request.subtitle,
+        appearance: {
+          textColor: DEFAULT_HEADER_APPEARANCE.textColor,
+          frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
+        },
       }
   }
 
