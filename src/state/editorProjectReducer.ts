@@ -9,6 +9,7 @@ import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
+import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
@@ -209,6 +210,11 @@ function reduceEditorProjectState(
     case 'set-section-frame-width':
     case 'set-section-frame-color':
       return reduceColorProjectAction(state, action)
+
+    case 'set-header-text-color':
+    case 'set-header-frame-width':
+    case 'set-header-frame-color':
+      return reduceHeaderAppearanceAction(state, action)
 
     case 'set-image-alt-text':
     case 'set-image-mode':
