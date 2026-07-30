@@ -5,7 +5,6 @@ import type { EditorElement } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
 import { DEFAULT_HEADER_APPEARANCE } from './headerAppearance'
-import { DEFAULT_HEADER_WIDTH_MODE } from './headerWidth'
 import {
   DEFAULT_IMAGE_MODE,
   DEFAULT_IMAGE_TRANSFORM,
@@ -84,7 +83,6 @@ export function createEditorElement({
           fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
           frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
         },
-        widthMode: DEFAULT_HEADER_WIDTH_MODE,
       }
   }
 
