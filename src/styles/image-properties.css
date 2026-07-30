@@ -11,7 +11,7 @@
 .image-properties__field {
   display: grid;
   gap: 7px;
-  color: var(--text);
+  color: var(--portal-text);
   font-size: 14px;
   font-weight: 600;
 }
@@ -21,10 +21,10 @@
   min-height: 76px;
   box-sizing: border-box;
   padding: 10px 12px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--portal-border-strong);
   border-radius: 8px;
-  color: var(--text);
-  background: #ffffff;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
   font: inherit;
   font-weight: 500;
   resize: vertical;
@@ -32,22 +32,26 @@
 
 .image-properties textarea:hover:not(:disabled),
 .image-properties__submit:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--portal-accent);
+}
+
+.image-properties textarea:hover:not(:disabled) {
+  background: var(--portal-control-hover);
 }
 
 .image-properties textarea:focus-visible,
 .image-properties__submit:focus-visible {
-  outline: 3px solid rgba(143, 67, 47, 0.24);
+  outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
 }
 
 .image-properties__submit {
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--portal-accent);
   border-radius: 8px;
   color: #ffffff;
-  background: var(--accent);
+  background: var(--portal-accent);
   font: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -58,14 +62,20 @@
     border-color 120ms ease;
 }
 
+.image-properties__submit:hover:not(:disabled) {
+  background: var(--portal-accent-hover);
+}
+
 .image-properties__submit:active:not(:disabled) {
   transform: translateY(2px);
 }
 
 .image-properties textarea:disabled,
 .image-properties__submit:disabled {
+  color: var(--portal-text-muted);
+  background: var(--portal-control-disabled);
+  border-color: var(--portal-border);
   cursor: not-allowed;
-  opacity: 0.58;
 }
 
 .image-properties__help,
@@ -85,16 +95,16 @@
 
 .image-properties__help,
 .image-properties__locked-note {
-  color: var(--muted);
+  color: var(--portal-text-muted);
 }
 
 .image-properties__saved {
-  color: #35634b;
+  color: var(--portal-success);
   font-weight: 700;
 }
 
 .image-properties__warning {
-  color: #8d2f24;
+  color: var(--portal-warning);
   font-weight: 650;
 }
 
@@ -103,9 +113,9 @@
   gap: 8px;
   margin: 18px 0 0;
   padding: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--portal-border);
   border-radius: 8px;
-  background: #faf7f5;
+  background: var(--portal-control-subtle);
 }
 
 .image-properties__metadata div {
@@ -124,13 +134,13 @@
 }
 
 .image-properties__metadata dt {
-  color: var(--muted);
+  color: var(--portal-text-muted);
 }
 
 .image-properties__metadata dd {
   min-width: 0;
   overflow-wrap: anywhere;
-  color: var(--text);
+  color: var(--portal-text);
   text-align: right;
 }
 
