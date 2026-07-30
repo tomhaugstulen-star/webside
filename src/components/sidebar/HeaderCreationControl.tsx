@@ -33,12 +33,10 @@ type HeaderCreationRequest = Extract<
 
 type HeaderCreationControlProps = {
   onCreateHeader: (request: HeaderCreationRequest) => boolean
-  onCreated: () => void
 }
 
 export function HeaderCreationControl({
   onCreateHeader,
-  onCreated,
 }: HeaderCreationControlProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const mountedRef = useRef(true)
@@ -141,10 +139,10 @@ export function HeaderCreationControl({
         return
       }
 
+      registeredAssetId = null
       setSiteName('')
       setSubtitle('')
       setPreparedLogo(null)
-      onCreated()
     } catch {
       if (registeredAssetId) removeImageAsset(registeredAssetId)
       setErrorMessage('Headeren kunne ikke opprettes. Prøv igjen.')

@@ -84,12 +84,14 @@ export function RightPropertiesPanel({
 
             <section aria-labelledby="right-properties-panel-element-title">
               <h3 id="right-properties-panel-element-title">Element</h3>
-              <dl className="right-properties-panel__details">
-                <div className="right-properties-panel__detail-row">
-                  <dt>Status:</dt>
-                  <dd>{element.locked ? 'Låst' : 'Ulåst'}</dd>
-                </div>
-              </dl>
+              {element.kind !== 'header' && (
+                <dl className="right-properties-panel__details">
+                  <div className="right-properties-panel__detail-row">
+                    <dt>Status:</dt>
+                    <dd>{element.locked ? 'Låst' : 'Ulåst'}</dd>
+                  </div>
+                </dl>
+              )}
               <DeleteElementSection
                 element={element}
                 onRequestDeletion={onRequestElementDeletion}

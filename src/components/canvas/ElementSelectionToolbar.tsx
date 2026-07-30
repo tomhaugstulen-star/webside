@@ -4,6 +4,7 @@ import { useElementLocking } from '../../state/useElementLocking'
 
 type ElementSelectionToolbarProps = {
   elementId: string
+  lockable: boolean
   locked: boolean
   layout: ElementLayout
   onOpenProperties: () => void
@@ -35,6 +36,7 @@ function LockIcon({ locked }: { locked: boolean }) {
 
 export function ElementSelectionToolbar({
   elementId,
+  lockable,
   locked,
   layout,
   onOpenProperties,
@@ -64,16 +66,18 @@ export function ElementSelectionToolbar({
       >
         Egenskaper
       </button>
-      <button
-        className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
-        type="button"
-        aria-label={locked ? 'Lås opp element' : 'Lås element'}
-        aria-pressed={locked}
-        title={locked ? 'Lås opp' : 'Lås'}
-        onClick={() => toggleElementLocked(elementId)}
-      >
-        <LockIcon locked={locked} />
-      </button>
+      {lockable && (
+        <button
+          className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
+          type="button"
+          aria-label={locked ? 'Lås opp element' : 'Lås element'}
+          aria-pressed={locked}
+          title={locked ? 'Lås opp' : 'Lås'}
+          onClick={() => toggleElementLocked(elementId)}
+        >
+          <LockIcon locked={locked} />
+        </button>
+      )}
     </div>
   )
 }

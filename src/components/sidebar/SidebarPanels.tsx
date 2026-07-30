@@ -17,20 +17,14 @@ type SidebarPanelProps = PanelProps & ElementsPanelProps & {
   activeTool: EditorTool
 }
 
-function LogoHeaderPanel({
-  onSelect,
-  onCreateElement,
-}: PanelProps & ElementsPanelProps) {
+function LogoHeaderPanel({ onCreateElement }: ElementsPanelProps) {
   return (
     <>
       <h2>Logo og header</h2>
       <p className="panel-intro">
         Velg logo, skriv inn navn og opprett en samlet header på siden.
       </p>
-      <HeaderCreationControl
-        onCreateHeader={onCreateElement}
-        onCreated={onSelect}
-      />
+      <HeaderCreationControl onCreateHeader={onCreateElement} />
     </>
   )
 }
@@ -87,12 +81,7 @@ export function SidebarPanel({
     case 'design':
       return <ColorsPanel />
     case 'media':
-      return (
-        <LogoHeaderPanel
-          onSelect={onSelect}
-          onCreateElement={onCreateElement}
-        />
-      )
+      return <LogoHeaderPanel onCreateElement={onCreateElement} />
     case 'elements':
       return <ElementsPanel onCreateElement={onCreateElement} />
     case 'files':

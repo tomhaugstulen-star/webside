@@ -5,10 +5,14 @@ export function toggleElementLock(
   elementId: string,
   updatedAt: string,
 ): EditorProjectState {
-  const activePage = state.project.pages.find((page) => page.id === state.activePageId)
-  const element = activePage?.elements.find((candidate) => candidate.id === elementId)
+  const activePage = state.project.pages.find(
+    (page) => page.id === state.activePageId,
+  )
+  const element = activePage?.elements.find(
+    (candidate) => candidate.id === elementId,
+  )
 
-  if (!activePage || !element) {
+  if (!activePage || !element || element.kind === 'header') {
     return state
   }
 
@@ -17,7 +21,7 @@ export function toggleElementLock(
       ? {
           ...page,
           elements: page.elements.map((candidate) =>
-            candidate.id === elementId
+            candidate.id === elementId && candidate.kind !== 'header'
               ? { ...candidate, locked: !candidate.locked }
               : candidate,
           ),
