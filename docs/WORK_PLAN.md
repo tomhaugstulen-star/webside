@@ -150,15 +150,19 @@ OpenAI-integrasjonen skal bruke en lokal serverprosess eller tilsvarende sikker 
 ## Leveransestatus
 
 ```text
-siste fullførte produksjonsfase: 14 – korrigeringslinjer og snapping
-source branch-head: 28da295d938d4384c8f3cfa2f3b8a72d4a2e1bb4
-pull request: #39 – merget
-mergecommit på main: 0122605b60808689cdda7cb1601eb3342680f88c
-GitHub-sak: #34 – lukket som fullført
+siste fullførte produksjonsfase på main: 14 – korrigeringslinjer og snapping
+main ved fase-15-branchstart: 20b14af77365c4df912d0b3584a1a503cf0cec59
 prosjektskjema: versjon 9
-aktiv produksjonsfase: ingen
-neste planlagte fase: 15 – duse portalfarger og tydelig visuell struktur
-fase 15: ikke startet
+aktiv produksjonsfase: 15 – duse portalfarger og tydelig visuell struktur
+aktiv branch: feature/phase-15-portal-colors
+verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
+pull request: #43 – draft, ikke merget
+GitHub-sak: #42 – åpen til merge
+framtidsrettet kodeaudit: fullført
+automatisk sluttkontroll: bestått
+filstørrelseskontroll: bestått
+visuell regresjon: godkjent
+neste planlagte fase etter merge: 16 – automatisert testgrunnlag
 ```
 
 Fase 14 leverte:
@@ -190,13 +194,13 @@ produksjonsfiler på eller over 250 linjer: 0
 
 Hele den relevante manuelle regresjonen ble godkjent i PC- og Telefon-visning. PR #39 ble merget etter eksplisitt brukergodkjenning, og brukerens lokale `main` ble synkronisert og bekreftet clean på mergecommit `0122605`.
 
-Ingen produksjonsbranch er aktiv. Fase 15 skal ikke startes før omfanget under er gjennomgått og eksplisitt godkjent.
+Fase 15 er implementert og verifisert på featurebranchen. Den er ikke fullført på `main` før PR #43 er merget og faktisk mergecommit er dokumentert.
 
 ## Låst roadmap
 
 ```text
 fase 14  Korrigeringslinjer og snapping – fullført
-fase 15  Duse portalfarger og tydelig visuell struktur
+fase 15  Duse portalfarger og tydelig visuell struktur – klar for endelig PR-kontroll
 fase 16  Automatisert testgrunnlag
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
@@ -219,6 +223,10 @@ Rekkefølgen er låst fordi hver fase bygger nødvendig grunnlag for senere fase
 
 ## Fase 15 – duse portalfarger og tydelig visuell struktur
 
+### Status
+
+Implementert, visuelt godkjent, auditert og automatisk verifisert på produksjons-head `7ea58a5`. Avventer siste dokument-/PR-kontroll og eksplisitt mergegodkjenning.
+
 ### Formål
 
 Skille portalområdene visuelt uten å gjøre grensesnittet sterkt eller urolig.
@@ -233,12 +241,79 @@ Skille portalområdene visuelt uten å gjøre grensesnittet sterkt eller urolig.
 - bevare `prefers-reduced-motion`
 - ingen endring av nettsideprosjektets farger
 
+### Levert palett
+
+```text
+portal/header        #F6EFE6
+panel                #FAF6F1
+aktiv bakgrunn       #FFE8DA
+kant                 #E6DED2
+aktiv oransje        #E25A1C
+mørk tekst           #1F1F1F
+sekundær tekst       #6B6F76
+blå ikon             #2F6DB6
+grønn ikon           #2E7D32
+lilla ikon           #7E3FA8
+oransje ikon         #E07A24
+```
+
+Den røde topplinjen i brukerens referanseskjermbilde tilhører nettleserens dev-miljø og er ikke del av editorens design.
+
+### Framtidsrettet auditrettelse
+
+Første implementasjon koblet ikonfargene til `nth-child`. Det ville gjort fargene avhengige av DOM-rekkefølge og kunne gitt feil farge når menyen eller elementbiblioteket senere utvides.
+
+Dette er erstattet med eksplisitte semantiske variantklasser:
+
+```text
+rail-button--files
+rail-button--design
+rail-button--media
+rail-button--elements
+rail-button--settings
+
+element-card--section
+element-card--image
+element-card--text
+element-card--button
+```
+
+TSX-endringene påvirker bare CSS-klassenavn. State, eventflyt, prosjektmodell, validering og elementoppretting er uendret.
+
+### Verifisert sluttkontroll på `7ea58a5`
+
+```text
+ESLint: bestått
+TypeScript: bestått
+Dependency Cruiser: 118 moduler, 341 avhengigheter, 0 brudd
+Vite: 127 moduler transformert
+CSS: 45.36 kB, gzip 7.34 kB
+JavaScript: 280.72 kB, gzip 83.19 kB
+produksjonsbuild: bestått på 197 ms
+git diff --check origin/main...HEAD: ingen feil
+git status --short: clean
+produksjonsfiler på eller over 250 linjer: 0
+```
+
+Arkitekturrapportene er ikke regenerert fordi ingen import eller modulgrense er endret.
+
 ### Ikke del av fasen
 
 - tekstboksbakgrunn i prosjektmodellen
 - globale nettsidemaler
 - mørk modus
 - brukerdefinerte portaltemaer
+- editor-only elementgrense
+- elementnotat og høyrepanelmodell
+- like mellomrom og fordelingsguider
+- arbeidsportalnavigator eller `Ctrl + K`
+- sider eller navigasjonsmodell
+- Header-meny eller Hero
+- responsive mobiloverstyringer
+- angre/gjør om
+- lokal lagring, prosjektimport eller fullskjermsforhåndsvisning
+- OpenAI
+- offentlig publisering
 
 ### Akseptansekriterier
 
@@ -247,6 +322,7 @@ Skille portalområdene visuelt uten å gjøre grensesnittet sterkt eller urolig.
 - ingen prosjektdata eller skjemaversjon endres
 - CSS bruker sentrale tokens fremfor gjentatte tilfeldige farger
 - PC-visning fungerer på eksisterende minimumsbredde
+- ikonfarger er bundet til semantiske varianter, ikke DOM-rekkefølge
 - `npm run check` og visuell regresjon er bestått
 
 ---
