@@ -10,7 +10,6 @@ import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
 import { setElementLink } from './setElementLink'
-import { setHeaderWidthMode } from './setHeaderWidthMode'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
@@ -181,14 +180,6 @@ function reduceEditorProjectState(
     case 'set-header-frame-width':
     case 'set-header-frame-color':
       return reduceHeaderAppearanceAction(state, action)
-
-    case 'set-header-width-mode':
-      return setHeaderWidthMode(
-        state,
-        action.elementId,
-        action.widthMode,
-        action.updatedAt,
-      )
 
     case 'set-image-alt-text':
     case 'set-image-mode':
