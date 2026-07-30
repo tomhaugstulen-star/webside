@@ -3,6 +3,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
+  type PointerEvent,
   type RefObject,
 } from 'react'
 import type { ElementLayout } from '../../model/elementLayout'
@@ -69,7 +70,7 @@ export function EditorCanvasElement({
   const initialLayout: ElementLayout =
     isHeader && canvasWidth > 0
       ? {
-          position: { x: 0, y: resolvedPosition.y },
+          position: { x: 0, y: 0 },
           size: { width: canvasWidth, height: resolvedSize.height },
         }
       : {
@@ -115,6 +116,7 @@ export function EditorCanvasElement({
     top: layout.position.y,
     width: layout.size.width,
     height: layout.size.height,
+    cursor: isHeader ? 'default' : undefined,
     ...getElementAppearanceCssStyle(element),
     ...(element.kind === 'text'
       ? getTextElementCssStyle(element.textStyle)
@@ -127,7 +129,31 @@ export function EditorCanvasElement({
   const editingClass = isTextEditing ? ' canvas-element--editing' : ''
   const accessibleLabel = getAccessibleElementLabel(element)
 
+  const handleElementPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isHeader) {
+      handleMovePointerDown(event)
+      return
+    }
+
+    if (event.button !== 0) return
+    event.stopPropagation()
+    onSelect(element.id)
+    onOpenProperties()
+  }
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (
+      isHeader &&
+      event.key.startsWith('Arrow') &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
+      event.preventDefault()
+      onSelect(element.id)
+      onOpenProperties()
+      return
+    }
+
     handleCanvasElementKeyDown(event, {
       element,
       selected,
@@ -176,7 +202,7 @@ export function EditorCanvasElement({
         }
         aria-pressed={isTextEditing ? undefined : selected}
         data-element-id={element.id}
-        onPointerDown={isTextEditing ? undefined : handleMovePointerDown}
+        onPointerDown={isTextEditing ? undefined : handleElementPointerDown}
         onPointerMove={isTextEditing ? undefined : handlePointerMove}
         onPointerUp={isTextEditing ? undefined : handlePointerUp}
         onPointerCancel={isTextEditing ? undefined : handlePointerCancel}
