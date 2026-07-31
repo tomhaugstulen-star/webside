@@ -55,10 +55,20 @@ async function terminateProcessTree(child) {
   }
 
   if (process.platform === 'win32') {
-    spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], {
-      stdio: 'ignore',
-      windowsHide: true,
-    })
+    const result = spawnSync(
+      'taskkill',
+      ['/PID', String(child.pid), '/T', '/F'],
+      {
+        stdio: 'ignore',
+        windowsHide: true,
+        timeout: 10_000,
+      },
+    )
+
+    if (result.error) {
+      child.kill()
+    }
+
     return
   }
 
@@ -106,24 +116,26 @@ async function main() {
     { detached: process.platform !== 'win32' },
   )
 
-  try {
-    await waitForServer(vite)
+  await waitForServer(vite)
 
-    const playwright = startNodeProcess(playwrightCli, [
-      'test',
-      '--config',
-      'playwright.config.ts',
-      ...process.argv.slice(2),
-    ])
-    const [exitCode, signal] = await once(playwright, 'exit')
+  const playwright = startNodeProcess(playwrightCli, [
+    'test',
+    '--config',
+    'playwright.config.ts',
+    ...process.argv.slice(2),
+  ])
+  const [exitCode, signal] = await once(playwright, 'exit')
 
-    process.exitCode = exitCode ?? (signal ? 1 : 0)
-  } finally {
-    await stopManagedProcesses()
-  }
+  return exitCode ?? (signal ? 1 : 0)
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error)
-  process.exitCode = 1
-})
+main()
+  .then(async (exitCode) => {
+    await stopManagedProcesses()
+    process.exit(exitCode)
+  })
+  .catch(async (error) => {
+    console.error(error instanceof Error ? error.message : error)
+    await stopManagedProcesses()
+    process.exit(1)
+  })
