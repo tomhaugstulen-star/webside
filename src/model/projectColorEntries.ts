@@ -5,6 +5,7 @@ export type ProjectColorTarget =
   | { type: 'page-background' }
   | { type: 'section-background'; elementId: string }
   | { type: 'section-frame'; elementId: string }
+  | { type: 'text-background'; elementId: string }
   | { type: 'text-color'; elementId: string }
   | { type: 'header-background'; elementId: string }
   | { type: 'header-text'; elementId: string }
@@ -85,6 +86,13 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
         label: `Tekst ${textNumber}`,
         locked: element.locked,
         entries: [
+          {
+            id: `${element.id}-background`,
+            label: 'Bakgrunn',
+            value: element.appearance.backgroundColor,
+            disabled: element.locked,
+            target: { type: 'text-background', elementId: element.id },
+          },
           {
             id: `${element.id}-text`,
             label: 'Tekstfarge',
