@@ -40,7 +40,7 @@ npm run verify
 
 `npm run verify` kjører filpolicy, filstørrelseskontroll, lint, TypeScript, arkitekturkontroll, 20 enhetstester, produksjonsbuild og den kritiske Chromium-flyten.
 
-GitHub-workflowen `Quality` kjører samme kommando på pull requests og ved push til `main`.
+GitHub-workflowen `Quality` kjører samme kommando på pull requests, ved kontrollert manuell start og ved push til `main`.
 
 ## Gjeldende utviklingsstatus
 
@@ -51,8 +51,9 @@ aktiv draft-PR: #50
 aktiv issue: #35
 prosjektskjema på branchen: versjon 10
 fase 17-kjerne: implementert og automatisk verifisert
-dokumentasjon og arkitekturrapporter: synkronisert
-gjenstår før merge: siste Quality på endelig head og manuell PC/Telefon-test
+dokumentasjons- og arkitektursynk: 34eeb8a7523af6799330c2a642c66d37a7a105c6
+dokumentasjonsfinalisering og handover: 1d637409737d91829b9f89bc221eb92bdf5a2a39
+gjenstår før merge: Quality på endelig head og manuell PC/Telefon-test
 ```
 
 Fase 17 legger til varig og validert bakgrunnsfarge for Tekst-elementer. `Farger` viser `Bakgrunn` før `Tekstfarge`, og låste Tekst-elementer kan inspiseres, men ikke endres.
