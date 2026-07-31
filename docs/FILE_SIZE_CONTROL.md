@@ -35,9 +35,30 @@ Kontrollen feiler også når:
 
 Det finnes ingen aktive unntak ved innføringen av kontrollen.
 
+## Regelmotor og tester
+
+Den rene regelmotoren ligger i `scripts/file-line-policy.mjs`. Grenseverdier, linjetelling og unntaksvalidering testes uten å opprette midlertidige produksjonsfiler.
+
+Testene dekker:
+
+- ordinær fil på 249 linjer
+- ordinær fil på 250 linjer
+- eksplisitt unntak på 250 og 299 linjer
+- absolutt blokkering på 300 linjer, også med unntak
+- manglende begrunnelse
+- manglende eller ukontrollert fil
+- foreldet unntak
+- LF- og CRLF-linjetelling
+
 ## Kommandoer
 
-Kjør bare filstørrelseskontrollen:
+Kjør bare regeltestene:
+
+```powershell
+npm run file-size:test
+```
+
+Kjør bare repositorykontrollen:
 
 ```powershell
 npm run file-size:check
@@ -49,11 +70,11 @@ Kjør hele kvalitetskontrollen:
 npm run check
 ```
 
-`npm run check` kjører filstørrelseskontrollen først. Den eksisterende GitHub Actions-workflowen kjører samme kommando på pull requests og ved push til `main`.
+`npm run check` kjører regeltestene og repositorykontrollen først. Den eksisterende GitHub Actions-workflowen kjører samme kommando på pull requests og ved push til `main`.
 
 ## Resultat
 
-Ved hver kjøring vises:
+Ved hver repositorykontroll vises:
 
 - antall kontrollerte produksjonsfiler
 - de ti største produksjonsfilene sortert etter linjetall
