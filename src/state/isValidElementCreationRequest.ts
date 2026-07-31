@@ -1,4 +1,3 @@
-import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import {
   isValidHeaderSiteName,
@@ -8,6 +7,7 @@ import {
   isImageAssetId,
   isValidImageAssetMetadata,
 } from '../model/imageAsset'
+import { isKnownButtonAssetId } from '../model/buttonAsset'
 
 export function isValidElementCreationRequest(
   request: ElementCreationRequest,
@@ -22,7 +22,7 @@ export function isValidElementCreationRequest(
         isValidImageAssetMetadata(request.assetMetadata)
       )
     case 'button':
-      return findButtonAsset(request.assetId) !== null
+      return isKnownButtonAssetId(request.assetId)
     case 'header':
       return (
         isImageAssetId(request.logoAssetId) &&

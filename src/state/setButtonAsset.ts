@@ -1,5 +1,7 @@
-import { findButtonAsset } from '../assets/buttons/buttonAssetCatalog'
-import type { ButtonAssetId } from '../model/buttonAsset'
+import {
+  isKnownButtonAssetId,
+  type ButtonAssetId,
+} from '../model/buttonAsset'
 import type { EditorProjectState } from '../model/editorProject'
 
 export function setButtonAsset(
@@ -16,7 +18,7 @@ export function setButtonAsset(
     !element ||
     element.kind !== 'button' ||
     element.locked ||
-    findButtonAsset(assetId) === null ||
+    !isKnownButtonAssetId(assetId) ||
     assetId === element.assetId
   ) {
     return state

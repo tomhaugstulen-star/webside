@@ -31,6 +31,20 @@ export function createButtonAssetId(value: string): ButtonAssetId {
   return value
 }
 
-export const DEFAULT_BUTTON_ASSET_ID = createButtonAssetId(
-  'button.primary-rounded.v1',
-)
+export const BUTTON_ASSET_IDS = {
+  primaryRounded: createButtonAssetId('button.primary-rounded.v1'),
+  secondaryRounded: createButtonAssetId('button.secondary-rounded.v1'),
+  outlineRounded: createButtonAssetId('button.outline-rounded.v1'),
+  darkRounded: createButtonAssetId('button.dark-rounded.v1'),
+} as const satisfies Record<string, ButtonAssetId>
+
+const knownButtonAssetIds = Object.values(BUTTON_ASSET_IDS)
+
+export function isKnownButtonAssetId(value: unknown): value is ButtonAssetId {
+  return (
+    isButtonAssetId(value) &&
+    knownButtonAssetIds.some((assetId) => assetId === value)
+  )
+}
+
+export const DEFAULT_BUTTON_ASSET_ID = BUTTON_ASSET_IDS.primaryRounded
