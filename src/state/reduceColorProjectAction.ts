@@ -2,6 +2,7 @@ import { isEditorColor } from '../model/editorColor'
 import type {
   EditorProjectState,
   SectionEditorElement,
+  TextEditorElement,
 } from '../model/editorProject'
 import { isValidPageAppearance } from '../model/pageAppearance'
 import {
@@ -9,11 +10,19 @@ import {
   isValidSectionAppearance,
   type SectionAppearance,
 } from '../model/sectionAppearance'
+import {
+  isValidTextAppearance,
+  type TextAppearance,
+} from '../model/textAppearance'
 import type { ColorProjectAction } from './editorProjectAction'
 
 type SectionAppearanceUpdater = (
   element: SectionEditorElement,
 ) => SectionAppearance | null
+
+type TextAppearanceUpdater = (
+  element: TextEditorElement,
+) => TextAppearance | null
 
 function updateActiveSectionAppearance(
   state: EditorProjectState,
@@ -44,6 +53,52 @@ function updateActiveSectionAppearance(
           ...page,
           elements: page.elements.map((candidate) =>
             candidate.id === elementId && candidate.kind === 'section'
+              ? { ...candidate, appearance: nextAppearance }
+              : candidate,
+          ),
+        }
+      : page,
+  )
+
+  return {
+    ...state,
+    project: {
+      ...state.project,
+      pages,
+      updatedAt,
+    },
+  }
+}
+
+function updateActiveTextAppearance(
+  state: EditorProjectState,
+  elementId: string,
+  updatedAt: string,
+  updateAppearance: TextAppearanceUpdater,
+): EditorProjectState {
+  const activePage = state.project.pages.find(
+    (page) => page.id === state.activePageId,
+  )
+  const element = activePage?.elements.find(
+    (candidate) => candidate.id === elementId,
+  )
+
+  if (!activePage || !element || element.kind !== 'text' || element.locked) {
+    return state
+  }
+
+  const nextAppearance = updateAppearance(element)
+
+  if (!nextAppearance || !isValidTextAppearance(nextAppearance)) {
+    return state
+  }
+
+  const pages = state.project.pages.map((page) =>
+    page.id === state.activePageId
+      ? {
+          ...page,
+          elements: page.elements.map((candidate) =>
+            candidate.id === elementId && candidate.kind === 'text'
               ? { ...candidate, appearance: nextAppearance }
               : candidate,
           ),
@@ -148,6 +203,21 @@ export function reduceColorProjectAction(
                 ...element.appearance,
                 frame: { ...element.appearance.frame, color: action.color },
               },
+      )
+
+    case 'set-text-background-color':
+      if (!isEditorColor(action.color)) {
+        return state
+      }
+
+      return updateActiveTextAppearance(
+        state,
+        action.elementId,
+        action.updatedAt,
+        (element) =>
+          element.appearance.backgroundColor === action.color
+            ? null
+            : { ...element.appearance, backgroundColor: action.color },
       )
   }
 
