@@ -14,6 +14,10 @@ import {
   isValidImageAssetMetadata,
   type ImageAssetMetadata,
 } from '../../src/model/imageAsset'
+import {
+  DEFAULT_TEXT_APPEARANCE,
+  isValidTextAppearance,
+} from '../../src/model/textAppearance'
 import { isValidElementCreationRequest } from '../../src/state/isValidElementCreationRequest'
 
 function createValidImageMetadata(): ImageAssetMetadata {
@@ -66,6 +70,16 @@ test.describe('model validators', () => {
     expect(isValidHeaderSiteName('')).toBe(false)
     expect(isValidHeaderSubtitle('')).toBe(true)
     expect(isValidHeaderSubtitle('Digitalt  håndverk')).toBe(false)
+  })
+
+  test('validates the exact text appearance shape', () => {
+    expect(DEFAULT_TEXT_APPEARANCE.backgroundColor).toBe('#FFFFFF')
+    expect(isValidTextAppearance(DEFAULT_TEXT_APPEARANCE)).toBe(true)
+    expect(isValidTextAppearance({ backgroundColor: '#ffffff' })).toBe(false)
+    expect(isValidTextAppearance({ backgroundColor: '#FFFFFF', extra: true })).toBe(
+      false,
+    )
+    expect(isValidTextAppearance(null)).toBe(false)
   })
 
   test('distinguishes stable known button IDs from arbitrary valid IDs', () => {
