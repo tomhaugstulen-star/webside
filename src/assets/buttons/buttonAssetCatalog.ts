@@ -1,5 +1,5 @@
 import {
-  createButtonAssetId,
+  BUTTON_ASSET_IDS,
   type ButtonAssetId,
 } from '../../model/buttonAsset'
 import darkRoundedButton from './dark-rounded.svg'
@@ -17,28 +17,28 @@ export type ButtonAssetDefinition = {
 
 export const buttonAssetCatalog = [
   {
-    id: createButtonAssetId('button.primary-rounded.v1'),
+    id: BUTTON_ASSET_IDS.primaryRounded,
     name: 'Primær avrundet',
     src: primaryRoundedButton,
     resizeMode: 'stretch',
     labelColor: '#FFFFFF',
   },
   {
-    id: createButtonAssetId('button.secondary-rounded.v1'),
+    id: BUTTON_ASSET_IDS.secondaryRounded,
     name: 'Sekundær avrundet',
     src: secondaryRoundedButton,
     resizeMode: 'stretch',
     labelColor: '#5F342A',
   },
   {
-    id: createButtonAssetId('button.outline-rounded.v1'),
+    id: BUTTON_ASSET_IDS.outlineRounded,
     name: 'Outline avrundet',
     src: outlineRoundedButton,
     resizeMode: 'stretch',
     labelColor: '#8F432F',
   },
   {
-    id: createButtonAssetId('button.dark-rounded.v1'),
+    id: BUTTON_ASSET_IDS.darkRounded,
     name: 'Mørk avrundet',
     src: darkRoundedButton,
     resizeMode: 'stretch',
