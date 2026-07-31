@@ -13,9 +13,8 @@
     "architecture:diagram": "depcruise --config --include-only \"^src\" --output-type mermaid --output-to docs/dependency-graph.mmd -- src",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "playwright test --config playwright.unit.config.ts",
-    "test:e2e": "playwright test --config playwright.config.ts",
-    "test:headed": "playwright test --config playwright.config.ts --headed",
-    "test:serve": "vite --host 127.0.0.1 --port 4173 --strictPort",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "test:headed": "node scripts/run-e2e.mjs --headed",
     "check": "npm run lint && npm run typecheck && npm run architecture:check && npm run test:unit && npm run build",
     "preview": "vite preview"
   },
