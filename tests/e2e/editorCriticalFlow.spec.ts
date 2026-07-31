@@ -43,11 +43,8 @@ test('creates a text element and edits its persisted background color', async ({
   ).toHaveText(['Bakgrunn', 'Tekstfarge'])
 
   const backgroundInput = textColorGroup.getByLabel(/Bakgrunn\. Nåværende farge/)
-  await backgroundInput.evaluate((input: HTMLInputElement) => {
-    input.value = '#e8f1ff'
-    input.dispatchEvent(new Event('input', { bubbles: true }))
-    input.dispatchEvent(new Event('change', { bubbles: true }))
-  })
+  await backgroundInput.fill('#e8f1ff')
 
+  await expect(backgroundInput).toHaveValue('#e8f1ff')
   await expect(textElement).toHaveCSS('background-color', 'rgb(232, 241, 255)')
 })
