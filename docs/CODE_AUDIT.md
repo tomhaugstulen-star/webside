@@ -1,158 +1,231 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den framtidsrettede auditen av fase 15 – duse portalfarger og tydelig visuell struktur – slik leveransen ble merget til `main` 31. juli 2026.
+Dette dokumentet beskriver gjeldende framtidsrettede kodeaudit etter at fase 16 – automatisert testgrunnlag – og den automatiske produksjonsfilkontrollen er merget til `main` 31. juli 2026.
 
 ## Leveransestatus
 
 ```text
-fullført fase på main: 15 – duse portalfarger og tydelig visuell struktur
-source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
-verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
-pull request: #43 – merget
-mergecommit på main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
-GitHub-sak: #42 – lukket som fullført
+siste fullførte produksjonsfase: 16 – automatisert testgrunnlag
+fase 16 source-head: df0f42f835024d2b05939a1002599033fcd63565
+fase 16 pull request: #46 – merget
+fase 16 mergecommit: b8212e84eef496286a83fbab3e05074eb591ddc5
+fase 16 GitHub-sak: #45 – lukket som fullført
+filstørrelseskontroll pull request: #48 – merget
+filstørrelseskontroll mergecommit: ba8334dab7c423f16358ce423e1f77309884daeb
+filstørrelseskontroll GitHub-sak: #47 – lukket som fullført
+gjeldende main: ba8334dab7c423f16358ce423e1f77309884daeb
 prosjektskjema: versjon 9
 aktiv produksjonsfase: ingen
-neste planlagte fase: 16 – automatisert testgrunnlag
+neste planlagte fase: 17 – tekstboksbakgrunn og små eksisterende modellgap
 ```
 
-Auditen omfatter alle produksjonsfiler endret i fase 15, samspillet mellom portaltema og nettsideprosjektets designverdier, CSS-vedlikehold, komponentklassifisering, filstørrelser, dependency-graf og autoritativ dokumentasjon.
+## Auditomfang
+
+Auditen omfatter:
+
+- testarkitektur og testkommandoer
+- modellvalidatorer og stabile ID-grenser
+- reducerens validerings- og identitetsgrenser
+- layout, clamping og snapping
+- nettleserbasert kritisk editorflyt
+- GitHub Actions og Windows-sikker E2E-kjøring
+- produksjonsfilenes linjegrenser
+- dependency-graf og produksjonsbuild
+- autoritativ dokumentasjon og neste fasegrense
+
+Fase 15 sin visuelle audit er fortsatt historisk gyldig via PR #43 og mergecommit `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Denne filen beskriver nå den nyere tekniske baselinen som senere produksjonsfaser skal bygge på.
 
 ## Arkitekturgrenser
 
-Fase 15 er et editor-UI-tema og skal ikke flytte ansvar mellom lag.
-
 Følgende grenser er kontrollert og bevart:
 
-- `EditorProject` er fortsatt eneste varige sannhetskilde.
-- Reduceren er fortsatt siste valideringsgrense.
-- Portaltema, hover, fokus, disabled og panelbakgrunner er transient rendering.
-- Ingen portalverdi lagres i prosjektmodellen.
-- Ingen action, reducer, hook eller validator er lagt til eller endret.
-- Ingen skjemaversjon er endret.
-- Ingen import er lagt til, fjernet eller flyttet.
-- Bilderessurslageret eier fortsatt `File` og Object URL.
-- Nettsideprosjektets egne farger eies fortsatt av prosjektdata og prosjektspesifikke renderingsstiler.
+- `EditorProject` er fortsatt eneste varige, serialiserbare sannhetskilde.
+- Reduceren er fortsatt siste valideringsgrense for prosjektmutasjoner.
+- Ugyldige og uendrede handlinger skal returnere samme state-identitet.
+- Transient pekerpreview, snapping-guider, paneltilstand og nettleserfokus lagres ikke i prosjektmodellen.
+- `File`, Blob, Object URL og lokal filsti er ikke prosjektdata.
+- Bilderessurslageret eier fortsatt transient fil- og Object URL-livssyklus.
+- Testkode skriver ikke parallelle produksjonsregler; den verifiserer eksporterte, rene grenser.
+- GitHub Actions bruker samme sentrale kvalitetskommando som lokal utvikling.
+- Filstørrelseskontrollen endrer ikke produksjonsadferd eller produksjonsmodellen.
+- Ingen funksjon fra fase 17 eller senere er skjult implementert.
 
-## Endringsomfang
+## Fase 16 – levert testgrunnlag
 
-Fase 15 endrer portalstiler for:
+Fase 16 leverte:
 
-- toppmeny
-- venstre rail
-- åpent venstrepanel
-- høyrepanel
-- arbeidsområde
-- kontrollflater
-- hover, fokus og disabled
-- advarsel, sletting og suksess
-- ikonfarger i venstremeny og elementbibliotek
+- Playwright-basert testverktøy for rene TypeScript-moduler
+- Chromium-basert nettleserregresjon
+- separat TypeScript-konfigurasjon for tester
+- 17 enhetstester
+- én kritisk nettleserflyt
+- Quality-workflow for pull requests og push til `main`
+- Windows-sikker E2E-runner
+- stabil knapp-ID-validering flyttet bort fra SVG-presentasjonskatalogen
+- oppdaterte dependency-rapporter
 
-Tre TSX-filer er endret kun for eksplisitte CSS-variantklasser:
+### Dekning
 
-```text
-src/components/sidebar/LeftSidebar.tsx
-src/components/sidebar/ElementsPanel.tsx
-src/components/sidebar/ImageImportControl.tsx
-```
+Enhetstestene verifiserer:
 
-Det er ingen endring i props, state, eventflyt, elementoppretting eller modellkobling.
+- bilde- og ressursmetadata ved dokumenterte grenser
+- normalisert Header-tekst
+- kjente stabile knapp-ID-er mot vilkårlige gyldige ID-formater
+- bilde-, knapp- og Header-opprettingsforespørsler
+- gyldige og ugyldige reducerhandlinger
+- objektidentitet ved avviste og uendrede handlinger
+- dupliserte element-ID-er
+- låste elementer og sletting
+- ugyldig prosjektbytte uten side
+- bevegelses- og resize-clamping
+- minimums- og maksimumsgrenser for layout
+- snapping på én og to akser
+- snapgrense og prioritet ved lik avstand
+- avvisning av snap som flytter element utenfor lerretet
 
-## Auditfunn og rettelser
-
-### 1. Ikonfarger var koblet til DOM-rekkefølge
-
-Første implementasjon brukte `nth-child` for å gi hovedverktøy og elementkort egne ikonfarger.
-
-Risiko:
-
-- et nytt menypunkt kunne forskyve alle etterfølgende farger
-- endret rekkefølge kunne gi feil semantisk farge
-- CSS-en beskrev posisjon i stedet for verktøyets identitet
-- regresjonen ville være lett å overse fordi funksjonaliteten fortsatt virket
-
-Rettelse:
+Nettleserregresjonen verifiserer en kritisk eksisterende flyt:
 
 ```text
-rail-button--files
-rail-button--design
-rail-button--media
-rail-button--elements
-rail-button--settings
-
-element-card--section
-element-card--image
-element-card--text
-element-card--button
+opprett tekstelement
+-> marker elementet
+-> åpne Egenskaper
 ```
 
-Variantene settes eksplisitt fra eksisterende typede verktøy- og elementverdier. Fargene er dermed robuste mot senere utvidelser og omorganisering.
+Dette gir en reell integrasjonssjekk mellom editor-UI, elementoppretting, markering og høyrepanel uten å innføre full visuell pixeltesting.
 
-### 2. Semantiske tokens og kompatibilitetsaliaser
+## Teststruktur og ansvar
 
-Fase 15 innfører eksplisitte `--portal-*`-roller for:
+Rene regler testes uten unødvendige browser-mocks. Nettlesertesten brukes bare der DOM, fokus og faktisk editorflyt er relevant.
 
-- flater
-- kontroller
-- tekst
-- border
-- fokus
-- disabled
-- fare
-- advarsel
-- suksess
-- ikonvarianter
+Følgende prinsipper gjelder videre:
 
-Eksisterende aliaser beholdes foreløpig:
+- nye rene validatorer og layoutregler skal ha direkte enhetstester
+- reducerendringer skal teste både gyldig mutasjon og avviste grenser
+- ugyldige handlinger skal kontrollere state-identitet når det er en invariant
+- kritiske brukerflyter legges til E2E bare når de gir reell regresjonsverdi
+- full pixeltesting innføres ikke uten eget behov og beslutning
+- framtidige tester skal ikke bygge store mock-systemer rundt kode som kan trekkes ut som rene funksjoner
+
+## Automatisk produksjonsfilkontroll
+
+PR #48 automatiserte den eksisterende prosjektregelen for filstørrelse.
+
+Kontrollen skanner disse produksjonsfiltypene under `src`:
 
 ```text
---text
---muted
---accent
---border
---border-strong
---panel
---app-bg
+.ts
+.tsx
+.js
+.jsx
+.css
 ```
 
-Dette er bevisst kompatibilitet, ikke et nytt parallelt temasystem. Flere eldre stilfiler bruker fortsatt aliasene. De skal ikke fjernes før all restbruk er kartlagt og migrert i en egen kontrollert opprydding.
+Gjeldende grenser:
 
-Nye portalstiler skal foretrekke eksplisitte `--portal-*`-roller.
+```text
+ordinær produksjonsfil: 0–249 linjer
+eksplisitt begrunnet unntak: 250–299 linjer
+absolutt blokkering: 300 linjer eller mer
+```
 
-### 3. Nettsideprosjektets farger er avgrenset
+Kontrollen avviser også:
 
-`project-colors.css` er endret bare for editorens kontrollgruppe, overskrift og skillelinjer. Ingen lagret sidebakgrunn, Seksjon-bakgrunn, tekstfarge, Header-farge eller knappdesign er endret.
+- unntak uten konkret begrunnelse
+- unntak som peker på en manglende eller ukontrollert fil
+- foreldede unntak når filen igjen er under 250 linjer
+- alle filer på 300 linjer eller mer, også registrerte unntak
 
-I `canvas.css` er bare arbeidsområdets portalbakgrunn endret. `.canvas-page` og elementenes prosjektstyrte designverdier er utenfor temaet.
+Regelmotoren er skilt fra filsystemskanningen og har ni egne policytester. Testene dekker 249, 250, 299 og 300 linjer, ugyldige unntak og LF-/CRLF-linjetelling.
 
-### 4. Panel- og layoutinvarianter er bevart
+## Gjeldende filstørrelsesstatus
 
-Kontrollert:
+Siste verifiserte kontroll omfattet 137 produksjonsfiler. Ingen fil krevde unntak.
 
-- høyrepanelet er fortsatt 320 px bredt
-- under 1680 px er høyrepanelet overlay
-- ved 1680 px og bredere reserveres plass
-- venstrepanelets bredde og åpne-/lukkelogikk er uendret
-- portaltemaet endrer ikke canvasberegninger
-- `prefers-reduced-motion` er bevart
-- alignment-guider og markeringer bruker eksisterende rendering
+Største produksjonsfiler:
 
-### 5. Interaksjonstilstander er samlet
+```text
+247  src/components/canvas/useElementPointerTransform.ts
+241  src/components/canvas/EditorCanvasElement.tsx
+236  src/model/imagePresentation.ts
+229  src/styles/toolbar.css
+224  src/components/sidebar/HeaderCreationControl.tsx
+211  src/components/properties/ElementLinkPropertiesSection.tsx
+201  src/state/editorProjectReducer.ts
+199  src/components/properties/ImagePropertiesSection.tsx
+192  src/components/canvas/snapElementMove.ts
+190  src/styles/sidebar-content.css
+```
 
-Tidligere dupliserte hvite kontrollflater, fokusfarger og statusfarger er erstattet med semantiske roller.
+`useElementPointerTransform.ts` har bare to tilgjengelige linjer før en ny linje vil blokkere kvalitetskontrollen. Neste funksjonelle endring i denne filen skal derfor begynne med en ansvarsstyrt oppdeling, ikke et unntak eller mer logikk i samme fil.
 
-Kontrollert:
+`EditorCanvasElement.tsx` skal også overvåkes tett. Oppdeling skal gjøres etter reelt ansvar og ikke gjennom tilfeldige hjelpefiler.
 
-- hover er synlig uten å bli dominant
-- valgt tilstand er tydelig
-- tastaturfokus bruker felles fokus-ring
-- disabled er lesbart og ser ikke aktivt ut
-- fare, advarsel og suksess kan skilles
-- slettingsdialogen beholder tydelig farehierarki
+## Dependency- og modulstatus
 
-### 6. Eksisterende kjente modellgap er ikke blandet inn
+Etter fase 16:
 
-Følgende er fortsatt separate saker og ble ikke skjult implementert i fase 15:
+```text
+118 moduler
+340 avhengigheter
+0 dependency-brudd
+```
+
+Fase 16 endret test- og valideringsstrukturen og oppdaterte derfor arkitekturrapportene.
+
+PR #48 endret bare verktøyskript, dokumentasjon, package-kommando og workflowtekst. Produksjonsmodul- og importgrafen ble ikke endret, og arkitekturrapportene ble derfor ikke regenerert i den leveransen.
+
+## Sentrale kvalitetskommandoer
+
+```powershell
+npm run file-size:test
+npm run file-size:check
+npm run check
+npm run test:e2e
+npm run architecture:json
+npm run architecture:diagram
+git diff --check
+git status --short
+git diff --stat
+```
+
+`npm run check` kjører i denne rekkefølgen:
+
+```text
+policytester for filstørrelse
+produksjonsfilkontroll
+ESLint
+TypeScript og test-typecheck
+Dependency Cruiser
+enhetstester
+produksjonsbuild
+```
+
+GitHub Actions kjører `npm run check` og deretter Chromium-regresjonen.
+
+## Siste verifiserte kvalitetsbaseline
+
+Brukerens terminaloutput og grønn CI bekreftet:
+
+```text
+policytester for filstørrelse: 9 bestått
+kontrollerte produksjonsfiler: 137
+produksjonsfiler på eller over 250 linjer: 0
+ESLint: bestått
+TypeScript og test-typecheck: bestått
+Dependency Cruiser: 118 moduler, 340 avhengigheter, 0 brudd
+enhetstester: 17 bestått
+Chromium-regresjon: 1 bestått
+Vite: 127 moduler transformert
+CSS: 45.36 kB, gzip 7.34 kB
+JavaScript: 280.88 kB, gzip 83.22 kB
+produksjonsbuild: bestått
+git diff --check: ingen feil
+Quality-workflow: success
+```
+
+## Kjente modellgap og neste fasegrense
+
+Følgende kjente saker er ikke blandet inn i fase 16 eller filstørrelsesleveransen:
 
 - issue #35: tekstboksbakgrunn som varig prosjektdata
 - issue #36: editor-only elementgrense
@@ -160,84 +233,14 @@ Følgende er fortsatt separate saker og ble ikke skjult implementert i fase 15:
 - issue #38: like mellomrom og fordelingsguider
 - issue #3: senere mobile designkontroller
 
-Tekstboksens hvite bakgrunn er fortsatt et dokumentert modellgap og håndteres i fase 17.
+Neste planlagte produksjonsfase er fase 17. Før produksjonskode skal omfanget låses rundt issue #35 og andre små modellgap skal vurderes separat, ikke samles ukritisk i samme branch.
 
-## Filstørrelser
-
-Repositoryomfattende lokal kontroll på `7ea58a5` ga ingen produksjonsfiler på eller over 250 linjer.
-
-`toolbar.css` er holdt under den aktive terskelen. Fase 15 har ikke flyttet nytt funksjonelt ansvar inn i stilfilen; endringen normaliserer eksisterende visuelle regler.
-
-Genererte filer `architecture.json` og `docs/dependency-graph.mmd` vurderes ikke etter produksjonsgrensen.
-
-## Arkitekturrapporter
-
-Dependency-grafen er uendret:
-
-```text
-118 moduler
-341 avhengigheter
-0 dependency-brudd
-```
-
-Rapportene er ikke regenerert fordi fase 15 ikke endrer import- eller modulgrafen. De tre TSX-endringene legger bare til CSS-klassenavn og introduserer ingen import.
-
-## Siste automatiske kontroll
-
-Brukerens terminaloutput på branch-head `7ea58a5` bekreftet:
-
-```text
-ESLint: bestått
-TypeScript: bestått
-Dependency Cruiser: 118 moduler, 341 avhengigheter, 0 brudd
-Vite: 127 moduler transformert
-CSS: 45.36 kB, gzip 7.34 kB
-JavaScript: 280.72 kB, gzip 83.19 kB
-produksjonsbuild: bestått på 197 ms
-git diff --check origin/main...HEAD: ingen feil
-git status --short: clean
-produksjonsfiler >= 250 linjer: 0
-```
-
-## Manuell kontroll
-
-Brukeren godkjente den reviderte paletten og den visuelle retningen.
-
-Kontrollert i den visuelle regresjonen:
-
-- toppmeny og portalflater kan skilles
-- hovedikonene er lettere å skille
-- aktiv PC-/Telefon-tilstand er tydelig
-- aktiv venstremenyknapp er tydelig
-- venstre rail og åpent panel har ulike roller
-- høyrepanelets kontroller er lesbare
-- arbeidsområdet kan skilles fra nettsidelerretet
-- prosjektets egne farger er uendret
-- fare-, advarsel- og fokusuttrykk er tydelige
-
-Den røde topplinjen i referanseskjermbildet tilhører nettleserens dev-miljø og inngår ikke i editorens design.
-
-## Merge-resultat
-
-PR #43 ble kontrollert mot head `7a4e688`, markert klar for review og merget etter eksplisitt brukergodkjenning.
-
-Kontrollert før merge:
-
-- PR-en var mergebar
-- full changed-file-liste var gjennomgått
-- ingen GitHub Actions- eller CI-kjøringer var konfigurert
-- ingen reviews forelå
-- ingen kommentarer forelå
-- ingen åpne review-tråder forelå
-- lokal branch var synkronisert og clean
-- dokumentdiffen hadde ingen `git diff --check`-feil
-
-GitHub opprettet mergecommit `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Issue #42 ble automatisk lukket som fullført.
+Fase 17 skal ikke starte før dokumentasjonssynken er kontrollert og merget etter eksplisitt brukergodkjenning.
 
 ## Konklusjon
 
-Det finnes ingen kjent funksjons-, modell-, state-, dependency- eller filstørrelsesblokkerer i fase 15.
+Fase 16 er fullført og oppfyller de låste akseptansekriteriene. Den automatiske filstørrelseskontrollen er aktiv lokalt og i CI.
 
-Den eneste framtidsrettede vedlikeholdsrisikoen som ble funnet – rekkefølgeavhengige ikonfarger – er rettet med eksplisitte semantiske variantklasser.
+Det finnes ingen kjent test-, build-, dependency-, dokumentasjons- eller filstørrelsesblokkerer på `main` ved commit `ba8334dab7c423f16358ce423e1f77309884daeb`.
 
-Fase 15 er fullført på `main`. Det finnes ingen kjent funksjons-, modell-, state-, dependency-, dokumentasjons- eller filstørrelsesblokkerer fra leveransen. Neste planlagte produksjonsfase er fase 16 – automatisert testgrunnlag.
+Den tydeligste vedlikeholdsrisikoen er størrelsen på `useElementPointerTransform.ts`. Denne risikoen er nå automatisk håndhevet og skal håndteres før filen utvides.
