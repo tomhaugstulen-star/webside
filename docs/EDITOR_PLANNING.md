@@ -31,7 +31,7 @@ prosjektskjema på branchen: versjon 10
 samlet kontroll: npm run verify
 automatisk kodekontroll: bestått på verifisert kode-head
 manuell PC-/Telefon-regresjon: gjenstår
-arkitekturrapporter etter nye moduler: gjenstår
+arkitekturrapporter etter nye moduler: synkronisert
 ```
 
 Fase 15 og 16 er ferdige på `main`. Fase 17 er avgrenset til tekstboksbakgrunn og forblir draft til siste automatiske og manuelle kontroll er dokumentert.

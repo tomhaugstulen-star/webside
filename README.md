@@ -51,7 +51,8 @@ aktiv draft-PR: #50
 aktiv issue: #35
 prosjektskjema på branchen: versjon 10
 fase 17-kjerne: implementert og automatisk verifisert
-gjenstår før merge: dokumentasjon, oppdaterte arkitekturrapporter og manuell PC/Telefon-test
+dokumentasjon og arkitekturrapporter: synkronisert
+gjenstår før merge: siste Quality på endelig head og manuell PC/Telefon-test
 ```
 
 Fase 17 legger til varig og validert bakgrunnsfarge for Tekst-elementer. `Farger` viser `Bakgrunn` før `Tekstfarge`, og låste Tekst-elementer kan inspiseres, men ikke endres.
@@ -67,6 +68,7 @@ Programmet har ennå ikke lokal prosjektlagring, autolagring, krasjgjenopprettin
 - faktisk GitHub-state og terminaloutput er sannhetskilde
 - `npm run verify` er obligatorisk før merge og før kritisk bruk
 - nye funksjoner fryses når jobbregresjonen starter
+- AI utfører alle GitHub-operasjoner den har tilgang til; brukeren kjører bare nødvendige lokale kommandoer og manuelle UI-tester
 
 ## Autoritativ dokumentasjon
 

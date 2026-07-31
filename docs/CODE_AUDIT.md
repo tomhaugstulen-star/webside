@@ -12,7 +12,8 @@ issue: #35
 prosjektskjema på branchen: 10
 verifisert kode-head: ea2a446044eca7423d40c027320922d1ea444151
 Quality på verifisert kode-head: success
-status: ikke mergeklar før siste branch-head, dokumentasjon, rapporter og manuell regresjon er verifisert
+dokumentasjons- og arkitektursynk: commit 34eeb8a7523af6799330c2a642c66d37a7a105c6
+status: ikke mergeklar før siste Quality på endelig head og manuell PC-/Telefon-regresjon er verifisert
 ```
 
 ## Levert modellendring
@@ -115,4 +116,4 @@ Før programmet brukes som eneste arbeidsverktøy må denne risikoen behandles e
 
 ## Konklusjon
 
-Fase-17-kjernen følger eksisterende modell- og reducergrenser og har målrettet testdekning. Ingen senere feature er blandet inn. PR #50 skal forbli draft til siste branch-head har grønn `npm run verify`, oppdaterte arkitekturrapporter, ren diff og godkjent manuell PC-/Telefon-regresjon.
+Fase-17-kjernen følger eksisterende modell- og reducergrenser og har målrettet testdekning. Ingen senere feature er blandet inn. PR #50 skal forbli draft til endelig branch-head har grønn GitHub Quality, ren diff og godkjent manuell PC-/Telefon-regresjon. Dokumentasjon og arkitekturrapporter er allerede synkronisert.

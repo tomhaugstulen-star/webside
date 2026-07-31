@@ -12,6 +12,14 @@ Dette dokumentet fastsetter varige arbeids-, produkt-, modell- og arkitekturgren
 - Lokal kontrollstatus påstås bare når terminaloutput er vist.
 - Låst roadmap i `docs/WORK_PLAN.md` endres bare gjennom eksplisitt produktbeslutning.
 
+## Remote og lokalt ansvar
+
+- AI bruker GitHub-connectoren til alle remote-operasjoner den har tilgang til: kode, dokumentasjon, branches, commits, issues, pull requests, CI-kontroll, reviews og tråder.
+- Brukeren skal ikke få repo-skrivende lokale kommandoer når samme arbeid kan utføres sikkert direkte i GitHub.
+- Brukeren utfører bare handlinger som faktisk krever den lokale PC-en: hente ferdig remote-state, starte programmet, kontrollere lokal status og gjennomføre manuell UI-/regresjonstest.
+- Lokale kommandoer skal være få, samlede og begrunnet i et konkret lokalt behov.
+- AI skal kontrollere remote-resultatet før brukeren blir bedt om lokal synk eller test.
+
 ## Produktgrense
 
 - Website-editoren er en lokal arbeidsportal på brukerens egen PC.

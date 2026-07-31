@@ -166,7 +166,7 @@ enhetstester: 20 bestått på verifisert kode-head
 nettleserregresjon: 1 bestått på verifisert kode-head
 Quality på kode-head ea2a446: success
 samlet kontrollkommando: npm run verify
-status: draft til dokumentasjon, arkitekturrapporter og manuell PC/Telefon-test er ferdige
+status: dokumentasjon og arkitekturrapporter er synkronisert; siste Quality og manuell PC/Telefon-test gjenstår
 neste roadmapfase etter ferdig fase 17: 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
 jobbberedskap: lokal lagring/autolagring er fortsatt et eksplisitt risikogap
 ```
@@ -406,7 +406,7 @@ git diff --check: bestått
 
 ### Status
 
-Pågår i `feature/phase-17-text-background` og draft-PR #50. Kodekjernen og automatiske tester er implementert. Leveransen forblir draft til dokumentasjon, arkitekturrapporter, siste `npm run verify`, GitHub Quality og manuell PC-/Telefon-regresjon er bestått.
+Pågår i `feature/phase-17-text-background` og draft-PR #50. Kodekjernen, dokumentasjon og arkitekturrapporter er implementert og synkronisert. Leveransen forblir draft til siste GitHub Quality på endelig head og manuell PC-/Telefon-regresjon er bestått.
 
 ### Formål
 

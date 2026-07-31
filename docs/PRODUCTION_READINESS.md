@@ -2,6 +2,12 @@
 
 Dette dokumentet er en kvalitetsport før Website-editoren brukes i faktisk arbeid. Det erstatter ikke roadmapen og senker ingen tekniske krav.
 
+## Ansvarsdeling
+
+- AI gjør alle mulige GitHub-endringer, dokumentoppdateringer, commits, PR-kontroller og CI-kontroller direkte i repoet.
+- Brukeren gjør bare nødvendig lokal synk, starter programmet og gjennomfører den manuelle regresjonen.
+- Ingen lokal kommandorunde brukes til arbeid som AI kan utføre sikkert remote.
+
 ## Full automatisk kontroll
 
 ```powershell
