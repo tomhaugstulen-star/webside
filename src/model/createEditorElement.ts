@@ -10,6 +10,7 @@ import {
   DEFAULT_IMAGE_TRANSFORM,
 } from './imagePresentation'
 import { DEFAULT_SECTION_APPEARANCE } from './sectionAppearance'
+import { DEFAULT_TEXT_APPEARANCE } from './textAppearance'
 import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
 
 type CreateEditorElementInput = {
@@ -61,6 +62,7 @@ export function createEditorElement({
         ...common,
         kind: 'text',
         content: '',
+        appearance: { ...DEFAULT_TEXT_APPEARANCE },
         textStyle: { ...DEFAULT_TEXT_ELEMENT_STYLE },
         link: { ...NO_ELEMENT_LINK },
       }
