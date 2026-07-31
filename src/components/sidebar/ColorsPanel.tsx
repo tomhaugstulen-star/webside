@@ -13,6 +13,7 @@ export function ColorsPanel() {
     updatePageBackgroundColor,
     updateSectionBackgroundColor,
     updateSectionFrameColor,
+    updateTextBackgroundColor,
     updateTextColor,
     updateHeaderBackgroundColor,
     updateHeaderTextColor,
@@ -31,6 +32,9 @@ export function ColorsPanel() {
         return
       case 'section-frame':
         updateSectionFrameColor(target.elementId, value)
+        return
+      case 'text-background':
+        updateTextBackgroundColor(target.elementId, value)
         return
       case 'text-color':
         updateTextColor(target.elementId, value)
