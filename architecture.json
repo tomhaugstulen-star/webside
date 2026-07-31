@@ -683,6 +683,24 @@
         },
         {
           "dynamic": false,
+          "module": "./textAppearance",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/textAppearance.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./textElementStyle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -912,12 +930,14 @@
         "src/model/textElementStyle.ts",
         "src/model/pageAppearance.ts",
         "src/model/sectionAppearance.ts",
+        "src/model/textAppearance.ts",
         "src/state/editorProjectAction.ts",
         "src/state/useHeaderAppearance.ts",
         "src/state/useSectionAppearance.ts",
         "src/components/colors/ColorSwatchInput.tsx",
         "src/model/projectColorEntries.ts",
         "src/state/useProjectColors.ts",
+        "src/state/useTextAppearance.ts",
         "src/state/reduceColorProjectAction.ts",
         "src/state/reduceHeaderAppearanceAction.ts"
       ],
@@ -1192,6 +1212,42 @@
       "valid": true
     },
     {
+      "source": "src/model/textAppearance.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./editorColor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/model/editorProject.ts",
+        "src/model/createEditorElement.ts",
+        "src/state/reduceColorProjectAction.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/model/elementCreation.ts",
       "dependencies": [
         {
@@ -1309,7 +1365,8 @@
         "src/state/useSectionAppearance.ts",
         "src/state/useTextElementStyle.ts",
         "src/components/sidebar/ColorsPanel.tsx",
-        "src/state/useProjectColors.ts"
+        "src/state/useProjectColors.ts",
+        "src/state/useTextAppearance.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -5858,6 +5915,23 @@
         },
         {
           "dynamic": false,
+          "module": "./useTextAppearance",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useTextAppearance.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./useTextElementStyle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -5876,6 +5950,57 @@
       ],
       "dependents": [
         "src/components/sidebar/ColorsPanel.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/useTextAppearance.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorColor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/useProjectColors.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -7078,6 +7203,23 @@
         },
         {
           "dynamic": false,
+          "module": "./textAppearance",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/textAppearance.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./textElementStyle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -7242,6 +7384,23 @@
             "import"
           ],
           "resolved": "src/model/sectionAppearance.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/textAppearance",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/textAppearance.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8168,10 +8327,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 118,
-    "totalDependenciesCruised": 340,
+    "totalCruised": 120,
+    "totalDependenciesCruised": 347,
     "optionsUsed": {
-      "baseDir": "C:\\Users\\tomha\\Desktop\\website",
+      "baseDir": "/home/runner/work/webside/webside",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

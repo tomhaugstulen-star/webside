@@ -97,7 +97,7 @@ Tekst viser font, størrelse, stil, justering, linjehøyde og lenke. Tekstinnhol
 
 Knapp viser knappetekst, design og lenke. Asset-ID valideres mot det bundlete biblioteket.
 
-Tekstboksbakgrunn er ikke en modellert egenskap i versjon 9 og vises derfor ikke i panelet eller `Farger`. Gapet spores i sak #35.
+Tekstboksbakgrunn er varig `TextAppearance` i versjon 10. Den redigeres i `Farger`, ikke som en parallell verdi i høyremenyen. Låst Tekst kan fortsatt inspiseres i høyremenyen, mens Bakgrunn og Tekstfarge er deaktiverte i `Farger` og avvises ved reducergrensen.
 
 ## Tilgjengelighet
 

@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test'
+import { createEditorColor } from '../../src/model/editorColor'
 import { getElementDesktopLayout } from '../../src/model/elementLayout'
 import type {
   EditorPage,
   EditorProject,
   EditorProjectState,
+  TextEditorElement,
 } from '../../src/model/editorProject'
 import {
   editorProjectReducer,
@@ -23,6 +25,21 @@ function getActivePage(state: EditorProjectState): EditorPage {
   }
 
   return page
+}
+
+function getTextElement(
+  state: EditorProjectState,
+  elementId = 'text-1',
+): TextEditorElement {
+  const element = getActivePage(state).elements.find(
+    (candidate) => candidate.id === elementId,
+  )
+
+  if (!element || element.kind !== 'text') {
+    throw new Error('Expected the text element to exist.')
+  }
+
+  return element
 }
 
 function addTextElement(
@@ -56,7 +73,7 @@ test.describe('editor project reducer', () => {
     ).toBe(state)
   })
 
-  test('adds a valid element and rejects a duplicate element ID', () => {
+  test('adds a valid text element with default appearance and rejects a duplicate ID', () => {
     const state = getInitialEditorProjectState()
     const created = addTextElement(state)
     const activePage = getActivePage(created)
@@ -67,6 +84,7 @@ test.describe('editor project reducer', () => {
       id: 'text-1',
       kind: 'text',
       locked: false,
+      appearance: { backgroundColor: '#FFFFFF' },
     })
     expect(created.selectedElementId).toBe('text-1')
     expect(created.project.updatedAt).toBe(CREATED_AT)
@@ -74,14 +92,71 @@ test.describe('editor project reducer', () => {
     expect(addTextElement(created)).toBe(created)
   })
 
+  test('validates text background changes and preserves identity when rejected', () => {
+    const created = addTextElement(getInitialEditorProjectState())
+    const originalUpdatedAt = created.project.updatedAt
+
+    expect(
+      editorProjectReducer(created, {
+        type: 'set-text-background-color',
+        elementId: 'text-1',
+        color: createEditorColor('#FFFFFF'),
+        updatedAt: UPDATED_AT,
+      }),
+    ).toBe(created)
+
+    expect(
+      editorProjectReducer(created, {
+        type: 'set-text-background-color',
+        elementId: 'missing-text',
+        color: createEditorColor('#E8F1FF'),
+        updatedAt: UPDATED_AT,
+      }),
+    ).toBe(created)
+
+    expect(
+      editorProjectReducer(created, {
+        type: 'set-text-background-color',
+        elementId: 'text-1',
+        color: '#e8f1ff' as never,
+        updatedAt: UPDATED_AT,
+      }),
+    ).toBe(created)
+    expect(created.project.updatedAt).toBe(originalUpdatedAt)
+
+    const updated = editorProjectReducer(created, {
+      type: 'set-text-background-color',
+      elementId: 'text-1',
+      color: createEditorColor('#E8F1FF'),
+      updatedAt: UPDATED_AT,
+    })
+
+    expect(updated).not.toBe(created)
+    expect(getTextElement(updated).appearance.backgroundColor).toBe('#E8F1FF')
+    expect(updated.project.updatedAt).toBe(UPDATED_AT)
+  })
+
+  test('rejects text background changes while the text element is locked', () => {
+    const created = addTextElement(getInitialEditorProjectState())
+    const locked = editorProjectReducer(created, {
+      type: 'toggle-element-lock',
+      elementId: 'text-1',
+      updatedAt: UPDATED_AT,
+    })
+
+    expect(
+      editorProjectReducer(locked, {
+        type: 'set-text-background-color',
+        elementId: 'text-1',
+        color: createEditorColor('#E8F1FF'),
+        updatedAt: UPDATED_AT,
+      }),
+    ).toBe(locked)
+  })
+
   test('rejects invalid and unchanged layouts before applying a valid layout', () => {
     const created = addTextElement(getInitialEditorProjectState())
-    const element = getActivePage(created).elements[0]
-
-    if (!element) {
-      throw new Error('Expected the text element to exist.')
-    }
-
+    const element = getTextElement(created)
     const currentLayout = getElementDesktopLayout(element)
 
     expect(
@@ -116,10 +191,7 @@ test.describe('editor project reducer', () => {
     })
 
     expect(updated).not.toBe(created)
-    expect(getActivePage(updated).elements[0]?.position.desktop).toEqual({
-      x: 60,
-      y: 80,
-    })
+    expect(getTextElement(updated).position.desktop).toEqual({ x: 60, y: 80 })
     expect(updated.project.updatedAt).toBe(UPDATED_AT)
   })
 
@@ -131,7 +203,7 @@ test.describe('editor project reducer', () => {
       updatedAt: UPDATED_AT,
     })
 
-    expect(getActivePage(locked).elements[0]?.locked).toBe(true)
+    expect(getTextElement(locked).locked).toBe(true)
     expect(
       editorProjectReducer(locked, {
         type: 'delete-element-from-active-page',

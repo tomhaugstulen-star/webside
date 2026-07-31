@@ -64,13 +64,19 @@ Kjør bare repositorykontrollen:
 npm run file-size:check
 ```
 
-Kjør hele kvalitetskontrollen:
+Kjør repositorykontrollen uten nettleserregresjon:
 
 ```powershell
 npm run check
 ```
 
-`npm run check` kjører regeltestene og repositorykontrollen først. Den eksisterende GitHub Actions-workflowen kjører samme kommando på pull requests og ved push til `main`.
+Kjør full sikkerhetskontroll, inkludert Chromium-regresjonen:
+
+```powershell
+npm run verify
+```
+
+`npm run check` kjører regeltestene og repositorykontrollen først. `npm run verify` kjører deretter den kritiske E2E-flyten. GitHub Actions-workflowen bruker `npm run verify` på pull requests og ved push til `main`.
 
 ## Resultat
 

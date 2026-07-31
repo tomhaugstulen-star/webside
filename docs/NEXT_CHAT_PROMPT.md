@@ -6,245 +6,229 @@ Kopier hele teksten mellom `START HANDOVER` og `SLUTT HANDOVER` inn i neste chat
 
 # START HANDOVER
 
-Du overtar ansvaret for Website-editoren. Arbeid som prosjektleder, teknisk arkitekt og kodeansvarlig. Svar på norsk. Bruk faktisk GitHub-state, faktisk kode, autoritativ dokumentasjon og brukerens terminaloutput som sannhetskilder. Ikke gjett, og ikke påstå at noe er clean, testet eller synkronisert uten bevis.
+Du overtar Website-editoren som prosjektleder, teknisk arkitekt og kodeansvarlig. Svar på norsk. Arbeid presist og effektivt. Faktisk GitHub-state, faktisk kode og brukerens terminaloutput er sannhetskilder. Ikke gjett og ikke påstå at branch, HEAD, clean tree, tester eller synkronisering er bekreftet uten bevis.
 
-## 1. Repo og lokal mappe
+## 1. Repo og aktiv leveranse
 
 ```text
 GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
-Standardbranch: main
+main: ecb443d384a1e0999ef14767419e1bea93c4a12c
+aktiv branch: feature/phase-17-text-background
+aktiv draft-PR: #50 – Fase 17: tekstboksbakgrunn
+aktiv issue: #35
+prosjektskjema på branchen: 10
+dokumentasjons- og arkitektursynk: 34eeb8a7523af6799330c2a642c66d37a7a105c6
 ```
 
-Bruk GitHub-connectoren til remote-operasjoner, kodeinspeksjon, branches, commits, issues og pull requests. Gi eksakte PowerShell- eller Windows-terminalkommandoer for lokale Git-, Node-, Vite- og manuelle kontroller.
+PR #50 er fortsatt draft og må ikke merges uten at brukeren eksplisitt skriver `godkjent`. `fungerer` betyr bare at en manuell test besto.
 
-## 2. Siste bekreftede prosjektstatus
+Hent alltid faktisk PR-head og siste CI-status før du beskriver nåstatus. Commitene etter `34eeb8a` kan ha flyttet head uten å endre faseomfanget.
+
+## 2. Ufravikelig arbeidsdeling
+
+AI skal gjøre alt den kan direkte i repoet gjennom GitHub-connectoren:
+
+- lese og endre kode
+- oppdatere dokumentasjon
+- opprette og vedlikeholde branches
+- committe og pushe remote-endringer
+- oppdatere issues og pull requests
+- kontrollere diff, changed files, mergebarhet, reviews og tråder
+- kjøre eller kontrollere GitHub Actions og CI
+
+Brukeren skal bare gjøre det som faktisk krever den lokale PC-en:
+
+- rydde eller synkronisere den lokale arbeidskopien etter at remote er ferdig
+- starte programmet
+- kjøre en lokal kommando når remote-verktøy ikke kan utføre oppgaven
+- gjennomføre manuell UI-/regresjonstest i PC- og Telefon-visning
+- lime inn terminaloutput som bevis på lokal state
+
+Ikke be brukeren generere dokumentasjon, arkitekturrapporter, commits eller andre repo-endringer lokalt når AI kan gjøre dette remote. Lokale kommandoer skal være få, samlede og begrunnet.
+
+## 3. Fase 17 – låst omfang
+
+Fase 17 er kun issue #35:
+
+- serialiserbar `TextAppearance`
+- `backgroundColor: EditorColor`
+- standard `#FFFFFF`
+- `TextEditorElement.appearance`
+- prosjektskjema 10
+- typed `set-text-background-color`
+- reduceravvisning for ugyldig, ukjent, feil type, låst og uendret handling
+- `Bakgrunn` før `Tekstfarge` i `Farger`
+- rendering fra prosjektdata i stedet for hardkodet CSS
+- modell-, reducer- og Chromium-test
+
+Issue #36, #37, #38 og senere roadmaparbeid er eksplisitt utenfor PR #50. Ikke bland inn lokal lagring, navigator, Hero, mobiloverstyringer eller andre features i denne branchen.
+
+## 4. Implementerte kodegrenser
+
+Nye produksjonsmoduler:
 
 ```text
-gjeldende main: ba8334dab7c423f16358ce423e1f77309884daeb
-commit: Merge pull request #48 from tomhaugstulen-star/chore/automated-file-size-check
-prosjektskjema: versjon 9
-aktiv produksjonsfase: ingen
-neste planlagte produksjonsfase: 17 – tekstboksbakgrunn og små eksisterende modellgap
+src/model/textAppearance.ts
+src/state/useTextAppearance.ts
 ```
 
-Brukerens lokale `main` er bekreftet synkronisert og clean på:
+Viktige berørte filer:
+
+- `src/model/editorProject.ts`: skjema 10 og `TextAppearance`
+- `src/model/createEditorElement.ts`: standardbakgrunn
+- `src/state/editorProjectAction.ts`: typed action
+- `src/state/reduceColorProjectAction.ts`: validering og mutasjon
+- `src/model/projectColorEntries.ts`: Bakgrunn og Tekstfarge
+- `src/state/useProjectColors.ts`: oppdateringsruting
+- `src/components/canvas/getElementAppearanceCssStyle.ts`: rendering
+- `src/styles/canvas.css`: hardkodet hvit Tekst-bakgrunn fjernet
+
+Reducergrensen bevarer samme state-identitet og `updatedAt` ved avviste eller uendrede handlinger. Låst Tekst kan inspiseres, men fargene kan ikke endres.
+
+## 5. Verifisert teknisk baseline
+
+Brukerens lokale terminal bekreftet den første kodekjernen:
 
 ```text
-ba8334d (HEAD -> main, origin/main, origin/HEAD) Merge pull request #48 from tomhaugstulen-star/chore/automated-file-size-check
-```
-
-## 3. Fullførte leveranser
-
-### Fase 15 – duse portalfarger og tydelig visuell struktur
-
-```text
-PR: #43 – merget
-mergecommit: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
-issue: #42 – lukket som fullført
-```
-
-Fase 15 leverte semantiske portaltokens, tydelig oppdeling av toppmeny, venstremeny, paneler, arbeidsområde og lerret, tydelige interaksjonstilstander og semantiske ikonvariantklasser. Brukeren godkjente den visuelle retningen.
-
-### Fase 16 – automatisert testgrunnlag
-
-```text
-source branch: feature/phase-16-test-foundation
-source head: df0f42f835024d2b05939a1002599033fcd63565
-PR: #46 – merget
-mergecommit: b8212e84eef496286a83fbab3e05074eb591ddc5
-issue: #45 – lukket som fullført
-```
-
-Fase 16 leverte:
-
-- Playwright-basert testverktøy for rene TypeScript-moduler og Chromium
-- 17 enhetstester
-- én kritisk nettleserregresjon
-- separat test-typecheck
-- GitHub Actions-workflowen `Quality`
-- Windows-sikker E2E-runner
-- stabil knapp-ID-validering skilt fra SVG-presentasjonskatalogen
-- oppdaterte dependency-rapporter
-
-Fase 16 er ferdig. Ikke start den på nytt og ikke opprett en ny fase 16-branch.
-
-### Automatisk produksjonsfilkontroll
-
-```text
-source branch: chore/automated-file-size-check
-source head: d6f0b48db2a740f90e07d2342ee5ca9beb347c7d
-PR: #48 – merget
-mergecommit: ba8334dab7c423f16358ce423e1f77309884daeb
-issue: #47 – lukket som fullført
-```
-
-Kontrollen:
-
-- skanner `.ts`, `.tsx`, `.js`, `.jsx` og `.css` under `src`
-- krever 0–249 linjer for ordinære produksjonsfiler
-- tillater bare eksplisitte og begrunnede unntak på 250–299 linjer
-- blokkerer alltid 300 linjer eller mer
-- avviser manglende, ugyldige og foreldede unntak
-- viser de ti største produksjonsfilene
-- har ni egne policytester
-- kjører først i `npm run check`
-- kjører i GitHub Actions gjennom samme kvalitetskommando
-
-## 4. Aktiv dokumentasjonssynk
-
-Det arbeides på en ren dokumentasjonsbranch:
-
-```text
-branch: docs/sync-phase-16-status
-base: ba8334dab7c423f16358ce423e1f77309884daeb
-```
-
-Formålet er bare å synkronisere autoritativ dokumentasjon med faktisk ferdigstilt fase 16 og automatisk filstørrelseskontroll.
-
-Dokumenter som oppdateres:
-
-```text
-docs/WORK_PLAN.md
-docs/CODE_AUDIT.md
-docs/NEXT_CHAT_PROMPT.md
-```
-
-Ingen produksjonskode, runtime-avhengighet, prosjektmodell eller arkitekturrapport skal endres i denne docs-leveransen.
-
-Kontroller faktisk GitHub-status før du antar at docs-branchen eller en eventuell docs-PR er merget. Ingen merge uten at brukeren eksplisitt skriver `godkjent`.
-
-## 5. Ufravikelig arbeidsmåte
-
-- Aldri utvikling direkte på `main`.
-- Én avgrenset feature-, chore- eller docs-branch per leveranse.
-- Ingen merge uten at brukeren eksplisitt skriver `godkjent`.
-- `fungerer` godkjenner en test, ikke en merge.
-- Lås omfang før produksjonskode.
-- Ikke bland inn senere faser eller separate issues.
-- Hold ordinære produksjonsfiler under 250 linjer.
-- 250–299 linjer krever et eksplisitt og konkret begrunnet unntak.
-- Ingen produksjonsfil kan være 300 linjer eller mer.
-- Gjennomfør framtidsrettet kodeaudit før PR.
-- Kjør full automatisk kontroll etter siste produksjonsendring.
-- Kontroller diff, PR, mergebarhet, CI/status, reviews, kommentarer og åpne tråder.
-- Regenerer arkitekturrapporter bare ved faktisk modul- eller importgrafendring.
-- Oppdater autoritativ dokumentasjon etter faktisk mergecommit.
-- Bruk faktisk terminaloutput som eneste kilde for lokal branch, HEAD, clean tree og teststatus.
-
-## 6. Autoritative dokumenter
-
-Les i denne rekkefølgen:
-
-1. `docs/WORK_PLAN.md`
-2. `docs/PROJECT_RULES.md`
-3. `docs/ELEMENT_MODEL.md`
-4. `docs/EDITOR_PLANNING.md`
-5. `docs/RESPONSIVE_DESIGN.md`
-6. `docs/RIGHT_PROPERTIES_PANEL.md`
-7. `docs/CODE_AUDIT.md`
-8. `docs/FILE_SIZE_CONTROL.md`
-9. `README.md`
-10. `docs/NEXT_CHAT_PROMPT.md`
-
-Regler:
-
-- Faktisk kode og terminaloutput vinner over foreldet dokumenttekst.
-- `WORK_PLAN.md` eier låst rekkefølge og faseomfang.
-- `PROJECT_RULES.md` eier varige arbeids-, modell- og arkitekturgrenser.
-- `FILE_SIZE_CONTROL.md` beskriver den automatiske linjepolicyen.
-- `CODE_AUDIT.md` beskriver gjeldende teknisk baseline og vedlikeholdsrisiko.
-
-## 7. Gjeldende kvalitetsbaseline
-
-Siste verifiserte resultater:
-
-```text
-policytester for filstørrelse: 9 bestått
-kontrollerte produksjonsfiler: 137
-produksjonsfiler på eller over 250 linjer: 0
+filpolicytester: 9 bestått
+produksjonsfiler: 139
+filgrensebrudd: 0
 ESLint: bestått
 TypeScript og test-typecheck: bestått
-Dependency Cruiser: 118 moduler, 340 avhengigheter, 0 brudd
-enhetstester: 17 bestått
-Chromium-regresjon: 1 bestått
-Vite: 127 moduler transformert
-CSS: 45.36 kB, gzip 7.34 kB
-JavaScript: 280.88 kB, gzip 83.22 kB
+Dependency Cruiser: 120 moduler, 347 avhengigheter, 0 brudd
+enhetstester: 20 bestått
+Vite: 129 moduler transformert
+CSS: 45.35 kB, gzip 7.34 kB
+JavaScript: 282.25 kB, gzip 83.33 kB
 produksjonsbuild: bestått
-Quality-workflow: success
 ```
 
-`npm run check` kjører:
+Den første E2E-feilen skyldtes testen, ikke produksjonslogikken: direkte `input.value` omgår React sin kontrollerte inputsporing. Testen ble rettet til Playwright `fill()` og GitHub Quality ble grønn.
 
-```text
-npm run file-size:test
-npm run file-size:check
-npm run lint
-npm run typecheck
-npm run architecture:check
-npm run test:unit
-npm run build
-```
+Dokumenter og arkitekturrapporter ble senere generert i en kontrollert GitHub Actions-kjøring. Den kjørte `npm run verify` før commit og produserte commit `34eeb8a7523af6799330c2a642c66d37a7a105c6`. Engangs-workflowen og migreringsskriptet ble fjernet i samme commit.
 
-Chromium-regresjonen kjøres separat med:
+## 6. Samlet kontroll
 
 ```powershell
-npm run test:e2e
+npm run verify
 ```
 
-## 8. Filstørrelser som må følges
+Kommandoen kjører:
 
-Siste topp:
+- filpolicytester
+- produksjonsfilkontroll
+- ESLint
+- TypeScript og test-typecheck
+- Dependency Cruiser
+- 20 enhetstester
+- produksjonsbuild
+- kritisk Chromium-regresjon
+
+GitHub-workflowen `Quality` bruker samme kommando. `workflow_dispatch` er lagt til slik at Quality også kan startes kontrollert manuelt remote.
+
+Arkitekturrapportene er oppdatert for 120 moduler og 347 avhengigheter:
 
 ```text
-247  src/components/canvas/useElementPointerTransform.ts
-241  src/components/canvas/EditorCanvasElement.tsx
-236  src/model/imagePresentation.ts
-229  src/styles/toolbar.css
-224  src/components/sidebar/HeaderCreationControl.tsx
+architecture.json
+docs/dependency-graph.mmd
 ```
 
-`useElementPointerTransform.ts` har bare to tilgjengelige linjer før kontrollen blokkerer ved 250. Neste funksjonelle endring i denne filen skal starte med ansvarsstyrt oppdeling. Ikke legg til et unntak for å omgå nødvendig refaktorering.
+## 7. Oppdatert dokumentasjon
 
-## 9. Neste produksjonsfase
+Disse dokumentene er synkronisert med fase 17:
 
-Neste låste fase er:
+1. `README.md`
+2. `docs/WORK_PLAN.md`
+3. `docs/PROJECT_RULES.md`
+4. `docs/ELEMENT_MODEL.md`
+5. `docs/EDITOR_PLANNING.md`
+6. `docs/RIGHT_PROPERTIES_PANEL.md`
+7. `docs/RESPONSIVE_DESIGN.md`
+8. `docs/MOBILE_DESIGN_CONTROLS.md`
+9. `docs/FILE_SIZE_CONTROL.md`
+10. `docs/CODE_AUDIT.md`
+11. `docs/PRODUCTION_READINESS.md`
+12. `docs/NEXT_CHAT_PROMPT.md`
+
+Skjemahistorikken viser versjon 10. Tekstbakgrunn er dokumentert som eget `TextAppearance`-ansvar, mens teksttypografi og tekstfarge forblir i `TextElementStyle`.
+
+## 8. Brukerens lokale state ved chatbytte
+
+Siste viste lokale status var på gammel head `87c936a` med disse lokale endringene:
 
 ```text
-fase 17 – tekstboksbakgrunn og små eksisterende modellgap
+M architecture.json
+M docs/dependency-graph.mmd
+D scripts/sync-phase-17-docs.mjs
 ```
 
-Primært omfang:
+Disse endringene kom fra den avbrutte lokale dokumentasjonsrunden og er nå erstattet av remote commit `34eeb8a`, som inneholder genererte rapporter og sletting av skriptet. Ikke be brukeren manuelt gjenskape dem.
 
-- implementere issue #35
-- varig og validert tekstboksbakgrunn
-- standardverdi og skjemakonsekvens
-- `Bakgrunn` og `Tekstfarge` under hvert tekstelement i `Farger`
-- reducer- og hookstøtte
-- rendering fra prosjektdata i stedet for hardkodet CSS
-- korrekt låseoppførsel
-- kontrollere andre små dokumenterte modellgap og behandle dem separat
+Når remote-sluttkontrollen er ferdig, skal brukeren få én samlet PowerShell-blokk som:
 
-Akseptansekriterier:
+1. kontrollerer at bare disse forventede lokale endringene finnes
+2. gjenoppretter dem fra lokal gammel head
+3. henter og fast-forwarder til faktisk remote-head
+4. viser branch, status og HEAD
 
-- bakgrunnsfarge lagres og gjenbrukes stabilt
-- låst tekst kan inspiseres, men ikke endres
-- ugyldig farge avvises ved reducergrensen
-- dokumentasjon og skjemahistorikk oppdateres
-- ingen urelaterte funksjoner blandes inn
+Ikke bruk `git reset --hard` uten å kontrollere statusen først. Ikke slett andre lokale filer.
 
-Ikke start fase 17 før dokumentasjonssynken er kontrollert og merget etter eksplisitt godkjenning.
+## 9. Det som gjenstår for PR #50
 
-## 10. Neste konkrete arbeidsrekkefølge
+1. Kontroller faktisk siste PR-head.
+2. Kontroller GitHub Quality på nøyaktig samme head.
+3. Kontroller changed files, mergebarhet, reviews og åpne tråder.
+4. Synkroniser brukerens lokale branch med én sikker PowerShell-blokk.
+5. La brukeren gjennomføre den manuelle regresjonen i `docs/PRODUCTION_READINESS.md`.
+6. Rett eventuelle faktiske feil på samme branch og kjør hele `npm run verify` igjen.
+7. Gjør PR-en klar for review først når remote og manuell test er grønne.
+8. Merge bare etter ny eksplisitt `godkjent`.
+9. Etter merge: synkroniser lokal `main`, lukk issue #35 dersom GitHub ikke gjør det automatisk, og oppdater status med faktisk mergecommit.
 
-1. Kontroller remote-head og diff på `docs/sync-phase-16-status`.
-2. La brukeren hente branchen lokalt.
-3. Kjør `git diff --check`, `git status --short` og relevant dokumentkontroll.
-4. Åpne docs-PR mot `main`.
-5. Kontroller mergebarhet, changed files, CI, reviews og tråder.
-6. Merge bare etter ny eksplisitt `godkjent`.
-7. Synkroniser lokal `main` etter merge.
-8. Les fase 17 på nytt og lås issue/branch før produksjonskode.
+## 10. Manuell fase-17-test
+
+Minimum som må bekreftes i programmet:
+
+- opprett Tekst
+- skriv og rediger tekst
+- endre `Bakgrunn` og `Tekstfarge`
+- bekreft at riktig Tekst-element endres
+- lås Tekst og bekreft at fargefeltene er synlige, men deaktiverte
+- lås opp, flytt og endre størrelse
+- bytt mellom PC og Telefon
+- kontroller at Seksjon, Knapp, Bilde og Header fortsatt fungerer
+- kontroller sikker sletting og avbryt sletting én gang
+
+Den fullstendige regresjonen ligger i `docs/PRODUCTION_READINESS.md`.
+
+## 11. Jobbkritisk risiko etter fase 17
+
+Programmet mangler fortsatt:
+
+- lokal prosjektlagring
+- autolagring
+- krasjgjenoppretting
+- prosjektimport
+- angre/gjør om
+
+Tester beskytter mot kodebrudd, men hindrer ikke tap av prosjektstate ved oppfriskning, lukking eller krasj. Ikke påstå at programmet er fullt jobbsikkert før denne risikoen er håndtert.
+
+Etter ferdig fase 17 må neste chat ta en eksplisitt roadmapbeslutning om jobbberedskap skal prioriteres foran fase 18. Ikke bygg lagring skjult i PR #50.
+
+## 12. Permanente regler
+
+- aldri utvikling direkte på `main`
+- ingen merge uten eksplisitt `godkjent`
+- ordinære produksjonsfiler: 0–249 linjer
+- 250–299 krever eksplisitt og konkret begrunnet unntak
+- 300+ er alltid blokkert
+- reduceren er siste valideringsgrense
+- ugyldige, låste og uendrede handlinger returnerer samme state
+- `updatedAt` endres bare ved reell gyldig mutasjon
+- DOM, CSS, `File`, Blob, Object URL og lokal filsti er ikke prosjektdata
+- arkitekturrapporter regenereres ved faktisk modul-/importendring
+- faktisk kode, GitHub-state og terminaloutput vinner over foreldet dokumentasjon
+- ingen senere feature blandes inn i aktiv branch
 
 # SLUTT HANDOVER

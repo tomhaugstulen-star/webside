@@ -18,6 +18,7 @@
     "test:e2e": "node scripts/run-e2e.mjs",
     "test:headed": "node scripts/run-e2e.mjs --headed",
     "check": "npm run file-size:test && npm run file-size:check && npm run lint && npm run typecheck && npm run architecture:check && npm run test:unit && npm run build",
+    "verify": "npm run check && npm run test:e2e",
     "preview": "vite preview"
   },
   "dependencies": {

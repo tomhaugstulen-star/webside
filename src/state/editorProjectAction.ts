@@ -37,6 +37,12 @@ export type ColorProjectAction =
       color: EditorColor
       updatedAt: string
     }
+  | {
+      type: 'set-text-background-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
 
 export type HeaderAppearanceAction =
   | {

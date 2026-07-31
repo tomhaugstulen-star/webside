@@ -14,6 +14,12 @@ export function getElementAppearanceCssStyle(
     }
   }
 
+  if (element.kind === 'text') {
+    return {
+      backgroundColor: element.appearance.backgroundColor,
+    }
+  }
+
   if (element.kind === 'header') {
     return {
       backgroundColor: element.appearance.backgroundColor,

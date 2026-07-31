@@ -21,23 +21,20 @@ Offentlig publisering, hosting, domener og produksjonsdeployment er fjernet fra 
 ## Gjeldende status
 
 ```text
-siste fullførte produksjonsfase på main: 15 – duse portalfarger og tydelig visuell struktur
-source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
-verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
-pull request #43: merget
-mergecommit på main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
-GitHub-sak #42: lukket som fullført
-prosjektskjema: versjon 9
-framtidsrettet kodeaudit: fullført
-automatisk sluttkontroll: bestått
-filstørrelseskontroll: bestått
-visuell fase-15-regresjon: godkjent
-aktiv produksjonsfase: ingen
-neste planlagte fase: 16 – automatisert testgrunnlag
-fase 16: ikke startet
+siste fullførte produksjonsfase på main: 16 – automatisert testgrunnlag
+gjeldende main: ecb443d384a1e0999ef14767419e1bea93c4a12c
+aktiv produksjonsfase: 17 – tekstboksbakgrunn
+aktiv branch: feature/phase-17-text-background
+aktiv draft-PR: #50
+aktiv sak: #35
+prosjektskjema på branchen: versjon 10
+samlet kontroll: npm run verify
+automatisk kodekontroll: bestått på verifisert kode-head
+manuell PC-/Telefon-regresjon: gjenstår
+arkitekturrapporter etter nye moduler: synkronisert
 ```
 
-Fase 15 er fullført på `main`. PR #43 ble merget etter eksplisitt brukergodkjenning på mergecommit `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Ingen produksjonsfase er aktiv.
+Fase 15 og 16 er ferdige på `main`. Fase 17 er avgrenset til tekstboksbakgrunn og forblir draft til siste automatiske og manuelle kontroll er dokumentert.
 
 ## Implementert editorgrunnlag
 
@@ -54,7 +51,7 @@ Fase 15 er fullført på `main`. PR #43 ble merget etter eksplisitt brukergodkje
 - lokal bilde- og logoimport
 - transient ressurslager med kontrollert Object URL-livssyklus
 - bildeutsnitt, zoom, alternativ tekst og metadata
-- side- og elementfarger
+- side- og elementfarger, inkludert varig tekstboksbakgrunn
 - Seksjon- og Header-ramme
 - korrigeringslinjer og snapping ved pekerflytting
 - semantisk portaltema med tydelige interaksjonstilstander
@@ -258,8 +255,8 @@ API-nøkkel skal aldri ligge i Vite- eller browserkode.
 ```text
 fase 14  Korrigeringslinjer og snapping – fullført
 fase 15  Duse portalfarger og tydelig visuell struktur – fullført
-fase 16  Automatisert testgrunnlag
-fase 17  Tekstboksbakgrunn og små eksisterende modellgap
+fase 16  Automatisert testgrunnlag – fullført
+fase 17  Tekstboksbakgrunn – pågår
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
 fase 19  Sider, seksjons-ID-er og navigasjonsmodell
 fase 20  Nettstedets Header og menynavigasjon

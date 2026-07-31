@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 9
+EDITOR_PROJECT_SCHEMA_VERSION = 10
 ```
 
 ```text
@@ -18,13 +18,15 @@ EDITOR_PROJECT_SCHEMA_VERSION = 9
 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 8  Header med logo, tekst, utseende og ramme
 9  Header-fontstørrelse
+10 Tekstutseende med varig tekstboksbakgrunn
 ```
 
-Det finnes ennå ingen prosjektimport eller migreringsmotor. Framtidig import må validere hele versjon-9-objektet før `replace-project`.
+Det finnes ennå ingen prosjektimport eller migreringsmotor. Framtidig import må validere hele versjon-10-objektet før `replace-project`.
 
 Kontrollert migreringsretning:
 
 - versjon 8 til 9 må legge til `HeaderAppearance.fontSize`, standard 24 px
+- versjon 9 til 10 må legge til `TextAppearance.backgroundColor`, standard `#FFFFFF`
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -33,7 +35,7 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 9
+  schemaVersion: 10
   id: string
   name: string
   pages: EditorPage[]
@@ -122,14 +124,19 @@ type TextEditorElement = BaseEditorElement & {
   kind: 'text'
   content: string
   textStyle: TextElementStyle
+  appearance: TextAppearance
   link: ElementLink
+}
+
+type TextAppearance = {
+  backgroundColor: EditorColor
 }
 ```
 
 Standardstørrelse: `240 × 96 px`  
 Minimum: `120 × 48 px`
 
-Tekststilen inneholder tekstfarge, men ikke bakgrunnsfarge. Tekstboksbakgrunn er derfor ikke varig prosjektdata i versjon 9. Mangelen spores i GitHub-sak #35.
+Teksttypografi og tekstfarge ligger fortsatt i `TextElementStyle`. Tekstboksens varige bakgrunn ligger separat i `TextAppearance.backgroundColor`. Ny Tekst opprettes med kanonisk `#FFFFFF`. Modellen validerer nøyaktig objektform og gyldig `EditorColor`.
 
 ## Knapp
 
@@ -218,7 +225,8 @@ type ElementFrame = {
 - rammen ligger innenfor elementets ytre størrelse
 - `Farger` er avledet UI og lagres ikke som egen palett
 - Seksjon og Header viser bakgrunn og eventuell rammefarge
-- Tekst og Header viser tekstfarge
+- Tekst viser Bakgrunn før Tekstfarge
+- Header viser bakgrunn og tekstfarge
 
 ## Asset-ID og ressurslager
 
@@ -251,7 +259,7 @@ Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
-- versjon 8 migreres kontrollert til versjon 9
+- versjon 8 migreres kontrollert til versjon 9 og deretter versjon 10
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
