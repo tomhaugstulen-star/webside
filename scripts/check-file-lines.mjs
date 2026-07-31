@@ -88,7 +88,7 @@ function findViolations(results) {
   for (const result of results) {
     if (result.lines >= HARD_LIMIT) {
       violations.push(
-        `${result.path}: ${result.lines} linjer overskrider hardgrensen på ${HARD_LIMIT - 1}.`,
+        `${result.path}: ${result.lines} linjer; alle produksjonsfiler må være under hardgrensen på ${HARD_LIMIT} linjer.`,
       )
       continue
     }
@@ -98,7 +98,7 @@ function findViolations(results) {
       !LINE_LIMIT_EXCEPTIONS.has(result.path)
     ) {
       violations.push(
-        `${result.path}: ${result.lines} linjer krever oppdeling eller et eksplisitt begrunnet unntak.`,
+        `${result.path}: ${result.lines} linjer; ordinære produksjonsfiler må være under ${ACTIVE_LIMIT} linjer.`,
       )
     }
   }
@@ -131,7 +131,7 @@ async function main() {
   ]
 
   console.log(
-    `Kontrollerte ${results.length} produksjonsfiler (aktiv grense: ${ACTIVE_LIMIT - 1}, hard grense: ${HARD_LIMIT - 1} linjer).`,
+    `Kontrollerte ${results.length} produksjonsfiler (ordinære filer < ${ACTIVE_LIMIT}; absolutt grense < ${HARD_LIMIT} linjer).`,
   )
   console.log(`Største ${Math.min(REPORT_COUNT, results.length)} filer:`)
 
