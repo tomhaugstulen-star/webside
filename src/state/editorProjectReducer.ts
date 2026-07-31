@@ -172,6 +172,7 @@ function reduceEditorProjectState(
     case 'set-section-background-color':
     case 'set-section-frame-width':
     case 'set-section-frame-color':
+    case 'set-text-background-color':
       return reduceColorProjectAction(state, action)
 
     case 'set-header-background-color':
