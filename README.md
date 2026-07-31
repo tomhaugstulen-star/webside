@@ -42,25 +42,17 @@ npm run verify
 
 GitHub-workflowen `Quality` kjører samme kommando på pull requests, ved kontrollert manuell start og ved push til `main`.
 
-## Gjeldende utviklingsstatus
+## Leveransestatus
 
-```text
-main: ecb443d384a1e0999ef14767419e1bea93c4a12c
-aktiv branch: feature/phase-17-text-background
-aktiv draft-PR: #50
-aktiv issue: #35
-prosjektskjema på branchen: versjon 10
-fase 17-kjerne: implementert og automatisk verifisert
-dokumentasjons- og arkitektursynk: 34eeb8a7523af6799330c2a642c66d37a7a105c6
-dokumentasjonsfinalisering og handover: 1d637409737d91829b9f89bc221eb92bdf5a2a39
-gjenstår før merge: Quality på endelig head og manuell PC/Telefon-test
-```
+Fase 17 leverer varig og validert bakgrunnsfarge for Tekst-elementer gjennom PR #50 og prosjektskjema 10. `Farger` viser `Bakgrunn` før `Tekstfarge`, og låste Tekst-elementer kan inspiseres, men ikke endres.
 
-Fase 17 legger til varig og validert bakgrunnsfarge for Tekst-elementer. `Farger` viser `Bakgrunn` før `Tekstfarge`, og låste Tekst-elementer kan inspiseres, men ikke endres.
+Produksjonskoden på `b1ef9fed0633ab8eb0bd93c8ea841e05f1423115` besto `npm run verify` og GitHub Quality run #20. Manuell regresjon i PC- og Telefon-visning ble bestått 1. august 2026, og eksplisitt mergegodkjenning ble mottatt.
+
+Neste planlagte roadmapfase er fase 18: arbeidsportalnavigasjon, navigator og hurtigsøk.
 
 ## Viktig jobbgrense
 
-Programmet har ennå ikke lokal prosjektlagring, autolagring, krasjgjenoppretting eller prosjektimport. Nettleseroppfriskning eller avslutning kan derfor miste prosjektstate. Dette må behandles som høyeste jobbrelaterte risiko etter at PR #50 er kontrollert.
+Programmet har ennå ikke lokal prosjektlagring, autolagring, krasjgjenoppretting eller prosjektimport. Nettleseroppfriskning eller avslutning kan derfor miste prosjektstate. Dette er den høyeste kjente jobbrelaterte risikoen.
 
 ## Arbeidsregel
 
