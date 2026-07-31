@@ -150,20 +150,24 @@ OpenAI-integrasjonen skal bruke en lokal serverprosess eller tilsvarende sikker 
 ## Leveransestatus
 
 ```text
-siste fullførte produksjonsfase på main: 15 – duse portalfarger og tydelig visuell struktur
-source branch-head: 7a4e6882cc3be69145de08f1478d385c5503193b
-verifisert produksjons-head: 7ea58a500b500efb884544751f0913a1a07cf285
-pull request: #43 – merget
-mergecommit på main: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
-GitHub-sak: #42 – lukket som fullført
+siste fullførte produksjonsfase på main: 16 – automatisert testgrunnlag
+source branch-head: df0f42f835024d2b05939a1002599033fcd63565
+verifisert produksjons-head: df0f42f835024d2b05939a1002599033fcd63565
+pull request: #46 – merget
+fase 16-mergecommit på main: b8212e84eef496286a83fbab3e05074eb591ddc5
+GitHub-sak: #45 – lukket som fullført
+gjeldende main: ba8334dab7c423f16358ce423e1f77309884daeb
+filstørrelseskontroll: PR #48 – merget
+filstørrelsessak: #47 – lukket som fullført
 prosjektskjema: versjon 9
 framtidsrettet kodeaudit: fullført
 automatisk sluttkontroll: bestått
-filstørrelseskontroll: bestått
-visuell regresjon: godkjent
+policytester for filstørrelse: 9 bestått
+enhetstester: 17 bestått
+nettleserregresjon: 1 bestått
 aktiv produksjonsfase: ingen
-neste planlagte fase: 16 – automatisert testgrunnlag
-fase 16: ikke startet
+neste planlagte fase: 17 – tekstboksbakgrunn og små eksisterende modellgap
+fase 17: ikke startet
 ```
 
 Fase 14 leverte:
@@ -195,14 +199,18 @@ produksjonsfiler på eller over 250 linjer: 0
 
 Hele den relevante manuelle regresjonen ble godkjent i PC- og Telefon-visning. PR #39 ble merget etter eksplisitt brukergodkjenning, og brukerens lokale `main` ble synkronisert og bekreftet clean på mergecommit `0122605`.
 
-Fase 15 er fullført og merget til `main` via PR #43. Faktisk mergecommit er `1ae0bebabf3eb02104bafa80a029b40d5c06de12`. Ingen produksjonsfase er aktiv; neste planlagte fase er fase 16.
+Fase 15 er fullført og merget til `main` via PR #43. Faktisk mergecommit er `1ae0bebabf3eb02104bafa80a029b40d5c06de12`.
+
+Fase 16 er fullført og merget via PR #46 på mergecommit `b8212e84eef496286a83fbab3e05074eb591ddc5`. Leveransen etablerte testverktøy, 17 enhetstester, én kritisk Chromium-regresjon og Quality-workflow i GitHub Actions.
+
+Automatisk produksjonsfilkontroll ble deretter merget via PR #48 på mergecommit `ba8334dab7c423f16358ce423e1f77309884daeb`. `npm run check` kjører nå policytester, faktisk filkontroll, lint, typecheck, dependency-kontroll, enhetstester og produksjonsbuild. Ingen produksjonsfase er aktiv; neste planlagte fase er fase 17.
 
 ## Låst roadmap
 
 ```text
 fase 14  Korrigeringslinjer og snapping – fullført
 fase 15  Duse portalfarger og tydelig visuell struktur – fullført
-fase 16  Automatisert testgrunnlag
+fase 16  Automatisert testgrunnlag – fullført
 fase 17  Tekstboksbakgrunn og små eksisterende modellgap
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
 fase 19  Sider, seksjons-ID-er og navigasjonsmodell
@@ -330,9 +338,37 @@ Arkitekturrapportene er ikke regenerert fordi ingen import eller modulgrense er 
 
 ## Fase 16 – automatisert testgrunnlag
 
+### Status
+
+Fullført og merget til `main` via PR #46 på mergecommit `b8212e84eef496286a83fbab3e05074eb591ddc5`. Issue #45 er lukket som fullført.
+
 ### Formål
 
 Redusere regresjonsrisiko før Hero, sider, navigasjon, lagring og AI gjør modellen større.
+
+### Levert
+
+- Playwright-basert testverktøy for rene TypeScript-moduler og Chromium
+- 17 enhetstester for modellvalidatorer, stabile ID-grenser, reducerhandlinger, ugyldige og uendrede handlinger, låsing, sletting, layout, clamping og snapping
+- én kritisk nettleserflyt som oppretter et tekstelement, markerer det og åpner Egenskaper
+- separat test-typecheck
+- GitHub Actions-workflowen `Quality`
+- Windows-sikker E2E-runner som rydder Vite-prosesstreet og returnerer korrekt exitkode
+- stabil knapp-ID-validering skilt fra SVG-presentasjonskatalogen
+- oppdaterte dependency-rapporter og låsefil
+
+### Verifisering
+
+```text
+npm run check: bestått
+ESLint: bestått
+TypeScript og test-typecheck: bestått
+Dependency Cruiser: 118 moduler, 340 avhengigheter, 0 brudd
+enhetstester: 17 bestått
+Chromium-regresjon: 1 bestått, exitkode 0
+Vite-produksjonsbuild: 127 moduler transformert
+git diff --check: bestått
+```
 
 ### Omfang
 
@@ -350,14 +386,16 @@ Redusere regresjonsrisiko før Hero, sider, navigasjon, lagring og AI gjør mode
 - full visuell pixeltest av hele editoren
 - testing av framtidige funksjoner som ikke finnes
 - store mock-rammeverk uten reelt behov
+- funksjonsendring i prosjektmodellen eller editorflyten
+- arbeid fra fase 17 eller senere
 
 ### Akseptansekriterier
 
-- testkommando kan kjøres lokalt og i CI
-- eksisterende rene modell- og layoutfunksjoner er dekket
-- reducerens valideringsgrenser er dekket
-- minst én kritisk editorflyt testes i nettleser
-- `npm run check` inkluderer eller følges av dokumentert testkontroll
+- testkommando kan kjøres lokalt og i CI – oppfylt
+- eksisterende rene modell- og layoutfunksjoner er dekket – oppfylt
+- reducerens valideringsgrenser er dekket – oppfylt
+- minst én kritisk editorflyt testes i nettleser – oppfylt
+- `npm run check` inkluderer dokumentert testkontroll – oppfylt
 
 ---
 
