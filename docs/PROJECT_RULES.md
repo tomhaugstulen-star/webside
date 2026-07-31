@@ -54,6 +54,10 @@ hard unntaksgrense: 300 linjer
 - CSS deles etter editorområde og komponentansvar.
 - Ingen tilfeldig samlemappe eller samlefil opprettes.
 - Genererte arkitekturrapporter omfattes ikke av produksjonsfilgrensen.
+- Filstørrelsesgrensene håndheves automatisk av `npm run file-size:check` som del av `npm run check`.
+- Grensereglene testes av `npm run file-size:test` før repositorykontrollen.
+- Ordinære produksjonsfiler skal være 0–249 linjer; eventuelle unntak må være eksplisitte og begrunnede.
+- Ingen produksjonsfil kan være 300 linjer eller mer.
 
 ## Autoritativ prosjektmodell
 

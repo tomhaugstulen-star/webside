@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run static checks, unit tests and build
+      - name: Run file-size check, static checks, unit tests and build
         run: npm run check
 
       - name: Install Chromium

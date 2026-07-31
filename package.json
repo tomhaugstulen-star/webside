@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false",
     "lint": "eslint .",
+    "file-size:test": "node --test scripts/file-line-policy.test.mjs",
+    "file-size:check": "node scripts/check-file-lines.mjs",
     "architecture:check": "depcruise --config -- src",
     "architecture:json": "depcruise --config --output-type json --output-to architecture.json -- src",
     "architecture:diagram": "depcruise --config --include-only \"^src\" --output-type mermaid --output-to docs/dependency-graph.mmd -- src",
@@ -15,7 +17,7 @@
     "test:unit": "playwright test --config playwright.unit.config.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
     "test:headed": "node scripts/run-e2e.mjs --headed",
-    "check": "npm run lint && npm run typecheck && npm run architecture:check && npm run test:unit && npm run build",
+    "check": "npm run file-size:test && npm run file-size:check && npm run lint && npm run typecheck && npm run architecture:check && npm run test:unit && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
