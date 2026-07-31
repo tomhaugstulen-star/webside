@@ -61,7 +61,7 @@ hard unntaksgrense: 300 linjer
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er versjon 9.
+- Gjeldende prosjektskjema på fase-17-branchen er versjon 10; main er versjon 9 fram til godkjent merge.
 - `EditorProject` eier alle varige, serialiserbare prosjektdata.
 - DOM og CSS er rendering, ikke permanent lagring.
 - `File`, Blob, Object URL og lokal filsti er ikke prosjektdata.
@@ -87,6 +87,7 @@ Skjemahistorikk:
 7  sidebakgrunn, Seksjon-utseende, Seksjon-ramme og tekstfarge
 8  Header med logo, tekst, utseende og ramme
 9  Header-fontstørrelse
+10 Tekstutseende med varig tekstboksbakgrunn
 ```
 
 ## Varig og transient state
@@ -98,7 +99,7 @@ Varig:
 - låsestatus for Seksjon, Bilde, Tekst og Knapp
 - Headerens kompatibilitetsfelt `locked`, alltid `false` i dagens flyt
 - side- og elementutseende
-- tekst, lenker og asset-ID-er
+- tekst, tekststil, tekstutseende, lenker og asset-ID-er
 - bilde- og logometadata
 - Header-fontfamilie og fontstørrelse
 - framtidige side-, seksjons- og navigasjonsmål
@@ -169,12 +170,14 @@ Transient state serialiseres ikke og inngår ikke direkte i historikk eller auto
 - Rammefarge beholdes når rammen slås av.
 - `Farger` avledes fra aktiv side og lagres ikke som egen palett.
 - Seksjon og Header kan ha bakgrunn og ramme.
-- Tekst og Header har tekstfarge.
+- Tekst har varig `TextAppearance.backgroundColor` og tekstfarge i `TextElementStyle.color`.
+- Ny Tekst opprettes med kanonisk bakgrunn `#FFFFFF`.
+- Tekstbakgrunn og tekstfarge er felles for PC og Telefon fram til fase 23.
+- Låst Tekst kan inspiseres, men fargekontrollene er deaktiverte og reduceren avviser mutasjon.
 - Headerens navn og undertittel deler fontfamilie og tekstfarge.
 - Header-fontstørrelse er en validert verdi fra 12 til 96 px.
 - Knapper beholder ferdig SVG-fargedesign.
 - Bilder har ingen prosjektfarge.
-- Tekstboksbakgrunn finnes ikke som varig modellverdi i versjon 9; gapet spores i sak #35.
 
 ## Bilde- og logoressurser
 
@@ -247,7 +250,7 @@ Framtidig portalnavigator og `Ctrl + K` skal lese eksisterende state og actions,
 ## Kvalitetskontroll
 
 ```powershell
-npm run check
+npm run verify
 npm run architecture:json
 npm run architecture:diagram
 git diff --check
@@ -255,4 +258,4 @@ git status --short
 git diff --stat
 ```
 
-Før PR kontrolleres også filstørrelser, framtidige import-/historikkgrenser, ressurslivssyklus, tilgjengelighet, regresjoner, PR-diff, mergebarhet, reviews, uløste tråder og CI.
+`npm run verify` er obligatorisk etter siste kodeendring og før merge. Den kjører hele repositorykontrollen og den kritiske Chromium-regresjonen. Før PR kontrolleres også filstørrelser, framtidige import-/historikkgrenser, ressurslivssyklus, tilgjengelighet, manuell PC-/Telefon-regresjon, PR-diff, mergebarhet, reviews, uløste tråder og CI.

@@ -33,7 +33,7 @@ Foreløpig felles for PC og Telefon:
 - innhold og tekststil
 - lenker
 - låsestatus
-- farger og rammer
+- farger og rammer, inkludert Tekst-bakgrunn
 - bildeasset, metadata og utsnitt
 - Header-logo, tekst, fontfamilie, fontstørrelse og utseende
 

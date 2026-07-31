@@ -1,12 +1,8 @@
 # Produksjonsklarhet for jobbbruk
 
-Dette dokumentet styrer den korte stabiliseringsperioden før Website-editoren tas i faktisk arbeid.
+Dette dokumentet er en kvalitetsport før Website-editoren brukes i faktisk arbeid. Det erstatter ikke roadmapen og senker ingen tekniske krav.
 
-## Mål
-
-Målet er ikke å ferdigstille hele roadmapen før jobbstart. Målet er å fryse dagens funksjonssett, kontrollere at det virker, og unngå regresjoner mens programmet brukes.
-
-## Én obligatorisk kontroll
+## Full automatisk kontroll
 
 ```powershell
 npm run verify
@@ -23,61 +19,49 @@ Kommandoen kjører:
 7. produksjonsbuild
 8. kritisk Chromium-regresjon
 
-GitHub Actions-workflowen `Quality` kjører samme kommando.
+GitHub Quality kjører samme kommando. Lokal og remote kontroll skal derfor måle samme leveranse.
 
-## Krav før merge av PR #50
+## Krav før PR #50 kan gjøres klar
 
-- `npm run verify` består på siste branch-head
-- GitHub `Quality` består på samme head
+- siste remote branch-head er kjent
+- `npm run verify` består på samme head
+- GitHub Quality består på samme head
 - `git diff --check` er ren
-- arkitekturrapportene er regenerert fordi fase 17 la til produksjonsmoduler og imports
-- prosjektskjema og autoritativ dokumentasjon viser versjon 10
-- brukerens manuelle PC- og Telefon-test er bestått
+- arkitekturrapportene er regenerert og kontrollert
+- alle påvirkede autoritative dokumenter viser skjema 10 og korrekt fase-17-status
+- kodeaudit er gjennomført mot framtidige fasegrenser
+- manuell PC- og Telefon-regresjon er bestått
 - PR-en er mergebar og uten uløste reviewtråder
 - merge skjer bare etter eksplisitt `godkjent`
 
-## Manuell røyketest
-
-Kjør denne testen én gang etter at siste branch-head er hentet:
+## Manuell regresjon
 
 1. Start med `npm run dev`.
-2. Opprett Tekst.
-3. Skriv tekst og avslutt redigering.
-4. Endre `Bakgrunn` og `Tekstfarge` i `Farger`.
-5. Lås Tekst og bekreft at fargefeltene er deaktiverte.
-6. Lås opp, flytt og endre størrelse.
-7. Opprett Seksjon og endre bakgrunn/ramme.
-8. Opprett Knapp og kontroller tekst/lenke.
-9. Importer Bilde og kontroller utsnitt/zoom.
-10. Opprett Header og kontroller logo, tekst, farge og høyde.
-11. Bytt mellom PC og Telefon og se etter skjulte eller ødelagte kontroller.
-12. Slett ett ulåst element og avbryt én sletting.
+2. Opprett Tekst og skriv innhold.
+3. Endre font, størrelse, stil, justering, linjehøyde og tekstfarge.
+4. Endre Tekst `Bakgrunn` i `Farger`; bekreft at riktig Tekst endres.
+5. Lås Tekst; bekreft at Bakgrunn og Tekstfarge kan ses, men ikke endres.
+6. Lås opp, flytt og endre størrelse med peker og relevante tastatursnarveier.
+7. Opprett Seksjon og kontroller bakgrunn og ramme.
+8. Opprett Knapp og kontroller design, tekst og lenke.
+9. Importer Bilde og kontroller alternativ tekst, modus, utsnitt og zoom.
+10. Opprett Header og kontroller logo, navn, undertittel, farger, font og høyde.
+11. Bytt mellom PC og Telefon og kontroller at eksisterende verdier vises konsistent.
+12. Kontroller markering, panelåpning/-lukking, låsing og sikker sletting.
 
-Et avvik betyr at PR #50 forblir draft til feilen er rettet.
+Et avvik dokumenteres og rettes på samme branch. Etter en feilretting kjøres hele `npm run verify` på nytt.
 
-## Kjent jobbrelatert risiko
+## Kjent kritisk begrensning
 
-Programmet har foreløpig ikke:
+Programmet mangler fortsatt lokal prosjektlagring, autolagring, krasjgjenoppretting, prosjektimport og angre/gjør om. Nettleseroppfriskning, lukking eller krasj kan derfor miste prosjektstate. Dette er en reell jobbrelatert risiko og skal ikke omtales som løst av tester.
 
-- lokal prosjektlagring
-- autolagring
-- krasjgjenoppretting
-- prosjektfil/import
-- angre/gjør om
+En separat, eksplisitt beslutning må avgjøre om jobbberedskap skal prioriteres foran fase 18. Ingen slik funksjon blandes inn i PR #50.
 
-Nettleseroppfriskning, lukking eller krasj kan derfor miste prosjektstate. Dette er den største risikoen ved faktisk jobbbruk og kan ikke skjules av testresultater.
+## Stabilitetsregel
 
-Inntil lokal lagring er implementert:
+Når en kjent godkjent commit er valgt til jobbbruk:
 
-- ikke oppdater nettleseren under arbeid
-- ikke lukk fanen før arbeidet er ferdig eller manuelt dokumentert utenfor programmet
-- unngå å bruke programmet som eneste varige lagringssted for kundearbeid
-
-## Stabiliseringsregel
-
-Etter at PR #50 og røyketesten er grønne:
-
-- ingen nye visuelle eller funksjonelle tillegg før jobbøkten
-- bare dokumenterte feil med direkte jobbkonsekvens kan endres
-- hver feilretting må etterfølges av `npm run verify`
-- siste grønne commit beholdes som kjent gjenopprettingspunkt
+- nye features utvikles ikke på samme arbeidskopi under kritisk arbeid
+- bare dokumenterte feil med direkte konsekvens rettes
+- hver rettelse går gjennom branch, `npm run verify`, PR og eksplisitt godkjenning
+- kjent god commit og synkronisert `main` beholdes som gjenopprettingspunkt

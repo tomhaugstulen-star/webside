@@ -27,16 +27,18 @@ Ingen senere fase startes eller blandes inn i en aktiv branch uten ny eksplisitt
 10. Kontroller diff, branch-synk, PR, reviews, tråder og CI.
 11. Merge bare etter eksplisitt brukergodkjenning.
 
-Standardkontroll:
+Standardkontroll etter siste kode- eller dokumentendring:
 
 ```powershell
-npm run check
+npm run verify
 npm run architecture:json
 npm run architecture:diagram
 git diff --check
 git status --short
 git diff --stat
 ```
+
+`npm run verify` er den samlede sikkerhetskontrollen. Den kjører hele `npm run check` og deretter den kritiske Chromium-regresjonen.
 
 ## Låst produktretning
 
@@ -151,23 +153,22 @@ OpenAI-integrasjonen skal bruke en lokal serverprosess eller tilsvarende sikker 
 
 ```text
 siste fullførte produksjonsfase på main: 16 – automatisert testgrunnlag
-source branch-head: df0f42f835024d2b05939a1002599033fcd63565
-verifisert produksjons-head: df0f42f835024d2b05939a1002599033fcd63565
-pull request: #46 – merget
-fase 16-mergecommit på main: b8212e84eef496286a83fbab3e05074eb591ddc5
-GitHub-sak: #45 – lukket som fullført
-gjeldende main: ba8334dab7c423f16358ce423e1f77309884daeb
-filstørrelseskontroll: PR #48 – merget
-filstørrelsessak: #47 – lukket som fullført
-prosjektskjema: versjon 9
-framtidsrettet kodeaudit: fullført
-automatisk sluttkontroll: bestått
-policytester for filstørrelse: 9 bestått
-enhetstester: 17 bestått
-nettleserregresjon: 1 bestått
-aktiv produksjonsfase: ingen
-neste planlagte fase: 17 – tekstboksbakgrunn og små eksisterende modellgap
-fase 17: ikke startet
+gjeldende main: ecb443d384a1e0999ef14767419e1bea93c4a12c
+aktiv produksjonsfase: 17 – tekstboksbakgrunn
+aktiv branch: feature/phase-17-text-background
+aktiv draft-PR: #50
+aktiv GitHub-sak: #35
+prosjektskjema på main: versjon 9
+prosjektskjema på fase-17-branchen: versjon 10
+implementert: varig TextAppearance.backgroundColor
+standard tekstbakgrunn: #FFFFFF
+enhetstester: 20 bestått på verifisert kode-head
+nettleserregresjon: 1 bestått på verifisert kode-head
+Quality på kode-head ea2a446: success
+samlet kontrollkommando: npm run verify
+status: draft til dokumentasjon, arkitekturrapporter og manuell PC/Telefon-test er ferdige
+neste roadmapfase etter ferdig fase 17: 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
+jobbberedskap: lokal lagring/autolagring er fortsatt et eksplisitt risikogap
 ```
 
 Fase 14 leverte:
@@ -203,7 +204,9 @@ Fase 15 er fullført og merget til `main` via PR #43. Faktisk mergecommit er `1a
 
 Fase 16 er fullført og merget via PR #46 på mergecommit `b8212e84eef496286a83fbab3e05074eb591ddc5`. Leveransen etablerte testverktøy, 17 enhetstester, én kritisk Chromium-regresjon og Quality-workflow i GitHub Actions.
 
-Automatisk produksjonsfilkontroll ble deretter merget via PR #48 på mergecommit `ba8334dab7c423f16358ce423e1f77309884daeb`. `npm run check` kjører nå policytester, faktisk filkontroll, lint, typecheck, dependency-kontroll, enhetstester og produksjonsbuild. Ingen produksjonsfase er aktiv; neste planlagte fase er fase 17.
+Automatisk produksjonsfilkontroll ble deretter merget via PR #48 på mergecommit `ba8334dab7c423f16358ce423e1f77309884daeb`. Dokumentasjonssynken etter fase 16 ble merget via PR #49 på `ecb443d384a1e0999ef14767419e1bea93c4a12c`.
+
+Fase 17 er aktiv på `feature/phase-17-text-background` i draft-PR #50. Omfanget er låst til issue #35: varig og validert tekstboksbakgrunn. Issue #36, #37, #38 og senere roadmaparbeid er eksplisitt utelatt. `npm run verify` er nå den samlede kontrollen lokalt og i GitHub Quality.
 
 ## Låst roadmap
 
@@ -211,7 +214,7 @@ Automatisk produksjonsfilkontroll ble deretter merget via PR #48 på mergecommit
 fase 14  Korrigeringslinjer og snapping – fullført
 fase 15  Duse portalfarger og tydelig visuell struktur – fullført
 fase 16  Automatisert testgrunnlag – fullført
-fase 17  Tekstboksbakgrunn og små eksisterende modellgap
+fase 17  Tekstboksbakgrunn – pågår
 fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
 fase 19  Sider, seksjons-ID-er og navigasjonsmodell
 fase 20  Nettstedets Header og menynavigasjon
@@ -399,7 +402,11 @@ git diff --check: bestått
 
 ---
 
-## Fase 17 – tekstboksbakgrunn og små eksisterende modellgap
+## Fase 17 – tekstboksbakgrunn
+
+### Status
+
+Pågår i `feature/phase-17-text-background` og draft-PR #50. Kodekjernen og automatiske tester er implementert. Leveransen forblir draft til dokumentasjon, arkitekturrapporter, siste `npm run verify`, GitHub Quality og manuell PC-/Telefon-regresjon er bestått.
 
 ### Formål
 
@@ -414,7 +421,7 @@ Lukke kjente, avgrensede modellmangler før større elementtyper legges til.
 - reducer- og hookstøtte
 - rendering fra prosjektdata i stedet for hardkodet CSS
 - korrekt låseoppførsel
-- kontrollere andre små dokumenterte modellgap og behandle dem separat
+- holde issue #36, #37, #38 og senere modellarbeid utenfor denne leveransen
 
 ### Akseptansekriterier
 

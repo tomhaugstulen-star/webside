@@ -32,6 +32,7 @@ subgraph src["src"]
     src_model_imagePresentation_ts["imagePresentation.ts"]
     src_model_pageAppearance_ts["pageAppearance.ts"]
     src_model_sectionAppearance_ts["sectionAppearance.ts"]
+    src_model_textAppearance_ts["textAppearance.ts"]
     src_model_elementCreation_ts["elementCreation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
     src_model_headerElement_ts["headerElement.ts"]
@@ -123,6 +124,7 @@ subgraph src["src"]
     src_state_useSectionAppearance_ts["useSectionAppearance.ts"]
     src_state_useTextElementStyle_ts["useTextElementStyle.ts"]
     src_state_useProjectColors_ts["useProjectColors.ts"]
+    src_state_useTextAppearance_ts["useTextAppearance.ts"]
     src_state_EditorProjectProvider_tsx["EditorProjectProvider.tsx"]
     src_state_editorProjectReducer_ts["editorProjectReducer.ts"]
     src_state_addElementToActivePage_ts["addElementToActivePage.ts"]
@@ -179,6 +181,7 @@ src_model_editorProject_ts-->src_model_imageAsset_ts
 src_model_editorProject_ts-->src_model_imagePresentation_ts
 src_model_editorProject_ts-->src_model_pageAppearance_ts
 src_model_editorProject_ts-->src_model_sectionAppearance_ts
+src_model_editorProject_ts-->src_model_textAppearance_ts
 src_model_editorProject_ts-->src_model_textElementStyle_ts
 src_model_headerAppearance_ts-->src_model_editorColor_ts
 src_model_headerAppearance_ts-->src_model_elementFrame_ts
@@ -191,6 +194,7 @@ src_model_pageAppearance_ts-->src_model_editorColor_ts
 src_model_sectionAppearance_ts-->src_model_editorColor_ts
 src_model_sectionAppearance_ts-->src_model_elementFrame_ts
 src_model_sectionAppearance_ts-->src_model_elementFrame_ts
+src_model_textAppearance_ts-->src_model_editorColor_ts
 src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
 src_model_elementCreation_ts-->src_model_imageAsset_ts
@@ -387,7 +391,10 @@ src_state_useProjectColors_ts-->src_model_editorColor_ts
 src_state_useProjectColors_ts-->src_state_useEditorProject_ts
 src_state_useProjectColors_ts-->src_state_useHeaderAppearance_ts
 src_state_useProjectColors_ts-->src_state_useSectionAppearance_ts
+src_state_useProjectColors_ts-->src_state_useTextAppearance_ts
 src_state_useProjectColors_ts-->src_state_useTextElementStyle_ts
+src_state_useTextAppearance_ts-->src_model_editorColor_ts
+src_state_useTextAppearance_ts-->src_state_useEditorProject_ts
 src_components_sidebar_ElementsPanel_tsx-->src_model_elementCreation_ts
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ButtonLibraryPanel_tsx
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ImageImportControl_tsx
@@ -444,6 +451,7 @@ src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_headerAppearance_ts
 src_model_createEditorElement_ts-->src_model_imagePresentation_ts
 src_model_createEditorElement_ts-->src_model_sectionAppearance_ts
+src_model_createEditorElement_ts-->src_model_textAppearance_ts
 src_model_createEditorElement_ts-->src_model_textElementStyle_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts
 src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
@@ -451,6 +459,7 @@ src_state_reduceColorProjectAction_ts-->src_model_editorColor_ts
 src_state_reduceColorProjectAction_ts-->src_model_editorProject_ts
 src_state_reduceColorProjectAction_ts-->src_model_pageAppearance_ts
 src_state_reduceColorProjectAction_ts-->src_model_sectionAppearance_ts
+src_state_reduceColorProjectAction_ts-->src_model_textAppearance_ts
 src_state_reduceColorProjectAction_ts-->src_state_editorProjectAction_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_model_editorColor_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_model_editorProject_ts

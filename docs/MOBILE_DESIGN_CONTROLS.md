@@ -222,7 +222,7 @@ Leveransen er ikke ferdig før dette er bekreftet:
 - Hero beholder sine låste invarianter
 - historikk og lagring behandler én ferdig transform som én endring
 - lokal forhåndsvisning viser samme responsive resultat
-- `npm run check` og separate desktop-/mobiltester er bestått
+- `npm run verify` og separate desktop-/mobiltester er bestått
 
 ## 15. Ikke del av leveransen uten ny beslutning
 

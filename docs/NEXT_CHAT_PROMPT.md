@@ -6,245 +6,149 @@ Kopier hele teksten mellom `START HANDOVER` og `SLUTT HANDOVER` inn i neste chat
 
 # START HANDOVER
 
-Du overtar ansvaret for Website-editoren. Arbeid som prosjektleder, teknisk arkitekt og kodeansvarlig. Svar på norsk. Bruk faktisk GitHub-state, faktisk kode, autoritativ dokumentasjon og brukerens terminaloutput som sannhetskilder. Ikke gjett, og ikke påstå at noe er clean, testet eller synkronisert uten bevis.
+Du overtar Website-editoren som prosjektleder, teknisk arkitekt og kodeansvarlig. Svar på norsk. Bruk faktisk GitHub-state, faktisk kode og brukerens terminaloutput som sannhetskilder. Ikke gjett og ikke påstå at branch, HEAD, clean tree, tester eller synkronisering er bekreftet uten bevis.
 
-## 1. Repo og lokal mappe
+## Repo
 
 ```text
 GitHub: https://github.com/tomhaugstulen-star/webside.git
 Lokalt: C:\Users\tomha\Desktop\website
-Standardbranch: main
+main: ecb443d384a1e0999ef14767419e1bea93c4a12c
+aktiv branch: feature/phase-17-text-background
+aktiv draft-PR: #50 – Fase 17: tekstboksbakgrunn
+aktiv issue: #35
 ```
 
-Bruk GitHub-connectoren til remote-operasjoner, kodeinspeksjon, branches, commits, issues og pull requests. Gi eksakte PowerShell- eller Windows-terminalkommandoer for lokale Git-, Node-, Vite- og manuelle kontroller.
+Aldri utvikling direkte på `main`. Ingen merge uten at brukeren eksplisitt skriver `godkjent`. `fungerer` betyr bare at en manuell test passerte.
 
-## 2. Siste bekreftede prosjektstatus
+## Tids- og kvalitetskontekst
+
+Brukeren skal bruke programmet i faktisk arbeid svært snart og ønsker høy sikkerhet mot regresjoner. Dette betyr ikke at kvalitet eller dokumentasjon kan kuttes. Arbeidet skal være effektivt, men hver endring må være avgrenset, testet, auditert og dokumentert. Ikke bruk tid på å gjenta allerede verifisert arbeid.
+
+## Fase 17 – låst omfang
+
+Fase 17 er avgrenset til issue #35:
+
+- ny serialiserbar `TextAppearance`
+- `backgroundColor: EditorColor`
+- standard `#FFFFFF`
+- `TextEditorElement.appearance`
+- prosjektskjema 10
+- typed `set-text-background-color`
+- validering av feil type, manglende, låst, ugyldig og uendret handling
+- `Bakgrunn` før `Tekstfarge` i `Farger`
+- rendering fra prosjektdata
+- modell-, reducer- og Chromium-test
+
+Issue #36, #37, #38 og senere roadmaparbeid er eksplisitt utenfor PR #50. Ikke bland inn lokal lagring, navigator, Hero eller andre features i denne branchen.
+
+## Implementert kode
+
+Nye produksjonsmoduler:
 
 ```text
-gjeldende main: ba8334dab7c423f16358ce423e1f77309884daeb
-commit: Merge pull request #48 from tomhaugstulen-star/chore/automated-file-size-check
-prosjektskjema: versjon 9
-aktiv produksjonsfase: ingen
-neste planlagte produksjonsfase: 17 – tekstboksbakgrunn og små eksisterende modellgap
+src/model/textAppearance.ts
+src/state/useTextAppearance.ts
 ```
 
-Brukerens lokale `main` er bekreftet synkronisert og clean på:
+Berørte hovedgrenser:
+
+- `src/model/editorProject.ts` bruker skjema 10 og TextAppearance
+- `src/model/createEditorElement.ts` oppretter standardbakgrunn
+- `src/state/editorProjectAction.ts` har typed action
+- `src/state/reduceColorProjectAction.ts` validerer og muterer
+- `src/model/projectColorEntries.ts` eksponerer Bakgrunn og Tekstfarge
+- `src/state/useProjectColors.ts` ruter oppdatering
+- `src/components/canvas/getElementAppearanceCssStyle.ts` renderer lagret bakgrunn
+- hardkodet hvit Tekst-bakgrunn er fjernet fra `src/styles/canvas.css`
+
+## Verifisert kodebaseline
+
+Brukerens terminal bekreftet på den første fase-17-kodekjernen:
 
 ```text
-ba8334d (HEAD -> main, origin/main, origin/HEAD) Merge pull request #48 from tomhaugstulen-star/chore/automated-file-size-check
-```
-
-## 3. Fullførte leveranser
-
-### Fase 15 – duse portalfarger og tydelig visuell struktur
-
-```text
-PR: #43 – merget
-mergecommit: 1ae0bebabf3eb02104bafa80a029b40d5c06de12
-issue: #42 – lukket som fullført
-```
-
-Fase 15 leverte semantiske portaltokens, tydelig oppdeling av toppmeny, venstremeny, paneler, arbeidsområde og lerret, tydelige interaksjonstilstander og semantiske ikonvariantklasser. Brukeren godkjente den visuelle retningen.
-
-### Fase 16 – automatisert testgrunnlag
-
-```text
-source branch: feature/phase-16-test-foundation
-source head: df0f42f835024d2b05939a1002599033fcd63565
-PR: #46 – merget
-mergecommit: b8212e84eef496286a83fbab3e05074eb591ddc5
-issue: #45 – lukket som fullført
-```
-
-Fase 16 leverte:
-
-- Playwright-basert testverktøy for rene TypeScript-moduler og Chromium
-- 17 enhetstester
-- én kritisk nettleserregresjon
-- separat test-typecheck
-- GitHub Actions-workflowen `Quality`
-- Windows-sikker E2E-runner
-- stabil knapp-ID-validering skilt fra SVG-presentasjonskatalogen
-- oppdaterte dependency-rapporter
-
-Fase 16 er ferdig. Ikke start den på nytt og ikke opprett en ny fase 16-branch.
-
-### Automatisk produksjonsfilkontroll
-
-```text
-source branch: chore/automated-file-size-check
-source head: d6f0b48db2a740f90e07d2342ee5ca9beb347c7d
-PR: #48 – merget
-mergecommit: ba8334dab7c423f16358ce423e1f77309884daeb
-issue: #47 – lukket som fullført
-```
-
-Kontrollen:
-
-- skanner `.ts`, `.tsx`, `.js`, `.jsx` og `.css` under `src`
-- krever 0–249 linjer for ordinære produksjonsfiler
-- tillater bare eksplisitte og begrunnede unntak på 250–299 linjer
-- blokkerer alltid 300 linjer eller mer
-- avviser manglende, ugyldige og foreldede unntak
-- viser de ti største produksjonsfilene
-- har ni egne policytester
-- kjører først i `npm run check`
-- kjører i GitHub Actions gjennom samme kvalitetskommando
-
-## 4. Aktiv dokumentasjonssynk
-
-Det arbeides på en ren dokumentasjonsbranch:
-
-```text
-branch: docs/sync-phase-16-status
-base: ba8334dab7c423f16358ce423e1f77309884daeb
-```
-
-Formålet er bare å synkronisere autoritativ dokumentasjon med faktisk ferdigstilt fase 16 og automatisk filstørrelseskontroll.
-
-Dokumenter som oppdateres:
-
-```text
-docs/WORK_PLAN.md
-docs/CODE_AUDIT.md
-docs/NEXT_CHAT_PROMPT.md
-```
-
-Ingen produksjonskode, runtime-avhengighet, prosjektmodell eller arkitekturrapport skal endres i denne docs-leveransen.
-
-Kontroller faktisk GitHub-status før du antar at docs-branchen eller en eventuell docs-PR er merget. Ingen merge uten at brukeren eksplisitt skriver `godkjent`.
-
-## 5. Ufravikelig arbeidsmåte
-
-- Aldri utvikling direkte på `main`.
-- Én avgrenset feature-, chore- eller docs-branch per leveranse.
-- Ingen merge uten at brukeren eksplisitt skriver `godkjent`.
-- `fungerer` godkjenner en test, ikke en merge.
-- Lås omfang før produksjonskode.
-- Ikke bland inn senere faser eller separate issues.
-- Hold ordinære produksjonsfiler under 250 linjer.
-- 250–299 linjer krever et eksplisitt og konkret begrunnet unntak.
-- Ingen produksjonsfil kan være 300 linjer eller mer.
-- Gjennomfør framtidsrettet kodeaudit før PR.
-- Kjør full automatisk kontroll etter siste produksjonsendring.
-- Kontroller diff, PR, mergebarhet, CI/status, reviews, kommentarer og åpne tråder.
-- Regenerer arkitekturrapporter bare ved faktisk modul- eller importgrafendring.
-- Oppdater autoritativ dokumentasjon etter faktisk mergecommit.
-- Bruk faktisk terminaloutput som eneste kilde for lokal branch, HEAD, clean tree og teststatus.
-
-## 6. Autoritative dokumenter
-
-Les i denne rekkefølgen:
-
-1. `docs/WORK_PLAN.md`
-2. `docs/PROJECT_RULES.md`
-3. `docs/ELEMENT_MODEL.md`
-4. `docs/EDITOR_PLANNING.md`
-5. `docs/RESPONSIVE_DESIGN.md`
-6. `docs/RIGHT_PROPERTIES_PANEL.md`
-7. `docs/CODE_AUDIT.md`
-8. `docs/FILE_SIZE_CONTROL.md`
-9. `README.md`
-10. `docs/NEXT_CHAT_PROMPT.md`
-
-Regler:
-
-- Faktisk kode og terminaloutput vinner over foreldet dokumenttekst.
-- `WORK_PLAN.md` eier låst rekkefølge og faseomfang.
-- `PROJECT_RULES.md` eier varige arbeids-, modell- og arkitekturgrenser.
-- `FILE_SIZE_CONTROL.md` beskriver den automatiske linjepolicyen.
-- `CODE_AUDIT.md` beskriver gjeldende teknisk baseline og vedlikeholdsrisiko.
-
-## 7. Gjeldende kvalitetsbaseline
-
-Siste verifiserte resultater:
-
-```text
-policytester for filstørrelse: 9 bestått
-kontrollerte produksjonsfiler: 137
-produksjonsfiler på eller over 250 linjer: 0
+filpolicytester: 9 bestått
+produksjonsfiler: 139
+filgrensebrudd: 0
 ESLint: bestått
-TypeScript og test-typecheck: bestått
-Dependency Cruiser: 118 moduler, 340 avhengigheter, 0 brudd
-enhetstester: 17 bestått
-Chromium-regresjon: 1 bestått
-Vite: 127 moduler transformert
-CSS: 45.36 kB, gzip 7.34 kB
-JavaScript: 280.88 kB, gzip 83.22 kB
+TypeScript: bestått
+Dependency Cruiser: 120 moduler, 347 avhengigheter, 0 brudd
+enhetstester: 20 bestått
+Vite: 129 moduler transformert
+CSS: 45.35 kB, gzip 7.34 kB
+JavaScript: 282.25 kB, gzip 83.33 kB
 produksjonsbuild: bestått
-Quality-workflow: success
 ```
 
-`npm run check` kjører:
+Den første E2E-testen feilet fordi testen satte en kontrollert fargeinput med direkte DOM-JavaScript. Produksjonslogikken var ikke årsaken. Testen ble rettet til Playwright `fill()`. GitHub Quality på kode-head `ea2a446044eca7423d40c027320922d1ea444151` fullførte med `success`, inkludert E2E.
 
-```text
-npm run file-size:test
-npm run file-size:check
-npm run lint
-npm run typecheck
-npm run architecture:check
-npm run test:unit
-npm run build
-```
+Senere commits la til samlet `npm run verify`, endret Quality til samme kommando og startet dokumentasjonssynken. Derfor må PR #50 sin faktiske siste head og siste CI alltid leses på nytt før noen status påstås.
 
-Chromium-regresjonen kjøres separat med:
+## Samlet kontroll
 
 ```powershell
-npm run test:e2e
+npm run verify
 ```
 
-## 8. Filstørrelser som må følges
+Dette kjører hele `npm run check` og deretter `npm run test:e2e`. GitHub Quality bruker samme kommando.
 
-Siste topp:
+Fordi fase 17 la til produksjonsmoduler og imports, må også disse kjøres før PR-klargjøring:
 
-```text
-247  src/components/canvas/useElementPointerTransform.ts
-241  src/components/canvas/EditorCanvasElement.tsx
-236  src/model/imagePresentation.ts
-229  src/styles/toolbar.css
-224  src/components/sidebar/HeaderCreationControl.tsx
+```powershell
+npm run architecture:json
+npm run architecture:diagram
 ```
 
-`useElementPointerTransform.ts` har bare to tilgjengelige linjer før kontrollen blokkerer ved 250. Neste funksjonelle endring i denne filen skal starte med ansvarsstyrt oppdeling. Ikke legg til et unntak for å omgå nødvendig refaktorering.
+## Dokumentasjon
 
-## 9. Neste produksjonsfase
+Følgende påvirkes og skal være synkronisert:
 
-Neste låste fase er:
+1. `README.md`
+2. `docs/WORK_PLAN.md`
+3. `docs/PROJECT_RULES.md`
+4. `docs/ELEMENT_MODEL.md`
+5. `docs/EDITOR_PLANNING.md`
+6. `docs/RIGHT_PROPERTIES_PANEL.md`
+7. `docs/RESPONSIVE_DESIGN.md`
+8. `docs/MOBILE_DESIGN_CONTROLS.md`
+9. `docs/FILE_SIZE_CONTROL.md`
+10. `docs/CODE_AUDIT.md`
+11. `docs/PRODUCTION_READINESS.md`
+12. `docs/NEXT_CHAT_PROMPT.md`
 
-```text
-fase 17 – tekstboksbakgrunn og små eksisterende modellgap
-```
+Et kontrollert midlertidig skript `scripts/sync-phase-17-docs.mjs` kan ligge på branchen fram til lokal dokumentasjonssynk er utført. Skriptet skal stoppe ved feil branch, dirty tree eller uventet dokumenttekst. Etter vellykket kjøring fjernes skriptet før sluttcommit, med mindre det finnes en eksplisitt grunn til å beholde det.
 
-Primært omfang:
+## Neste konkrete rekkefølge
 
-- implementere issue #35
-- varig og validert tekstboksbakgrunn
-- standardverdi og skjemakonsekvens
-- `Bakgrunn` og `Tekstfarge` under hvert tekstelement i `Farger`
-- reducer- og hookstøtte
-- rendering fra prosjektdata i stedet for hardkodet CSS
-- korrekt låseoppførsel
-- kontrollere andre små dokumenterte modellgap og behandle dem separat
+1. Hent faktisk PR #50-head og CI-status fra GitHub.
+2. Kontroller brukerens lokale branch og clean tree fra terminaloutput.
+3. Hent siste remote branch.
+4. Kjør det kontrollerte dokumentasjonsskriptet dersom dokumentene ikke allerede er synkronisert.
+5. Les og kontroller dokumentdiffen; ikke anta at skriptets suksess alene er nok.
+6. Fjern det midlertidige skriptet etter bruk.
+7. Regenerer `architecture.json` og `docs/dependency-graph.mmd`.
+8. Kjør `npm run verify`.
+9. Kjør `git diff --check`, `git status --short` og `git diff --stat`.
+10. La brukeren gjennomføre manuell regresjon fra `docs/PRODUCTION_READINESS.md` i PC og Telefon.
+11. Commit og push bare kontrollerte endringer.
+12. Verifiser PR-filer, mergebarhet, reviews, tråder og GitHub Quality på nøyaktig siste head.
+13. Gjør PR-en klar for review først når alt er grønt.
+14. Merge bare etter ny eksplisitt `godkjent`.
 
-Akseptansekriterier:
+## Jobbkritisk ærlighet
 
-- bakgrunnsfarge lagres og gjenbrukes stabilt
-- låst tekst kan inspiseres, men ikke endres
-- ugyldig farge avvises ved reducergrensen
-- dokumentasjon og skjemahistorikk oppdateres
-- ingen urelaterte funksjoner blandes inn
+Programmet mangler fortsatt lokal prosjektlagring, autolagring, krasjgjenoppretting, prosjektimport og angre/gjør om. Tester kan oppdage kodebrudd, men kan ikke hindre tap av prosjektstate ved oppfriskning eller lukking. Ikke påstå at programmet er fullt jobbsikkert før denne risikoen er eksplisitt besluttet og håndtert. Ikke bland løsningen inn i PR #50; opprett en separat, avgrenset jobbberedskapsbeslutning etter at fase 17 er ferdig.
 
-Ikke start fase 17 før dokumentasjonssynken er kontrollert og merget etter eksplisitt godkjenning.
+## Permanente regler
 
-## 10. Neste konkrete arbeidsrekkefølge
-
-1. Kontroller remote-head og diff på `docs/sync-phase-16-status`.
-2. La brukeren hente branchen lokalt.
-3. Kjør `git diff --check`, `git status --short` og relevant dokumentkontroll.
-4. Åpne docs-PR mot `main`.
-5. Kontroller mergebarhet, changed files, CI, reviews og tråder.
-6. Merge bare etter ny eksplisitt `godkjent`.
-7. Synkroniser lokal `main` etter merge.
-8. Les fase 17 på nytt og lås issue/branch før produksjonskode.
+- ordinære produksjonsfiler: 0–249 linjer
+- 250–299 krever eksplisitt, begrunnet unntak
+- 300+ er alltid blokkert
+- reduceren er siste valideringsgrense
+- ugyldige og uendrede handlinger returnerer samme state
+- `updatedAt` endres bare ved reell gyldig mutasjon
+- DOM, CSS, File, Blob, Object URL og lokal filsti er ikke prosjektdata
+- arkitekturrapporter regenereres ved faktisk modul-/importendring
+- faktisk kode og terminaloutput vinner over foreldet dokumentasjon
 
 # SLUTT HANDOVER
