@@ -6,11 +6,12 @@ import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
 import type { PageAppearance } from './pageAppearance'
 import type { SectionAppearance } from './sectionAppearance'
+import type { TextAppearance } from './textAppearance'
 import type { TextElementStyle } from './textElementStyle'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 9 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 10 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -49,6 +50,7 @@ export type ImageEditorElement = BaseEditorElement & {
 export type TextEditorElement = BaseEditorElement & {
   kind: 'text'
   content: string
+  appearance: TextAppearance
   textStyle: TextElementStyle
   link: ElementLink
 }
