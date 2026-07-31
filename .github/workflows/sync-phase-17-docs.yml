@@ -1,0 +1,71 @@
+name: Sync phase 17 documentation
+
+on:
+  push:
+    branches:
+      - feature/phase-17-text-background
+    paths:
+      - .github/workflows/sync-phase-17-docs.yml
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out phase branch
+        uses: actions/checkout@v6
+        with:
+          ref: feature/phase-17-text-background
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Synchronize documentation
+        run: node scripts/sync-phase-17-docs.mjs
+
+      - name: Regenerate architecture reports
+        run: |
+          npm run architecture:json
+          npm run architecture:diagram
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run full verification
+        run: npm run verify
+
+      - name: Remove temporary synchronization files
+        run: |
+          rm scripts/sync-phase-17-docs.mjs
+          rm .github/workflows/sync-phase-17-docs.yml
+
+      - name: Check generated diff
+        run: |
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Commit synchronized project state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Synchronize phase 17 documentation and architecture"
+          git push origin HEAD:feature/phase-17-text-background
+
+      - name: Verify committed head with Quality
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run quality.yml --ref feature/phase-17-text-background
