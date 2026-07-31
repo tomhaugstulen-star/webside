@@ -6,12 +6,17 @@
   "scripts": {
     "dev": "vite --open",
     "build": "tsc -b && vite build",
-    "typecheck": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false",
     "lint": "eslint .",
     "architecture:check": "depcruise --config -- src",
     "architecture:json": "depcruise --config --output-type json --output-to architecture.json -- src",
     "architecture:diagram": "depcruise --config --include-only \"^src\" --output-type mermaid --output-to docs/dependency-graph.mmd -- src",
-    "check": "npm run lint && npm run typecheck && npm run architecture:check && npm run build",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "playwright test --config playwright.unit.config.ts",
+    "test:e2e": "playwright test --config playwright.config.ts",
+    "test:headed": "playwright test --config playwright.config.ts --headed",
+    "test:serve": "vite --host 127.0.0.1 --port 4173 --strictPort",
+    "check": "npm run lint && npm run typecheck && npm run architecture:check && npm run test:unit && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.0",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
