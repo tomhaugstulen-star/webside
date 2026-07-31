@@ -1,0 +1,60 @@
+name: Finalize phase 17 documentation
+
+on:
+  push:
+    branches:
+      - feature/phase-17-text-background
+    paths:
+      - .github/workflows/finalize-phase-17-docs.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out phase branch
+        uses: actions/checkout@v6
+        with:
+          ref: feature/phase-17-text-background
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Finalize documentation
+        run: node scripts/finalize-phase-17-docs.mjs
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run full verification
+        run: npm run verify
+
+      - name: Remove temporary finalization files
+        run: |
+          rm scripts/finalize-phase-17-docs.mjs
+          rm .github/workflows/finalize-phase-17-docs.yml
+
+      - name: Check final diff
+        run: |
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Commit finalized documentation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Finalize phase 17 documentation and handover"
+          git push origin HEAD:feature/phase-17-text-background
