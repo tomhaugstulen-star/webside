@@ -60,7 +60,7 @@ export function isValidSize(value: unknown) {
 
 export function isValidResponsiveValue<T>(
   value: unknown,
-  validator: (candidate: unknown) => candidate is T,
+  validator: (candidate: unknown) => boolean,
 ): value is ResponsiveValue<T> {
   if (!isRecord(value)) {
     return false
