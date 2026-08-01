@@ -18,7 +18,7 @@ import {
   type PersistenceStatus,
 } from './persistenceContext'
 
-const AUTOSAVE_DELAY_MS = 650
+const AUTOSAVE_DELAY_MS = 2_000
 
 type PersistenceProviderProps = PropsWithChildren<{
   initiallySaved: boolean
