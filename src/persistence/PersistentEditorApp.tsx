@@ -134,8 +134,15 @@ export function PersistentEditorApp() {
     )
   }
 
+  const assetStoreKey = startup.persistenceDisabled
+    ? 'temporary-session'
+    : `project-${startup.project.id}`
+
   return (
-    <ImageAssetStoreProvider initialAssets={startup.assets}>
+    <ImageAssetStoreProvider
+      key={assetStoreKey}
+      initialAssets={startup.assets}
+    >
       <HydratedEditor
         project={startup.project}
         initiallySaved={startup.initiallySaved}
