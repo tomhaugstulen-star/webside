@@ -22,16 +22,18 @@ const AUTOSAVE_DELAY_MS = 650
 
 type PersistenceProviderProps = PropsWithChildren<{
   initiallySaved: boolean
+  disabled?: boolean
 }>
 
 export function PersistenceProvider({
   children,
   initiallySaved,
+  disabled = false,
 }: PersistenceProviderProps) {
   const { state } = useEditorProject()
   const { getAllImageAssets } = useImageAssetStore()
   const [status, setStatus] = useState<PersistenceStatus>(
-    initiallySaved ? 'saved' : 'idle',
+    disabled ? 'error' : initiallySaved ? 'saved' : 'idle',
   )
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve())
   const saveSequenceRef = useRef(0)
@@ -45,7 +47,7 @@ export function PersistenceProvider({
   }, [state.project])
 
   const saveNow = useCallback(async () => {
-    if (resettingRef.current) {
+    if (disabled || resettingRef.current) {
       return false
     }
 
@@ -81,9 +83,14 @@ export function PersistenceProvider({
       }
       return false
     }
-  }, [getAllImageAssets, state.project])
+  }, [disabled, getAllImageAssets, state.project])
 
   useEffect(() => {
+    if (disabled) {
+      setStatus('error')
+      return
+    }
+
     if (firstAutosaveRef.current) {
       firstAutosaveRef.current = false
 
@@ -103,7 +110,7 @@ export function PersistenceProvider({
       window.clearTimeout(idleTimeoutId)
       window.clearTimeout(saveTimeoutId)
     }
-  }, [initiallySaved, saveNow])
+  }, [disabled, initiallySaved, saveNow])
 
   useEffect(() => {
     const warnBeforeUnsavedUnload = (event: BeforeUnloadEvent) => {
