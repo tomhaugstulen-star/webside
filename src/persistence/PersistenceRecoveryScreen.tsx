@@ -3,12 +3,10 @@ import { clearLocalProject } from './localProjectStorage'
 
 type PersistenceRecoveryScreenProps = {
   message: string
-  onContinueWithoutStorage: () => void
 }
 
 export function PersistenceRecoveryScreen({
   message,
-  onContinueWithoutStorage,
 }: PersistenceRecoveryScreenProps) {
   const [busy, setBusy] = useState(false)
   const [resetError, setResetError] = useState<string | null>(null)
@@ -40,17 +38,16 @@ export function PersistenceRecoveryScreen({
         <h1>Prosjektet kunne ikke åpnes</h1>
         <p>{message}</p>
         <p>
-          Lagrede data er ikke overskrevet. Du kan fortsette midlertidig uten
-          lagring, eller nullstille dersom du vil starte med et nytt lokalt
-          prosjekt.
+          Lagrede data er ikke overskrevet. Prøv igjen først. Nullstill bare
+          dersom du vil slette den lokale kopien og starte med et nytt prosjekt.
         </p>
         <div className="persistence-screen__actions">
           <button
             type="button"
             disabled={busy}
-            onClick={onContinueWithoutStorage}
+            onClick={() => window.location.reload()}
           >
-            Fortsett uten lagring
+            Prøv igjen
           </button>
           <button
             type="button"
