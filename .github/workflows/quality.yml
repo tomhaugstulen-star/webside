@@ -8,8 +8,7 @@ on:
       - main
 
 permissions:
-  actions: read
-  contents: write
+  contents: read
 
 jobs:
   quality:
@@ -19,8 +18,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -36,66 +33,3 @@ jobs:
 
       - name: Run full verification
         run: npm run verify
-
-      - name: Synchronize final phase 25 files
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/8811212146/zip" > /tmp/phase25-sync.zip
-          mkdir -p /tmp/phase25-sync
-          unzip -q -o /tmp/phase25-sync.zip -d /tmp/phase25-sync
-          cp /tmp/phase25-sync/README.md README.md
-          cp /tmp/phase25-sync/docs/*.md docs/
-          npm run architecture:json
-          npm run architecture:diagram
-          cat > .github/workflows/quality.yml <<'NORMAL_WORKFLOW'
-          name: Quality
-
-          on:
-            workflow_dispatch:
-            pull_request:
-            push:
-              branches:
-                - main
-
-          permissions:
-            contents: read
-
-          jobs:
-            quality:
-              runs-on: ubuntu-latest
-              timeout-minutes: 20
-
-              steps:
-                - name: Check out repository
-                  uses: actions/checkout@v6
-
-                - name: Set up Node.js
-                  uses: actions/setup-node@v6
-                  with:
-                    node-version: 24
-                    cache: npm
-
-                - name: Install dependencies
-                  run: npm ci
-
-                - name: Install Chromium
-                  run: npx playwright install --with-deps chromium
-
-                - name: Run full verification
-                  run: npm run verify
-          NORMAL_WORKFLOW
-
-      - name: Commit synchronized files
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/quality.yml README.md architecture.json docs
-          if git diff --cached --quiet; then
-            echo "Phase 25 files are already synchronized."
-          else
-            git commit -m "docs: synchronize phase 25 reports and status"
-            git push origin "HEAD:${{ github.head_ref }}"
-          fi
