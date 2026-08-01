@@ -1,12 +1,23 @@
 import { isKnownButtonAssetId, normalizeButtonLabel } from '../model/buttonAsset'
 import { HEADER_SERIALIZED_WIDTH } from '../model/elementDimensions'
+import {
+  isValidElementDesktopLayout,
+  isValidElementLayout,
+} from '../model/elementLayout'
 import { isValidElementLink } from '../model/elementLink'
 import { isValidHeaderAppearance } from '../model/headerAppearance'
 import {
   isValidHeaderSiteName,
   isValidHeaderSubtitle,
 } from '../model/headerElement'
-import type { EditorElement } from '../model/editorProject'
+import type {
+  CanvasPosition,
+  EditorElement,
+  ElementKind,
+  ElementSize,
+  ImageEditorElement,
+  ResponsiveValue,
+} from '../model/editorProject'
 import {
   isValidImageAssetMetadata,
   isImageAssetId,
@@ -37,23 +48,48 @@ const baseElementKeys = [
   'locked',
 ] as const
 
-function hasValidBaseElement(value: Record<string, unknown>) {
+function hasValidResponsiveLayout(
+  kind: ElementKind,
+  value: Record<string, unknown>,
+) {
+  const positions = value.position as ResponsiveValue<CanvasPosition>
+  const sizes = value.size as ResponsiveValue<ElementSize>
+  const desktopLayout = {
+    position: positions.desktop,
+    size: sizes.desktop,
+  }
+  const mobileLayout = {
+    position: positions.mobile ?? positions.desktop,
+    size: sizes.mobile ?? sizes.desktop,
+  }
+
+  return (
+    isValidElementLayout(kind, desktopLayout) &&
+    isValidElementLayout(kind, mobileLayout)
+  )
+}
+
+function hasValidBaseElement(
+  kind: ElementKind,
+  value: Record<string, unknown>,
+) {
   return (
     isStableId(value.id) &&
-    isValidResponsiveValue(value.position, isValidPosition) &&
-    isValidResponsiveValue(value.size, isValidSize) &&
-    isValidResponsiveValue(
+    isValidResponsiveValue<CanvasPosition>(value.position, isValidPosition) &&
+    isValidResponsiveValue<ElementSize>(value.size, isValidSize) &&
+    isValidResponsiveValue<boolean>(
       value.visibility,
-      (candidate): candidate is boolean => typeof candidate === 'boolean',
+      (candidate) => typeof candidate === 'boolean',
     ) &&
-    typeof value.locked === 'boolean'
+    typeof value.locked === 'boolean' &&
+    hasValidResponsiveLayout(kind, value)
   )
 }
 
 function isValidSectionElement(value: Record<string, unknown>) {
   return (
     hasExactKeys(value, [...baseElementKeys, 'appearance']) &&
-    hasValidBaseElement(value) &&
+    hasValidBaseElement('section', value) &&
     isValidSectionAppearance(value.appearance)
   )
 }
@@ -61,28 +97,37 @@ function isValidSectionElement(value: Record<string, unknown>) {
 function isValidImageElement(value: Record<string, unknown>) {
   const normalizedTransform = normalizeImageTransform(value.transform)
 
-  return (
-    hasExactKeys(value, [
+  if (
+    !hasExactKeys(value, [
       ...baseElementKeys,
       'assetId',
       'assetMetadata',
       'altText',
       'mode',
       'transform',
-    ]) &&
-    hasValidBaseElement(value) &&
-    isImageAssetId(value.assetId) &&
-    isValidImageAssetMetadata(value.assetMetadata) &&
-    typeof value.altText === 'string' &&
-    value.altText === value.altText.trim() &&
-    isImageMode(value.mode) &&
-    normalizedTransform !== null &&
-    isRecord(value.transform) &&
-    imageTransformsEqual(
+    ]) ||
+    !hasValidBaseElement('image', value) ||
+    !isImageAssetId(value.assetId) ||
+    !isValidImageAssetMetadata(value.assetMetadata) ||
+    typeof value.altText !== 'string' ||
+    value.altText !== value.altText.trim() ||
+    !isImageMode(value.mode) ||
+    normalizedTransform === null ||
+    !isRecord(value.transform) ||
+    !hasExactKeys(value.transform, ['zoom', 'offsetX', 'offsetY']) ||
+    !imageTransformsEqual(
       normalizedTransform,
       value.transform as unknown as typeof normalizedTransform,
     )
-  )
+  ) {
+    return false
+  }
+
+  const element = value as unknown as ImageEditorElement
+  return isValidElementDesktopLayout(element, {
+    position: element.position.desktop,
+    size: element.size.desktop,
+  })
 }
 
 function isValidTextElement(value: Record<string, unknown>) {
@@ -94,7 +139,7 @@ function isValidTextElement(value: Record<string, unknown>) {
       'textStyle',
       'link',
     ]) &&
-    hasValidBaseElement(value) &&
+    hasValidBaseElement('text', value) &&
     typeof value.content === 'string' &&
     isValidTextAppearance(value.appearance) &&
     isValidTextElementStyle(value.textStyle) &&
@@ -110,7 +155,7 @@ function isValidButtonElement(value: Record<string, unknown>) {
       'label',
       'link',
     ]) &&
-    hasValidBaseElement(value) &&
+    hasValidBaseElement('button', value) &&
     isKnownButtonAssetId(value.assetId) &&
     typeof value.label === 'string' &&
     normalizeButtonLabel(value.label) === value.label &&
@@ -131,7 +176,7 @@ function isValidHeaderElement(value: Record<string, unknown>) {
       'subtitle',
       'appearance',
     ]) &&
-    hasValidBaseElement(value) &&
+    hasValidBaseElement('header', value) &&
     isRecord(position) &&
     position.x === 0 &&
     position.y === 0 &&

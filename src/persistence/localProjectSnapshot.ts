@@ -4,7 +4,8 @@ import {
   isValidImageAssetMetadata,
 } from '../model/imageAsset'
 import {
-  getReferencedImageAssetIds,
+  getReferencedImageAssetMetadata,
+  imageAssetMetadataEqual,
   isValidEditorProject,
 } from './editorProjectValidation'
 import {
@@ -69,25 +70,32 @@ export function validateLocalProjectSnapshot(
   envelope: unknown,
   assets: unknown,
 ): LocalProjectSnapshot | null {
-  if (
-    !isValidLocalProjectEnvelope(envelope) ||
-    !Array.isArray(assets) ||
-    !assets.every(isValidStoredImageAsset)
-  ) {
+  if (!isValidLocalProjectEnvelope(envelope) || !Array.isArray(assets)) {
     return null
   }
 
-  const assetMap = new Map(assets.map((asset) => [asset.assetId, asset]))
-  const referencedAssetIds = getReferencedImageAssetIds(envelope.project)
+  const validAssets = assets.filter(isValidStoredImageAsset)
+  const assetMap = new Map(validAssets.map((asset) => [asset.assetId, asset]))
+  const requiredMetadata = getReferencedImageAssetMetadata(envelope.project)
 
-  if ([...referencedAssetIds].some((assetId) => !assetMap.has(assetId))) {
+  if (!requiredMetadata) {
     return null
+  }
+
+  const referencedAssets: StoredImageAsset[] = []
+
+  for (const [assetId, metadata] of requiredMetadata) {
+    const asset = assetMap.get(assetId)
+
+    if (!asset || !imageAssetMetadataEqual(asset.metadata, metadata)) {
+      return null
+    }
+
+    referencedAssets.push(asset)
   }
 
   return {
     envelope,
-    assets: [...referencedAssetIds].map(
-      (assetId) => assetMap.get(assetId) as StoredImageAsset,
-    ),
+    assets: referencedAssets,
   }
 }

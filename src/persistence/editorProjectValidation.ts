@@ -3,7 +3,10 @@ import {
   type EditorPage,
   type EditorProject,
 } from '../model/editorProject'
-import type { ImageAssetId } from '../model/imageAsset'
+import type {
+  ImageAssetId,
+  ImageAssetMetadata,
+} from '../model/imageAsset'
 import { isValidPageAppearance } from '../model/pageAppearance'
 import { isValidEditorElement } from './editorElementValidation'
 import {
@@ -51,6 +54,19 @@ function hasUniqueIds(project: EditorProject) {
   )
 }
 
+export function imageAssetMetadataEqual(
+  first: ImageAssetMetadata,
+  second: ImageAssetMetadata,
+) {
+  return (
+    first.fileName === second.fileName &&
+    first.mimeType === second.mimeType &&
+    first.byteSize === second.byteSize &&
+    first.width === second.width &&
+    first.height === second.height
+  )
+}
+
 export function isValidEditorProject(
   value: unknown,
 ): value is EditorProject {
@@ -73,7 +89,8 @@ export function isValidEditorProject(
     value.pages.length === 0 ||
     !value.pages.every(isValidEditorPage) ||
     !isIsoTimestamp(value.createdAt) ||
-    !isIsoTimestamp(value.updatedAt)
+    !isIsoTimestamp(value.updatedAt) ||
+    Date.parse(value.createdAt) > Date.parse(value.updatedAt)
   ) {
     return false
   }
@@ -81,18 +98,42 @@ export function isValidEditorProject(
   return hasUniqueIds(value as EditorProject)
 }
 
-export function getReferencedImageAssetIds(project: EditorProject) {
-  const assetIds = new Set<ImageAssetId>()
+export function getReferencedImageAssetMetadata(project: EditorProject) {
+  const metadataById = new Map<ImageAssetId, ImageAssetMetadata>()
 
-  project.pages.forEach((page) => {
-    page.elements.forEach((element) => {
-      if (element.kind === 'image') {
-        assetIds.add(element.assetId)
-      } else if (element.kind === 'header') {
-        assetIds.add(element.logoAssetId)
+  for (const page of project.pages) {
+    for (const element of page.elements) {
+      const reference =
+        element.kind === 'image'
+          ? { assetId: element.assetId, metadata: element.assetMetadata }
+          : element.kind === 'header'
+            ? {
+                assetId: element.logoAssetId,
+                metadata: element.logoAssetMetadata,
+              }
+            : null
+
+      if (!reference) {
+        continue
       }
-    })
-  })
 
-  return assetIds
+      const existingMetadata = metadataById.get(reference.assetId)
+
+      if (
+        existingMetadata &&
+        !imageAssetMetadataEqual(existingMetadata, reference.metadata)
+      ) {
+        return null
+      }
+
+      metadataById.set(reference.assetId, reference.metadata)
+    }
+  }
+
+  return metadataById
+}
+
+export function getReferencedImageAssetIds(project: EditorProject) {
+  const metadataById = getReferencedImageAssetMetadata(project)
+  return new Set<ImageAssetId>(metadataById?.keys() ?? [])
 }

@@ -33,14 +33,18 @@ export function PersistenceProvider({
     initiallySaved ? 'saved' : 'idle',
   )
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve())
+  const saveSequenceRef = useRef(0)
+  const currentProjectRef = useRef(state.project)
   const resettingRef = useRef(false)
   const firstAutosaveRef = useRef(true)
+  currentProjectRef.current = state.project
 
   const saveNow = useCallback(async () => {
     if (resettingRef.current) {
       return false
     }
 
+    const sequence = ++saveSequenceRef.current
     const project = state.project
     const assets = getAllImageAssets()
     setStatus('saving')
@@ -54,12 +58,20 @@ export function PersistenceProvider({
     try {
       await operation
 
-      if (!resettingRef.current) {
+      if (
+        !resettingRef.current &&
+        sequence === saveSequenceRef.current &&
+        currentProjectRef.current === project
+      ) {
         setStatus('saved')
       }
       return true
     } catch {
-      if (!resettingRef.current) {
+      if (
+        !resettingRef.current &&
+        sequence === saveSequenceRef.current &&
+        currentProjectRef.current === project
+      ) {
         setStatus('error')
       }
       return false
@@ -90,6 +102,7 @@ export function PersistenceProvider({
 
   const resetLocalProject = useCallback(async () => {
     resettingRef.current = true
+    saveSequenceRef.current += 1
     setStatus('saving')
 
     try {

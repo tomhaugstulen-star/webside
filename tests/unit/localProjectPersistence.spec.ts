@@ -48,6 +48,12 @@ test.describe('local project persistence validation', () => {
         pages: [{ ...project.pages[0], id: project.id }],
       }),
     ).toBe(false)
+    expect(
+      isValidEditorProject({
+        ...project,
+        updatedAt: '2020-01-01T00:00:00.000Z',
+      }),
+    ).toBe(false)
   })
 
   test('collects image and logo references without duplicates', () => {
@@ -72,10 +78,19 @@ test.describe('local project persistence validation', () => {
     })
   })
 
-  test('rejects mismatched file metadata and unsupported envelopes', () => {
+  test('rejects project and file metadata mismatches', () => {
     const { project, assetId, file, metadata } = createProjectWithImage()
     const envelope = createLocalProjectEnvelope(project, UPDATED_AT)
 
+    expect(
+      validateLocalProjectSnapshot(envelope, [
+        {
+          assetId,
+          file,
+          metadata: { ...metadata, width: metadata.width + 1 },
+        },
+      ]),
+    ).toBeNull()
     expect(
       validateLocalProjectSnapshot(envelope, [
         {
@@ -85,6 +100,16 @@ test.describe('local project persistence validation', () => {
         },
       ]),
     ).toBeNull()
+  })
+
+  test('ignores invalid orphan data but rejects unsupported envelopes', () => {
+    const project = createInitialEditorProjectState().project
+    const envelope = createLocalProjectEnvelope(project, UPDATED_AT)
+
+    expect(validateLocalProjectSnapshot(envelope, [{ corrupt: true }])).toEqual({
+      envelope,
+      assets: [],
+    })
     expect(
       validateLocalProjectSnapshot(
         { ...envelope, storageVersion: 2 },

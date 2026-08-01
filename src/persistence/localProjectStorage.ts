@@ -41,6 +41,7 @@ function transactionComplete(transaction: IDBTransaction) {
 function openDatabase(factory: IDBFactory) {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = factory.open(DATABASE_NAME, DATABASE_VERSION)
+    let settled = false
 
     request.onupgradeneeded = () => {
       const database = request.result
@@ -54,11 +55,30 @@ function openDatabase(factory: IDBFactory) {
       }
     }
 
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () =>
-      reject(request.error ?? new Error('IndexedDB could not be opened.'))
-    request.onblocked = () =>
-      reject(new Error('IndexedDB upgrade was blocked by another tab.'))
+    request.onsuccess = () => {
+      const database = request.result
+      database.onversionchange = () => database.close()
+
+      if (settled) {
+        database.close()
+        return
+      }
+
+      settled = true
+      resolve(database)
+    }
+    request.onerror = () => {
+      if (!settled) {
+        settled = true
+        reject(request.error ?? new Error('IndexedDB could not be opened.'))
+      }
+    }
+    request.onblocked = () => {
+      if (!settled) {
+        settled = true
+        reject(new Error('IndexedDB upgrade was blocked by another tab.'))
+      }
+    }
   })
 }
 
@@ -166,6 +186,9 @@ export async function writeLocalProject(
     const projectStore = transaction.objectStore(PROJECT_STORE)
     const assetStore = transaction.objectStore(ASSET_STORE)
     const existingKeysRequest = assetStore.getAllKeys()
+    const referencedIds = new Set<ImageAssetId>(
+      validatedSnapshot.assets.map((asset) => asset.assetId),
+    )
 
     projectStore.put({
       key: ACTIVE_PROJECT_KEY,
@@ -176,16 +199,16 @@ export async function writeLocalProject(
       assetStore.put(asset)
     })
 
-    const existingKeys = await requestResult(existingKeysRequest)
-    const referencedIds = new Set<ImageAssetId>(
-      validatedSnapshot.assets.map((asset) => asset.assetId),
-    )
-
-    existingKeys.forEach((key) => {
-      if (typeof key === 'string' && !referencedIds.has(key as ImageAssetId)) {
-        assetStore.delete(key)
-      }
-    })
+    existingKeysRequest.onsuccess = () => {
+      existingKeysRequest.result.forEach((key) => {
+        if (
+          typeof key === 'string' &&
+          !referencedIds.has(key as ImageAssetId)
+        ) {
+          assetStore.delete(key)
+        }
+      })
+    }
 
     await completion
   } finally {
