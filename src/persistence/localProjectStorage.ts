@@ -87,6 +87,7 @@ export async function readLocalProject(
       [PROJECT_STORE, ASSET_STORE],
       'readonly',
     )
+    const completion = transactionComplete(transaction)
     const projectRequest = transaction
       .objectStore(PROJECT_STORE)
       .get(ACTIVE_PROJECT_KEY)
@@ -99,7 +100,7 @@ export async function readLocalProject(
       projectResult,
       assetsResult,
     ])
-    await transactionComplete(transaction)
+    await completion
 
     if (!projectRecord) {
       return { status: 'empty' }
@@ -161,6 +162,7 @@ export async function writeLocalProject(
       [PROJECT_STORE, ASSET_STORE],
       'readwrite',
     )
+    const completion = transactionComplete(transaction)
     const projectStore = transaction.objectStore(PROJECT_STORE)
     const assetStore = transaction.objectStore(ASSET_STORE)
     const existingKeysRequest = assetStore.getAllKeys()
@@ -185,7 +187,7 @@ export async function writeLocalProject(
       }
     })
 
-    await transactionComplete(transaction)
+    await completion
   } finally {
     database.close()
   }
@@ -205,9 +207,10 @@ export async function clearLocalProject(factory?: IDBFactory) {
       [PROJECT_STORE, ASSET_STORE],
       'readwrite',
     )
+    const completion = transactionComplete(transaction)
     transaction.objectStore(PROJECT_STORE).clear()
     transaction.objectStore(ASSET_STORE).clear()
-    await transactionComplete(transaction)
+    await completion
   } finally {
     database.close()
   }

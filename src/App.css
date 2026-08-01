@@ -21,6 +21,7 @@
 @import './styles/image-crop-properties.css';
 @import './styles/element-link-properties.css';
 @import './styles/element-deletion.css';
+@import './styles/project-persistence.css';
 
 #root {
   min-height: 100vh;

@@ -1,16 +1,8 @@
-import { ImageAssetStoreProvider } from './assets/images/ImageAssetStoreProvider'
-import { EditorShell } from './components/editor/EditorShell'
-import { EditorProjectProvider } from './state/EditorProjectProvider'
+import { PersistentEditorApp } from './persistence/PersistentEditorApp'
 import './App.css'
 
 function App() {
-  return (
-    <ImageAssetStoreProvider>
-      <EditorProjectProvider>
-        <EditorShell />
-      </EditorProjectProvider>
-    </ImageAssetStoreProvider>
-  )
+  return <PersistentEditorApp />
 }
 
 export default App

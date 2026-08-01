@@ -1,18 +1,48 @@
 import { useMemo, useReducer, type PropsWithChildren } from 'react'
+import type { EditorProject, EditorProjectState } from '../model/editorProject'
 import { EditorProjectContext } from './editorProjectContext'
 import {
   editorProjectReducer,
   getInitialEditorProjectState,
 } from './editorProjectReducer'
 
-export function EditorProjectProvider({ children }: PropsWithChildren) {
+type EditorProjectProviderProps = PropsWithChildren<{
+  initialProject?: EditorProject
+}>
+
+function createProviderState(
+  initialProject: EditorProject | undefined,
+): EditorProjectState {
+  if (!initialProject) {
+    return getInitialEditorProjectState()
+  }
+
+  const activePageId = initialProject.pages[0]?.id
+
+  if (!activePageId) {
+    throw new Error('An editor project must contain at least one page.')
+  }
+
+  return {
+    project: initialProject,
+    activePageId,
+    selectedElementId: null,
+  }
+}
+
+export function EditorProjectProvider({
+  children,
+  initialProject,
+}: EditorProjectProviderProps) {
   const [state, dispatch] = useReducer(
     editorProjectReducer,
-    undefined,
-    getInitialEditorProjectState,
+    initialProject,
+    createProviderState,
   )
 
-  const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+  const activePage = state.project.pages.find(
+    (page) => page.id === state.activePageId,
+  )
 
   if (!activePage) {
     throw new Error('The active editor page does not exist in the current project.')

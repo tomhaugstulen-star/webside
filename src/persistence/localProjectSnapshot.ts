@@ -38,6 +38,7 @@ export function isValidStoredImageAsset(
     !isRecord(value) ||
     !hasExactKeys(value, ['assetId', 'file', 'metadata']) ||
     !isImageAssetId(value.assetId) ||
+    typeof File === 'undefined' ||
     !(value.file instanceof File) ||
     !isValidImageAssetMetadata(value.metadata)
   ) {

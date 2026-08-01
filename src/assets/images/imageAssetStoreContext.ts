@@ -10,7 +10,17 @@ export type ImageAssetResource = {
   metadata: ImageAssetMetadata
 }
 
+export type ImageAssetSource = {
+  assetId: ImageAssetId
+  file: File
+  metadata: ImageAssetMetadata
+}
+
+export type ImageAssetHydrationStatus = 'loading' | 'ready' | 'error'
+
 export type ImageAssetStoreContextValue = {
+  hydrationStatus: ImageAssetHydrationStatus
+  hydrationError: string | null
   registerImageAsset: (
     assetId: ImageAssetId,
     file: File,
@@ -18,6 +28,7 @@ export type ImageAssetStoreContextValue = {
   ) => boolean
   removeImageAsset: (assetId: ImageAssetId) => void
   getImageAsset: (assetId: ImageAssetId) => ImageAssetResource | null
+  getAllImageAssets: () => ImageAssetSource[]
 }
 
 export const ImageAssetStoreContext =

@@ -1,0 +1,112 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from 'react'
+import { useImageAssetStore } from '../assets/images/useImageAssetStore'
+import { useEditorProject } from '../state/useEditorProject'
+import {
+  clearLocalProject,
+  writeLocalProject,
+} from './localProjectStorage'
+import {
+  PersistenceContext,
+  type PersistenceStatus,
+} from './persistenceContext'
+
+const AUTOSAVE_DELAY_MS = 650
+
+type PersistenceProviderProps = PropsWithChildren<{
+  initiallySaved: boolean
+}>
+
+export function PersistenceProvider({
+  children,
+  initiallySaved,
+}: PersistenceProviderProps) {
+  const { state } = useEditorProject()
+  const { getAllImageAssets } = useImageAssetStore()
+  const [status, setStatus] = useState<PersistenceStatus>(
+    initiallySaved ? 'saved' : 'idle',
+  )
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve())
+  const resettingRef = useRef(false)
+  const firstAutosaveRef = useRef(true)
+
+  const saveNow = useCallback(async () => {
+    if (resettingRef.current) {
+      return false
+    }
+
+    const project = state.project
+    const assets = getAllImageAssets()
+    setStatus('saving')
+
+    const operation = saveQueueRef.current
+      .catch(() => undefined)
+      .then(() => writeLocalProject(project, assets))
+
+    saveQueueRef.current = operation
+
+    try {
+      await operation
+
+      if (!resettingRef.current) {
+        setStatus('saved')
+      }
+      return true
+    } catch {
+      if (!resettingRef.current) {
+        setStatus('error')
+      }
+      return false
+    }
+  }, [getAllImageAssets, state.project])
+
+  useEffect(() => {
+    if (firstAutosaveRef.current) {
+      firstAutosaveRef.current = false
+
+      if (initiallySaved) {
+        return
+      }
+    }
+
+    setStatus('idle')
+    const timeoutId = window.setTimeout(() => {
+      void saveNow()
+    }, AUTOSAVE_DELAY_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [initiallySaved, saveNow])
+
+  const resetLocalProject = useCallback(async () => {
+    resettingRef.current = true
+    setStatus('saving')
+
+    try {
+      await saveQueueRef.current.catch(() => undefined)
+      await clearLocalProject()
+      window.location.reload()
+      return true
+    } catch {
+      resettingRef.current = false
+      setStatus('error')
+      return false
+    }
+  }, [])
+
+  const value = useMemo(
+    () => ({ status, saveNow, resetLocalProject }),
+    [resetLocalProject, saveNow, status],
+  )
+
+  return (
+    <PersistenceContext.Provider value={value}>
+      {children}
+    </PersistenceContext.Provider>
+  )
+}
