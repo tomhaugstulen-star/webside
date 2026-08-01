@@ -75,12 +75,17 @@ export function PersistenceProvider({
       }
     }
 
-    setStatus('idle')
-    const timeoutId = window.setTimeout(() => {
+    const idleTimeoutId = window.setTimeout(() => {
+      setStatus('idle')
+    }, 0)
+    const saveTimeoutId = window.setTimeout(() => {
       void saveNow()
     }, AUTOSAVE_DELAY_MS)
 
-    return () => window.clearTimeout(timeoutId)
+    return () => {
+      window.clearTimeout(idleTimeoutId)
+      window.clearTimeout(saveTimeoutId)
+    }
   }, [initiallySaved, saveNow])
 
   const resetLocalProject = useCallback(async () => {
