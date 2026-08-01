@@ -82,6 +82,18 @@ function openDatabase(factory: IDBFactory) {
   })
 }
 
+function deleteDatabase(factory: IDBFactory) {
+  return new Promise<void>((resolve, reject) => {
+    const request = factory.deleteDatabase(DATABASE_NAME)
+
+    request.onsuccess = () => resolve()
+    request.onerror = () =>
+      reject(request.error ?? new Error('IndexedDB could not be deleted.'))
+    request.onblocked = () =>
+      reject(new Error('IndexedDB reset was blocked by another tab.'))
+  })
+}
+
 function getFactory(factory?: IDBFactory) {
   return factory ?? globalThis.indexedDB
 }
@@ -223,18 +235,5 @@ export async function clearLocalProject(factory?: IDBFactory) {
     throw new Error('IndexedDB is unavailable.')
   }
 
-  const database = await openDatabase(resolvedFactory)
-
-  try {
-    const transaction = database.transaction(
-      [PROJECT_STORE, ASSET_STORE],
-      'readwrite',
-    )
-    const completion = transactionComplete(transaction)
-    transaction.objectStore(PROJECT_STORE).clear()
-    transaction.objectStore(ASSET_STORE).clear()
-    await completion
-  } finally {
-    database.close()
-  }
+  await deleteDatabase(resolvedFactory)
 }
