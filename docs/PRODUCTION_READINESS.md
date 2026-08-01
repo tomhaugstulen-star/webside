@@ -1,73 +1,76 @@
 # Produksjonsklarhet for jobbbruk
 
-Dette dokumentet er en kvalitetsport før Website-editoren brukes i faktisk arbeid. Det erstatter ikke roadmapen og senker ingen tekniske krav.
+Dette dokumentet er kvalitetsporten før Website-editoren brukes i faktisk arbeid.
 
-## Ansvarsdeling
+## Nåstatus
 
-- AI gjør alle mulige GitHub-endringer, dokumentoppdateringer, commits, PR-kontroller og CI-kontroller direkte i repoet.
-- Brukeren gjør bare nødvendig lokal synk, starter programmet og gjennomfører den manuelle regresjonen.
-- Ingen lokal kommandorunde brukes til arbeid som AI kan utføre sikkert remote.
+```text
+main: 161125d00a4a7d08b4c376d82933dd1176a0cc44
+prosjektskjema: 10
+fase 17: fullført
+fase 25: aktiv i draft-PR #52
+jobbbruk med eneste kopi i editoren: ikke godkjent
+```
+
+`main` mangler fortsatt lokal prosjektlagring, autolagring og krasjgjenoppretting. Nettleseroppfriskning, lukking eller krasj kan miste hele arbeidsøkten.
 
 ## Full automatisk kontroll
 
 ```powershell
 npm run verify
+npm run architecture:json
+npm run architecture:diagram
+git diff --check
+git status --short
+git diff --stat
 ```
 
-Kommandoen kjører:
+GitHub `Quality` skal kjøre samme `npm run verify` med read-only repository permissions.
 
-1. ni tester av filstørrelsespolicyen
-2. kontroll av alle produksjonsfiler
-3. ESLint
-4. TypeScript for produksjon og tester
-5. Dependency Cruiser
-6. alle enhetstester
-7. produksjonsbuild
-8. kritisk Chromium-regresjon
+## Krav før PR #52 kan gjøres klar
 
-GitHub Quality kjører samme kommando. Lokal og remote kontroll skal derfor måle samme leveranse.
-
-## Krav før PR #50 kan gjøres klar
-
-- siste remote branch-head er kjent
-- `npm run verify` består på samme head
-- GitHub Quality består på samme head
-- `git diff --check` er ren
-- arkitekturrapportene er regenerert og kontrollert
-- alle påvirkede autoritative dokumenter viser skjema 10 og korrekt fase-17-status
-- kodeaudit er gjennomført mot framtidige fasegrenser
+- faktisk siste PR-head er kjent
+- branchen er basert på korrekt `main`
+- endelig head har grønn GitHub `Quality`
+- `npm run verify` består på samme kode
+- arkitekturrapportene er regenerert etter siste importendring
+- alle autoritative dokumenter viser samme fase og status
+- IndexedDB-adapterens read/write/clear-feilveier er deterministisk testet
+- recovery-reset fungerer ved inkompatibel databaseversjon og manglende stores
+- både desktop- og eventuelle mobile verdier valideres
+- bilde og Header-logo overlever refresh
+- lagringsfeil vises og kan ikke rapporteres som `Lagret`
+- PR er mergebar uten uløste reviewtråder
 - manuell PC- og Telefon-regresjon er bestått
-- PR-en er mergebar og uten uløste reviewtråder
 - merge skjer bare etter eksplisitt `godkjent`
 
-## Manuell regresjon
+## Manuell fase-25-regresjon
 
-1. Start med `npm run dev`.
-2. Opprett Tekst og skriv innhold.
-3. Endre font, størrelse, stil, justering, linjehøyde og tekstfarge.
-4. Endre Tekst `Bakgrunn` i `Farger`; bekreft at riktig Tekst endres.
-5. Lås Tekst; bekreft at Bakgrunn og Tekstfarge kan ses, men ikke endres.
-6. Lås opp, flytt og endre størrelse med peker og relevante tastatursnarveier.
-7. Opprett Seksjon og kontroller bakgrunn og ramme.
-8. Opprett Knapp og kontroller design, tekst og lenke.
-9. Importer Bilde og kontroller alternativ tekst, modus, utsnitt og zoom.
-10. Opprett Header og kontroller logo, navn, undertittel, farger, font og høyde.
-11. Bytt mellom PC og Telefon og kontroller at eksisterende verdier vises konsistent.
-12. Kontroller markering, panelåpning/-lukking, låsing og sikker sletting.
+1. Start med tom lokal database.
+2. Opprett og rediger Tekst; endre layout, tekst- og bakgrunnsfarge.
+3. Importer Bilde og opprett Header med logo.
+4. Vent til status viser `Lagret`.
+5. Oppdater siden og bekreft at tekst, layout, farger, bilde og logo gjenopprettes.
+6. Bytt mellom PC og Telefon og kontroller konsistent rendering.
+7. Slett et bilde, vent på lagring, oppdater og bekreft at element og orphan-asset er borte.
+8. Fremprovoser eller simuler lagringsfeil; kontroller at UI viser feil og aldri `Lagret`.
+9. Legg inn ugyldig envelope; kontroller at editoren ikke åpnes og data beholdes.
+10. Test reset og bekreft at nytt skjema-10-prosjekt åpnes.
+11. Test reset ved inkompatibel IndexedDB-versjon eller manglende store.
+12. Kontroller markering, flytting, resizing, låsing, paneler og sikker sletting.
+13. Kontroller at ingen aktiv offentlig `Publiser`-handling finnes.
+14. Gjenta relevant flyt i PC- og Telefon-visning.
 
-Et avvik dokumenteres og rettes på samme branch. Etter en feilretting kjøres hele `npm run verify` på nytt.
+Et avvik rettes på samme branch. Etter siste produksjonsretting kjøres hele kontrollen på nytt.
 
-## Kjent kritisk begrensning
+## Stabil jobbbruk etter merge
 
-Programmet mangler fortsatt lokal prosjektlagring, autolagring, krasjgjenoppretting, prosjektimport og angre/gjør om. Nettleseroppfriskning, lukking eller krasj kan derfor miste prosjektstate. Dette er en reell jobbrelatert risiko og skal ikke omtales som løst av tester.
+Før første kritiske arbeidsøkt:
 
-En separat, eksplisitt beslutning må avgjøre om jobbberedskap skal prioriteres foran fase 18. Ingen slik funksjon blandes inn i PR #50.
+- synkroniser lokal `main`
+- kjør `npm ci` og `npm run verify`
+- start fra kjent god commit
+- lag en ekstern sikkerhetskopi inntil fase 26 er levert
+- ikke utvikle nye features i samme arbeidskopi under kritisk arbeid
 
-## Stabilitetsregel
-
-Når en kjent godkjent commit er valgt til jobbbruk:
-
-- nye features utvikles ikke på samme arbeidskopi under kritisk arbeid
-- bare dokumenterte feil med direkte konsekvens rettes
-- hver rettelse går gjennom branch, `npm run verify`, PR og eksplisitt godkjenning
-- kjent god commit og synkronisert `main` beholdes som gjenopprettingspunkt
+Fase 25 reduserer risikoen for tap i samme nettleserprofil. Den erstatter ikke backup, eksport eller import fra fase 26.
