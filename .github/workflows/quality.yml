@@ -33,3 +33,18 @@ jobs:
 
       - name: Run full verification
         run: npm run verify
+
+      - name: Generate synchronized reports
+        run: |
+          npm run architecture:json
+          npm run architecture:diagram
+
+      - name: Upload synchronization files
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-25-synchronization
+          retention-days: 1
+          path: |
+            architecture.json
+            README.md
+            docs/*.md
