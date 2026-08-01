@@ -34,6 +34,12 @@ function sourceIsValid(source: ImageAssetSource) {
   )
 }
 
+function revokeResources(resources: ImageAssetMap) {
+  resources.forEach((resource) => {
+    URL.revokeObjectURL(resource.objectUrl)
+  })
+}
+
 export function ImageAssetStoreProvider({
   children,
   initialAssets = [],
@@ -55,6 +61,8 @@ export function ImageAssetStoreProvider({
     }
 
     const nextResources = new Map<ImageAssetId, ImageAssetResource>()
+    let failed = false
+    let committed = false
 
     try {
       initialAssets.forEach((source) => {
@@ -68,24 +76,37 @@ export function ImageAssetStoreProvider({
           metadata: { ...source.metadata },
         })
       })
+    } catch {
+      revokeResources(nextResources)
+      nextResources.clear()
+      failed = true
+    }
 
+    const frameId = requestAnimationFrame(() => {
+      if (failed) {
+        setHydrationError('Lagrede bilder kunne ikke åpnes.')
+        setHydrationStatus('error')
+        return
+      }
+
+      committed = true
       resourcesRef.current = nextResources
       setResources(nextResources)
       setHydrationStatus('ready')
-    } catch {
-      nextResources.forEach((resource) => {
-        URL.revokeObjectURL(resource.objectUrl)
-      })
-      setHydrationError('Lagrede bilder kunne ikke åpnes.')
-      setHydrationStatus('error')
+    })
+
+    return () => {
+      cancelAnimationFrame(frameId)
+
+      if (!committed) {
+        revokeResources(nextResources)
+      }
     }
   }, [initialAssets])
 
   useEffect(
     () => () => {
-      resourcesRef.current.forEach((resource) => {
-        URL.revokeObjectURL(resource.objectUrl)
-      })
+      revokeResources(resourcesRef.current)
       resourcesRef.current = new Map()
     },
     [],
