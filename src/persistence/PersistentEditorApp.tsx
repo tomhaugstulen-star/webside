@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ImageAssetStoreProvider } from '../assets/images/ImageAssetStoreProvider'
 import { useImageAssetStore } from '../assets/images/useImageAssetStore'
 import { EditorShell } from '../components/editor/EditorShell'
@@ -17,6 +17,7 @@ type StartupState =
       project: EditorProject
       assets: StoredImageAsset[]
       initiallySaved: boolean
+      persistenceDisabled: boolean
     }
   | { status: 'error'; message: string }
 
@@ -34,9 +35,13 @@ function LoadingScreen() {
 function HydratedEditor({
   project,
   initiallySaved,
+  persistenceDisabled,
+  onContinueWithoutStorage,
 }: {
   project: EditorProject
   initiallySaved: boolean
+  persistenceDisabled: boolean
+  onContinueWithoutStorage: () => void
 }) {
   const { hydrationStatus, hydrationError } = useImageAssetStore()
 
@@ -48,13 +53,17 @@ function HydratedEditor({
     return (
       <PersistenceRecoveryScreen
         message={hydrationError ?? 'Lagrede bilder kunne ikke åpnes.'}
+        onContinueWithoutStorage={onContinueWithoutStorage}
       />
     )
   }
 
   return (
     <EditorProjectProvider initialProject={project}>
-      <PersistenceProvider initiallySaved={initiallySaved}>
+      <PersistenceProvider
+        initiallySaved={initiallySaved}
+        disabled={persistenceDisabled}
+      >
         <EditorShell />
       </PersistenceProvider>
     </EditorProjectProvider>
@@ -63,6 +72,16 @@ function HydratedEditor({
 
 export function PersistentEditorApp() {
   const [startup, setStartup] = useState<StartupState>({ status: 'loading' })
+
+  const continueWithoutStorage = useCallback(() => {
+    setStartup({
+      status: 'ready',
+      project: createBlankProject(),
+      assets: [],
+      initiallySaved: false,
+      persistenceDisabled: true,
+    })
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -83,6 +102,7 @@ export function PersistentEditorApp() {
           project: createBlankProject(),
           assets: [],
           initiallySaved: false,
+          persistenceDisabled: false,
         })
         return
       }
@@ -92,6 +112,7 @@ export function PersistentEditorApp() {
         project: result.snapshot.envelope.project,
         assets: result.snapshot.assets,
         initiallySaved: true,
+        persistenceDisabled: false,
       })
     })
 
@@ -105,7 +126,12 @@ export function PersistentEditorApp() {
   }
 
   if (startup.status === 'error') {
-    return <PersistenceRecoveryScreen message={startup.message} />
+    return (
+      <PersistenceRecoveryScreen
+        message={startup.message}
+        onContinueWithoutStorage={continueWithoutStorage}
+      />
+    )
   }
 
   return (
@@ -113,6 +139,8 @@ export function PersistentEditorApp() {
       <HydratedEditor
         project={startup.project}
         initiallySaved={startup.initiallySaved}
+        persistenceDisabled={startup.persistenceDisabled}
+        onContinueWithoutStorage={continueWithoutStorage}
       />
     </ImageAssetStoreProvider>
   )
