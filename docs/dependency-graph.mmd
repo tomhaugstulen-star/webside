@@ -3,6 +3,19 @@ flowchart LR
 subgraph src["src"]
   src_App_tsx["App.tsx"]
   src_App_css["App.css"]
+  subgraph src_persistence["persistence"]
+    src_persistence_PersistentEditorApp_tsx["PersistentEditorApp.tsx"]
+    src_persistence_usePersistence_ts["usePersistence.ts"]
+    src_persistence_persistenceContext_ts["persistenceContext.ts"]
+    src_persistence_localProjectStorage_ts["localProjectStorage.ts"]
+    src_persistence_localProjectSnapshot_ts["localProjectSnapshot.ts"]
+    src_persistence_editorProjectValidation_ts["editorProjectValidation.ts"]
+    src_persistence_editorElementValidation_ts["editorElementValidation.ts"]
+    src_persistence_validationHelpers_ts["validationHelpers.ts"]
+    src_persistence_localProjectTypes_ts["localProjectTypes.ts"]
+    src_persistence_PersistenceProvider_tsx["PersistenceProvider.tsx"]
+    src_persistence_PersistenceRecoveryScreen_tsx["PersistenceRecoveryScreen.tsx"]
+  end
   subgraph src_assets["assets"]
     subgraph src_assets_images["images"]
       src_assets_images_ImageAssetStoreProvider_tsx["ImageAssetStoreProvider.tsx"]
@@ -77,6 +90,7 @@ subgraph src["src"]
     end
     subgraph src_components_dialogs["dialogs"]
       src_components_dialogs_ConfirmElementDeletionDialog_tsx["ConfirmElementDeletionDialog.tsx"]
+      src_components_dialogs_ConfirmProjectResetDialog_tsx["ConfirmProjectResetDialog.tsx"]
     end
     subgraph src_components_properties["properties"]
       src_components_properties_RightPropertiesPanel_tsx["RightPropertiesPanel.tsx"]
@@ -104,6 +118,7 @@ subgraph src["src"]
     end
     subgraph src_components_toolbar["toolbar"]
       src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
+      src_components_toolbar_ToolbarIcon_tsx["ToolbarIcon.tsx"]
     end
   end
   subgraph src_state["state"]
@@ -151,15 +166,25 @@ subgraph src["src"]
   src_index_css["index.css"]
 end
 src_App_tsx-->src_App_css
-src_App_tsx-->src_assets_images_ImageAssetStoreProvider_tsx
-src_App_tsx-->src_components_editor_EditorShell_tsx
-src_App_tsx-->src_state_EditorProjectProvider_tsx
+src_App_tsx-->src_persistence_PersistentEditorApp_tsx
+src_persistence_PersistentEditorApp_tsx-->src_assets_images_ImageAssetStoreProvider_tsx
+src_persistence_PersistentEditorApp_tsx-->src_assets_images_useImageAssetStore_ts
+src_persistence_PersistentEditorApp_tsx-->src_components_editor_EditorShell_tsx
+src_persistence_PersistentEditorApp_tsx-->src_model_createEditorProject_ts
+src_persistence_PersistentEditorApp_tsx-->src_model_editorProject_ts
+src_persistence_PersistentEditorApp_tsx-->src_state_EditorProjectProvider_tsx
+src_persistence_PersistentEditorApp_tsx-->src_persistence_localProjectStorage_ts
+src_persistence_PersistentEditorApp_tsx-->src_persistence_localProjectTypes_ts
+src_persistence_PersistentEditorApp_tsx-->src_persistence_PersistenceProvider_tsx
+src_persistence_PersistentEditorApp_tsx-->src_persistence_PersistenceRecoveryScreen_tsx
 src_assets_images_ImageAssetStoreProvider_tsx-->src_model_imageAsset_ts
 src_assets_images_ImageAssetStoreProvider_tsx-->src_assets_images_imageAssetStoreContext_ts
 src_model_imageAsset_ts-->src_model_createStableId_ts
 src_assets_images_imageAssetStoreContext_ts-->src_model_imageAsset_ts
+src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
 src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
 src_components_editor_EditorShell_tsx-->src_model_elementCreation_ts
+src_components_editor_EditorShell_tsx-->src_persistence_usePersistence_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementCreation_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementDeletion_ts
@@ -168,6 +193,7 @@ src_components_editor_EditorShell_tsx-->src_state_useImageProperties_ts
 src_components_editor_EditorShell_tsx-->src_types_editor_ts
 src_components_editor_EditorShell_tsx-->src_components_canvas_EditorCanvas_tsx
 src_components_editor_EditorShell_tsx-->src_components_dialogs_ConfirmElementDeletionDialog_tsx
+src_components_editor_EditorShell_tsx-->src_components_dialogs_ConfirmProjectResetDialog_tsx
 src_components_editor_EditorShell_tsx-->src_components_properties_RightPropertiesPanel_tsx
 src_components_editor_EditorShell_tsx-->src_components_sidebar_LeftSidebar_tsx
 src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
@@ -198,6 +224,7 @@ src_model_textAppearance_ts-->src_model_editorColor_ts
 src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
 src_model_elementCreation_ts-->src_model_imageAsset_ts
+src_persistence_usePersistence_ts-->src_persistence_persistenceContext_ts
 src_state_useEditorProject_ts-->src_state_editorProjectContext_ts
 src_state_editorProjectContext_ts-->src_model_editorProject_ts
 src_state_editorProjectContext_ts-->src_state_editorProjectAction_ts
@@ -226,7 +253,6 @@ src_state_useElementDeletion_ts-->src_assets_images_useImageAssetStore_ts
 src_state_useElementDeletion_ts-->src_model_editorProject_ts
 src_state_useElementDeletion_ts-->src_model_imageAsset_ts
 src_state_useElementDeletion_ts-->src_state_useEditorProject_ts
-src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
 src_state_useImageProperties_ts-->src_model_imagePresentation_ts
 src_state_useImageProperties_ts-->src_state_useEditorProject_ts
@@ -413,11 +439,17 @@ src_components_sidebar_HeaderCreationControl_tsx-->src_model_elementCreation_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_model_headerElement_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_model_imageAsset_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_components_sidebar_SidebarIcon_tsx
+src_components_toolbar_TopToolbar_tsx-->src_persistence_persistenceContext_ts
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
+src_components_toolbar_TopToolbar_tsx-->src_components_toolbar_ToolbarIcon_tsx
 src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts
 src_components_editor_useSelectedImageCropKeyboard_ts-->src_model_editorProject_ts
 src_components_editor_useSelectedImageCropKeyboard_ts-->src_model_imagePresentation_ts
+src_model_createEditorProject_ts-->src_model_createStableId_ts
+src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_model_createEditorProject_ts-->src_model_pageAppearance_ts
+src_state_EditorProjectProvider_tsx-->src_model_editorProject_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectContext_ts
 src_state_EditorProjectProvider_tsx-->src_state_editorProjectReducer_ts
 src_state_editorProjectReducer_ts-->src_model_createEditorProject_ts
@@ -435,9 +467,6 @@ src_state_editorProjectReducer_ts-->src_state_setElementLink_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementContent_ts
 src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
 src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
-src_model_createEditorProject_ts-->src_model_createStableId_ts
-src_model_createEditorProject_ts-->src_model_editorProject_ts
-src_model_createEditorProject_ts-->src_model_pageAppearance_ts
 src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
 src_state_addElementToActivePage_ts-->src_model_editorProject_ts
 src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
@@ -495,5 +524,40 @@ src_state_setTextElementContent_ts-->src_model_editorProject_ts
 src_state_setTextElementStyle_ts-->src_model_editorProject_ts
 src_state_setTextElementStyle_ts-->src_model_textElementStyle_ts
 src_state_toggleElementLock_ts-->src_model_editorProject_ts
+src_persistence_localProjectStorage_ts-->src_model_editorProject_ts
+src_persistence_localProjectStorage_ts-->src_model_imageAsset_ts
+src_persistence_localProjectStorage_ts-->src_persistence_localProjectSnapshot_ts
+src_persistence_localProjectStorage_ts-->src_persistence_localProjectTypes_ts
+src_persistence_localProjectSnapshot_ts-->src_model_editorProject_ts
+src_persistence_localProjectSnapshot_ts-->src_model_imageAsset_ts
+src_persistence_localProjectSnapshot_ts-->src_persistence_editorProjectValidation_ts
+src_persistence_localProjectSnapshot_ts-->src_persistence_localProjectTypes_ts
+src_persistence_localProjectSnapshot_ts-->src_persistence_validationHelpers_ts
+src_persistence_editorProjectValidation_ts-->src_model_editorProject_ts
+src_persistence_editorProjectValidation_ts-->src_model_imageAsset_ts
+src_persistence_editorProjectValidation_ts-->src_model_pageAppearance_ts
+src_persistence_editorProjectValidation_ts-->src_persistence_editorElementValidation_ts
+src_persistence_editorProjectValidation_ts-->src_persistence_validationHelpers_ts
+src_persistence_editorElementValidation_ts-->src_model_buttonAsset_ts
+src_persistence_editorElementValidation_ts-->src_model_editorProject_ts
+src_persistence_editorElementValidation_ts-->src_model_elementDimensions_ts
+src_persistence_editorElementValidation_ts-->src_model_elementLayout_ts
+src_persistence_editorElementValidation_ts-->src_model_elementLink_ts
+src_persistence_editorElementValidation_ts-->src_model_headerAppearance_ts
+src_persistence_editorElementValidation_ts-->src_model_headerElement_ts
+src_persistence_editorElementValidation_ts-->src_model_imageAsset_ts
+src_persistence_editorElementValidation_ts-->src_model_imagePresentation_ts
+src_persistence_editorElementValidation_ts-->src_model_sectionAppearance_ts
+src_persistence_editorElementValidation_ts-->src_model_textAppearance_ts
+src_persistence_editorElementValidation_ts-->src_model_textElementStyle_ts
+src_persistence_editorElementValidation_ts-->src_persistence_validationHelpers_ts
+src_persistence_validationHelpers_ts-->src_model_editorProject_ts
+src_persistence_localProjectTypes_ts-->src_model_editorProject_ts
+src_persistence_localProjectTypes_ts-->src_model_imageAsset_ts
+src_persistence_PersistenceProvider_tsx-->src_assets_images_useImageAssetStore_ts
+src_persistence_PersistenceProvider_tsx-->src_state_useEditorProject_ts
+src_persistence_PersistenceProvider_tsx-->src_persistence_localProjectStorage_ts
+src_persistence_PersistenceProvider_tsx-->src_persistence_persistenceContext_ts
+src_persistence_PersistenceRecoveryScreen_tsx-->src_persistence_localProjectStorage_ts
 src_main_tsx-->src_App_tsx
 src_main_tsx-->src_index_css
