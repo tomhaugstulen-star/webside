@@ -11,7 +11,7 @@ import {
 } from '../../src/persistence/localProjectSnapshot'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
 
-const UPDATED_AT = '2026-08-01T00:00:00.000Z'
+const UPDATED_AT = '2099-01-01T00:00:00.000Z'
 
 function createProjectWithImage() {
   const state = createInitialEditorProjectState()
