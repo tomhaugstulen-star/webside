@@ -37,6 +37,7 @@ export function PersistenceProvider({
   const saveSequenceRef = useRef(0)
   const currentProjectRef = useRef(state.project)
   const resettingRef = useRef(false)
+  const allowUnloadRef = useRef(false)
   const firstAutosaveRef = useRef(true)
 
   useLayoutEffect(() => {
@@ -104,6 +105,21 @@ export function PersistenceProvider({
     }
   }, [initiallySaved, saveNow])
 
+  useEffect(() => {
+    const warnBeforeUnsavedUnload = (event: BeforeUnloadEvent) => {
+      if (allowUnloadRef.current || status === 'saved') {
+        return
+      }
+
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', warnBeforeUnsavedUnload)
+    return () =>
+      window.removeEventListener('beforeunload', warnBeforeUnsavedUnload)
+  }, [status])
+
   const resetLocalProject = useCallback(async () => {
     resettingRef.current = true
     saveSequenceRef.current += 1
@@ -112,6 +128,7 @@ export function PersistenceProvider({
     try {
       await saveQueueRef.current.catch(() => undefined)
       await clearLocalProject()
+      allowUnloadRef.current = true
       window.location.reload()
       return true
     } catch {
