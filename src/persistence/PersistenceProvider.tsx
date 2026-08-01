@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -37,7 +38,10 @@ export function PersistenceProvider({
   const currentProjectRef = useRef(state.project)
   const resettingRef = useRef(false)
   const firstAutosaveRef = useRef(true)
-  currentProjectRef.current = state.project
+
+  useLayoutEffect(() => {
+    currentProjectRef.current = state.project
+  }, [state.project])
 
   const saveNow = useCallback(async () => {
     if (resettingRef.current) {
