@@ -6,42 +6,46 @@ Dette dokumentet fastsetter varige arbeids-, produkt-, modell- og arkitekturgren
 
 Prioritet:
 
-1. faktisk GitHub-state og verifisert terminaloutput
+1. faktisk GitHub-state og verifisert kontrolloutput
 2. `docs/WORK_PLAN.md`
 3. `docs/PROJECT_RULES.md`
-4. øvrige autoritative dokumenter
-5. historiske commits og lukkede PR-er
+4. `docs/ELEMENT_MODEL.md`
+5. historiske commits, lukkede saker og lukkede PR-er
 
-Autoritative dokumenter skal oppdateres samlet. En lukket eller merget PR skal aldri stå som aktiv leveranse.
+`README.md` er inngangspunkt, men skal ikke overstyre dokumentene over.
+
+Det opprettes ikke permanente audit-, readiness-, fase- eller chat-handoverdokumenter. Detaljert faseomfang, testplan, funn og beslutninger ligger i den aktuelle GitHub-saken og PR-en.
+
+## Produktgrense
+
+- Website-editoren er et lokalt énbrukerverktøy.
+- Stabilitet og enkel gjenoppretting prioriteres foran funksjonsbredde og kompleksitet.
+- Kontoer, roller, samarbeid, flerbrukerstate og skyarkitektur skal ikke bygges uten en ny uttrykkelig produktbeslutning.
+- Hosting, domeneoppsett, offentlig server og produksjonsdeployment er fjernet fra produktplanen.
+- Lokal forhåndsvisning, prosjektlagring, sikkerhetskopi, import og gjenoppretting er del av roadmapen.
+- En aktiv `Publiser`-handling skal ikke finnes.
+- Uimplementerte handlinger skal være skjult eller tydelig deaktivert.
 
 ## Branch, PR og merge
 
 - Det utvikles aldri direkte på `main`.
-- Hver leveranse bruker egen avgrenset branch.
+- Hver fase eller feilretting bruker egen avgrenset branch.
 - Ingen senere fase legges skjult inn i aktiv branch.
+- En gammel branch som har blitt forbigått av flere faser merges ikke direkte; relevant kode vurderes på nytt på en fersk branch fra gjeldende `main`.
 - PR forblir draft til avtalte kontroller er bestått.
-- Ingen merge uten at brukeren eksplisitt skriver `godkjent`.
-- Lokal kontrollstatus påstås bare når terminaloutput er vist.
 - GitHub `Quality` må være grønn på nøyaktig endelig PR-head.
-- Workflows skal være read-only for kildekode og dokumentasjon. Midlertidige workflows som henter hardkodede artifacts, overskriver filer eller pusher til egen PR-branch er ikke tillatt.
+- Ingen merge uten uttrykkelig brukergodkjenning.
+- Workflows skal være read-only for kildekode og dokumentasjon. Workflows som overskriver filer eller pusher til egen PR-branch er ikke tillatt.
 
 ## Remote og lokalt ansvar
 
-AI bruker GitHub-connectoren til remote-operasjoner den har tilgang til. Brukeren utfører bare handlinger som krever lokal PC:
+AI bruker GitHub-connectoren til remote-operasjoner den har tilgang til. Brukeren utfører bare handlinger som faktisk krever lokal PC:
 
 - sikker lokal synk
 - starte programmet
 - nødvendige lokale kommandoer
 - manuell PC-/Telefon-regresjon
 - dele terminaloutput som bevis
-
-## Produktgrense
-
-- Website-editoren er en lokal arbeidsportal.
-- Hosting, domeneoppsett, offentlig server og produksjonsdeployment er fjernet.
-- Lokal forhåndsvisning, prosjektlagring, backup, import og gjenoppretting er del av produktretningen.
-- En aktiv `Publiser`-handling skal ikke finnes.
-- Uimplementerte handlinger skal være skjult eller tydelig deaktivert.
 
 ## Filstørrelse og ansvar
 
@@ -54,8 +58,8 @@ hard grense: 300+ linjer, alltid blokkert
 - Filer deles etter reelt modell-, state-, hook-, UI-, adapter- eller stilansvar.
 - `App.tsx` setter bare sammen hovedgrensene.
 - Canvas eier ikke varig fil- eller prosjektlagring.
-- Persistence-adapteren eier IndexedDB-operasjoner, ikke UI-komponentene.
 - Genererte arkitekturrapporter omfattes ikke av produksjonsfilgrensen.
+- Filpolicyen håndheves av repositorykontrollen; et eget permanent dokument er ikke nødvendig.
 
 ## Autoritativ prosjektmodell
 
@@ -68,7 +72,7 @@ hard grense: 300+ linjer, alltid blokkert
 - DOM, CSS, `File`, Blob, Object URL og lokal filsti er ikke prosjektdata.
 - ID-er er stabile og kryptografisk generert.
 - Header lagres ved `x = 0`, `y = 0` og kanonisk bredde.
-- Alle eksisterende responsive desktop- og mobile verdier skal valideres; manglende `mobile` betyr arv fra desktop.
+- Manglende `mobile` betyr arv fra desktop.
 
 ## Varig og transient state
 
@@ -91,26 +95,23 @@ Transient:
 
 Transient state serialiseres ikke i `EditorProject`.
 
-## Lokal lagringsgrense
+## Stabilitet og datatap
 
-- IndexedDB brukes for prosjekt og importerte mediefiler.
-- Storage-envelope har egen versjon, separat fra prosjektskjemaet.
-- Prosjekt og nødvendige assets valideres før editoren blir interaktiv.
-- Et standardprosjekt skal aldri autosaves over en gyldig lagret leveranse under startup.
-- Bare gyldig gjeldende prosjektskjema autosaves.
-- Object URL-er lagres aldri; de opprettes og tilbakekalles i ressurslageret.
-- Ugyldige eller ustøttede data injiseres aldri i reducer-state.
-- Ugyldige data beholdes frem til eksplisitt reset.
-- Reset må fungere også når databaseskjemaet er inkompatibelt eller mangler forventede stores.
-- Orphan-assets slettes bare etter vellykket prosjektlagring.
-- UI skal aldri vise `Lagret` etter en mislykket skrivning.
-- Adapterens read, write, clear og feilveier skal testes deterministisk.
+- Programmet skal ikke stoppe hele arbeidsøkten ved en håndterbar feil.
+- Feil skal være synlige og handlingsrettede.
+- UI skal aldri rapportere en mislykket operasjon som vellykket.
+- Automatisk lagring bygges i fase 25 og reagerer bare på reelle prosjektmutasjoner.
+- Et gyldig lagret prosjekt skal aldri overskrives av et standardprosjekt under oppstart.
+- Ugyldige eller ustøttede data skal ikke injiseres i reducer-state.
+- Backup, eksport, import og migrering bygges separat i fase 26.
 
-## Navigasjon og publisering
+## Navigasjonsgrenser
 
-Arbeidsportalens navigasjon og nettstedets navigasjon er separate ansvar. Portalmenyen er editor-UI og serialiseres ikke som nettsideinnhold.
+Arbeidsportalens navigasjon og nettstedets navigasjon er separate ansvar.
 
-Offentlig publisering bygges ikke. Lokal visning skal bruke `Forhåndsvisning` når fase 27 er implementert.
+- portalnavigasjon er editor-UI og serialiseres ikke som nettsideinnhold
+- nettstedets navigasjon er prosjektdata og bygges i fase 19–20
+- navigator og hurtigsøk skal lese eksisterende state, ikke opprette en parallell prosjektkopi
 
 ## Kvalitetskontroll
 
@@ -125,11 +126,10 @@ git diff --stat
 
 Før merge kontrolleres i tillegg:
 
-- branch og mergebase
-- changed files og omfang
-- filstørrelser
-- arkitekturbrudd
+- branch, base og mergebase
+- changed files og faseomfang
+- filstørrelser og arkitekturbrudd
 - reviews og uløste tråder
 - CI på endelig head
-- manuell PC-/Telefon-regresjon
-- autoritativ dokumentkonsistens
+- relevant manuell PC-/Telefon-regresjon
+- konsistens mellom roadmap, regler og modell
