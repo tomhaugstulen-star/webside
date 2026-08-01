@@ -1,52 +1,15 @@
 # Arbeidsplan
 
-Dette dokumentet er den autoritative arbeidsrekkefølgen for Website-editoren. Faktisk GitHub-state og verifisert kontrolloutput vinner over foreldet tekst.
+Dette dokumentet er den autoritative rekkefølgen for Website-editoren.
 
-## Produktretning
+Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar drift prioriteres foran kontoer, flerbrukerfunksjoner og skyarkitektur.
 
-Programmet er et lokalt énbrukerverktøy. Prioritetene er:
+## Nåstatus
 
-1. stabil redigering uten unødvendige stopp
-2. tydelig og forutsigbar arbeidsflyt
-3. lokal kontroll over prosjektdata
-4. enkel arkitektur uten flerbruker-, konto- eller skykompleksitet
-
-## Fast arbeidsflyt
-
-1. Kontroller faktisk `main`, branch, PR-head og mergebase.
-2. Lås omfanget for én fase.
-3. Implementer bare denne fasen på egen branch.
-4. Hold ordinære produksjonsfiler under 250 linjer.
-5. Kjør relevant kodeaudit og full automatisk kontroll.
-6. Test påvirket funksjonalitet manuelt i PC- og Telefon-visning.
-7. Regenerer arkitekturrapporter ved modul- eller importendringer.
-8. Oppdater autoritative dokumenter i samme leveranse.
-9. Kontroller diff, PR, reviews, tråder og CI på siste head.
-10. Merge bare etter eksplisitt godkjenning.
-
-Standardkontroll:
-
-```powershell
-npm run verify
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status --short
-git diff --stat
-```
-
-## Faktisk status 1. august 2026
-
-```text
-main: e48aa0613176a2209c6277b2c3b0ce65918324fc
-siste fullførte produksjonsfase: 17 – tekstboksbakgrunn
-prosjektskjema på main: 10
-neste produksjonsfase: 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
-aktiv implementeringsbranch for fase 18: ikke opprettet ennå
-parkert draft-PR: #52 – fase 25 lokal prosjektlagring, autolagring og gjenoppretting
-```
-
-PR #52 er ikke aktiv leveranse og skal ikke merges eller videreutvikles før fase 25 nås i den låste rekkefølgen.
+- fullført gjennom fase 17 – tekstboksbakgrunn
+- neste produksjonsfase er fase 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
+- den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
+- ny implementering starter alltid fra oppdatert `main` på en egen branch
 
 ## Låst roadmap
 
@@ -65,7 +28,31 @@ fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  OpenAI-integrasjon
 ```
 
-Denne rekkefølgen endres bare etter en ny, eksplisitt beslutning fra brukeren og en dokumentoppdatering før kodearbeidet starter.
+Rekkefølgen endres bare etter en ny, uttrykkelig beslutning fra brukeren. Endringen dokumenteres her før kodearbeidet starter.
+
+## Fast arbeidsflyt per fase
+
+1. Kontroller faktisk `main`, åpne PR-er, branch og mergebase.
+2. Opprett eller oppdater én GitHub-sak med låst omfang og akseptansekriterier.
+3. Implementer bare den aktive fasen på egen branch.
+4. Hold ordinære produksjonsfiler under 250 linjer.
+5. Kjør full automatisk kontroll etter siste produksjonsendring.
+6. Regenerer arkitekturrapporter ved modul- eller importendringer.
+7. Test relevant funksjonalitet manuelt i PC- og Telefon-visning.
+8. Kontroller diff, PR, reviews, tråder og CI på nøyaktig siste head.
+9. Oppdater de tre permanente dokumentene bare når modell, regler eller roadmap faktisk er endret.
+10. Merge bare etter uttrykkelig godkjenning.
+
+Standardkontroll:
+
+```powershell
+npm run verify
+npm run architecture:json
+npm run architecture:diagram
+git diff --check
+git status --short
+git diff --stat
+```
 
 ## Fase 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
 
@@ -75,7 +62,7 @@ Gjøre editorens innhold og verktøy raske å finne uten å opprette parallelle 
 
 ### Omfang
 
-- portaloversikt for aktivt prosjekt
+- oversikt for aktivt prosjekt
 - hierarkisk navigator for gjeldende sider og elementer
 - finne og markere element fra navigatoren
 - vise elementtype, navn, synlighet og låsestatus
@@ -86,57 +73,42 @@ Gjøre editorens innhold og verktøy raske å finne uten å opprette parallelle 
 
 ### Ikke del av fasen
 
-- full sideadministrasjon fra fase 19
+- sideadministrasjon fra fase 19
 - nettstedets Header-meny fra fase 20
 - Hero
-- mobiloverstyringer
+- responsive mobiloverstyringer
 - angre/gjør om
-- lokal lagring eller autolagring
+- lokal lagring eller automatisk lagring
 - OpenAI
 
-### Akseptansekriterier
+### Minimumskrav
 
-- brukeren finner valgt side eller element uten å lete på lerretet
-- `Ctrl + K` åpner og lukker kontrollert
-- Escape og fokusretur fungerer
+- navigator og lerret viser samme valgte element
 - portalstatus avledes fra eksisterende state
-- elementvalg i navigator og lerret er synkronisert
+- `Ctrl + K`, Escape og fokusretur fungerer kontrollert
+- ingen ny parallell prosjektmodell opprettes
 - `npm run verify` og manuell PC-/Telefon-regresjon består
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
 Fasen er planlagt, men ikke aktiv.
 
-Krav som allerede er låst:
+Låste hovedkrav:
 
 - automatisk, debounced lagring etter reelle prosjektendringer
 - lokal IndexedDB-lagring av prosjekt og importerte bilde-/logofiler
 - gjenoppretting før normal redigering starter
 - tydelig status for lagrer, lagret og feil
-- feil skal ikke feilaktig rapporteres som `Lagret`
-- en lagringsfeil skal være synlig uten å stoppe hele arbeidsøkten når det er trygt å fortsette i midlertidig modus
-- robust reset også ved inkompatibel eller strukturelt mangelfull database
+- en feil skal aldri rapporteres som `Lagret`
+- lagringsfeil skal være synlig uten å stoppe hele arbeidsøkten når midlertidig videre arbeid er trygt
+- robust reset ved inkompatibel eller strukturelt mangelfull database
 - ingen kontoer, flerbrukerfunksjoner eller skykrav
 
-Detaljert implementering gjenopptas først etter fase 24.
-
-## Fullført fase 17
-
-Fase 17 ble merget via PR #50 på mergecommit `161125d00a4a7d08b4c376d82933dd1176a0cc44`.
-
-Levert:
-
-- `TextAppearance.backgroundColor`
-- standard `#FFFFFF`
-- prosjektskjema 10
-- validerte reducergrenser
-- rendering fra prosjektdata
-- modell-, reducer- og Chromium-test
-- manuell PC-/Telefon-regresjon
+Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fra PR #52 kan brukes som referanse, men skal ikke merges direkte etter fase 18–24.
 
 ## Separat backlog
 
-Disse sakene blandes ikke inn i fase 18 uten eksplisitt beslutning:
+Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 
 - #36 editor-only elementgrense
 - #37 elementnotat og høyrepanelendringer
@@ -144,4 +116,4 @@ Disse sakene blandes ikke inn i fase 18 uten eksplisitt beslutning:
 
 ## Dokumentregel
 
-Alle autoritative statusdokumenter skal vise samme main-commit, aktive fase, roadmap og kvalitetsstatus. En ny chat skal aldri instrueres til å fortsette en parkert, lukket eller merget leveranse.
+Detaljert faseomfang, auditfunn, testplan og handover lagres i GitHub-saken og PR-en. Permanente status-, audit-, readiness- eller chat-handoverdokumenter opprettes ikke.
