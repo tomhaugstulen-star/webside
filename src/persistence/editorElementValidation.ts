@@ -48,24 +48,28 @@ const baseElementKeys = [
   'locked',
 ] as const
 
+function getResponsiveLayouts(value: Record<string, unknown>) {
+  const positions = value.position as ResponsiveValue<CanvasPosition>
+  const sizes = value.size as ResponsiveValue<ElementSize>
+
+  return [
+    {
+      position: positions.desktop,
+      size: sizes.desktop,
+    },
+    {
+      position: positions.mobile ?? positions.desktop,
+      size: sizes.mobile ?? sizes.desktop,
+    },
+  ]
+}
+
 function hasValidResponsiveLayout(
   kind: ElementKind,
   value: Record<string, unknown>,
 ) {
-  const positions = value.position as ResponsiveValue<CanvasPosition>
-  const sizes = value.size as ResponsiveValue<ElementSize>
-  const desktopLayout = {
-    position: positions.desktop,
-    size: sizes.desktop,
-  }
-  const mobileLayout = {
-    position: positions.mobile ?? positions.desktop,
-    size: sizes.mobile ?? sizes.desktop,
-  }
-
-  return (
-    isValidElementLayout(kind, desktopLayout) &&
-    isValidElementLayout(kind, mobileLayout)
+  return getResponsiveLayouts(value).every((layout) =>
+    isValidElementLayout(kind, layout),
   )
 }
 
@@ -124,10 +128,9 @@ function isValidImageElement(value: Record<string, unknown>) {
   }
 
   const element = value as unknown as ImageEditorElement
-  return isValidElementDesktopLayout(element, {
-    position: element.position.desktop,
-    size: element.size.desktop,
-  })
+  return getResponsiveLayouts(value).every((layout) =>
+    isValidElementDesktopLayout(element, layout),
+  )
 }
 
 function isValidTextElement(value: Record<string, unknown>) {
@@ -163,10 +166,16 @@ function isValidButtonElement(value: Record<string, unknown>) {
   )
 }
 
-function isValidHeaderElement(value: Record<string, unknown>) {
-  const position = isRecord(value.position) ? value.position.desktop : null
-  const size = isRecord(value.size) ? value.size.desktop : null
+function hasCanonicalHeaderLayouts(value: Record<string, unknown>) {
+  return getResponsiveLayouts(value).every(
+    ({ position, size }) =>
+      position.x === 0 &&
+      position.y === 0 &&
+      size.width === HEADER_SERIALIZED_WIDTH,
+  )
+}
 
+function isValidHeaderElement(value: Record<string, unknown>) {
   return (
     hasExactKeys(value, [
       ...baseElementKeys,
@@ -177,11 +186,7 @@ function isValidHeaderElement(value: Record<string, unknown>) {
       'appearance',
     ]) &&
     hasValidBaseElement('header', value) &&
-    isRecord(position) &&
-    position.x === 0 &&
-    position.y === 0 &&
-    isRecord(size) &&
-    size.width === HEADER_SERIALIZED_WIDTH &&
+    hasCanonicalHeaderLayouts(value) &&
     isImageAssetId(value.logoAssetId) &&
     isValidImageAssetMetadata(value.logoAssetMetadata) &&
     typeof value.siteName === 'string' &&
