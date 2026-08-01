@@ -1,119 +1,99 @@
 # Kodeaudit og tekniske grenser
 
-Dette dokumentet beskriver den aktive framtidsrettede auditen for fase 17 – tekstboksbakgrunn.
+Dette dokumentet beskriver aktiv audit for fase 25 – lokal prosjektlagring, autolagring og gjenoppretting.
 
-## Status
-
-```text
-main: ecb443d384a1e0999ef14767419e1bea93c4a12c
-branch: feature/phase-17-text-background
-draft-PR: #50
-issue: #35
-prosjektskjema på branchen: 10
-verifisert kode-head: ea2a446044eca7423d40c027320922d1ea444151
-Quality på verifisert kode-head: success
-dokumentasjons- og arkitektursynk: commit 34eeb8a7523af6799330c2a642c66d37a7a105c6
-status: ikke mergeklar før siste Quality på endelig head og manuell PC-/Telefon-regresjon er verifisert
-```
-
-## Levert modellendring
-
-- `TextEditorElement` har egen serialiserbar `appearance: TextAppearance`.
-- `TextAppearance` inneholder bare validert `backgroundColor: EditorColor`.
-- standardverdien er kanonisk `#FFFFFF`.
-- typografi og tekstfarge forblir i `TextElementStyle`.
-- prosjektskjemaet økes fra 9 til 10.
-- framtidig migrering 9 → 10 må legge til standard `TextAppearance`.
-- hardkodet hvit tekstbakgrunn er fjernet fra CSS; rendering leser prosjektdata.
-
-## State- og valideringsgrenser
-
-Reducerhandlingen `set-text-background-color` avviser:
-
-- ugyldig eller ikke-kanonisk farge
-- manglende element
-- feil elementtype
-- element på feil side
-- låst Tekst
-- uendret farge
-
-Avviste handlinger returnerer samme state-identitet og bevarer `updatedAt`. Gyldig mutasjon endrer bare målrettet Tekst-element.
-
-## UI-grense
-
-- `Farger` viser `Bakgrunn` før `Tekstfarge` for hvert Tekst-element.
-- kontrollene er avledet fra aktiv side; ingen parallell palett lagres.
-- låste Tekst-elementer vises, men begge fargefeltene er deaktiverte.
-- høyremenyen beholder teksttypografi, lenke og elementhandlinger; tekstbakgrunn dupliseres ikke der.
-
-## Testdekning
-
-Den verifiserte kodekjernen hadde:
+## Kontrollert baseline
 
 ```text
-filpolicytester: 9 bestått
-produksjonsfiler kontrollert: 139
-produksjonsfiler >= 250 linjer: 0
-ESLint: bestått
-TypeScript og test-typecheck: bestått
-Dependency Cruiser: 120 moduler, 347 avhengigheter, 0 brudd
-enhetstester: 20 bestått
-Chromium-regresjon: 1 bestått
-Vite: 129 moduler transformert
-CSS: 45.35 kB, gzip 7.34 kB
-JavaScript: 282.25 kB, gzip 83.33 kB
-produksjonsbuild: bestått
+main: 161125d00a4a7d08b4c376d82933dd1176a0cc44
+branch: feature/phase-25-local-persistence
+draft-PR: #52
+issue: #51
+PR-head ved siste kontroll: 6ff4e32a872fee5342868218e8e45bc87a2fd442
+prosjektskjema: 10
+storage-envelope: 1
+arkitekturrapport på branch: 133 moduler, 396 avhengigheter, 0 brudd
+Quality på endelig head: action_required; ingen utført jobb
+status: ikke mergeklar
 ```
 
-Enhetstestene dekker nøyaktig `TextAppearance`-form, standardoppretting, gyldig mutasjon, ugyldig/ukjent/uendret handling og låsing. E2E-flyten oppretter Tekst, åpner `Farger`, verifiserer rekkefølgen og kontrollerer faktisk rendret bakgrunn.
+## Arkitektur som beholdes
 
-## Samlet sikkerhetskontroll
+- `PersistentEditorApp` eier startup-porten.
+- `localProjectStorage` isolerer IndexedDB.
+- `localProjectSnapshot` validerer envelope og refererte assets.
+- `PersistenceProvider` eier autosave, skrivekø og status.
+- `ImageAssetStoreProvider` eier `File`, Object URL og runtime-ressurser.
+- `EditorProjectProvider` mottar bare et validert startprosjekt.
+- prosjekt og assets skrives i samme IndexedDB-transaksjon.
+- Object URL-er serialiseres ikke.
 
-```powershell
-npm run verify
-```
+Dette er et egnet grunnlag og skal ikke bygges om uten en konkret feil.
 
-Kommandoen kjører hele `npm run check` og deretter den kritiske Chromium-regresjonen. GitHub Quality bruker samme kommando. Arkitekturrapportene genereres fortsatt eksplisitt når modul-/importgrafen er endret:
+## Blokkerende funn
 
-```powershell
-npm run architecture:json
-npm run architecture:diagram
-```
+### 1. Endelig CI mangler
 
-## Filstørrelsesrisiko
+Siste `Quality` på PR-head er `action_required`, og ingen jobb ble utført. Ingen kontrollstatus kan avledes fra tidligere heads.
 
-Siste målte topp:
+### 2. Utrygg historisk workflow
 
-```text
-247  src/components/canvas/useElementPointerTransform.ts
-241  src/components/canvas/EditorCanvasElement.tsx
-236  src/model/imagePresentation.ts
-229  src/styles/toolbar.css
-226  src/state/reduceColorProjectAction.ts
-224  src/components/sidebar/HeaderCreationControl.tsx
-211  src/components/properties/ElementLinkPropertiesSection.tsx
-202  src/state/editorProjectReducer.ts
-199  src/components/properties/ImagePropertiesSection.tsx
-192  src/components/canvas/snapElementMove.ts
-```
+Branchen har tidligere brukt en midlertidig workflow med `contents: write`, hardkodet artifact-ID og automatisk push til egen PR-branch. Workflowen er fjernet, men denne mekanismen skal ikke gjeninnføres. Endelig kontroll skal være read-only og reproducerbar.
 
-`useElementPointerTransform.ts` skal deles etter ansvar før ny logikk legges til. `reduceColorProjectAction.ts` har vokst til 226 linjer og skal overvåkes; neste større fargeansvar bør vurderes trukket ut før terskelen nås. Ingen unntak er aktive.
+### 3. Recovery-reset er ikke robust nok
 
-## Arkitekturkonsekvens
+`clearLocalProject()` åpner databaseversjon 1 og forventer eksisterende `project`- og `assets`-stores. Reset kan derfor feile ved høyere databaseversjon, manglende store eller inkompatibelt skjema.
 
-Fase 17 legger til to produksjonsmoduler:
+Krav:
 
-- `src/model/textAppearance.ts`
-- `src/state/useTextAppearance.ts`
+- vanlig clear for kjent gyldig database
+- eksplisitt nødreset med `indexedDB.deleteDatabase`
+- håndtering av `blocked`, `error` og vellykket sletting
+- test av inkompatibel versjon og manglende stores
 
-Importgrafen er derfor endret, og både `architecture.json` og `docs/dependency-graph.mmd` må regenereres på siste branch-head før PR-en kan gjøres klar.
+### 4. Responsive valideringshull
 
-## Jobbkritisk risiko utenfor fase 17
+Headerens kanoniske posisjon/bredde og bildets crop-grenser kontrolleres bare fullt for desktop. Eventuelle lagrede `mobile`-verdier må valideres med samme relevante modellgrenser.
 
-Editoren har ennå ikke lokal prosjektlagring, autolagring, krasjgjenoppretting, import eller angre/gjør om. Automatiske tester kan beskytte eksisterende funksjoner mot kodefeil, men de kan ikke hindre tap av prosjektstate ved nettleseroppfriskning eller avslutning.
+### 5. Adaptertesten mangler
 
-Før programmet brukes som eneste arbeidsverktøy må denne risikoen behandles eksplisitt. Roadmapendring eller en avgrenset jobbberedskapsfase skal ikke bygges skjult i PR #50; den må besluttes og dokumenteres separat.
+Dagens enhetstest dekker valideringsfunksjoner, men ikke faktiske read/write/clear-operasjoner eller transaksjonsfeil i IndexedDB-adapteren.
 
-## Konklusjon
+Krav:
 
-Fase-17-kjernen følger eksisterende modell- og reducergrenser og har målrettet testdekning. Ingen senere feature er blandet inn. PR #50 skal forbli draft til endelig branch-head har grønn GitHub Quality, ren diff og godkjent manuell PC-/Telefon-regresjon. Dokumentasjon og arkitekturrapporter er allerede synkronisert.
+- adapter-seam eller deterministisk IndexedDB-testimplementasjon
+- read empty/ready/invalid
+- atomisk write av prosjekt og assets
+- orphan-opprydding
+- clear og nødreset
+- blocked/error-veier der praktisk
+
+### 6. E2E dekker ikke hele kravet
+
+Refresh-testen dekker tekst og Bilde, men må også dekke Header-logo. Recovery-testen må utvides til strukturell databasefeil og reset.
+
+## Ikke-blokkerende eksisterende produktgjeld
+
+- Aktiv `Publiser`-knapp strider mot produktgrensen.
+- Angre og Forhåndsvisning fremstår aktive før sine faser.
+- Dette skal tas som en liten, separat UI-korreksjon eller inkluderes bare dersom den er nødvendig for fase-25-akseptansekriteriet om ærlig status. Ingen ny funksjonalitet skal implementeres.
+
+## Fil- og ansvarsgrenser
+
+- ordinære produksjonsfiler: under 250 linjer
+- 250–299: eksplisitt begrunnet unntak
+- 300+: blokkert
+- adapter, validering, provider, recovery-UI og testhjelpere skal forbli separate ansvar
+- ingen ny generell samlefil
+
+## Mergeport
+
+PR #52 kan først gjøres klar når:
+
+- blokkeringene over er lukket
+- siste head har grønn read-only `Quality`
+- `npm run verify` består
+- rapporter og dokumenter er synkronisert
+- manuell PC-/Telefon-regresjon er dokumentert
+- PR er mergebar uten uløste tråder
+- brukeren eksplisitt skriver `godkjent`
