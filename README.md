@@ -1,6 +1,13 @@
 # Website-editor
 
-Lokal webside-editor bygget med React, TypeScript og Vite.
+Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget for én bruker på egen PC.
+
+## Hovedmål
+
+- stabil redigering uten unødvendige stopp
+- tydelig og forutsigbar arbeidsflyt
+- lokal kontroll over prosjektdata
+- enkel arkitektur uten konto-, flerbruker- eller skykompleksitet
 
 ## Nåværende funksjoner
 
@@ -8,28 +15,19 @@ Lokal webside-editor bygget med React, TypeScript og Vite.
 - Seksjon, Bilde, Tekst, Knapp og Header
 - markering, flytting, størrelsesendring, låsing og sikker sletting
 - tekstredigering, tekststil, tekstfarge, tekstboksbakgrunn og lenker
-- lokalt bilde- og logovalg for PNG, JPEG og WebP
-- bildeutsnitt, zoom og alternativ tekst
-- side-, Seksjon-, Tekst- og Header-farger
-- Seksjon- og Header-ramme
-- korrigeringslinjer og 6 px snapping
+- lokal bilde- og logoimport for PNG, JPEG og WebP
+- bildeutsnitt, zoom, farger og rammer
+- korrigeringslinjer og snapping
 - automatiske modell-, reducer-, layout-, filstørrelses- og nettlesertester
 
-## Faktisk leveransestatus
+## Leveransestatus
 
-```text
-main: 161125d00a4a7d08b4c376d82933dd1176a0cc44
-siste fullførte fase: 17 – tekstboksbakgrunn
-prosjektskjema: 10
-aktiv leveranse: fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
-aktiv issue: #51
-aktiv draft-PR: #52
-neste fase etter fase 25: 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
-```
+- fullført gjennom fase 17 – tekstboksbakgrunn
+- neste fase er fase 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
+- fase 25 leverer lokal prosjektlagring, automatisk lagring og gjenoppretting
+- den tidligere fase-25-PR-en #52 er parkert og skal ikke brukes som aktiv leveranse
 
-Fase 25 gjennomføres eksplisitt før fase 18 fordi tap av prosjektstate ved oppfriskning, lukking eller krasj er den høyeste jobbrelaterte risikoen. De opprinnelige fasenumrene beholdes.
-
-PR #52 er ikke mergeklar før endelig branch-head har grønn `Quality`, full testdekning for den avtalte lagringsgrensen og godkjent manuell PC-/Telefon-regresjon.
+Den låste rekkefølgen ligger i `docs/WORK_PLAN.md`.
 
 ## Starte programmet
 
@@ -39,44 +37,29 @@ npm install
 npm run dev
 ```
 
-## Full sikkerhetskontroll
+## Full kontroll
 
 ```powershell
 npm run verify
-npm run architecture:json
-npm run architecture:diagram
-git diff --check
-git status --short
-git diff --stat
 ```
 
-`npm run verify` kjører filpolicy, filstørrelseskontroll, lint, TypeScript, arkitekturkontroll, enhetstester, produksjonsbuild og den kritiske Chromium-regresjonen.
+Ved modul- eller importendringer regenereres også:
 
-## Viktig jobbgrense
+```powershell
+npm run architecture:json
+npm run architecture:diagram
+```
 
-`main` har ennå ikke lokal prosjektlagring, autolagring eller krasjgjenoppretting. Programmet skal derfor ikke brukes som eneste lagringssted for jobbkritisk arbeid før fase 25 er kontrollert og merget.
+## Viktig før fase 25
 
-## Produktgrense
-
-Website-editoren er en lokal arbeidsportal. Offentlig publisering, hosting, domeneoppsett og produksjonsdeployment er fjernet fra produktretningen. Uimplementerte handlinger skal være skjult eller tydelig deaktivert; en aktiv `Publiser`-handling skal ikke finnes.
-
-## Arbeidsregel
-
-- aldri utvikling direkte på `main`
-- én avgrenset leveranse per branch
-- faktisk GitHub-state og terminaloutput er sannhetskilde
-- ingen merge uten eksplisitt `godkjent`
-- ingen automatisk workflow skal skrive dokumentasjon eller kode tilbake til en PR-branch
-- `npm run verify` er obligatorisk etter siste produksjonsendring og før merge
-- brukeren utfører bare nødvendige lokale kommandoer og manuelle UI-tester
+Gjeldende `main` har ikke varig prosjektlagring eller automatisk lagring. Oppfriskning, lukking eller krasj kan derfor miste arbeidsøkten. Programmet skal ikke være eneste lagringssted for jobbkritisk innhold før fase 25 er ferdig kontrollert og merget.
 
 ## Autoritativ dokumentasjon
 
-1. `docs/WORK_PLAN.md`
-2. `docs/PROJECT_RULES.md`
-3. `docs/ELEMENT_MODEL.md`
-4. `docs/PRODUCTION_READINESS.md`
-5. `docs/CODE_AUDIT.md`
-6. `docs/NEXT_CHAT_PROMPT.md`
+Kun disse dokumentene er permanente sannhetskilder:
 
-Historiske beskrivelser i Git-historikken er ikke gjeldende prosjektstatus.
+1. `docs/WORK_PLAN.md` – rekkefølge og aktiv fase
+2. `docs/PROJECT_RULES.md` – varige arbeids- og arkitekturregler
+3. `docs/ELEMENT_MODEL.md` – serialiserbar prosjektmodell
+
+Fasespesifikke krav og auditfunn ligger i den aktuelle GitHub-saken og PR-en. `architecture.json` og `docs/dependency-graph.mmd` er genererte rapporter, ikke statusdokumenter.
