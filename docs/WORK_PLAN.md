@@ -28,6 +28,8 @@ fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  OpenAI-integrasjon
 ```
 
+Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Den beskriver en clipboard-first arbeidsflyt der valgte editorområder sendes manuelt til ChatGPT med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
+
 Rekkefølgen endres bare etter en ny, uttrykkelig beslutning fra brukeren. Endringen dokumenteres her før kodearbeidet starter.
 
 ## Fast arbeidsflyt per fase
