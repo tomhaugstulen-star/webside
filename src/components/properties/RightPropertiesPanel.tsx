@@ -5,6 +5,7 @@ import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
 import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
+import { SectionAnchorPropertiesSection } from './SectionAnchorPropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
 const elementKindLabels: Record<ElementKind, string> = {
@@ -60,6 +61,10 @@ export function RightPropertiesPanel({
 
             {element.kind === 'header' && (
               <HeaderFontPropertiesSection element={element} />
+            )}
+
+            {element.kind === 'section' && (
+              <SectionAnchorPropertiesSection key={element.id} element={element} />
             )}
 
             {(element.kind === 'section' || element.kind === 'header') && (

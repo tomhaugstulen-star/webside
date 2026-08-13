@@ -1,0 +1,244 @@
+.page-management,
+.website-navigation {
+  display: grid;
+  gap: 14px;
+  padding-top: 22px;
+  border-top: 1px solid var(--portal-border);
+}
+
+.page-management {
+  margin-bottom: 26px;
+}
+
+.website-navigation {
+  margin-top: 26px;
+}
+
+.site-structure__section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.site-structure__section-heading h3 {
+  margin: 0;
+}
+
+.site-structure__section-heading > span {
+  min-width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--portal-text-muted);
+  background: var(--portal-control-subtle);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.site-structure__section-heading > button,
+.site-structure__form > button,
+.website-navigation__add-form > button,
+.section-anchor-properties form > button,
+.site-structure__button-row button,
+.site-structure__danger-button {
+  min-height: 36px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.site-structure__section-heading > button {
+  padding: 0 10px;
+  color: var(--portal-accent);
+}
+
+.site-structure__hint {
+  margin: 0;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.site-structure__form,
+.website-navigation__add-form,
+.section-anchor-properties form {
+  display: grid;
+  gap: 10px;
+}
+
+.site-structure__form label,
+.website-navigation__add-form label,
+.site-structure__select-field,
+.section-anchor-properties label {
+  display: grid;
+  gap: 6px;
+}
+
+.site-structure__form label > span,
+.website-navigation__add-form label > span,
+.site-structure__select-field > span,
+.section-anchor-properties label > span {
+  color: var(--portal-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.site-structure__form input,
+.website-navigation__add-form input,
+.website-navigation__add-form select,
+.site-structure__select-field select,
+.section-anchor-properties input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  font: inherit;
+  font-size: 12px;
+}
+
+.site-structure__form > button,
+.website-navigation__add-form > button,
+.section-anchor-properties form > button {
+  width: 100%;
+}
+
+.site-structure__button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.website-navigation__item .site-structure__button-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.site-structure__danger-button {
+  width: 100%;
+  color: var(--portal-danger);
+}
+
+.site-structure__section-heading > button:hover:not(:disabled),
+.site-structure__form > button:hover:not(:disabled),
+.website-navigation__add-form > button:hover:not(:disabled),
+.section-anchor-properties form > button:hover:not(:disabled),
+.site-structure__button-row button:hover:not(:disabled),
+.site-structure__danger-button:hover:not(:disabled) {
+  border-color: var(--portal-border-strong);
+  background: var(--portal-control-hover);
+}
+
+.site-structure__section-heading > button:disabled,
+.site-structure__form > button:disabled,
+.website-navigation__add-form > button:disabled,
+.section-anchor-properties form > button:disabled,
+.site-structure__button-row button:disabled,
+.site-structure__danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.site-structure__form input:focus-visible,
+.website-navigation__add-form input:focus-visible,
+.website-navigation__add-form select:focus-visible,
+.site-structure__select-field select:focus-visible,
+.section-anchor-properties input:focus-visible,
+.site-structure__section-heading > button:focus-visible,
+.site-structure__form > button:focus-visible,
+.website-navigation__add-form > button:focus-visible,
+.section-anchor-properties form > button:focus-visible,
+.site-structure__button-row button:focus-visible,
+.site-structure__danger-button:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
+}
+
+.site-structure__feedback {
+  min-height: 17px;
+  margin: 0;
+  color: var(--portal-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.website-navigation__empty {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--portal-border-strong);
+  border-radius: 10px;
+  color: var(--portal-text-muted);
+  background: var(--portal-control-subtle);
+  font-size: 12px;
+  text-align: center;
+}
+
+.website-navigation__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.website-navigation__item {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 10px;
+  background: var(--portal-control-subtle);
+}
+
+.section-anchor-properties {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 28px;
+}
+
+.section-anchor-properties > p {
+  margin: 0;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.section-anchor-properties__input {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  background: var(--portal-control-surface);
+}
+
+.section-anchor-properties__input > span {
+  padding-left: 10px;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+}
+
+.section-anchor-properties__input input {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.section-anchor-properties__input:focus-within {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
+}
+
+.section-anchor-properties__input input:focus-visible {
+  outline: 0;
+}

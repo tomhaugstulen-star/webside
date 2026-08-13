@@ -57,6 +57,33 @@ export function isValidPageSlug(value: unknown): value is string {
   return typeof value === 'string' && normalizePageSlug(value) === value
 }
 
+export function createUniquePageSlug(
+  existingSlugs: readonly string[],
+  preferredValue = 'side',
+) {
+  const normalized = normalizePageSlug(preferredValue)
+  const preferred = normalized && normalized !== '/' ? normalized : '/side'
+  const used = new Set(existingSlugs)
+
+  if (!used.has(preferred)) {
+    return preferred
+  }
+
+  let suffix = 2
+
+  while (true) {
+    const suffixText = `-${suffix}`
+    const base = preferred.slice(0, MAX_PAGE_SLUG_LENGTH - suffixText.length)
+    const candidate = `${base}${suffixText}`
+
+    if (!used.has(candidate)) {
+      return candidate
+    }
+
+    suffix += 1
+  }
+}
+
 export function normalizeSectionAnchorId(value: string): string | null {
   const token = normalizeIdentifierToken(value.trim().replace(/^#+/, ''))
 

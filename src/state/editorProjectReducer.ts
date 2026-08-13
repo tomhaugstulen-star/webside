@@ -1,15 +1,19 @@
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
+import { isValidProjectSiteStructure } from '../model/siteStructure'
 import { addElementToActivePage } from './addElementToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
 import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
+import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
+import { reducePageProjectAction } from './reducePageProjectAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
 import { setElementLink } from './setElementLink'
+import { setSectionAnchorId } from './setSectionAnchorId'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
@@ -57,6 +61,10 @@ function reduceEditorProjectState(
         throw new Error('An editor project must contain at least one page.')
       }
 
+      if (!isValidProjectSiteStructure(action.project)) {
+        return state
+      }
+
       return {
         project: action.project,
         activePageId,
@@ -102,6 +110,20 @@ function reduceEditorProjectState(
       }
     }
 
+    case 'add-page':
+    case 'set-page-name':
+    case 'set-page-slug':
+    case 'move-page':
+    case 'delete-page':
+      return reducePageProjectAction(state, action)
+
+    case 'add-navigation-item':
+    case 'set-navigation-item-label':
+    case 'set-navigation-item-target':
+    case 'move-navigation-item':
+    case 'delete-navigation-item':
+      return reduceNavigationProjectAction(state, action)
+
     case 'add-element-to-active-page':
       return addElementToActivePage(
         state,
@@ -114,6 +136,14 @@ function reduceEditorProjectState(
       return deleteElementFromActivePage(
         state,
         action.elementId,
+        action.updatedAt,
+      )
+
+    case 'set-section-anchor-id':
+      return setSectionAnchorId(
+        state,
+        action.elementId,
+        action.anchorId,
         action.updatedAt,
       )
 

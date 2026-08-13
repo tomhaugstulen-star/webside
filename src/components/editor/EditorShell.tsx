@@ -26,7 +26,7 @@ export function EditorShell() {
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
-  const { activePage } = useEditorProject()
+  const { activePage, state, dispatch } = useEditorProject()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
@@ -44,6 +44,12 @@ export function EditorShell() {
 
   const closeToolPanel = () => {
     setActiveTool(null)
+  }
+
+  const changeActivePage = (pageId: string) => {
+    dispatch({ type: 'set-active-page', pageId })
+    closeToolPanel()
+    setPropertiesPanelOpen(false)
   }
 
   const createElementAndClosePanel = (request: ElementCreationRequest) => {
@@ -120,8 +126,10 @@ export function EditorShell() {
       className={`editor-shell${activeTool ? ' editor-shell--panel-open' : ''}${visiblePropertiesElement ? ' editor-shell--properties-open' : ''}`}
     >
       <TopToolbar
-        pageName={activePage.name}
+        pages={state.project.pages}
+        activePageId={state.activePageId}
         viewport={viewport}
+        onPageChange={changeActivePage}
         onViewportChange={setViewport}
       />
       <div className="editor-shell__body">
@@ -133,6 +141,7 @@ export function EditorShell() {
         />
         <EditorCanvas
           viewport={viewport}
+          onWorkspacePointerDown={closeToolPanel}
           onOpenProperties={() => setPropertiesPanelOpen(true)}
           onCloseProperties={() => setPropertiesPanelOpen(false)}
         />

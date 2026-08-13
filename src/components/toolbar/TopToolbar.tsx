@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ViewportMode } from '../../types/editor'
 
+type ToolbarPage = {
+  id: string
+  name: string
+}
+
 type TopToolbarProps = {
-  pageName: string
+  pages: readonly ToolbarPage[]
+  activePageId: string
   viewport: ViewportMode
+  onPageChange: (pageId: string) => void
   onViewportChange: (viewport: ViewportMode) => void
 }
 
@@ -61,7 +68,13 @@ function Icon({ name }: { name: IconName }) {
   }
 }
 
-export function TopToolbar({ pageName, viewport, onViewportChange }: TopToolbarProps) {
+export function TopToolbar({
+  pages,
+  activePageId,
+  viewport,
+  onPageChange,
+  onViewportChange,
+}: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -98,10 +111,23 @@ export function TopToolbar({ pageName, viewport, onViewportChange }: TopToolbarP
         <span className="brand-name">Website</span>
       </div>
 
-      <button className="page-selector" type="button">
-        <span>{pageName}</span>
-        <Icon name="chevron" />
-      </button>
+      <div className="page-selector-wrap">
+        <select
+          className="page-selector"
+          aria-label="Velg side"
+          value={activePageId}
+          onChange={(event) => onPageChange(event.target.value)}
+        >
+          {pages.map((page) => (
+            <option key={page.id} value={page.id}>
+              {page.name}
+            </option>
+          ))}
+        </select>
+        <span className="page-selector__icon" aria-hidden="true">
+          <Icon name="chevron" />
+        </span>
+      </div>
 
       <div className="top-toolbar__viewport" aria-label="Velg visning">
         <button

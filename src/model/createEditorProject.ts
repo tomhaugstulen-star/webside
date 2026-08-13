@@ -9,14 +9,22 @@ import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
 
 export { migrateEditorProjectV10 } from './editorProjectMigration'
 
-export function createBlankPage(name = 'Forside', slug = '/'): EditorPage {
+export function createEditorPage(
+  id: string,
+  name: string,
+  slug: string,
+): EditorPage {
   return {
-    id: createStableId(),
+    id,
     name,
     slug,
     appearance: { ...DEFAULT_PAGE_APPEARANCE },
     elements: [],
   }
+}
+
+export function createBlankPage(name = 'Forside', slug = '/'): EditorPage {
+  return createEditorPage(createStableId(), name, slug)
 }
 
 export function createBlankProject(name = 'Nytt prosjekt'): EditorProject {
