@@ -8417,7 +8417,7 @@
     "totalCruised": 122,
     "totalDependenciesCruised": 350,
     "optionsUsed": {
-      "baseDir": "C:\\Users\\tomha\\Desktop\\website",
+      "baseDir": "/home/runner/work/webside/webside",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

@@ -1,4 +1,4 @@
-﻿@import './styles/editor-base.css';
+@import './styles/editor-base.css';
 @import './styles/toolbar.css';
 @import './styles/sidebar.css';
 @import './styles/sidebar-content.css';
@@ -26,4 +26,3 @@
 #root {
   min-height: 100vh;
 }
-
