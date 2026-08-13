@@ -101,6 +101,10 @@ subgraph src["src"]
       src_components_sidebar_ButtonLibraryPanel_tsx["ButtonLibraryPanel.tsx"]
       src_components_sidebar_ImageImportControl_tsx["ImageImportControl.tsx"]
       src_components_sidebar_HeaderCreationControl_tsx["HeaderCreationControl.tsx"]
+      src_components_sidebar_ProjectNavigatorPanel_tsx["ProjectNavigatorPanel.tsx"]
+    end
+    subgraph src_components_navigation["navigation"]
+      src_components_navigation_editorNavigationItems_ts["editorNavigationItems.ts"]
     end
     subgraph src_components_toolbar["toolbar"]
       src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
@@ -380,7 +384,7 @@ src_components_sidebar_SidebarPanels_tsx-->src_types_editor_ts
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ColorsPanel_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ElementsPanel_tsx
 src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_HeaderCreationControl_tsx
-src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_SidebarIcon_tsx
+src_components_sidebar_SidebarPanels_tsx-->src_components_sidebar_ProjectNavigatorPanel_tsx
 src_components_sidebar_ColorsPanel_tsx-->src_model_projectColorEntries_ts
 src_components_sidebar_ColorsPanel_tsx-->src_state_useEditorProject_ts
 src_components_sidebar_ColorsPanel_tsx-->src_state_useProjectColors_ts
@@ -413,6 +417,9 @@ src_components_sidebar_HeaderCreationControl_tsx-->src_model_elementCreation_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_model_headerElement_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_model_imageAsset_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_components_sidebar_SidebarIcon_tsx
+src_components_sidebar_ProjectNavigatorPanel_tsx-->src_state_useEditorProject_ts
+src_components_sidebar_ProjectNavigatorPanel_tsx-->src_components_navigation_editorNavigationItems_ts
+src_components_navigation_editorNavigationItems_ts-->src_model_editorProject_ts
 src_components_toolbar_TopToolbar_tsx-->src_types_editor_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_model_editorProject_ts
 src_components_editor_useElementDeletionShortcut_ts-->src_components_editor_isElementDeletionShortcutTarget_ts

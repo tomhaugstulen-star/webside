@@ -1,9 +1,9 @@
-import type { ElementCreationRequest } from '../../model/elementCreation'
+﻿import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorTool } from '../../types/editor'
 import { ColorsPanel } from './ColorsPanel'
 import { ElementsPanel } from './ElementsPanel'
 import { HeaderCreationControl } from './HeaderCreationControl'
-import { SidebarIcon } from './SidebarIcon'
+import { ProjectNavigatorPanel } from './ProjectNavigatorPanel'
 
 type PanelProps = {
   onSelect: () => void
@@ -25,27 +25,6 @@ function LogoHeaderPanel({ onCreateElement }: ElementsPanelProps) {
         Velg logo, skriv inn navn og opprett en samlet header på siden.
       </p>
       <HeaderCreationControl onCreateHeader={onCreateElement} />
-    </>
-  )
-}
-
-function ProjectPanel({ onSelect }: PanelProps) {
-  return (
-    <>
-      <h2>Prosjekt</h2>
-      <button
-        className="primary-panel-button"
-        type="button"
-        onClick={onSelect}
-      >
-        <SidebarIcon name="upload" />
-        Last opp fil
-      </button>
-      <div className="empty-library">
-        <SidebarIcon name="files" />
-        <strong>Ingen filer</strong>
-        <span>Dokumenter og vedlegg vises her.</span>
-      </div>
     </>
   )
 }
@@ -85,7 +64,7 @@ export function SidebarPanel({
     case 'elements':
       return <ElementsPanel onCreateElement={onCreateElement} />
     case 'files':
-      return <ProjectPanel onSelect={onSelect} />
+      return <ProjectNavigatorPanel />
     case 'settings':
       return <SettingsPanel onSelect={onSelect} />
   }
