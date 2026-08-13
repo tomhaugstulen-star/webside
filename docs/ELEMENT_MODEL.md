@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 10
+EDITOR_PROJECT_SCHEMA_VERSION = 11
 ```
 
 ```text
@@ -19,14 +19,16 @@ EDITOR_PROJECT_SCHEMA_VERSION = 10
 8  Header med logo, tekst, utseende og ramme
 9  Header-fontstørrelse
 10 Tekstutseende med varig tekstboksbakgrunn
+11 Sider, offentlige seksjons-ID-er og nettstednavigasjon
 ```
 
-Det finnes ennå ingen prosjektimport eller migreringsmotor. Framtidig import må validere hele versjon-10-objektet før `replace-project`.
+Det finnes ennå ingen prosjektimport-UI. Modellen har en deterministisk migrator fra versjon 10 til 11, og framtidig import må validere den migrerte versjon-11-strukturen før `replace-project`.
 
 Kontrollert migreringsretning:
 
 - versjon 8 til 9 må legge til `HeaderAppearance.fontSize`, standard 24 px
 - versjon 9 til 10 må legge til `TextAppearance.backgroundColor`, standard `#FFFFFF`
+- versjon 10 til 11 legger til stabile seksjonsankere og tom `WebsiteNavigation`
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -35,10 +37,11 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 10
+  schemaVersion: 11
   id: string
   name: string
   pages: EditorPage[]
+  navigation: WebsiteNavigation
   createdAt: string
   updatedAt: string
 }
@@ -89,6 +92,7 @@ Telefon arver desktopverdien når `mobile` mangler. Dagens UI oppretter ikke mob
 ```ts
 type SectionEditorElement = BaseEditorElement & {
   kind: 'section'
+  anchorId: string
   appearance: {
     backgroundColor: EditorColor
     frame: ElementFrame
@@ -98,6 +102,30 @@ type SectionEditorElement = BaseEditorElement & {
 
 Standardstørrelse: `320 × 180 px`  
 Minimum: `160 × 90 px`
+
+`anchorId` er en offentlig, URL-/fragmentvennlig seksjons-ID som er separat fra elementets interne `id`. Den er unik innen siden, opprettes deterministisk som `seksjon`, `seksjon-2` osv., og endres bare ved en eksplisitt brukerhandling. Flytting, sidenavn og andre redigeringer endrer ikke en etablert seksjons-ID.
+
+Editorens interne DOM kan fortsatt bruke egne editoridentifikatorer. Det offentlige ankeret er prosjektdata og skal brukes av senere Header-/forhåndsvisningsrendering.
+
+## Nettstednavigasjon
+
+```ts
+type WebsiteNavigation = {
+  items: NavigationItem[]
+}
+
+type NavigationItem = {
+  id: string
+  label: string
+  target:
+    | { type: 'page'; pageId: string }
+    | { type: 'section'; pageId: string; elementId: string }
+}
+```
+
+Navigasjonsmål peker på stabile prosjekt-ID-er, ikke DOM-noder, slugs, ankertekst eller visningstekst. Seksjonsmål bruker den interne stabile element-ID-en for referanseintegritet; offentlig URL-fragment avledes senere fra seksjonens `anchorId`.
+
+Side- og seksjonssletting rydder navigasjonspunkter som ellers ville blitt hengende. Ugyldige mål avvises ved reducergrensen. Menymodellen er serialiserbar prosjektdata; faktisk Header-meny og navigasjonsrendering bygges i fase 20.
 
 ## Bilde
 
@@ -239,6 +267,8 @@ Prosjektet lagrer stabil asset-ID og serialiserbar metadata. Følgende lagres ik
 
 Det transiente ressurslageret eier faktisk fil og Object URL. Sletting fjerner ressursen bare når ingen Bilde- eller Header-elementer refererer til asset-ID-en.
 
+Ved sletting av en hel side ryddes bilde- og logoressurser som ikke lenger refereres av andre sider, uten å legge `File`, Blob eller Object URL inn i prosjektstate.
+
 ## Reducergrenser
 
 Reducerhandlinger krever:
@@ -256,10 +286,14 @@ Header-layoutcommit normaliserer alltid `x = 0, y = 0` og kanonisk serialisert b
 
 Ugyldige og uendrede handlinger returnerer samme state og endrer ikke `updatedAt`.
 
+Sideadministrasjon avviser ugyldig navn, ugyldig eller duplisert slug, duplisert side-ID og sletting av prosjektets siste side. Ved sletting av aktiv side velges neste side på samme indeks når mulig, ellers forrige siste side, og elementmarkeringen tømmes.
+
+Seksjons-ID kan bare endres eksplisitt på en eksisterende ulåst Seksjon og må være gyldig og unik på siden. Navigasjonspunkter validerer label og mål, og side-/seksjonssletting fjerner dangling navigasjonsreferanser deterministisk.
+
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
-- versjon 8 migreres kontrollert til versjon 9 og deretter versjon 10
+- versjon 8 migreres kontrollert til versjon 9, deretter 10 og videre til 11
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions

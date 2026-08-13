@@ -1,4 +1,5 @@
 import type { EditorProjectState } from '../model/editorProject'
+import { pruneDanglingNavigationItems } from '../model/navigation'
 
 export function deleteElementFromActivePage(
   state: EditorProjectState,
@@ -20,12 +21,17 @@ export function deleteElementFromActivePage(
         }
       : page,
   )
+  const navigation = pruneDanglingNavigationItems(
+    state.project.navigation,
+    pages,
+  )
 
   return {
     ...state,
     project: {
       ...state.project,
       pages,
+      navigation,
       updatedAt,
     },
     selectedElementId:

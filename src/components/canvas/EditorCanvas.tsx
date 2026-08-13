@@ -15,6 +15,7 @@ import { getCanvasContentHeight } from './getCanvasContentHeight'
 
 type EditorCanvasProps = {
   viewport: ViewportMode
+  onWorkspacePointerDown: () => void
   onOpenProperties: () => void
   onCloseProperties: () => void
 }
@@ -47,6 +48,7 @@ function orderElementsForRendering(elements: EditorElement[]) {
 
 export function EditorCanvas({
   viewport,
+  onWorkspacePointerDown,
   onOpenProperties,
   onCloseProperties,
 }: EditorCanvasProps) {
@@ -129,7 +131,11 @@ export function EditorCanvas({
   }
 
   return (
-    <main className="editor-workspace" onPointerDown={clearSelectionAndProperties}>
+    <main
+      className="editor-workspace"
+      onPointerDownCapture={onWorkspacePointerDown}
+      onPointerDown={clearSelectionAndProperties}
+    >
       <div className="canvas-stage" ref={scrollContainerRef}>
         <div className="canvas-wrap">
           <div

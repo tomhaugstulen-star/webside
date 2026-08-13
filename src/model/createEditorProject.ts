@@ -7,14 +7,24 @@ import {
 import { createStableId } from './createStableId'
 import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
 
-export function createBlankPage(name = 'Forside', slug = '/'): EditorPage {
+export { migrateEditorProjectV10 } from './editorProjectMigration'
+
+export function createEditorPage(
+  id: string,
+  name: string,
+  slug: string,
+): EditorPage {
   return {
-    id: createStableId(),
+    id,
     name,
     slug,
     appearance: { ...DEFAULT_PAGE_APPEARANCE },
     elements: [],
   }
+}
+
+export function createBlankPage(name = 'Forside', slug = '/'): EditorPage {
+  return createEditorPage(createStableId(), name, slug)
 }
 
 export function createBlankProject(name = 'Nytt prosjekt'): EditorProject {
@@ -26,6 +36,7 @@ export function createBlankProject(name = 'Nytt prosjekt'): EditorProject {
     id: createStableId(),
     name,
     pages: [firstPage],
+    navigation: { items: [] },
     createdAt,
     updatedAt: createdAt,
   }

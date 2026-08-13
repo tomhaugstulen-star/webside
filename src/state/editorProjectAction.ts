@@ -12,6 +12,8 @@ import type {
   TextFontFamily,
   TextFontSize,
 } from '../model/textElementStyle'
+import type { NavigationProjectAction } from './navigationProjectAction'
+import type { PageProjectAction } from './pageProjectAction'
 
 export type ColorProjectAction =
   | {
@@ -98,6 +100,12 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'set-section-anchor-id'
+      elementId: string
+      anchorId: string
+      updatedAt: string
+    }
+  | {
       type: 'set-element-desktop-layout'
       elementId: string
       layout: ElementLayout
@@ -165,3 +173,5 @@ export type EditorProjectAction =
     }
   | ColorProjectAction
   | HeaderAppearanceAction
+  | PageProjectAction
+  | NavigationProjectAction

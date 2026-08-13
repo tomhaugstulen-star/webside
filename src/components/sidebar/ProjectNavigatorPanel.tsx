@@ -8,6 +8,8 @@ import {
   type NavigatorKindFilter,
   type NavigatorStatusFilter,
 } from '../navigation/editorNavigationItems'
+import { PageManagementSection } from './PageManagementSection'
+import { WebsiteNavigationSection } from './WebsiteNavigationSection'
 
 export function ProjectNavigatorPanel() {
   const { state, dispatch } = useEditorProject()
@@ -37,6 +39,8 @@ export function ProjectNavigatorPanel() {
           {state.project.pages.length === 1 ? 'side' : 'sider'}
         </span>
       </div>
+
+      <PageManagementSection />
 
       <div className="project-navigator__filters">
         <label>
@@ -143,6 +147,8 @@ export function ProjectNavigatorPanel() {
           )
         })}
       </nav>
+
+      <WebsiteNavigationSection />
     </>
   )
 }

@@ -63,7 +63,7 @@ hard grense: 300+ linjer, alltid blokkert
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er 10.
+- Gjeldende prosjektskjema er 11.
 - `EditorProject` eier alle varige serialiserbare prosjektdata.
 - Varige prosjektendringer går gjennom typede reducerhandlinger.
 - Reduceren er siste mutasjonsgrense.
@@ -79,6 +79,7 @@ hard grense: 300+ linjer, alltid blokkert
 Varig:
 
 - prosjekt, sider og elementer
+- nettstednavigasjon og offentlige seksjons-ID-er
 - posisjon, størrelse, synlighet og låsestatus
 - utseende, tekst, lenker og asset-ID-er
 - bilde- og logometadata
