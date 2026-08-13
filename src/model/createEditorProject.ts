@@ -7,6 +7,8 @@ import {
 import { createStableId } from './createStableId'
 import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
 
+export { migrateEditorProjectV10 } from './editorProjectMigration'
+
 export function createBlankPage(name = 'Forside', slug = '/'): EditorPage {
   return {
     id: createStableId(),
@@ -26,6 +28,7 @@ export function createBlankProject(name = 'Nytt prosjekt'): EditorProject {
     id: createStableId(),
     name,
     pages: [firstPage],
+    navigation: { items: [] },
     createdAt,
     updatedAt: createdAt,
   }

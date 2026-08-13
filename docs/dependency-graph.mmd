@@ -30,6 +30,7 @@ subgraph src["src"]
     src_model_elementFrame_ts["elementFrame.ts"]
     src_model_textElementStyle_ts["textElementStyle.ts"]
     src_model_imagePresentation_ts["imagePresentation.ts"]
+    src_model_navigation_ts["navigation.ts"]
     src_model_pageAppearance_ts["pageAppearance.ts"]
     src_model_sectionAppearance_ts["sectionAppearance.ts"]
     src_model_textAppearance_ts["textAppearance.ts"]
@@ -39,6 +40,8 @@ subgraph src["src"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
     src_model_projectColorEntries_ts["projectColorEntries.ts"]
     src_model_createEditorProject_ts["createEditorProject.ts"]
+    src_model_editorProjectMigration_ts["editorProjectMigration.ts"]
+    src_model_siteStructure_ts["siteStructure.ts"]
     src_model_createEditorElement_ts["createEditorElement.ts"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
   end
@@ -183,6 +186,7 @@ src_model_editorProject_ts-->src_model_elementLink_ts
 src_model_editorProject_ts-->src_model_headerAppearance_ts
 src_model_editorProject_ts-->src_model_imageAsset_ts
 src_model_editorProject_ts-->src_model_imagePresentation_ts
+src_model_editorProject_ts-->src_model_navigation_ts
 src_model_editorProject_ts-->src_model_pageAppearance_ts
 src_model_editorProject_ts-->src_model_sectionAppearance_ts
 src_model_editorProject_ts-->src_model_textAppearance_ts
@@ -444,7 +448,11 @@ src_state_editorProjectReducer_ts-->src_state_setTextElementStyle_ts
 src_state_editorProjectReducer_ts-->src_state_toggleElementLock_ts
 src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
+src_model_createEditorProject_ts-->src_model_editorProjectMigration_ts
 src_model_createEditorProject_ts-->src_model_pageAppearance_ts
+src_model_editorProjectMigration_ts-->src_model_editorProject_ts
+src_model_editorProjectMigration_ts-->src_model_siteStructure_ts
+src_model_siteStructure_ts-->src_model_navigation_ts
 src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
 src_state_addElementToActivePage_ts-->src_model_editorProject_ts
 src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
@@ -458,6 +466,7 @@ src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_headerAppearance_ts
 src_model_createEditorElement_ts-->src_model_imagePresentation_ts
 src_model_createEditorElement_ts-->src_model_sectionAppearance_ts
+src_model_createEditorElement_ts-->src_model_siteStructure_ts
 src_model_createEditorElement_ts-->src_model_textAppearance_ts
 src_model_createEditorElement_ts-->src_model_textElementStyle_ts
 src_model_findElementCreationPosition_ts-->src_model_editorProject_ts

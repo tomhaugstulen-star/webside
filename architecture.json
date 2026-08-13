@@ -647,6 +647,24 @@
         },
         {
           "dynamic": false,
+          "module": "./navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./pageAppearance",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -756,6 +774,7 @@
         "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/state/editorProjectReducer.ts",
         "src/model/createEditorProject.ts",
+        "src/model/editorProjectMigration.ts",
         "src/state/addElementToActivePage.ts",
         "src/model/createEditorElement.ts",
         "src/model/findElementCreationPosition.ts",
@@ -1092,6 +1111,23 @@
         "src/state/setImageDesktopFrame.ts",
         "src/state/setImageMode.ts",
         "src/state/setImageTransform.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/model/navigation.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/model/editorProject.ts",
+        "src/model/siteStructure.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -7014,6 +7050,23 @@
         },
         {
           "dynamic": false,
+          "module": "./editorProjectMigration",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/model/editorProjectMigration.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./pageAppearance",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -7032,6 +7085,92 @@
       ],
       "dependents": [
         "src/state/editorProjectReducer.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/model/editorProjectMigration.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./siteStructure",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/siteStructure.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/model/createEditorProject.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/model/siteStructure.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/model/editorProjectMigration.ts",
+        "src/model/createEditorElement.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -7281,6 +7420,23 @@
             "import"
           ],
           "resolved": "src/model/sectionAppearance.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./siteStructure",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/siteStructure.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8414,10 +8570,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 122,
-    "totalDependenciesCruised": 350,
+    "totalCruised": 125,
+    "totalDependenciesCruised": 356,
     "optionsUsed": {
-      "baseDir": "/home/runner/work/webside/webside",
+      "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

@@ -10,6 +10,7 @@ import {
   DEFAULT_IMAGE_TRANSFORM,
 } from './imagePresentation'
 import { DEFAULT_SECTION_APPEARANCE } from './sectionAppearance'
+import { createUniqueSectionAnchorId } from './siteStructure'
 import { DEFAULT_TEXT_APPEARANCE } from './textAppearance'
 import { DEFAULT_TEXT_ELEMENT_STYLE } from './textElementStyle'
 
@@ -38,15 +39,23 @@ export function createEditorElement({
   }
 
   switch (request.kind) {
-    case 'section':
+    case 'section': {
+      const anchorId = createUniqueSectionAnchorId(
+        existingElements
+          .filter((element) => element.kind === 'section')
+          .map((element) => element.anchorId),
+      )
+
       return {
         ...common,
         kind: 'section',
+        anchorId,
         appearance: {
           backgroundColor: DEFAULT_SECTION_APPEARANCE.backgroundColor,
           frame: { ...DEFAULT_SECTION_APPEARANCE.frame },
         },
       }
+    }
     case 'image':
       return {
         ...common,

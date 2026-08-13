@@ -4,6 +4,7 @@ import type { ElementLink } from './elementLink'
 import type { HeaderAppearance } from './headerAppearance'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
+import type { WebsiteNavigation } from './navigation'
 import type { PageAppearance } from './pageAppearance'
 import type { SectionAppearance } from './sectionAppearance'
 import type { TextAppearance } from './textAppearance'
@@ -11,7 +12,7 @@ import type { TextElementStyle } from './textElementStyle'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 10 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 11 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -35,6 +36,7 @@ type BaseEditorElement = {
 
 export type SectionEditorElement = BaseEditorElement & {
   kind: 'section'
+  anchorId: string
   appearance: SectionAppearance
 }
 
@@ -91,6 +93,7 @@ export type EditorProject = {
   id: string
   name: string
   pages: EditorPage[]
+  navigation: WebsiteNavigation
   createdAt: string
   updatedAt: string
 }
