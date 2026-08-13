@@ -1,4 +1,4 @@
-﻿.project-navigator__summary {
+.project-navigator__summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -135,4 +135,46 @@
   z-index: 1;
   outline: 3px solid var(--portal-focus-ring);
   outline-offset: -3px;
+}
+
+.project-navigator__filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.project-navigator__filters label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.project-navigator__filters label > span {
+  color: var(--portal-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.project-navigator__filters select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 30px 0 10px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.project-navigator__filters select:hover {
+  border-color: var(--portal-border-strong);
+}
+
+.project-navigator__filters select:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
 }

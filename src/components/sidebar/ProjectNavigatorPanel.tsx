@@ -1,68 +1,19 @@
-﻿import type {
-  EditorElement,
-  EditorPage,
-  ElementKind,
-} from '../../model/editorProject'
+import { useState } from 'react'
 import { useEditorProject } from '../../state/useEditorProject'
-
-const kindLabels: Record<ElementKind, string> = {
-  section: 'Seksjon',
-  image: 'Bilde',
-  text: 'Tekst',
-  button: 'Knapp',
-  header: 'Header',
-}
-
-function getKindOrdinal(page: EditorPage, elementIndex: number) {
-  const element = page.elements[elementIndex]
-
-  return page.elements
-    .slice(0, elementIndex + 1)
-    .filter((candidate) => candidate.kind === element.kind).length
-}
-
-function getElementName(
-  page: EditorPage,
-  element: EditorElement,
-  elementIndex: number,
-) {
-  switch (element.kind) {
-    case 'text': {
-      const content = element.content.trim().replace(/\s+/g, ' ')
-      return content ? content.slice(0, 32) : 'Tom tekstboks'
-    }
-    case 'button':
-      return element.label.trim() || 'Knapp'
-    case 'image':
-      return element.assetMetadata.fileName
-    case 'header':
-      return element.siteName.trim() || 'Header'
-    case 'section':
-      return `Seksjon ${getKindOrdinal(page, elementIndex)}`
-  }
-}
-
-function getVisibilityLabel(element: EditorElement) {
-  const desktopVisible = element.visibility.desktop
-  const mobileVisible = element.visibility.mobile ?? desktopVisible
-
-  if (!desktopVisible && !mobileVisible) {
-    return 'Skjult'
-  }
-
-  if (desktopVisible && !mobileVisible) {
-    return 'Skjult på telefon'
-  }
-
-  if (!desktopVisible && mobileVisible) {
-    return 'Skjult på PC'
-  }
-
-  return 'Synlig'
-}
+import {
+  getNavigatorElementName,
+  getNavigatorVisibilityLabel,
+  matchesNavigatorFilters,
+  navigatorKindLabels,
+  type NavigatorKindFilter,
+  type NavigatorStatusFilter,
+} from '../navigation/editorNavigationItems'
 
 export function ProjectNavigatorPanel() {
   const { state, dispatch } = useEditorProject()
+  const [kindFilter, setKindFilter] = useState<NavigatorKindFilter>('all')
+  const [statusFilter, setStatusFilter] =
+    useState<NavigatorStatusFilter>('all')
 
   const selectPage = (pageId: string) => {
     dispatch({ type: 'set-active-page', pageId })
@@ -87,9 +38,49 @@ export function ProjectNavigatorPanel() {
         </span>
       </div>
 
+      <div className="project-navigator__filters">
+        <label>
+          <span>Elementtype</span>
+          <select
+            value={kindFilter}
+            onChange={(event) =>
+              setKindFilter(event.target.value as NavigatorKindFilter)
+            }
+          >
+            <option value="all">Alle</option>
+            <option value="section">Seksjon</option>
+            <option value="image">Bilde</option>
+            <option value="text">Tekst</option>
+            <option value="button">Knapp</option>
+            <option value="header">Header</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Status</span>
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              setStatusFilter(event.target.value as NavigatorStatusFilter)
+            }
+          >
+            <option value="all">Alle</option>
+            <option value="visible">Synlige</option>
+            <option value="hidden">Skjulte</option>
+            <option value="locked">Låste</option>
+            <option value="unlocked">Ulåste</option>
+          </select>
+        </label>
+      </div>
+
       <nav className="project-navigator" aria-label="Prosjektnavigator">
         {state.project.pages.map((page) => {
           const activePage = page.id === state.activePageId
+          const matchingElements = page.elements
+            .map((element, elementIndex) => ({ element, elementIndex }))
+            .filter(({ element }) =>
+              matchesNavigatorFilters(element, kindFilter, statusFilter),
+            )
 
           return (
             <section className="project-navigator__page" key={page.id}>
@@ -105,12 +96,16 @@ export function ProjectNavigatorPanel() {
                 <small>{page.slug}</small>
               </button>
 
-              {page.elements.length > 0 ? (
+              {matchingElements.length > 0 ? (
                 <ul className="project-navigator__elements">
-                  {page.elements.map((element, elementIndex) => {
+                  {matchingElements.map(({ element, elementIndex }) => {
                     const selected =
                       activePage && element.id === state.selectedElementId
-                    const name = getElementName(page, element, elementIndex)
+                    const name = getNavigatorElementName(
+                      page,
+                      element,
+                      elementIndex,
+                    )
 
                     return (
                       <li key={element.id}>
@@ -126,10 +121,12 @@ export function ProjectNavigatorPanel() {
                         >
                           <span className="project-navigator__element-main">
                             <strong>{name}</strong>
-                            <small>{kindLabels[element.kind]}</small>
+                            <small>{navigatorKindLabels[element.kind]}</small>
                           </span>
                           <span className="project-navigator__element-status">
-                            <small>{getVisibilityLabel(element)}</small>
+                            <small>
+                              {getNavigatorVisibilityLabel(element)}
+                            </small>
                             {element.locked && <small>Låst</small>}
                           </span>
                         </button>
@@ -138,7 +135,9 @@ export function ProjectNavigatorPanel() {
                   })}
                 </ul>
               ) : (
-                <p className="project-navigator__empty">Ingen elementer</p>
+                <p className="project-navigator__empty">
+                  Ingen elementer matcher filteret
+                </p>
               )}
             </section>
           )
