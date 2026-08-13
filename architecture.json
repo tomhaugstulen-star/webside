@@ -751,6 +751,7 @@
         "src/components/properties/ImagePropertiesSection.tsx",
         "src/components/properties/TextPropertiesSection.tsx",
         "src/model/projectColorEntries.ts",
+        "src/components/navigation/editorNavigationItems.ts",
         "src/components/editor/useElementDeletionShortcut.ts",
         "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/state/editorProjectReducer.ts",
@@ -1366,7 +1367,8 @@
         "src/state/useTextElementStyle.ts",
         "src/components/sidebar/ColorsPanel.tsx",
         "src/state/useProjectColors.ts",
-        "src/state/useTextAppearance.ts"
+        "src/state/useTextAppearance.ts",
+        "src/components/sidebar/ProjectNavigatorPanel.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -5568,7 +5570,6 @@
       "dependencies": [],
       "dependents": [
         "src/components/sidebar/LeftSidebar.tsx",
-        "src/components/sidebar/SidebarPanels.tsx",
         "src/components/sidebar/ElementsPanel.tsx",
         "src/components/sidebar/ImageImportControl.tsx",
         "src/components/sidebar/HeaderCreationControl.tsx"
@@ -5675,14 +5676,14 @@
         },
         {
           "dynamic": false,
-          "module": "./SidebarIcon",
+          "module": "./ProjectNavigatorPanel",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "src/components/sidebar/SidebarIcon.tsx",
+          "resolved": "src/components/sidebar/ProjectNavigatorPanel.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -6397,6 +6398,92 @@
       ],
       "dependents": [
         "src/components/sidebar/SidebarPanels.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/sidebar/ProjectNavigatorPanel.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../state/useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../navigation/editorNavigationItems",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/navigation/editorNavigationItems.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/SidebarPanels.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/navigation/editorNavigationItems.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/ProjectNavigatorPanel.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8327,10 +8414,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 120,
-    "totalDependenciesCruised": 347,
+    "totalCruised": 122,
+    "totalDependenciesCruised": 350,
     "optionsUsed": {
-      "baseDir": "/home/runner/work/webside/webside",
+      "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,
