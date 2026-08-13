@@ -58,7 +58,9 @@
 
 .header-element__site-name {
   font-size: inherit;
-  line-height: 1.08;
+  line-height: 1.2;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
 }
 
 .header-element__subtitle {
