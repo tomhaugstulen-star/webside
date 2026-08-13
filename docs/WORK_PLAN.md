@@ -6,15 +6,16 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 ## Nåstatus
 
-- fullført gjennom fase 17 – tekstboksbakgrunn
-- neste produksjonsfase er fase 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
+- fullført gjennom fase 18 – arbeidsportalnavigasjon og navigator
+- separat header-descender-fiks er merget i PR #59
+- neste produksjonsfase er fase 19 – sider, seksjons-ID-er og navigasjonsmodell (#60)
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny implementering starter alltid fra oppdatert `main` på en egen branch
 
 ## Låst roadmap
 
 ```text
-fase 18  Arbeidsportalnavigasjon, navigator og hurtigsøk
+fase 18  Arbeidsportalnavigasjon og navigator
 fase 19  Sider, seksjons-ID-er og navigasjonsmodell
 fase 20  Nettstedets Header og menynavigasjon
 fase 21  Hero
@@ -25,10 +26,10 @@ fase 25  Lokal prosjektlagring, autolagring og gjenoppretting
 fase 26  Sikkerhetskopi, prosjektformat, import og migrering
 fase 27  Lokal forhåndsvisning
 fase 28  Malbibliotek og gjenbrukbare seksjoner
-fase 29  OpenAI-integrasjon
+fase 29  ChatGPT clipboard-arbeidsflyt
 ```
 
-Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Den beskriver en clipboard-first arbeidsflyt der valgte editorområder sendes manuelt til ChatGPT med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
+Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell ChatGPT-workflow der valgte editorområder sendes via kontrollert utklipp med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen, verken nå eller som planlagt senere oppgradering. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
 
 Rekkefølgen endres bare etter en ny, uttrykkelig beslutning fra brukeren. Endringen dokumenteres her før kodearbeidet starter.
 
@@ -56,40 +57,37 @@ git status --short
 git diff --stat
 ```
 
-## Fase 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
+## Fase 18 – arbeidsportalnavigasjon og navigator
 
-### Formål
+Fasen er fullført og merget i PR #58.
 
-Gjøre editorens innhold og verktøy raske å finne uten å opprette parallelle kopier av prosjektstate.
-
-### Omfang
+### Levert
 
 - oversikt for aktivt prosjekt
 - hierarkisk navigator for gjeldende sider og elementer
 - finne og markere element fra navigatoren
 - vise elementtype, navn, synlighet og låsestatus
 - filtrering etter elementtype og status
-- globalt hurtigsøk, anbefalt `Ctrl + K`
-- tastaturnavigasjon, Escape og korrekt fokusretur
 - synkronisert valg mellom navigator og lerret
+- eksisterende `EditorProject` og selection-flyt uten parallell prosjekt-/selection-state
 
-### Ikke del av fasen
+Globalt `Ctrl + K`-hurtigsøk ble prøvd lokalt, men ble eksplisitt tatt ut før commit fordi funksjonen ikke er ønsket. Ingen hurtigsøk-kode ble merget.
 
-- sideadministrasjon fra fase 19
-- nettstedets Header-meny fra fase 20
-- Hero
-- responsive mobiloverstyringer
-- angre/gjør om
-- lokal lagring eller automatisk lagring
-- OpenAI
+## Fase 19 – sider, seksjons-ID-er og navigasjonsmodell
 
-### Minimumskrav
+Aktiv planleggingssak: #60.
 
-- navigator og lerret viser samme valgte element
-- portalstatus avledes fra eksisterende state
-- `Ctrl + K`, Escape og fokusretur fungerer kontrollert
-- ingen ny parallell prosjektmodell opprettes
-- `npm run verify` og manuell PC-/Telefon-regresjon består
+Låste hovedmål:
+
+- kontrollert sideoppretting, navngiving, slug, sletting og rekkefølge
+- minst én side i prosjektet til enhver tid
+- stabile offentlige seksjons-/anker-ID-er separat fra interne element-ID-er
+- én serialiserbar, typet navigasjonsmodell med stabile side- og seksjonsmål
+- ingen dangling navigasjonsreferanser etter relevante slettinger
+- eksplisitt schema/migrering dersom serialisert prosjektform endres
+- faktisk Header-meny og menyrendering utsettes til fase 20
+
+Detaljert omfang og akseptansekriterier ligger i GitHub-sak #60.
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
@@ -115,6 +113,7 @@ Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 - #36 editor-only elementgrense
 - #37 elementnotat og høyrepanelendringer
 - #38 like mellomrom og fordelingsguider
+- #57 rammetykkelse for tekstelementer
 
 ## Dokumentregel
 

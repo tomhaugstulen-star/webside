@@ -1,8 +1,36 @@
 # ChatGPT clipboard-workflow for Website-editoren
 
-Dette dokumentet beskriver en alternativ AI-retning for Website-editoren der ChatGPT brukes manuelt som meddesigner uten direkte OpenAI API-integrasjon i editoren.
+Dette dokumentet beskriver den låste AI-retningen for Website-editoren.
 
-Dokumentet er en produkt- og arkitekturreferanse for senere arbeid. `docs/WORK_PLAN.md` er fortsatt autoritativ for faseorden og aktiv leveranse.
+`docs/WORK_PLAN.md` er autoritativ for faseorden og aktiv leveranse. Dette dokumentet er produkt- og arkitekturreferansen for fase 29.
+
+## Låst produktbeslutning
+
+Website-editoren er et lokalt énbrukerverktøy, og AI-funksjonen skal bruke brukerens eksisterende ChatGPT Plus-abonnement manuelt utenfor editorens runtime.
+
+Den planlagte modellen er:
+
+```text
+Website-editor
+  -> kontrollert utklipp
+  -> ChatGPT
+  -> kontrollert retur
+  -> lokal validering
+  -> forhåndsvisning
+  -> eksplisitt godkjenning
+  -> typede actions/reducere
+  -> prosjektstate
+```
+
+Følgende er eksplisitt ikke del av prosjektplanen:
+
+- direkte OpenAI API-integrasjon
+- egen AI-backend
+- API-nøkler i editoren
+- automatiske AI-kall fra Website-editoren
+- egen API-bruksmåling eller API-kostnadslogikk
+
+Dette er ikke en midlertidig førsteversjonsbegrensning. Det er den valgte produktretningen. Den endres bare ved en ny, uttrykkelig beslutning fra brukeren, og en slik endring skal dokumenteres i `docs/WORK_PLAN.md` før kodearbeid starter.
 
 ## Formål
 
@@ -10,33 +38,39 @@ Målet er å kunne sende et valgt område fra Website-editoren til ChatGPT med k
 
 Løsningen skal:
 
-- bruke eksisterende ChatGPT-abonnement manuelt fremfor å kreve API-kall for hver designoppgave
+- bruke ChatGPT manuelt som meddesigner
 - bevare ekte bredde, høyde og andre begrensninger fra editoren
 - gjøre det raskt å bruke ChatGPT på Header, Hero, Seksjon, Tekst, farger, bilder og senere komplette sideområder
 - aldri la ChatGPT endre prosjektstate direkte
 - validere alt som kommer tilbake før det kan bli prosjektdata
 - la brukeren forhåndsvise og eksplisitt godkjenne endringen
-- passe inn i eksisterende prosjektmodell, actions, reducere og senere undo/redo
+- passe inn i eksisterende prosjektmodell, actions, reducere og undo/redo
 
 ## Grunnidé
 
 Brukeren markerer eller låser et område i editoren, for eksempel Header, Hero, Seksjon eller et annet avgrenset område.
 
-Editoren tilbyr en kommando, for eksempel via høyre museknapp:
+Editoren tilbyr én tydelig handling i første versjon:
 
 ```text
 Kopier til ChatGPT
 ```
 
-Denne handlingen lager et kontrollert AI-utklipp som består av:
+Handlingen lager et kontrollert AI-utklipp som består av:
 
 1. et bilde av det valgte området i samme sideforhold som editorområdet
 2. eksakte mål i editorens koordinatsystem
 3. elementtype og relevante prosjektverdier
 4. begrensninger som ChatGPT skal respektere
-5. et standardisert returformat som Website-editoren kan lese senere
+5. relevant designkontekst
+6. et standardisert returformat som Website-editoren kan lese
+7. en ferdig instruks som gjør at brukeren slipper å gjenta tekniske krav manuelt
 
-Brukeren limer eller drar materialet inn i ChatGPT, skriver ønsket kommando og lar ChatGPT lage et forslag.
+Brukeren limer eller drar materialet inn i ChatGPT og skriver selve designønsket, for eksempel:
+
+```text
+Gjør denne seksjonen mer moderne og rolig.
+```
 
 Når forslaget er ferdig, kopierer eller drar brukeren resultatet tilbake til Website-editoren.
 
@@ -51,11 +85,11 @@ Website-editor
       v
 Kopier til ChatGPT
       |
-      | bilde + eksakte data + begrensninger
+      | bilde + eksakte data + begrensninger + ferdig instruks
       v
 ChatGPT
       |
-      | bruker skriver ønsket kommando
+      | bruker beskriver ønsket endring
       v
 AI-forslag
       |
@@ -63,7 +97,7 @@ AI-forslag
       v
 Website-editor
       |
-      | validering
+      | parsing og validering
       v
 Forhåndsvis forslag
       |
@@ -79,7 +113,7 @@ Prosjektstate
 
 Et skjermbilde viser hvordan området ser ut, men skal ikke være eneste sannhetskilde for størrelse eller prosjektdata.
 
-Website-editoren kjenner de faktiske verdiene og skal derfor alltid legge dem ved eksplisitt.
+Website-editoren kjenner de faktiske verdiene og skal alltid legge dem ved eksplisitt.
 
 Eksempel:
 
@@ -94,11 +128,11 @@ Background: #F6EFE6
 TextColor: #1F1F1F
 ```
 
-Dermed trenger ikke ChatGPT å gjette størrelsen fra et skjermbilde.
+ChatGPT skal dermed ikke måtte gjette tekniske mål fra et skjermbilde.
 
 ## AI-utklipp
 
-Første versjon bør bygge et enkelt standardisert utklipp.
+Første versjon skal bygge et enkelt standardisert utklipp.
 
 Eksempel:
 
@@ -141,13 +175,13 @@ Utklippet kan senere utvides med:
 
 ## Visuelt bilde i utklippet
 
-Editoren bør kunne lage et PNG-bilde av det valgte området.
+Editoren skal kunne lage et PNG-bilde av det valgte området.
 
 Krav:
 
 - bildet bruker samme sideforhold som editorområdet
 - området eksporteres uten unødvendig editor-UI rundt
-- selection-outline, resizegrep og andre editor-hjelpemidler kan skjules i eksportbildet
+- selection-outline, resizegrep og andre editor-hjelpemidler skjules i eksportbildet når det er praktisk
 - bildet brukes som visuell kontekst, ikke som autoritativ prosjektstate
 - faktiske mål sendes alltid separat
 
@@ -167,30 +201,32 @@ height = 88
 
 ## Aktivering i editoren
 
-Aktuelle innganger:
+Første versjon skal ha én primær inngang for å unngå parallelle arbeidsmåter.
 
-- høyreklikk på markert element -> `Kopier til ChatGPT`
-- høyreklikk på markert område -> `Kopier område til ChatGPT`
-- senere tastatursnarvei
-- senere egen AI-handling i høyrepanelet
+Foretrukket inngang:
 
-Første versjon bør velge én enkel inngang og unngå flere parallelle måter å gjøre samme handling på.
+```text
+Kopier til ChatGPT
+```
+
+Den kan ligge i kontekstmeny eller et annet naturlig sted når fase 29 spesifiseres, men funksjonen skal være den samme.
+
+Senere kan en tastatursnarvei eller sekundær inngang legges til dersom det faktisk gir verdi.
 
 ## Eksempel: Header
 
 Brukeren markerer Header og velger `Kopier til ChatGPT`.
 
-Editoren kopierer bilde og metadata.
+Editoren lager bilde, metadata, begrensninger og ferdig teknisk instruks.
 
-Brukeren skriver i ChatGPT:
+Brukeren trenger da bare å skrive for eksempel:
 
 ```text
 Gjør denne Header-en mer moderne og rolig.
-Behold nøyaktig størrelse.
 Designet skal passe til resten av siden.
 ```
 
-ChatGPT skal få nok informasjon til å vite:
+ChatGPT skal allerede ha nok informasjon til å vite:
 
 - Headerens eksakte størrelse
 - tilgjengelige farger
@@ -243,7 +279,7 @@ Målet er at forslaget skal kunne oversettes tilbake til editorens egne elemente
 
 ## To returtyper
 
-Løsningen bør skille mellom strukturelle designendringer og bildefiler.
+Løsningen skal skille mellom strukturelle designendringer og bildefiler.
 
 ### 1. Strukturert designretur
 
@@ -276,7 +312,7 @@ Eksempel:
 }
 ```
 
-Website-editoren skal aldri stole direkte på JSON-en.
+Website-editoren skal aldri stole direkte på returdataene.
 
 Den skal:
 
@@ -311,7 +347,7 @@ Det skal ikke oppstå en separat AI-spesialvei som omgår vanlig filvalidering.
 
 ## Lim inn AI-forslag
 
-Editoren kan senere få en handling:
+Editoren kan få en handling:
 
 ```text
 Lim inn AI-forslag
@@ -351,7 +387,7 @@ Avbryt    Bruk forslag
 
 - kjører endringen gjennom vanlig validert stateflyt
 - oppdaterer bare tillatte prosjektverdier
-- skal senere registreres som én undo/redo-handling
+- registreres som én undo/redo-handling når historikkfunksjonen finnes
 
 ## Viktig sikkerhetsgrense
 
@@ -376,11 +412,11 @@ ChatGPT
   -> reducer
 ```
 
-Dette følger eksisterende prosjektregel om at reducere er siste mutasjonsgrense.
+Dette følger prosjektregelen om at reducere er siste mutasjonsgrense.
 
 ## Ingen tilfeldig HTML/CSS som hovedformat
 
-Website-editoren bør ikke bygge AI-integrasjonen rundt kopiering av ferdig HTML og CSS.
+Website-editoren skal ikke bygge AI-workflowen rundt kopiering av ferdig HTML og CSS.
 
 Årsaker:
 
@@ -395,7 +431,7 @@ ChatGPT skal derfor primært arbeide mot et dokumentert Website-editor-format.
 
 ## Kopier hele områder
 
-På sikt bør løsningen kunne eksportere mer enn ett element.
+På sikt skal løsningen kunne eksportere mer enn ett element.
 
 Eksempler:
 
@@ -437,18 +473,16 @@ Eksempel:
 
 ChatGPT kan da foreslå ny plassering uten å miste den faktiske rammen området skal passe inn i.
 
-## Låst ramme
+## Låst AI-ramme
 
-Brukeren foreslo at et område kan låses før det sendes til ChatGPT.
+Et område kan sendes med låst ytre ramme.
 
-Dette er nyttig og bør vurderes eksplisitt.
-
-`Låst AI-ramme` betyr:
+`LockedFrame: true` betyr:
 
 - yttergrensen kan ikke endres av AI-forslaget
 - bredde og høyde er absolutte begrensninger
 - AI kan bare endre innholdet innenfor rammen
-- editoren avviser retur som forsøker å endre rammens størrelse dersom rammen er låst
+- editoren avviser retur som forsøker å endre rammens størrelse
 
 Dette er særlig relevant for:
 
@@ -476,7 +510,7 @@ ProjectDesignContext:
 
 Senere kan editoren også legge ved:
 
-- skjermbilde av området før/etter valgt element
+- skjermbilde av området før eller etter valgt element
 - Header-sammendrag
 - Hero-sammendrag
 - prosjektets fargegrupper
@@ -487,7 +521,7 @@ Mengden kontekst skal holdes kontrollert og relevant.
 
 ## Personvern og datakontroll
 
-Før `Kopier til ChatGPT` bør editoren vite nøyaktig hva som eksporteres.
+Før `Kopier til ChatGPT` skal editoren vite nøyaktig hva som eksporteres.
 
 Interne notater eller andre editor-only data skal ikke sendes automatisk.
 
@@ -497,89 +531,26 @@ Prinsipp:
 Bare data som er nødvendig for det valgte AI-arbeidet eksporteres.
 ```
 
-Eventuelle framtidige interne notater skal være eksplisitt ekskludert som standard.
+Eventuelle interne notater skal være eksplisitt ekskludert som standard.
 
-## Kostnadsmodell
+## Lokal og enkel arkitektur
 
-Denne arbeidsflyten er bevisst laget slik at Website-editoren ikke trenger å sende automatiske API-kall for hver designendring.
+AI-workflowen skal ikke innføre nettverksarkitektur i Website-editoren.
 
-ChatGPT brukes manuelt utenfor editorens runtime.
+Det betyr:
 
-Fordeler:
+- ingen AI-server
+- ingen autentisering mot en AI-tjeneste
+- ingen hemmeligheter eller tokens i Vite/browserkode
+- ingen nettverkskø for AI-jobber
+- ingen bakgrunnsagent
+- ingen automatisk opplasting av prosjektdata
 
-- ingen API-nøkkel i Website-editoren
-- ingen separat backend nødvendig for første AI-versjon
-- ingen egen API-bruksmåling i editoren
-- ingen risiko for at editoren automatisk sender mange kostbare forespørsler
-- brukeren beholder full kontroll mellom hvert steg
-
-Dette utelukker ikke senere OpenAI API-integrasjon.
-
-Formatet og valideringsgrensene bør tvert imot bygges slik at samme mekanisme senere kan brukes av en API-basert integrasjon dersom det blir ønskelig.
-
-## Forholdet til tidligere fase 29
-
-Den gamle AI-planen beskrev OpenAI som kontrollert meddesigner med blant annet:
-
-- tekst og omskriving
-- fargepaletter og designinspirasjon
-- bildegenerering
-- Hero- og seksjonsgenerator
-- side- og navigasjonsforslag
-- komplette sideutkast
-- konsistenskontroll
-
-Denne clipboard-workflowen endrer først og fremst transportlaget.
-
-Tidligere tenkt modell:
-
-```text
-Website-editor -> egen backend -> OpenAI API -> forslag -> editor
-```
-
-Ny mulig første modell:
-
-```text
-Website-editor -> kontrollert utklipp -> ChatGPT -> kontrollert retur -> editor
-```
-
-De samme sikkerhetsprinsippene beholdes:
-
-```text
-Forslag
-  -> validering
-  -> forhåndsvisning
-  -> eksplisitt godkjenning
-  -> typede actions/reducere
-  -> én historikkhandling
-```
-
-## Senere API-oppgradering
-
-Hvis direkte OpenAI-integrasjon senere blir ønsket, skal editorens AI-format kunne gjenbrukes.
-
-Da kan arkitekturen bli:
-
-```text
-Website-editor
-  -> AI request builder
-  -> sikker backend
-  -> OpenAI API
-  -> samme Website-editor-returformat
-  -> samme validator
-  -> samme forhåndsvisning
-  -> samme godkjenningsflyt
-```
-
-Dermed unngår vi å bygge AI-funksjonen to ganger.
-
-Clipboard-versjonen kan fungere som første produktversjon og samtidig definere kontrakten for en senere API-versjon.
+Website-editorens ansvar stopper ved å lage et kontrollert utklipp og motta et kontrollert resultat tilbake fra brukeren.
 
 ## Foreslått implementeringsrekkefølge
 
-Denne planen skal ikke implementeres før de prosjektmodellene den avhenger av er stabile.
-
-Når AI-arbeidet senere starter, anbefales følgende rekkefølge:
+AI-arbeidet starter først når de prosjektmodellene det avhenger av er stabile og fase 29 er aktiv.
 
 ### Trinn 1 – AI-utklipp for ett element
 
@@ -587,6 +558,7 @@ Når AI-arbeidet senere starter, anbefales følgende rekkefølge:
 - lag eksportbilde
 - legg ved eksakte mål
 - legg ved relevant designkontekst
+- legg ved ferdig teknisk ChatGPT-instruks
 - kopier en standardisert tekstpakke
 
 ### Trinn 2 – standard returformat
@@ -600,7 +572,7 @@ Når AI-arbeidet senere starter, anbefales følgende rekkefølge:
 
 - parse et gyldig forslag
 - vis transient preview
-- Avbryt / Bruk forslag
+- tilby `Avbryt` og `Bruk forslag`
 
 ### Trinn 4 – godkjent import
 
@@ -610,7 +582,7 @@ Når AI-arbeidet senere starter, anbefales følgende rekkefølge:
 ### Trinn 5 – bilde-workflow
 
 - eksport av valgt visuelt område
-- retur av generert bilde
+- retur av generert eller endret bilde
 - vanlig bildevalidering og assetregistrering
 
 ### Trinn 6 – områdepakker
@@ -620,61 +592,57 @@ Når AI-arbeidet senere starter, anbefales følgende rekkefølge:
 - koordinater relativt til området
 - Hero og komplette Seksjoner
 
-### Trinn 7 – senere hele sider
+### Trinn 7 – hele sider
 
 - sideutklipp
 - sideforslag
 - navigasjon
 - komplette sideutkast
 
-### Trinn 8 – vurder API
-
-Først når den manuelle arbeidsflyten er stabil vurderes om direkte API-integrasjon faktisk gir nok verdi til å forsvare mer kompleksitet og kostnad.
-
 ## Akseptansekriterier for første versjon
 
-Første reelle versjon bør minst tilfredsstille:
+Første reelle versjon skal minst tilfredsstille:
 
 - ett valgt element kan eksporteres med visuelt bilde og eksakte mål
 - eksporterte mål samsvarer med prosjektmodellen, ikke DOM-gjetting
 - eksporten inneholder tydelig elementtype og formatversjon
+- eksporten inneholder ferdig teknisk instruks til ChatGPT
 - ChatGPT kan få en eksplisitt låst ramme
 - returformatet er dokumentert og runtime-validert
 - ugyldig retur kan aldri mutere prosjektet
 - et gyldig forslag vises som transient preview
-- Avbryt endrer ikke prosjektet eller `updatedAt`
-- Bruk forslag går gjennom eksisterende typede stategrenser
+- `Avbryt` endrer ikke prosjektet eller `updatedAt`
+- `Bruk forslag` går gjennom eksisterende typede stategrenser
 - AI-forslag kan aldri omgå låsing eller modellvalidatorer
 - editor-only data eksporteres ikke automatisk
-- ingen API-nøkkel ligger i Vite- eller browserkode
+- ingen AI-backend, API-nøkkel eller direkte API-integrasjon finnes i løsningen
 - eksisterende PC- og Telefon-funksjonalitet fungerer som før
 
-## Ikke del av første versjon
+## Ikke del av AI-løsningen
 
-- direkte automatiske OpenAI API-kall
+- direkte automatiske AI-kall fra editoren
+- OpenAI API-integrasjon
+- AI-backend
+- API-nøkler
 - AI som endrer prosjektet uten godkjenning
 - rå HTML/CSS som permanent prosjektformat
 - automatisk opplasting av hele prosjektet til ChatGPT
 - automatisk deling av interne notater
 - bakgrunnsagent som kontinuerlig analyserer prosjektet
 - auto-genererte endringer uten preview
-- skjult kostnadsbruk
 
-## Produktbeslutning som skal huskes
-
-Website-editorens første AI-retning skal vurderes som en manuell, kontrollert ChatGPT-workflow før direkte API-integrasjon.
-
-Kjerneideen er:
+## Låst kjerneflyt
 
 ```text
 Marker eller lås et område
--> kopier området med ekte mål og relevant prosjektdata
+-> Kopier til ChatGPT
+-> editoren lager bilde + ekte mål + prosjektdata + ferdig teknisk instruks
 -> bruk ChatGPT som meddesigner
 -> kopier eller dra resultatet tilbake
 -> valider lokalt
 -> forhåndsvis
 -> godkjenn eksplisitt
--> bruk eksisterende prosjektmodell
+-> bruk eksisterende prosjektmodell og stategrenser
 ```
 
-Dette skal gjøre ChatGPT nyttig som designverktøy uten at Website-editoren trenger å gi AI direkte kontroll eller betale for automatiske API-kall fra første versjon.
+Denne arbeidsflyten er fase 29-retningen for Website-editoren. Den skal ikke utvides med API-, backend- eller agentarkitektur uten en ny, uttrykkelig produktbeslutning og en dokumentert roadmap-endring først.
