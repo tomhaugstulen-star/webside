@@ -1,4 +1,4 @@
-import { useEffect, useState, type KeyboardEvent } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import {
   normalizeEditorColor,
   type EditorColor,
@@ -39,23 +39,23 @@ export function ColorSwatchInput({
   onChange,
 }: ColorSwatchInputProps) {
   const [draftValue, setDraftValue] = useState(value)
+  const [isEditingHex, setIsEditingHex] = useState(false)
   const [picking, setPicking] = useState(false)
   const eyeDropperSupported = getEyeDropperConstructor() !== null
   const controlDisabled = disabled || picking
-
-  useEffect(() => {
-    setDraftValue(value)
-  }, [value])
+  const displayedHexValue = isEditingHex ? draftValue : value
 
   const applyHexValue = (candidate: string) => {
     const normalized = normalizeEditorColor(candidate)
 
     if (!normalized) {
       setDraftValue(value)
+      setIsEditingHex(false)
       return
     }
 
     setDraftValue(normalized)
+    setIsEditingHex(false)
     onChange(normalized)
   }
 
@@ -75,6 +75,7 @@ export function ColorSwatchInput({
 
     if (event.key === 'Escape') {
       setDraftValue(value)
+      setIsEditingHex(false)
       event.currentTarget.blur()
     }
   }
@@ -109,14 +110,18 @@ export function ColorSwatchInput({
         <input
           className="color-swatch-input__hex"
           type="text"
-          value={draftValue}
+          value={displayedHexValue}
           disabled={controlDisabled}
           maxLength={7}
           autoCapitalize="characters"
           autoComplete="off"
           spellCheck={false}
           aria-label={`${label} HEX-kode`}
-          aria-invalid={normalizeEditorColor(draftValue) === null}
+          aria-invalid={normalizeEditorColor(displayedHexValue) === null}
+          onFocus={() => {
+            setDraftValue(value)
+            setIsEditingHex(true)
+          }}
           onChange={(event) => handleHexChange(event.target.value)}
           onBlur={() => applyHexValue(draftValue)}
           onKeyDown={handleHexKeyDown}
