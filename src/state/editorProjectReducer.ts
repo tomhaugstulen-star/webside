@@ -39,14 +39,9 @@ function selectedElementExists(state: EditorProjectState) {
 }
 
 function ensureValidSelection(state: EditorProjectState): EditorProjectState {
-  if (selectedElementExists(state)) {
-    return state
-  }
+  if (selectedElementExists(state)) return state
 
-  return {
-    ...state,
-    selectedElementId: null,
-  }
+  return { ...state, selectedElementId: null }
 }
 
 function reduceEditorProjectState(
@@ -61,9 +56,7 @@ function reduceEditorProjectState(
         throw new Error('An editor project must contain at least one page.')
       }
 
-      if (!isValidProjectSiteStructure(action.project)) {
-        return state
-      }
+      if (!isValidProjectSiteStructure(action.project)) return state
 
       return {
         project: action.project,
@@ -73,17 +66,12 @@ function reduceEditorProjectState(
     }
 
     case 'set-active-page': {
-      if (action.pageId === state.activePageId) {
-        return state
-      }
+      if (action.pageId === state.activePageId) return state
 
       const pageExists = state.project.pages.some(
         (page) => page.id === action.pageId,
       )
-
-      if (!pageExists) {
-        return state
-      }
+      if (!pageExists) return state
 
       return {
         ...state,
@@ -92,23 +80,15 @@ function reduceEditorProjectState(
       }
     }
 
-    case 'set-selected-element': {
-      if (action.elementId === state.selectedElementId) {
-        return state
-      }
-
+    case 'set-selected-element':
+      if (action.elementId === state.selectedElementId) return state
       if (
         action.elementId !== null &&
         !activePageContainsElement(state, action.elementId)
       ) {
         return state
       }
-
-      return {
-        ...state,
-        selectedElementId: action.elementId,
-      }
-    }
+      return { ...state, selectedElementId: action.elementId }
 
     case 'add-page':
     case 'set-page-name':
@@ -203,6 +183,8 @@ function reduceEditorProjectState(
     case 'set-section-frame-width':
     case 'set-section-frame-color':
     case 'set-text-background-color':
+    case 'set-text-frame-width':
+    case 'set-text-frame-color':
       return reduceColorProjectAction(state, action)
 
     case 'set-header-background-color':
