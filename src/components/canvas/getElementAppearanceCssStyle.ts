@@ -17,6 +17,9 @@ export function getElementAppearanceCssStyle(
   if (element.kind === 'text') {
     return {
       backgroundColor: element.appearance.backgroundColor,
+      borderColor: element.appearance.frame.color,
+      borderStyle: 'solid',
+      borderWidth: element.appearance.frame.width,
     }
   }
 

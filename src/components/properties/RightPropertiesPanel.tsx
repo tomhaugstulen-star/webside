@@ -67,7 +67,9 @@ export function RightPropertiesPanel({
               <SectionAnchorPropertiesSection key={element.id} element={element} />
             )}
 
-            {(element.kind === 'section' || element.kind === 'header') && (
+            {(element.kind === 'section' ||
+              element.kind === 'header' ||
+              element.kind === 'text') && (
               <FramePropertiesSection element={element} />
             )}
 
