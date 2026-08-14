@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 11
+EDITOR_PROJECT_SCHEMA_VERSION = 12
 ```
 
 ```text
@@ -20,15 +20,17 @@ EDITOR_PROJECT_SCHEMA_VERSION = 11
 9  Header-fontstørrelse
 10 Tekstutseende med varig tekstboksbakgrunn
 11 Sider, offentlige seksjons-ID-er og nettstednavigasjon
+12 Tekstboksramme og 1 px standardramme for nye innrammede elementer
 ```
 
-Det finnes ennå ingen prosjektimport-UI. Modellen har en deterministisk migrator fra versjon 10 til 11, og framtidig import må validere den migrerte versjon-11-strukturen før `replace-project`.
+Det finnes ennå ingen prosjektimport-UI. Modellen har en deterministisk migreringskjede fra versjon 10 til gjeldende skjema, og framtidig import må validere den ferdig migrerte strukturen før `replace-project`.
 
 Kontrollert migreringsretning:
 
 - versjon 8 til 9 må legge til `HeaderAppearance.fontSize`, standard 24 px
 - versjon 9 til 10 må legge til `TextAppearance.backgroundColor`, standard `#FFFFFF`
 - versjon 10 til 11 legger til stabile seksjonsankere og tom `WebsiteNavigation`
+- versjon 11 til 12 legger til `TextAppearance.frame` med 1 px standardramme
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -37,7 +39,7 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 11
+  schemaVersion: 12
   id: string
   name: string
   pages: EditorPage[]
@@ -158,13 +160,14 @@ type TextEditorElement = BaseEditorElement & {
 
 type TextAppearance = {
   backgroundColor: EditorColor
+  frame: ElementFrame
 }
 ```
 
 Standardstørrelse: `240 × 96 px`  
 Minimum: `120 × 48 px`
 
-Teksttypografi og tekstfarge ligger fortsatt i `TextElementStyle`. Tekstboksens varige bakgrunn ligger separat i `TextAppearance.backgroundColor`. Ny Tekst opprettes med kanonisk `#FFFFFF`. Modellen validerer nøyaktig objektform og gyldig `EditorColor`.
+Teksttypografi og tekstfarge ligger fortsatt i `TextElementStyle`. Tekstboksens varige bakgrunn og ramme ligger i `TextAppearance`. Ny Tekst opprettes med kanonisk `#FFFFFF` og 1 px ramme. Rammen kan eksplisitt settes til `Ingen`/0 px eller 1–10 px med egen rammefarge.
 
 ## Knapp
 
@@ -229,8 +232,9 @@ Korrigeringslinjer og snapping lagres ikke i `EditorProject`.
 
 Transient alignment-state omfatter:
 
-- snapmål for X og Y
-- aktive guider
+- snapmål for X og Y ved flytting
+- størrelsesmål for lik bredde og høyde ved resize
+- aktive guider, inkludert begge ytterkanter når størrelser matcher
 - fryst lerretsbredde og -høyde
 - fryste målekoordinater for aktiv pekerøkt
 - layoutpreview før commit
@@ -248,13 +252,16 @@ type ElementFrame = {
 }
 ```
 
+- nye innrammede elementer starter med 1 px
 - `0` betyr `Ingen`
 - rammefargen beholdes når bredden settes til `0`
 - rammen ligger innenfor elementets ytre størrelse
 - `Farger` er avledet UI og lagres ikke som egen palett
-- Seksjon og Header viser bakgrunn og eventuell rammefarge
+- Seksjon, Tekst og Header viser bakgrunn og eventuell rammefarge
 - Tekst viser Bakgrunn før Tekstfarge
 - Header viser bakgrunn og tekstfarge
+- fargekontroller viser redigerbar kanonisk HEX-kode
+- pipette er transient UI og endrer bare den valgte fargeverdien; den lagres ikke som prosjektdata
 
 ## Asset-ID og ressurslager
 
@@ -293,7 +300,7 @@ Seksjons-ID kan bare endres eksplisitt på en eksisterende ulåst Seksjon og må
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
-- versjon 8 migreres kontrollert til versjon 9, deretter 10 og videre til 11
+- versjon 8 migreres kontrollert til versjon 9, deretter 10, 11 og 12
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
