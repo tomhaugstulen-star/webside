@@ -3,6 +3,7 @@ import { ColorSwatchInput } from '../colors/ColorSwatchInput'
 import type {
   HeaderEditorElement,
   SectionEditorElement,
+  TextEditorElement,
 } from '../../model/editorProject'
 import {
   elementFrameWidths,
@@ -11,8 +12,12 @@ import {
 } from '../../model/elementFrame'
 import { useHeaderAppearance } from '../../state/useHeaderAppearance'
 import { useSectionAppearance } from '../../state/useSectionAppearance'
+import { useTextAppearance } from '../../state/useTextAppearance'
 
-type FramedEditorElement = SectionEditorElement | HeaderEditorElement
+type FramedEditorElement =
+  | SectionEditorElement
+  | HeaderEditorElement
+  | TextEditorElement
 
 type FramePropertiesSectionProps = {
   element: FramedEditorElement
@@ -29,6 +34,7 @@ export function FramePropertiesSection({
     useSectionAppearance()
   const { updateHeaderFrameWidth, updateHeaderFrameColor } =
     useHeaderAppearance()
+  const { updateTextFrameWidth, updateTextFrameColor } = useTextAppearance()
   const idPrefix = useId()
   const widthId = `${idPrefix}-width`
   const colorId = `${idPrefix}-color`
@@ -37,16 +43,22 @@ export function FramePropertiesSection({
   const updateFrameWidth = (width: ElementFrameWidth) => {
     if (element.kind === 'section') {
       updateSectionFrameWidth(element.id, width)
-      return
+    } else if (element.kind === 'header') {
+      updateHeaderFrameWidth(element.id, width)
+    } else {
+      updateTextFrameWidth(element.id, width)
     }
-
-    updateHeaderFrameWidth(element.id, width)
   }
 
-  const updateFrameColor = (value: string) =>
-    element.kind === 'section'
-      ? updateSectionFrameColor(element.id, value)
-      : updateHeaderFrameColor(element.id, value)
+  const updateFrameColor = (value: string) => {
+    if (element.kind === 'section') {
+      updateSectionFrameColor(element.id, value)
+    } else if (element.kind === 'header') {
+      updateHeaderFrameColor(element.id, value)
+    } else {
+      updateTextFrameColor(element.id, value)
+    }
+  }
 
   return (
     <section className="frame-properties" aria-labelledby={`${idPrefix}-title`}>
