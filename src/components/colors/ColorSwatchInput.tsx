@@ -38,7 +38,7 @@ export function ColorSwatchInput({
   disabled = false,
   onChange,
 }: ColorSwatchInputProps) {
-  const [draftValue, setDraftValue] = useState(value)
+  const [draftValue, setDraftValue] = useState<string>(value)
   const [isEditingHex, setIsEditingHex] = useState(false)
   const [picking, setPicking] = useState(false)
   const eyeDropperSupported = getEyeDropperConstructor() !== null
