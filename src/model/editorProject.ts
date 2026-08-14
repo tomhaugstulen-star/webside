@@ -12,7 +12,7 @@ import type { TextElementStyle } from './textElementStyle'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 11 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 12 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
