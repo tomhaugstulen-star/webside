@@ -45,6 +45,18 @@ export type ColorProjectAction =
       color: EditorColor
       updatedAt: string
     }
+  | {
+      type: 'set-text-frame-width'
+      elementId: string
+      width: ElementFrameWidth
+      updatedAt: string
+    }
+  | {
+      type: 'set-text-frame-color'
+      elementId: string
+      color: EditorColor
+      updatedAt: string
+    }
 
 export type HeaderAppearanceAction =
   | {
