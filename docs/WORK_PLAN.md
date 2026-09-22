@@ -6,11 +6,14 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 ## Nåstatus
 
-- fullført gjennom fase 18 – arbeidsportalnavigasjon og navigator
+- `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
-- neste produksjonsfase er fase 19 – sider, seksjons-ID-er og navigasjonsmodell (#60)
+- aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
+- #63 er ferdig implementert og `npm run verify` er grønn; manuell PC-/Telefon-kontroll, oppdaterte arkitekturrapporter i commit, PR/CI og uttrykkelig mergegodkjenning gjenstår
+- repo-audit #64 er en egen oppryddingsgate før fase 20
+- neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
-- ny implementering starter alltid fra oppdatert `main` på en egen branch
+- ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
 
 ## Låst roadmap
 
@@ -75,19 +78,51 @@ Globalt `Ctrl + K`-hurtigsøk ble prøvd lokalt, men ble eksplisitt tatt ut før
 
 ## Fase 19 – sider, seksjons-ID-er og navigasjonsmodell
 
-Aktiv planleggingssak: #60.
+Fasen er fullført og merget i PR #62. Sak #60 er avsluttet.
 
-Låste hovedmål:
+Levert:
 
 - kontrollert sideoppretting, navngiving, slug, sletting og rekkefølge
 - minst én side i prosjektet til enhver tid
 - stabile offentlige seksjons-/anker-ID-er separat fra interne element-ID-er
 - én serialiserbar, typet navigasjonsmodell med stabile side- og seksjonsmål
-- ingen dangling navigasjonsreferanser etter relevante slettinger
-- eksplisitt schema/migrering dersom serialisert prosjektform endres
-- faktisk Header-meny og menyrendering utsettes til fase 20
+- deterministisk opprydding av dangling navigasjonsreferanser
+- schema 10 → 11 med kontrollert migrering
+- sidevelger i toppverktøylinjen og side-/navigasjonsredigering i Prosjekt-panelet
+- faktisk Header-meny og menyrendering er fortsatt utsatt til fase 20
 
-Detaljert omfang og akseptansekriterier ligger i GitHub-sak #60.
+## Vedlikeholdsgate før fase 20
+
+### #63 – editor polish
+
+Implementert på aktiv branch:
+
+- 1 px standardramme for nye innrammede elementer
+- Tekst får serialiserbar ramme med `Ingen` og 1–10 px
+- snapping og guider for lik bredde/høyde under resize
+- redigerbar HEX-kode i delte fargekontroller
+- pipette via EyeDropper med kontrollert fallback
+- schema 11 → 12 for tekstboksramme
+- `npm run verify` er grønn med 31 unit-tester og 3 E2E-tester
+
+Gjenstår før #63 kan merges:
+
+- manuell kontroll av standardramme, tekstramme, lik-størrelse-snapping, HEX og pipette
+- commit av regenererte `architecture.json` og `docs/dependency-graph.mmd`
+- PR, diff/review/trådkontroll og CI på nøyaktig siste head
+- uttrykkelig brukergodkjenning før merge
+
+### #64 – repo-opprydding
+
+Auditen før fase 20 fant:
+
+- ubrukte template-/assetfiler
+- aktive UI-kontroller uten implementert handling
+- et testgap for resize-snapping og HEX/pipette
+- BOM i `SidebarPanels.tsx`
+- behov for å sikre at genererte arkitekturrapporter følger siste modulendringer
+
+Dette ryddes separat uten å implementere funksjonene som hører til fase 20, 24, 25 eller 27.
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
@@ -110,10 +145,11 @@ Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fr
 
 Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 
-- #36 editor-only elementgrense
+- #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer
 - #38 like mellomrom og fordelingsguider
-- #57 rammetykkelse for tekstelementer
+- #3 er den eldre planleggingsaken for viewport-spesifikke mobilkontroller og hører funksjonelt til fase 23
+- #57 er dekket av implementasjonen i #63 og skal ikke ha en separat kodeleveranse; saken kan lukkes når #63 er merget
 
 ## Dokumentregel
 

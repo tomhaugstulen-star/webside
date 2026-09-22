@@ -14,16 +14,22 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 - PC- og Telefon-visning
 - Seksjon, Bilde, Tekst, Knapp og Header
 - markering, flytting, størrelsesendring, låsing og sikker sletting
-- tekstredigering, tekststil, tekstfarge, tekstboksbakgrunn og lenker
+- tekstredigering, tekststil, tekstfarge, tekstboksbakgrunn, rammer og lenker
 - lokal bilde- og logoimport for PNG, JPEG og WebP
-- bildeutsnitt, zoom, farger og rammer
-- korrigeringslinjer og snapping
+- bildeutsnitt, zoom, prosjektfarger og rammer
+- sideoppretting, sidenavn, slug, rekkefølge og sletting
+- stabile offentlige seksjons-ID-er og serialiserbar nettstednavigasjon
+- korrigeringslinjer og snapping; aktiv vedlikeholdsbranch har også snapping til lik bredde/høyde
+- aktiv vedlikeholdsbranch har redigerbar HEX-kode og pipette der nettleseren støtter EyeDropper
 - automatiske modell-, reducer-, layout-, filstørrelses- og nettlesertester
 
 ## Leveransestatus
 
-- fullført gjennom fase 17 – tekstboksbakgrunn
-- neste fase er fase 18 – arbeidsportalnavigasjon, navigator og hurtigsøk
+- `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
+- aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
+- #63 er implementert og `npm run verify` er grønn; manuell PC-/Telefon-kontroll, arkitekturrapport-commit, PR/CI og merge gjenstår
+- repo-audit #64 samler kode-/assetrester, falske UI-handlinger og testgap som skal ryddes før fase 20
+- neste produksjonsfase etter disse vedlikeholdsgatene er fase 20 – nettstedets Header og menynavigasjon
 - fase 25 leverer lokal prosjektlagring, automatisk lagring og gjenoppretting
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke brukes som aktiv leveranse
 

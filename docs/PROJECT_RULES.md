@@ -63,7 +63,7 @@ hard grense: 300+ linjer, alltid blokkert
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er 11.
+- Gjeldende prosjektskjema er 12.
 - `EditorProject` eier alle varige serialiserbare prosjektdata.
 - Varige prosjektendringer går gjennom typede reducerhandlinger.
 - Reduceren er siste mutasjonsgrense.
@@ -111,8 +111,9 @@ Transient state serialiseres ikke i `EditorProject`.
 Arbeidsportalens navigasjon og nettstedets navigasjon er separate ansvar.
 
 - portalnavigasjon er editor-UI og serialiseres ikke som nettsideinnhold
-- nettstedets navigasjon er prosjektdata og bygges i fase 19–20
-- navigator og hurtigsøk skal lese eksisterende state, ikke opprette en parallell prosjektkopi
+- nettstedets serialiserbare navigasjonsmodell og stabile side-/seksjonsmål ble levert i fase 19
+- faktisk Header-meny og navigasjonsrendering bygges først i fase 20
+- navigatoren skal lese eksisterende state, ikke opprette en parallell prosjektkopi
 
 ## Kvalitetskontroll
 
