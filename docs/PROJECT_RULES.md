@@ -21,10 +21,10 @@ Det opprettes ikke permanente audit-, readiness-, fase- eller chat-handoverdokum
 - Website-editoren er et lokalt énbrukerverktøy.
 - Stabilitet og enkel gjenoppretting prioriteres foran funksjonsbredde og kompleksitet.
 - Kontoer, roller, samarbeid, flerbrukerstate og skyarkitektur skal ikke bygges uten en ny uttrykkelig produktbeslutning.
-- Hosting, domeneoppsett, offentlig server og produksjonsdeployment er fjernet fra produktplanen.
 - Lokal forhåndsvisning, prosjektlagring, sikkerhetskopi, import og gjenoppretting er del av roadmapen.
-- En aktiv `Publiser`-handling skal ikke finnes.
-- Uimplementerte handlinger skal være skjult eller tydelig deaktivert.
+- Eksisterende synlige editorhandlinger er produktforpliktelser og skal få reell funksjon i riktig fase; de skal ikke fjernes bare fordi implementasjonen kommer senere.
+- `Publiser`, domene og SEO er tilbake i produktplanen og spesifiseres i en egen senere publiseringsfase.
+- Frem til en synlig handling er implementert, skal den være tydelig deaktivert eller merket som kommende slik at UI-et ikke lover en handling som ennå ikke virker.
 
 ## Branch, PR og merge
 
