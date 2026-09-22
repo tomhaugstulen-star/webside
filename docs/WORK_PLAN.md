@@ -9,7 +9,7 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
 - aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
-- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch med regenererte arkitekturrapporter; full lokal kontroll, manuell PC-/Telefon-test, senere PR/CI og uttrykkelig mergegodkjenning gjenstår
+- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch med regenererte arkitekturrapporter; brukeren har bekreftet full lokal kontroll og meldt manuell regresjon OK etter HEX/Escape-fiksen; PR/review, CI på endelig head og uttrykkelig mergegodkjenning gjenstår
 - repo-audit #64 er en egen oppryddingsgate før fase 20
 - neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
@@ -106,12 +106,12 @@ Implementert på aktiv branch:
 - pipette via EyeDropper med kontrollert fallback
 - schema 11 → 12 for tekstboksramme
 - 48 unit-tester, lint, TypeScript, filgrenser, arkitekturkontroll og bygg er grønne
-- tre nye E2E-tester dekker HEX og stubbet EyeDropper, inkludert avbrudd og manglende støtte; siste `npm run verify` stoppet før nettlesertestene kunne kjøre fordi Chromium-installasjonen feilet
+- tre nye E2E-tester dekker HEX og stubbet EyeDropper, inkludert avbrudd og manglende støtte
+- brukeren har bekreftet full lokal `npm run verify` på `9548312` med 48 unit-tester og 6 E2E-tester; agentmiljøets nettleserkjøring var blokkert av Chromium-nedlasting
+- lokal Escape-håndtering i HEX-feltet bevarer Farger-panelet; brukeren har meldt manuell regresjon OK etter fiksen
 
 Gjenstår før #63 kan merges:
 
-- manuell kontroll av standardramme, tekstramme, lik-størrelse-snapping, HEX og pipette
-- full lokal `npm run verify`, inkludert de seks E2E-testene
 - PR, diff/review/trådkontroll og CI på nøyaktig siste head
 - uttrykkelig brukergodkjenning før merge
 
