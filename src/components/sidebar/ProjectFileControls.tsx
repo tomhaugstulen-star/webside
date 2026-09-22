@@ -33,8 +33,10 @@ export function ProjectFileControls() {
       const anchor = document.createElement('a')
       anchor.href = objectUrl
       anchor.download = createProjectFileName(state.project.name)
+      document.body.append(anchor)
       anchor.click()
-      URL.revokeObjectURL(objectUrl)
+      anchor.remove()
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0)
       setMessage('Prosjektfilen er klar.')
     } catch {
       setMessage('Prosjektet kunne ikke eksporteres.')
