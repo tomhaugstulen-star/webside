@@ -9,7 +9,7 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
 - aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
-- #63 er ferdig implementert og `npm run verify` er grønn; manuell PC-/Telefon-kontroll, oppdaterte arkitekturrapporter i commit, PR/CI og uttrykkelig mergegodkjenning gjenstår
+- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch med regenererte arkitekturrapporter; full lokal kontroll, manuell PC-/Telefon-test, senere PR/CI og uttrykkelig mergegodkjenning gjenstår
 - repo-audit #64 er en egen oppryddingsgate før fase 20
 - neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
@@ -105,12 +105,13 @@ Implementert på aktiv branch:
 - redigerbar HEX-kode i delte fargekontroller
 - pipette via EyeDropper med kontrollert fallback
 - schema 11 → 12 for tekstboksramme
-- `npm run verify` er grønn med 31 unit-tester og 3 E2E-tester
+- 48 unit-tester, lint, TypeScript, filgrenser, arkitekturkontroll og bygg er grønne
+- tre nye E2E-tester dekker HEX og stubbet EyeDropper, inkludert avbrudd og manglende støtte; siste `npm run verify` stoppet før nettlesertestene kunne kjøre fordi Chromium-installasjonen feilet
 
 Gjenstår før #63 kan merges:
 
 - manuell kontroll av standardramme, tekstramme, lik-størrelse-snapping, HEX og pipette
-- commit av regenererte `architecture.json` og `docs/dependency-graph.mmd`
+- full lokal `npm run verify`, inkludert de seks E2E-testene
 - PR, diff/review/trådkontroll og CI på nøyaktig siste head
 - uttrykkelig brukergodkjenning før merge
 
@@ -124,7 +125,7 @@ Auditen før fase 20 fant:
 - BOM i `SidebarPanels.tsx`
 - behov for å sikre at genererte arkitekturrapporter følger siste modulendringer
 
-Dette ryddes separat uten å implementere funksjonene som hører til fase 20, 24, 25 eller 27.
+Ferdigstilt på aktiv branch: dedikerte resize-/target-tester og HEX-/pipette-tester, deaktivert planlagt UI med opprydding av døde callbacks, fjernet BOM og ubrukt `hero.png`, samt regenererte arkitekturrapporter. Knappbibliotekets SVG-er er beholdt. Ingen senere funksjonsfase er implementert.
 
 ## Synlige UI-handlinger som skal bli funksjonelle
 

@@ -151,14 +151,14 @@ export function TopToolbar({
       </div>
 
       <div className="top-toolbar__history" aria-label="Historikk">
-        <button className="toolbar-icon-button" type="button" aria-label="Angre"><Icon name="undo" /></button>
-        <button className="toolbar-icon-button" type="button" aria-label="Gjør om" disabled><Icon name="redo" /></button>
+        <button className="toolbar-icon-button" type="button" aria-label="Angre" disabled title="Kommer senere"><Icon name="undo" /></button>
+        <button className="toolbar-icon-button" type="button" aria-label="Gjør om" disabled title="Kommer senere"><Icon name="redo" /></button>
       </div>
 
       <div className="top-toolbar__actions">
-        <button className="toolbar-action" type="button"><Icon name="eye" /><span>Forhåndsvisning</span></button>
-        <button className="toolbar-action" type="button"><Icon name="save" /><span>Lagre</span></button>
-        <button className="publish-button" type="button"><Icon name="publish" /><span>Publiser</span></button>
+        <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" disabled title="Kommer senere"><Icon name="eye" /><span>Forhåndsvisning</span></button>
+        <button className="toolbar-action" type="button" aria-label="Lagre" disabled title="Kommer senere"><Icon name="save" /><span>Lagre</span></button>
+        <button className="publish-button" type="button" aria-label="Publiser" disabled title="Kommer senere"><Icon name="publish" /><span>Publiser</span></button>
         <div className="main-menu-wrap" ref={menuRef}>
           <button
             className="main-menu-button"
@@ -171,9 +171,9 @@ export function TopToolbar({
           </button>
           {menuOpen && (
             <div className="main-menu-popover">
-              <button type="button">Prosjektinnstillinger</button>
-              <button type="button">Dupliser prosjekt</button>
-              <button type="button">Hjelp</button>
+              <button type="button" disabled title="Kommer senere">Prosjektinnstillinger</button>
+              <button type="button" disabled title="Kommer senere">Dupliser prosjekt</button>
+              <button type="button" disabled title="Kommer senere">Hjelp</button>
             </div>
           )}
         </div>

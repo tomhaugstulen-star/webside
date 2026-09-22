@@ -27,7 +27,8 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
-- #63 er implementert og `npm run verify` er grønn; manuell PC-/Telefon-kontroll, arkitekturrapport-commit, PR/CI og merge gjenstår
+- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch, inkludert testdekning og regenererte arkitekturrapporter; 48 unit-tester, lint, TypeScript, filgrenser, arkitekturkontroll og bygg er grønne
+- siste `npm run verify` stoppet ved E2E fordi Chromium ikke kunne installeres i arbeidsmiljøet; full lokal kontroll, manuell PC-/Telefon-test og senere PR/CI/merge gjenstår
 - repo-audit #64 samler kode-/assetrester, falske UI-handlinger og testgap som skal ryddes før fase 20
 - neste produksjonsfase etter disse vedlikeholdsgatene er fase 20 – nettstedets Header og menynavigasjon
 - eksisterende synlige editorhandlinger som Lagre, Forhåndsvisning og Publiser er planlagte funksjoner; fase 30 skal kunne generere en komplett statisk nettsidemappe som kan lastes direkte opp til vanlig webhotell/domene
