@@ -23,7 +23,7 @@ Det opprettes ikke permanente audit-, readiness-, fase- eller chat-handoverdokum
 - Kontoer, roller, samarbeid, flerbrukerstate og skyarkitektur skal ikke bygges uten en ny uttrykkelig produktbeslutning.
 - Lokal forhåndsvisning, prosjektlagring, sikkerhetskopi, import og gjenoppretting er del av roadmapen.
 - Eksisterende synlige editorhandlinger er produktforpliktelser og skal få reell funksjon i riktig fase; de skal ikke fjernes bare fordi implementasjonen kommer senere.
-- `Publiser`, domene og SEO er tilbake i produktplanen og spesifiseres i en egen senere publiseringsfase.
+- `Publiser`, SEO og statisk nettstedseksport er del av produktplanen og spesifiseres i fase 30. Grunnleveransen er en komplett statisk mappe som kan lastes direkte opp til vanlig webhotell/domene uten Node.js eller backend.
 - Frem til en synlig handling er implementert, skal den være tydelig deaktivert eller merket som kommende slik at UI-et ikke lover en handling som ennå ikke virker.
 
 ## Branch, PR og merge
