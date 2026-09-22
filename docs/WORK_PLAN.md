@@ -12,6 +12,7 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - #63 er ferdig implementert og `npm run verify` er grønn; manuell PC-/Telefon-kontroll, oppdaterte arkitekturrapporter i commit, PR/CI og uttrykkelig mergegodkjenning gjenstår
 - repo-audit #64 er en egen oppryddingsgate før fase 20
 - neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
+- synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
 
@@ -30,6 +31,7 @@ fase 26  Sikkerhetskopi, prosjektformat, import og migrering
 fase 27  Lokal forhåndsvisning
 fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  ChatGPT clipboard-arbeidsflyt
+fase 30  Prosjektinnstillinger, domene, SEO og publisering
 ```
 
 Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell ChatGPT-workflow der valgte editorområder sendes via kontrollert utklipp med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen, verken nå eller som planlagt senere oppgradering. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
@@ -123,6 +125,20 @@ Auditen før fase 20 fant:
 - behov for å sikre at genererte arkitekturrapporter følger siste modulendringer
 
 Dette ryddes separat uten å implementere funksjonene som hører til fase 20, 24, 25 eller 27.
+
+## Synlige UI-handlinger som skal bli funksjonelle
+
+Knappene som allerede finnes i editoren er ikke ment som permanent dødt UI. De kobles til roadmapen slik:
+
+- `Angre` / `Gjør om` → fase 24
+- `Lagre` → fase 25
+- `Dupliser prosjekt` → fase 26
+- `Forhåndsvisning` → fase 27
+- `Prosjektnavn`, `Prosjektinnstillinger`, `Domene`, `SEO`, `Publiser` og `Hjelp` → fase 30
+
+Før den aktuelle fasen er implementert skal kontrollen være tydelig deaktivert eller merket som kommende, men ikke fjernes som om funksjonen er avlyst.
+
+Fase 30 skal låse den konkrete publiseringsmodellen før kodearbeid starter, inkludert hvordan domene, SEO og faktisk publisering/deployment skal fungere.
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
