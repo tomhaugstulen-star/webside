@@ -74,6 +74,8 @@ export function ColorSwatchInput({
     }
 
     if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
       setDraftValue(value)
       setIsEditingHex(false)
       event.currentTarget.blur()
