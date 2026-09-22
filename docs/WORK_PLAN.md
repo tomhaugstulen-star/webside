@@ -26,7 +26,7 @@ fase 19  Sider, seksjons-ID-er og navigasjonsmodell
 fase 20  Nettstedets Header og menynavigasjon
 fase 21  Hero
 fase 22  Header-redigering og nettstedstruktur
-fase 23  Responsive mobiloverstyringer
+fase 23  Responsiv mobiltilpasning og breakpoint-adferd
 fase 24  Angre og gjør om
 fase 25  Lokal prosjektlagring, autolagring og gjenoppretting
 fase 26  Sikkerhetskopi, prosjektformat, import og migrering
@@ -182,7 +182,7 @@ Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 - #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer
 - #38 like mellomrom og fordelingsguider
-- #3 er den eldre planleggingsaken for viewport-spesifikke mobilkontroller og hører funksjonelt til fase 23
+- #3 er den eldre planleggingsaken for responsive mobilkontroller og hører funksjonelt til fase 23. Mobilvisning er samme responsive nettsted ved smalere viewport, ikke et separat device-spesifikt design.
 - #57 er dekket av implementasjonen i #63 og skal ikke ha en separat kodeleveranse; saken kan lukkes når #63 er merget
 
 ## Dokumentregel
