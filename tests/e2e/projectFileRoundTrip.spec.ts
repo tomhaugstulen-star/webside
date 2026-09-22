@@ -41,6 +41,11 @@ test('project file round-trip restores pages and imported image assets', async (
   await expect(page.getByText('Åpnet «Nytt prosjekt».', { exact: true })).toBeVisible()
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
   await expect(page.locator('.project-navigator__element').filter({ hasText: 'Bilde' })).toHaveCount(1)
+
+  await page.locator('.project-navigator__page-button').filter({ hasText: 'Side 2' }).click()
+  const restoredImage = page.locator('.image-element__image')
+  await expect(restoredImage).toBeVisible()
+  await expect.poll(() => restoredImage.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBe(1)
 })
 
 test('invalid project file is rejected without replacing the current project', async ({ page }) => {
