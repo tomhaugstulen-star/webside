@@ -31,7 +31,7 @@ fase 26  Sikkerhetskopi, prosjektformat, import og migrering
 fase 27  Lokal forhåndsvisning
 fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  ChatGPT clipboard-arbeidsflyt
-fase 30  Prosjektinnstillinger, domene, SEO og publisering
+fase 30  Prosjektinnstillinger, SEO, statisk eksport og publisering
 ```
 
 Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell ChatGPT-workflow der valgte editorområder sendes via kontrollert utklipp med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen, verken nå eller som planlagt senere oppgradering. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
@@ -170,3 +170,24 @@ Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 ## Dokumentregel
 
 Detaljert faseomfang, auditfunn, testplan og handover lagres i GitHub-saken og PR-en. Permanente status-, audit-, readiness- eller chat-handoverdokumenter opprettes ikke.
+
+
+## Fase 30 – prosjektinnstillinger, SEO, statisk eksport og publisering
+
+Målet er at et ferdig nettsted kan tas ut av Website-editoren som en komplett statisk mappe og legges direkte på vanlig webhotell/domene.
+
+Låste krav:
+
+- generer ferdige statiske filer for hele nettstedet
+- output skal kunne lastes direkte opp til domenets dokumentrot eller en valgt undermappe i cPanel/vanlig webhotell
+- generert nettsted skal ikke kreve Node.js, Vite, React-devserver, database eller egen backend for å vises
+- generer nødvendige HTML-, CSS-, JavaScript- og assetfiler med relative eller kontrollerte URL-er
+- flere sider skal genereres med stabil og forståelig mappestruktur/URL-struktur
+- interne side- og seksjonslenker skal fungere i den eksporterte siden
+- bilder, logoer og øvrige assets skal kopieres til eksportpakken
+- SEO-felter og relevante metadata skal inngå i genererte HTML-filer
+- eksporten skal kunne pakkes som én mappe/ZIP som brukeren selv kan laste opp
+- eventuell senere direkte publisering til hosting er et tillegg; statisk eksport er grunnkravet
+- editorens egne kildefiler, prosjektstate og utviklingsverktøy skal ikke følge med i den offentlige nettsidepakken
+
+Den konkrete URL-/mappestrukturen, asset-cache-regler og eventuell direkte hostingintegrasjon låses når fase 30 starter.
