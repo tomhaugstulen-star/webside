@@ -91,11 +91,16 @@ export function parseImportedEditorProject(value: unknown): EditorProject | null
   if (!hasMigratableShape(value) || !isRecord(value)) return null
 
   let migrated: unknown = value
-  if (value.schemaVersion === 10) {
-    migrated = migrateEditorProjectV10(value as unknown as EditorProjectV10)
-  } else if (value.schemaVersion === 11) {
-    migrated = migrateEditorProjectV11(value as unknown as EditorProjectV11)
-  } else if (value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION) {
+
+  try {
+    if (value.schemaVersion === 10) {
+      migrated = migrateEditorProjectV10(value as unknown as EditorProjectV10)
+    } else if (value.schemaVersion === 11) {
+      migrated = migrateEditorProjectV11(value as unknown as EditorProjectV11)
+    } else if (value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION) {
+      return null
+    }
+  } catch {
     return null
   }
 
