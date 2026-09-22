@@ -64,6 +64,12 @@ Knapp    160 × 48 px
 
 Størrelsene er startverdier, ikke endelige designbegrensninger. Minimumsstørrelser ble senere fastsatt i drag/resize-fasen.
 
+## Gjeldende tillegg etter denne fasen
+
+I gjeldende prosjektskjema 12 opprettes innrammede elementer med en faktisk 1 px designramme som standard. Dette gjelder Seksjon og Tekst i den vanlige elementflyten, og Header i sin separate opprettingsflyt. Brukeren kan senere velge `Ingen`/0 px på elementtyper som støtter `ElementFrame`.
+
+Bilde og Knapp har ikke fått en ny serialiserbar designramme gjennom denne endringen. Se `docs/ELEMENT_MODEL.md` for den autoritative nåværende elementformen.
+
 ## Startplassering
 
 Nye elementer opprettes i en mobiltrygg venstrekolonne:

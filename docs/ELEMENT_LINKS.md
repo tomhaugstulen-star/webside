@@ -14,14 +14,14 @@ mergecommit: f71b354
 skjemaversjon innført i fasen: 4
 ```
 
-Den historiske fasen koblet lenken til tekstbokser. Knappbiblioteket gjenbruker samme modell og samme høyremenyskjema for knapper. Denne utvidelsen er merget til `main` gjennom PR #21 og inngår i gjeldende prosjektskjema versjon 5.
+Den historiske fasen koblet lenken til tekstbokser. Knappbiblioteket gjenbruker samme modell og samme høyremenyskjema for knapper. Denne utvidelsen ble innført i skjemaversjon 5; gjeldende prosjektskjema på aktiv branch er versjon 12.
 
 ## Fast UX-regel
 
 ```text
 Lerretet   = markere elementet
 Høyremeny  = legge til, endre eller fjerne lenken
-Forhåndsvisning/publisering = aktivere lenken
+Lokal forhåndsvisning (fase 27) = aktivere lenken
 ```
 
 Vanlig klikk i editoren markerer elementet. Lenken åpnes aldri i editormodus.
@@ -108,6 +108,7 @@ type TextEditorElement = BaseEditorElement & {
   kind: 'text'
   content: string
   textStyle: TextElementStyle
+  appearance: TextAppearance
   link: ElementLink
 }
 ```
@@ -180,7 +181,7 @@ Knappetekst redigeres separat i knappeseksjonen i høyremenyen.
 
 Editormodus renderer ikke et aktivt navigerbart anker rundt tekstboksen eller knappen.
 
-Forhåndsvisning og publisering skal senere tolke lenkedata og opprette faktisk navigasjon med korrekt tilgjengelig navn.
+Lokal forhåndsvisning i fase 27 skal tolke lenkedata og opprette faktisk navigasjon med korrekt tilgjengelig navn. Publisering/hosting er ikke del av den låste produktplanen.
 
 ## Arkitektur
 

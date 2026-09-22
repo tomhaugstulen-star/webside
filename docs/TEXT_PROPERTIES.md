@@ -15,7 +15,7 @@ skjemaversjon innført i fasen: 3
 
 Fasen er implementert, auditert, kontrollert og merget til `main` gjennom PR #11.
 
-Skjemaversjon 3 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 5.
+Skjemaversjon 3 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema på aktiv branch er versjon 12.
 
 Tidligere «Status før PR»-formuleringer beskrev branchens tilstand før PR #11 og er ikke gjeldende prosjektstatus.
 
@@ -31,11 +31,15 @@ Lerretet   = redigere selve teksten og transformere elementer
 
 ## Implementert høyremeny
 
-Når et vanlig tekstelement er markert, vises:
+Når et vanlig tekstelement er markert, viser dagens høyrepanel blant annet:
 
 ```text
 Egenskaper
 Tekst
+
+Ramme
+Tykkelse
+Farge
 
 Tekstutseende
 Font
@@ -52,7 +56,7 @@ Status: Ulåst
 Slett tekstboks
 ```
 
-Formateringen gjelder hele tekstboksen. Det finnes ikke riktekst eller tegnbasert formatering. Andre elementtyper åpner høyremenyen uten `Tekstutseende`.
+Formateringen gjelder hele tekstboksen. Det finnes ikke riktekst eller tegnbasert formatering. Ramme er en egen delt egenskapsseksjon for innrammede elementer. Tekstboksens bakgrunn og tekstfarge kan også endres fra prosjektets Farger-panel.
 
 Lenke og sletting ble implementert i senere faser og er tatt med her for å beskrive dagens panelstruktur. Se `docs/ELEMENT_LINKS.md` og `docs/ELEMENT_DELETION.md`.
 
@@ -121,7 +125,7 @@ lineHeight
 
 Tekststil er varig prosjektdata og er foreløpig felles for PC og Telefon. Nye tekstbokser får en egen kopi av standardstilen.
 
-Prosjektskjemaet ble senere økt til versjon 4 i lenkefasen og til gjeldende versjon 5 i knappbibliotekfasen.
+Prosjektskjemaet ble senere økt til versjon 4 i lenkefasen og versjon 5 i knappbibliotekfasen. Senere endringer har ført modellen videre til gjeldende versjon 12.
 
 ## Reducer og validering
 
@@ -138,6 +142,18 @@ Hver brukerhandling sender én avgrenset stilpatch. Reduceren bruker nyeste auto
 `project.updatedAt` endres bare ved en gyldig, faktisk stilendring.
 
 Runtime-validatoren er trygg mot utypede data og bruker et uttømmende validatorregister.
+
+## Senere utvidelser som gjelder dagens tekstboks
+
+Etter fase 8 er tekstboksen utvidet med:
+
+- varig bakgrunnsfarge
+- serialiserbar `ElementFrame` med `Ingen`/0 px og 1–10 px
+- 1 px standardramme for nye tekstbokser
+- delte fargekontroller med redigerbar kanonisk `#RRGGBB`
+- pipette via EyeDropper der nettleseren støtter API-et, med kontrollert fallback
+
+Den autoritative nåværende modellen ligger i `docs/ELEMENT_MODEL.md`.
 
 ## Låste elementer
 
@@ -173,7 +189,7 @@ Implementert ansvarsdeling:
 - `src/components/canvas/getTextElementCssStyle.ts` — fonttoken og stil til CSS
 - `RightPropertiesPanel` — komposisjon, ikke egen tekststate
 
-Alle nye kildefiler var under 250 linjer i denne fasen. `EditorCanvasElement.tsx` var 244 linjer under fase 8 og er 247 linjer etter senere utvidelser. Den skal ikke få nye funksjonsansvar.
+Alle nye kildefiler var under 250 linjer i denne fasen. Senere filstørrelser håndheves av den automatiske repositorykontrollen; `EditorCanvasElement.tsx` skal fortsatt ikke få nye funksjonsansvar.
 
 ## Framtidsrettet kodeaudit
 

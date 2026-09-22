@@ -17,7 +17,7 @@ arkitekturrapporter: fbd8091
 
 Slettefunksjonen er implementert, framtidsauditert, kompilert, manuelt godkjent og merget til `main` gjennom PR #16.
 
-Fasen endret ikke prosjektmodellen. Skjemaversjonen var 4 på fasens base og etter sletteleveransen. Gjeldende prosjektskjema er senere økt til versjon 5 av knappbibliotekfasen.
+Fasen endret ikke prosjektmodellen. Skjemaversjonen var 4 på fasens base og etter sletteleveransen. Gjeldende prosjektskjema på aktiv branch er versjon 12; den autoritative nåværende formen ligger i `docs/ELEMENT_MODEL.md`.
 
 ## Omfang
 
