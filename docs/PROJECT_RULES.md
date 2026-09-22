@@ -21,10 +21,10 @@ Det opprettes ikke permanente audit-, readiness-, fase- eller chat-handoverdokum
 - Website-editoren er et lokalt énbrukerverktøy.
 - Stabilitet og enkel gjenoppretting prioriteres foran funksjonsbredde og kompleksitet.
 - Kontoer, roller, samarbeid, flerbrukerstate og skyarkitektur skal ikke bygges uten en ny uttrykkelig produktbeslutning.
-- Hosting, domeneoppsett, offentlig server og produksjonsdeployment er fjernet fra produktplanen.
 - Lokal forhåndsvisning, prosjektlagring, sikkerhetskopi, import og gjenoppretting er del av roadmapen.
-- En aktiv `Publiser`-handling skal ikke finnes.
-- Uimplementerte handlinger skal være skjult eller tydelig deaktivert.
+- Eksisterende synlige editorhandlinger er produktforpliktelser og skal få reell funksjon i riktig fase; de skal ikke fjernes bare fordi implementasjonen kommer senere.
+- `Publiser`, SEO og statisk nettstedseksport er del av produktplanen og spesifiseres i fase 30. Grunnleveransen er en komplett statisk mappe som kan lastes direkte opp til vanlig webhotell/domene uten Node.js eller backend.
+- Frem til en synlig handling er implementert, skal den være tydelig deaktivert eller merket som kommende slik at UI-et ikke lover en handling som ennå ikke virker.
 
 ## Branch, PR og merge
 
@@ -63,7 +63,7 @@ hard grense: 300+ linjer, alltid blokkert
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er 11.
+- Gjeldende prosjektskjema er 12.
 - `EditorProject` eier alle varige serialiserbare prosjektdata.
 - Varige prosjektendringer går gjennom typede reducerhandlinger.
 - Reduceren er siste mutasjonsgrense.
@@ -111,8 +111,9 @@ Transient state serialiseres ikke i `EditorProject`.
 Arbeidsportalens navigasjon og nettstedets navigasjon er separate ansvar.
 
 - portalnavigasjon er editor-UI og serialiseres ikke som nettsideinnhold
-- nettstedets navigasjon er prosjektdata og bygges i fase 19–20
-- navigator og hurtigsøk skal lese eksisterende state, ikke opprette en parallell prosjektkopi
+- nettstedets serialiserbare navigasjonsmodell og stabile side-/seksjonsmål ble levert i fase 19
+- faktisk Header-meny og navigasjonsrendering bygges først i fase 20
+- navigatoren skal lese eksisterende state, ikke opprette en parallell prosjektkopi
 
 ## Kvalitetskontroll
 

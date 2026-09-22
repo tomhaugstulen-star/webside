@@ -71,7 +71,10 @@ export function createEditorElement({
         ...common,
         kind: 'text',
         content: '',
-        appearance: { ...DEFAULT_TEXT_APPEARANCE },
+        appearance: {
+          backgroundColor: DEFAULT_TEXT_APPEARANCE.backgroundColor,
+          frame: { ...DEFAULT_TEXT_APPEARANCE.frame },
+        },
         textStyle: { ...DEFAULT_TEXT_ELEMENT_STYLE },
         link: { ...NO_ELEMENT_LINK },
       }

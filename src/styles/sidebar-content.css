@@ -44,7 +44,7 @@
   font-size: 14px;
 }
 
-.setting-row:hover {
+.setting-row:hover:not(:disabled) {
   background: var(--portal-control-hover);
 }
 
@@ -187,4 +187,9 @@
 
 .element-card svg {
   color: var(--element-card-accent, var(--portal-accent));
+}
+
+.setting-row:disabled {
+  opacity: 0.5;
+  cursor: default;
 }

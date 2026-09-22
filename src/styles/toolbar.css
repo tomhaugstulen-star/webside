@@ -66,7 +66,7 @@
   appearance: none;
 }
 .page-selector:hover,
-.toolbar-action:hover,
+.toolbar-action:hover:not(:disabled),
 .toolbar-icon-button:hover:not(:disabled) {
   border-color: var(--portal-border-strong);
   background: var(--portal-control-hover);
@@ -136,9 +136,9 @@
   border-radius: 9px;
   color: var(--portal-text);
 }
-.toolbar-icon-button:disabled {
-  color: color-mix(in srgb, var(--portal-text-muted) 58%, white);
-  background: transparent;
+.top-toolbar button:disabled {
+  opacity: 0.5;
+  box-shadow: none;
   cursor: default;
 }
 .top-toolbar__actions {
@@ -170,7 +170,7 @@
   background: linear-gradient(180deg, var(--portal-accent) 0%, var(--portal-accent-hover) 100%);
   box-shadow: 0 8px 18px color-mix(in srgb, var(--portal-accent) 24%, transparent);
 }
-.publish-button:hover {
+.publish-button:hover:not(:disabled) {
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--portal-accent) 86%, white) 0%,
@@ -217,7 +217,7 @@
   cursor: pointer;
   font-size: 13px;
 }
-.main-menu-popover button:hover {
+.main-menu-popover button:hover:not(:disabled) {
   background: var(--portal-control-hover);
 }
 .page-selector:focus-visible,

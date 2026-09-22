@@ -1,19 +1,15 @@
-﻿import type { ElementCreationRequest } from '../../model/elementCreation'
+import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorTool } from '../../types/editor'
 import { ColorsPanel } from './ColorsPanel'
 import { ElementsPanel } from './ElementsPanel'
 import { HeaderCreationControl } from './HeaderCreationControl'
 import { ProjectNavigatorPanel } from './ProjectNavigatorPanel'
 
-type PanelProps = {
-  onSelect: () => void
-}
-
 type ElementsPanelProps = {
   onCreateElement: (request: ElementCreationRequest) => boolean
 }
 
-type SidebarPanelProps = PanelProps & ElementsPanelProps & {
+type SidebarPanelProps = ElementsPanelProps & {
   activeTool: EditorTool
 }
 
@@ -29,20 +25,20 @@ function LogoHeaderPanel({ onCreateElement }: ElementsPanelProps) {
   )
 }
 
-function SettingsPanel({ onSelect }: PanelProps) {
+function SettingsPanel() {
   return (
     <>
       <h2>Innstillinger</h2>
       <div className="setting-group">
-        <button className="setting-row" type="button" onClick={onSelect}>
+        <button className="setting-row" type="button" disabled title="Kommer senere">
           <span>Prosjektnavn</span>
           <span>›</span>
         </button>
-        <button className="setting-row" type="button" onClick={onSelect}>
+        <button className="setting-row" type="button" disabled title="Kommer senere">
           <span>Domene</span>
           <span>›</span>
         </button>
-        <button className="setting-row" type="button" onClick={onSelect}>
+        <button className="setting-row" type="button" disabled title="Kommer senere">
           <span>SEO</span>
           <span>›</span>
         </button>
@@ -53,7 +49,6 @@ function SettingsPanel({ onSelect }: PanelProps) {
 
 export function SidebarPanel({
   activeTool,
-  onSelect,
   onCreateElement,
 }: SidebarPanelProps) {
   switch (activeTool) {
@@ -66,7 +61,7 @@ export function SidebarPanel({
     case 'files':
       return <ProjectNavigatorPanel />
     case 'settings':
-      return <SettingsPanel onSelect={onSelect} />
+      return <SettingsPanel />
   }
 
   const unhandledTool: never = activeTool

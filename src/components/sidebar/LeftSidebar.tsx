@@ -6,7 +6,6 @@ import { SidebarPanel } from './SidebarPanels'
 type LeftSidebarProps = {
   activeTool: EditorTool | null
   onToolChange: (tool: EditorTool) => void
-  onPanelAction: () => void
   onCreateElement: (request: ElementCreationRequest) => boolean
 }
 
@@ -20,7 +19,6 @@ const tools: Array<{ id: EditorTool; label: string; icon: SidebarIconName }> = [
 export function LeftSidebar({
   activeTool,
   onToolChange,
-  onPanelAction,
   onCreateElement,
 }: LeftSidebarProps) {
   return (
@@ -61,7 +59,6 @@ export function LeftSidebar({
           <div className="left-panel__content">
             <SidebarPanel
               activeTool={activeTool}
-              onSelect={onPanelAction}
               onCreateElement={onCreateElement}
             />
           </div>

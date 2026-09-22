@@ -7,7 +7,10 @@ import {
 import { createStableId } from './createStableId'
 import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
 
-export { migrateEditorProjectV10 } from './editorProjectMigration'
+export {
+  migrateEditorProjectV10,
+  migrateEditorProjectV11,
+} from './editorProjectMigration'
 
 export function createEditorPage(
   id: string,

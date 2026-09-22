@@ -8,12 +8,12 @@ GitHub-sak: #20 Build first bundled SVG button library
 base main: 06307a2
 PR #21: merget
 mergecommit: 5e548ad
-prosjektskjema: versjon 5
+skjemaversjon innført i fasen: 5
 ```
 
 ## Status
 
-Fasen er implementert, framtidsauditert, automatisk kontrollert, manuelt godkjent og merget til `main`. Sak #20 er lukket som fullført.
+Fasen er implementert, framtidsauditert, automatisk kontrollert, manuelt godkjent og merget til `main`. Sak #20 er lukket som fullført. Gjeldende prosjektskjema på aktiv branch er versjon 12.
 
 Produksjons- og kontrollcommits:
 
@@ -152,7 +152,7 @@ Transient bibliotekvisning, drafts, validering, feedback, fokus og hover seriali
 - riktekst
 - hover-, pressed- og disabled-varianter
 - intern sidenavigasjon
-- forhåndsvisning eller publisering
+- lokal forhåndsvisning (senere fase 27); publisering/hosting er ikke lenger del av produktplanen
 - historikk eller autolagring
 - egne mobiloverstyringer
 - separat venstremenypunkt kalt `Knapper`

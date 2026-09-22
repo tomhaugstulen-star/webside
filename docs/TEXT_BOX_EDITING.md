@@ -13,7 +13,7 @@ skjemaversjon innført i fasen: 2
 
 Fasen er ferdig, kodeauditert, kontrollert på PC og Telefon og merget til `main`.
 
-Skjemaversjon 2 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema er versjon 5.
+Skjemaversjon 2 er en historisk milepæl fra denne fasen. Gjeldende prosjektskjema på aktiv branch er versjon 12.
 
 ## Historisk omfang
 
@@ -40,7 +40,7 @@ content: ''
 
 Tom tekst er gyldig prosjektdata. Teksten **Dobbeltklikk for å skrive** er bare en editor-placeholder og lagres aldri som innhold.
 
-Prosjektskjemaet ble senere utvidet med `textStyle` i versjon 3, `link` i versjon 4 og knappens `assetId`, `label` og `link` i gjeldende versjon 5.
+Prosjektskjemaet ble senere utvidet med `textStyle` i versjon 3, `link` i versjon 4 og knappdata i versjon 5. Senere modellendringer har ført skjemaet videre til versjon 12; se `docs/ELEMENT_MODEL.md` for nåværende form.
 
 ## Objektmarkering og redigeringsmodus
 
@@ -114,7 +114,7 @@ Teksten klippes av tekstboksens elementgrense. Boksen vokser ikke automatisk med
 
 Tekstinnhold er felles elementdata for PC og Telefon. Det er ikke en responsiv verdi.
 
-Begge visninger viser samme tekst. Geometrien følger den midlertidige desktop-arven som er dokumentert i `docs/MOBILE_DESIGN_CONTROLS.md`.
+Begge visninger viser samme tekst. Geometrien følger fortsatt desktop-arv når mobilverdi mangler. Den autoritative regelen står i `docs/ELEMENT_MODEL.md`; eksplisitte mobiloverstyringer er planlagt i fase 23 i `docs/WORK_PLAN.md`.
 
 ## Arkitektur
 
@@ -154,4 +154,4 @@ Arkitekturrapportene ble regenerert og inkludert før PR #7 ble merget.
 
 Den neste planlagte fasen etter tekstredigering var høyremenyens grunnstruktur i `feature/right-properties-panel`. Denne fasen ble senere implementert og merget som PR #9.
 
-Tekstegenskaper og elementlenker ble deretter implementert i egne faser. Se `docs/RIGHT_PROPERTIES_PANEL.md`, `docs/TEXT_PROPERTIES.md` og `docs/ELEMENT_LINKS.md`.
+Tekstegenskaper og elementlenker ble deretter implementert i egne faser. Se `docs/TEXT_PROPERTIES.md` og `docs/ELEMENT_LINKS.md`. Nåværende panel- og modellgrenser er oppsummert i `docs/PROJECT_RULES.md` og `docs/ELEMENT_MODEL.md`.

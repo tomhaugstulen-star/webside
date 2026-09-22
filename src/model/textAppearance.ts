@@ -3,13 +3,20 @@ import {
   isEditorColor,
   type EditorColor,
 } from './editorColor'
+import {
+  DEFAULT_ELEMENT_FRAME,
+  isValidElementFrame,
+  type ElementFrame,
+} from './elementFrame'
 
 export type TextAppearance = {
   backgroundColor: EditorColor
+  frame: ElementFrame
 }
 
 export const DEFAULT_TEXT_APPEARANCE: TextAppearance = {
   backgroundColor: createEditorColor('#FFFFFF'),
+  frame: { ...DEFAULT_ELEMENT_FRAME },
 }
 
 export function isValidTextAppearance(
@@ -23,13 +30,11 @@ export function isValidTextAppearance(
     return false
   }
 
-  const keys = Object.keys(appearance)
+  const value = appearance as Record<string, unknown>
 
   return (
-    keys.length === 1 &&
-    keys[0] === 'backgroundColor' &&
-    isEditorColor(
-      (appearance as { backgroundColor?: unknown }).backgroundColor,
-    )
+    Object.keys(value).length === 2 &&
+    isEditorColor(value.backgroundColor) &&
+    isValidElementFrame(value.frame)
   )
 }

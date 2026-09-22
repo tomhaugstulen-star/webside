@@ -14,7 +14,7 @@ export type ElementFrame = {
 }
 
 export const DEFAULT_ELEMENT_FRAME: ElementFrame = {
-  width: 0,
+  width: 1,
   color: createEditorColor('#D8CEC8'),
 }
 

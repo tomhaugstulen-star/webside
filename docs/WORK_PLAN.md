@@ -6,11 +6,15 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 ## Nåstatus
 
-- fullført gjennom fase 18 – arbeidsportalnavigasjon og navigator
+- `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
-- neste produksjonsfase er fase 19 – sider, seksjons-ID-er og navigasjonsmodell (#60)
+- aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
+- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch med regenererte arkitekturrapporter; brukeren har bekreftet full lokal kontroll og meldt manuell regresjon OK etter HEX/Escape-fiksen; PR/review, CI på endelig head og uttrykkelig mergegodkjenning gjenstår
+- repo-audit #64 er en egen oppryddingsgate før fase 20
+- neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
+- synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
-- ny implementering starter alltid fra oppdatert `main` på en egen branch
+- ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
 
 ## Låst roadmap
 
@@ -27,6 +31,7 @@ fase 26  Sikkerhetskopi, prosjektformat, import og migrering
 fase 27  Lokal forhåndsvisning
 fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 29  ChatGPT clipboard-arbeidsflyt
+fase 30  Prosjektinnstillinger, SEO, statisk eksport og publisering
 ```
 
 Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell ChatGPT-workflow der valgte editorområder sendes via kontrollert utklipp med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen, verken nå eller som planlagt senere oppgradering. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
@@ -75,19 +80,66 @@ Globalt `Ctrl + K`-hurtigsøk ble prøvd lokalt, men ble eksplisitt tatt ut før
 
 ## Fase 19 – sider, seksjons-ID-er og navigasjonsmodell
 
-Aktiv planleggingssak: #60.
+Fasen er fullført og merget i PR #62. Sak #60 er avsluttet.
 
-Låste hovedmål:
+Levert:
 
 - kontrollert sideoppretting, navngiving, slug, sletting og rekkefølge
 - minst én side i prosjektet til enhver tid
 - stabile offentlige seksjons-/anker-ID-er separat fra interne element-ID-er
 - én serialiserbar, typet navigasjonsmodell med stabile side- og seksjonsmål
-- ingen dangling navigasjonsreferanser etter relevante slettinger
-- eksplisitt schema/migrering dersom serialisert prosjektform endres
-- faktisk Header-meny og menyrendering utsettes til fase 20
+- deterministisk opprydding av dangling navigasjonsreferanser
+- schema 10 → 11 med kontrollert migrering
+- sidevelger i toppverktøylinjen og side-/navigasjonsredigering i Prosjekt-panelet
+- faktisk Header-meny og menyrendering er fortsatt utsatt til fase 20
 
-Detaljert omfang og akseptansekriterier ligger i GitHub-sak #60.
+## Vedlikeholdsgate før fase 20
+
+### #63 – editor polish
+
+Implementert på aktiv branch:
+
+- 1 px standardramme for nye innrammede elementer
+- Tekst får serialiserbar ramme med `Ingen` og 1–10 px
+- snapping og guider for lik bredde/høyde under resize
+- redigerbar HEX-kode i delte fargekontroller
+- pipette via EyeDropper med kontrollert fallback
+- schema 11 → 12 for tekstboksramme
+- 48 unit-tester, lint, TypeScript, filgrenser, arkitekturkontroll og bygg er grønne
+- tre nye E2E-tester dekker HEX og stubbet EyeDropper, inkludert avbrudd og manglende støtte
+- brukeren har bekreftet full lokal `npm run verify` på `9548312` med 48 unit-tester og 6 E2E-tester; agentmiljøets nettleserkjøring var blokkert av Chromium-nedlasting
+- lokal Escape-håndtering i HEX-feltet bevarer Farger-panelet; brukeren har meldt manuell regresjon OK etter fiksen
+
+Gjenstår før #63 kan merges:
+
+- PR, diff/review/trådkontroll og CI på nøyaktig siste head
+- uttrykkelig brukergodkjenning før merge
+
+### #64 – repo-opprydding
+
+Auditen før fase 20 fant:
+
+- ubrukte template-/assetfiler
+- aktive UI-kontroller uten implementert handling
+- et testgap for resize-snapping og HEX/pipette
+- BOM i `SidebarPanels.tsx`
+- behov for å sikre at genererte arkitekturrapporter følger siste modulendringer
+
+Ferdigstilt på aktiv branch: dedikerte resize-/target-tester og HEX-/pipette-tester, deaktivert planlagt UI med opprydding av døde callbacks, fjernet BOM og ubrukt `hero.png`, samt regenererte arkitekturrapporter. Knappbibliotekets SVG-er er beholdt. Ingen senere funksjonsfase er implementert.
+
+## Synlige UI-handlinger som skal bli funksjonelle
+
+Knappene som allerede finnes i editoren er ikke ment som permanent dødt UI. De kobles til roadmapen slik:
+
+- `Angre` / `Gjør om` → fase 24
+- `Lagre` → fase 25
+- `Dupliser prosjekt` → fase 26
+- `Forhåndsvisning` → fase 27
+- `Prosjektnavn`, `Prosjektinnstillinger`, `Domene`, `SEO`, `Publiser` og `Hjelp` → fase 30
+
+Før den aktuelle fasen er implementert skal kontrollen være tydelig deaktivert eller merket som kommende, men ikke fjernes som om funksjonen er avlyst.
+
+Fase 30 skal låse den konkrete publiseringsmodellen før kodearbeid starter, inkludert hvordan domene, SEO og faktisk publisering/deployment skal fungere.
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
@@ -110,11 +162,33 @@ Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fr
 
 Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 
-- #36 editor-only elementgrense
+- #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer
 - #38 like mellomrom og fordelingsguider
-- #57 rammetykkelse for tekstelementer
+- #3 er den eldre planleggingsaken for viewport-spesifikke mobilkontroller og hører funksjonelt til fase 23
+- #57 er dekket av implementasjonen i #63 og skal ikke ha en separat kodeleveranse; saken kan lukkes når #63 er merget
 
 ## Dokumentregel
 
 Detaljert faseomfang, auditfunn, testplan og handover lagres i GitHub-saken og PR-en. Permanente status-, audit-, readiness- eller chat-handoverdokumenter opprettes ikke.
+
+
+## Fase 30 – prosjektinnstillinger, SEO, statisk eksport og publisering
+
+Målet er at et ferdig nettsted kan tas ut av Website-editoren som en komplett statisk mappe og legges direkte på vanlig webhotell/domene.
+
+Låste krav:
+
+- generer ferdige statiske filer for hele nettstedet
+- output skal kunne lastes direkte opp til domenets dokumentrot eller en valgt undermappe i cPanel/vanlig webhotell
+- generert nettsted skal ikke kreve Node.js, Vite, React-devserver, database eller egen backend for å vises
+- generer nødvendige HTML-, CSS-, JavaScript- og assetfiler med relative eller kontrollerte URL-er
+- flere sider skal genereres med stabil og forståelig mappestruktur/URL-struktur
+- interne side- og seksjonslenker skal fungere i den eksporterte siden
+- bilder, logoer og øvrige assets skal kopieres til eksportpakken
+- SEO-felter og relevante metadata skal inngå i genererte HTML-filer
+- eksporten skal kunne pakkes som én mappe/ZIP som brukeren selv kan laste opp
+- eventuell senere direkte publisering til hosting er et tillegg; statisk eksport er grunnkravet
+- editorens egne kildefiler, prosjektstate og utviklingsverktøy skal ikke følge med i den offentlige nettsidepakken
+
+Den konkrete URL-/mappestrukturen, asset-cache-regler og eventuell direkte hostingintegrasjon låses når fase 30 starter.

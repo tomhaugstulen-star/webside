@@ -1,4 +1,5 @@
 import { isEditorColor } from '../model/editorColor'
+import { isElementFrameWidth } from '../model/elementFrame'
 import type {
   EditorProjectState,
   SectionEditorElement,
@@ -62,11 +63,7 @@ function updateActiveSectionAppearance(
 
   return {
     ...state,
-    project: {
-      ...state.project,
-      pages,
-      updatedAt,
-    },
+    project: { ...state.project, pages, updatedAt },
   }
 }
 
@@ -108,11 +105,7 @@ function updateActiveTextAppearance(
 
   return {
     ...state,
-    project: {
-      ...state.project,
-      pages,
-      updatedAt,
-    },
+    project: { ...state.project, pages, updatedAt },
   }
 }
 
@@ -122,9 +115,7 @@ export function reduceColorProjectAction(
 ): EditorProjectState {
   switch (action.type) {
     case 'set-active-page-background-color': {
-      if (!isEditorColor(action.color)) {
-        return state
-      }
+      if (!isEditorColor(action.color)) return state
 
       const activePage = state.project.pages.find(
         (page) => page.id === state.activePageId,
@@ -135,10 +126,7 @@ export function reduceColorProjectAction(
       }
 
       const nextAppearance = { backgroundColor: action.color }
-
-      if (!isValidPageAppearance(nextAppearance)) {
-        return state
-      }
+      if (!isValidPageAppearance(nextAppearance)) return state
 
       return {
         ...state,
@@ -155,10 +143,7 @@ export function reduceColorProjectAction(
     }
 
     case 'set-section-background-color':
-      if (!isEditorColor(action.color)) {
-        return state
-      }
-
+      if (!isEditorColor(action.color)) return state
       return updateActiveSectionAppearance(
         state,
         action.elementId,
@@ -170,10 +155,7 @@ export function reduceColorProjectAction(
       )
 
     case 'set-section-frame-width':
-      if (!isSectionFrameWidth(action.width)) {
-        return state
-      }
-
+      if (!isSectionFrameWidth(action.width)) return state
       return updateActiveSectionAppearance(
         state,
         action.elementId,
@@ -188,10 +170,7 @@ export function reduceColorProjectAction(
       )
 
     case 'set-section-frame-color':
-      if (!isEditorColor(action.color)) {
-        return state
-      }
-
+      if (!isEditorColor(action.color)) return state
       return updateActiveSectionAppearance(
         state,
         action.elementId,
@@ -206,10 +185,7 @@ export function reduceColorProjectAction(
       )
 
     case 'set-text-background-color':
-      if (!isEditorColor(action.color)) {
-        return state
-      }
-
+      if (!isEditorColor(action.color)) return state
       return updateActiveTextAppearance(
         state,
         action.elementId,
@@ -218,6 +194,36 @@ export function reduceColorProjectAction(
           element.appearance.backgroundColor === action.color
             ? null
             : { ...element.appearance, backgroundColor: action.color },
+      )
+
+    case 'set-text-frame-width':
+      if (!isElementFrameWidth(action.width)) return state
+      return updateActiveTextAppearance(
+        state,
+        action.elementId,
+        action.updatedAt,
+        (element) =>
+          element.appearance.frame.width === action.width
+            ? null
+            : {
+                ...element.appearance,
+                frame: { ...element.appearance.frame, width: action.width },
+              },
+      )
+
+    case 'set-text-frame-color':
+      if (!isEditorColor(action.color)) return state
+      return updateActiveTextAppearance(
+        state,
+        action.elementId,
+        action.updatedAt,
+        (element) =>
+          element.appearance.frame.color === action.color
+            ? null
+            : {
+                ...element.appearance,
+                frame: { ...element.appearance.frame, color: action.color },
+              },
       )
   }
 

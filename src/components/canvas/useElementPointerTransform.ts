@@ -10,7 +10,6 @@ import type {
 } from '../../model/editorProject'
 import type { ImageTransform } from '../../model/imagePresentation'
 import { autoScrollCanvasNearEdges } from './autoScrollCanvas'
-import type { AlignmentTargets } from './alignmentGuideTypes'
 import {
   elementLayoutPreviewsEqual,
   type ElementLayoutPreview,
@@ -22,8 +21,11 @@ import {
   type PointerInteraction,
   type TransformMode,
 } from './elementPointerTransform'
-import { getAlignmentTargets } from './getAlignmentTargets'
-import { getPointerMovePreview } from './getPointerMovePreview'
+import {
+  getPointerSnapPreview,
+  getPointerSnapTargets,
+  type PointerSnapTargets,
+} from './pointerSnapPreview'
 
 type ElementPointerTransformOptions = {
   element: EditorElement
@@ -63,7 +65,7 @@ export function useElementPointerTransform({
   const [transformMode, setTransformMode] = useState<TransformMode | null>(null)
   const interactionRef = useRef<PointerInteraction | null>(null)
   const draftPreviewRef = useRef<ElementLayoutPreview | null>(null)
-  const alignmentTargetsRef = useRef<AlignmentTargets | null>(null)
+  const snapTargetsRef = useRef<PointerSnapTargets | null>(null)
 
   const publishDraftPreview = (preview: ElementLayoutPreview | null) => {
     draftPreviewRef.current = preview
@@ -109,16 +111,14 @@ export function useElementPointerTransform({
       canvasWidth: canvas.clientWidth,
       initialLayout,
     }
-    alignmentTargetsRef.current =
-      mode === 'move'
-        ? getAlignmentTargets({
-            elements: pageElements,
-            activeElementId: element.id,
-            viewport,
-            canvasWidth: canvas.clientWidth,
-            canvasHeight: canvas.clientHeight,
-          })
-        : null
+    snapTargetsRef.current = getPointerSnapTargets({
+      mode,
+      elements: pageElements,
+      activeElementId: element.id,
+      viewport,
+      canvasWidth: canvas.clientWidth,
+      canvasHeight: canvas.clientHeight,
+    })
     setTransformMode(mode)
     publishDraftPreview({
       elementId: element.id,
@@ -160,16 +160,12 @@ export function useElementPointerTransform({
       scrollContainer.scrollLeft,
       scrollContainer.scrollTop,
     )
-    const nextLayout = getNextPointerLayout(element, interaction, delta)
-    const nextPreview =
-      interaction.mode === 'move'
-        ? getPointerMovePreview({
-            elementId: element.id,
-            layout: nextLayout,
-            targets: alignmentTargetsRef.current,
-            canvasWidth: interaction.canvasWidth,
-          })
-        : { elementId: element.id, layout: nextLayout, guides: [] }
+    const nextPreview = getPointerSnapPreview({
+      element,
+      interaction,
+      layout: getNextPointerLayout(element, interaction, delta),
+      targets: snapTargetsRef.current,
+    })
 
     if (
       draftPreviewRef.current &&
@@ -185,7 +181,7 @@ export function useElementPointerTransform({
     const interaction = interactionRef.current
     const finalLayout = draftPreviewRef.current?.layout ?? null
     interactionRef.current = null
-    alignmentTargetsRef.current = null
+    snapTargetsRef.current = null
     setTransformMode(null)
     publishDraftPreview(null)
     if (!commit || !interaction || !finalLayout) return

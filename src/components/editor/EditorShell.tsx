@@ -136,7 +136,6 @@ export function EditorShell() {
         <LeftSidebar
           activeTool={activeTool}
           onToolChange={toggleToolPanel}
-          onPanelAction={closeToolPanel}
           onCreateElement={createElementAndClosePanel}
         />
         <EditorCanvas
