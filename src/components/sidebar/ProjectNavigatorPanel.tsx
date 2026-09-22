@@ -8,10 +8,21 @@ import {
   type NavigatorKindFilter,
   type NavigatorStatusFilter,
 } from '../navigation/editorNavigationItems'
+import type { ElementCreationRequest } from '../../model/elementCreation'
+import { ImageImportControl } from './ImageImportControl'
 import { PageManagementSection } from './PageManagementSection'
+import { ProjectFileControls } from './ProjectFileControls'
 import { WebsiteNavigationSection } from './WebsiteNavigationSection'
 
-export function ProjectNavigatorPanel() {
+type ImageCreationRequest = Extract<ElementCreationRequest, { kind: 'image' }>
+
+type ProjectNavigatorPanelProps = {
+  onCreateImage: (request: ImageCreationRequest) => boolean
+}
+
+export function ProjectNavigatorPanel({
+  onCreateImage,
+}: ProjectNavigatorPanelProps) {
   const { state, dispatch } = useEditorProject()
   const [kindFilter, setKindFilter] = useState<NavigatorKindFilter>('all')
   const [statusFilter, setStatusFilter] =
@@ -39,6 +50,16 @@ export function ProjectNavigatorPanel() {
           {state.project.pages.length === 1 ? 'side' : 'sider'}
         </span>
       </div>
+
+      <ProjectFileControls />
+
+      <section className="project-image-import">
+        <h3>Importer bilde</h3>
+        <ImageImportControl
+          label="Velg bilde fra maskinen"
+          onCreateImage={onCreateImage}
+        />
+      </section>
 
       <PageManagementSection />
 
