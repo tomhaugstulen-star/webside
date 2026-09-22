@@ -178,3 +178,73 @@
   outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
 }
+
+
+.project-file-controls,
+.project-image-import {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--portal-border);
+  border-radius: 12px;
+  background: var(--portal-control-surface);
+}
+
+.project-file-controls h3,
+.project-image-import h3 {
+  margin: 0 0 8px;
+}
+
+.project-file-controls > p {
+  margin: 0 0 12px;
+  color: var(--portal-text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.project-file-controls__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.project-file-controls__actions button {
+  min-height: 40px;
+  border: 1px solid var(--portal-border);
+  border-radius: 9px;
+  color: var(--portal-text);
+  background: var(--portal-control-subtle);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.project-file-controls__actions button:hover:not(:disabled) {
+  border-color: var(--portal-border-strong);
+  background: var(--portal-control-hover);
+}
+
+.project-file-controls__actions button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.project-file-controls__input {
+  display: none;
+}
+
+.project-file-controls__message {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.project-image-import .image-import-control,
+.project-image-import .element-card {
+  width: 100%;
+}
+
+.project-image-import .element-card {
+  min-height: 58px;
+  flex-direction: row;
+}
