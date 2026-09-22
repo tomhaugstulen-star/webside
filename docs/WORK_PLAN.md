@@ -11,10 +11,12 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
 - kodearbeidet for #63/#64 er ferdigstilt på aktiv branch med regenererte arkitekturrapporter; brukeren har bekreftet full lokal kontroll og meldt manuell regresjon OK etter HEX/Escape-fiksen; PR/review, CI på endelig head og uttrykkelig mergegodkjenning gjenstår
 - repo-audit #64 er en egen oppryddingsgate før fase 20
-- neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
+- #63/#64 er merget i PR #65; ny grunnlagsleveranse #66 flytter prosjektfil/import-round-trip frem før fase 20
+- neste produksjonsfase etter #66 er fase 20 – nettstedets Header og menynavigasjon
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
+- uttrykkelig beslutning 22.09.2026: nødvendig prosjektfil/import fra fase 26 leveres først som #66 før fase 20; øvrig fase-26 backup/import/migrering beholdes senere
 
 ## Låst roadmap
 
@@ -61,6 +63,21 @@ git diff --check
 git status --short
 git diff --stat
 ```
+
+## Grunnlagsleveranse #66 før fase 20 – prosjektfil og import
+
+Brukeren har uttrykkelig prioritert muligheten til å fortsette tidligere arbeid før fase 20.
+
+Leveransen skal:
+
+- eksportere hele editorprosjektet til én lokal prosjektfil med prosjektdata og refererte bilder/logoer
+- åpne/importere samme prosjektfil i en senere editorøkt
+- validere og migrere prosjektdata før aktiv state erstattes
+- gjenopprette asset-store konsistent og avvise korrupte/ufullstendige prosjektfiler uten å ødelegge aktivt prosjekt
+- gjøre eksisterende bildeimport lettere å oppdage uten parallell assetmodell
+- være rent filbasert; ingen backend, konto, sky eller IndexedDB/autolagring
+
+Dette er ikke fase 25-lagring, fase 27 Preview eller fase 30 nettstedseksport. Full fase 26 beholder senere ansvar for videre backup/import/migrering utover dette nødvendige round-trip-grunnlaget.
 
 ## Fase 18 – arbeidsportalnavigasjon og navigator
 
