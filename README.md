@@ -30,7 +30,7 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 - #63 er implementert og `npm run verify` er grønn; manuell PC-/Telefon-kontroll, arkitekturrapport-commit, PR/CI og merge gjenstår
 - repo-audit #64 samler kode-/assetrester, falske UI-handlinger og testgap som skal ryddes før fase 20
 - neste produksjonsfase etter disse vedlikeholdsgatene er fase 20 – nettstedets Header og menynavigasjon
-- eksisterende synlige editorhandlinger som Lagre, Forhåndsvisning og Publiser er planlagte funksjoner; de aktiveres i senere roadmapfaser
+- eksisterende synlige editorhandlinger som Lagre, Forhåndsvisning og Publiser er planlagte funksjoner; fase 30 skal kunne generere en komplett statisk nettsidemappe som kan lastes direkte opp til vanlig webhotell/domene
 - fase 25 leverer lokal prosjektlagring, automatisk lagring og gjenoppretting
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke brukes som aktiv leveranse
 
