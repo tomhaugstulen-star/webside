@@ -11,10 +11,7 @@ import { reduceHeroProjectAction } from './reduceHeroProjectAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
 import { reducePageProjectAction } from './reducePageProjectAction'
-import {
-  resetElementMobileOverrides,
-  setElementMobileVisibility,
-} from './reduceResponsiveElementAction'
+import { resetElementMobileOverrides, setElementMobileVisibility } from './reduceResponsiveElementAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
