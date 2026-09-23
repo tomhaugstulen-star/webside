@@ -31,9 +31,8 @@
 @import './styles/element-link-properties.css';
 @import './styles/element-deletion.css';
 @import './styles/preview.css';
+@import './styles/section-templates.css';
 
 #root {
   min-height: 100vh;
 }
-
-@import './styles/section-templates.css';
