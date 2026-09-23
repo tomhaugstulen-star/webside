@@ -8,42 +8,56 @@ import {
 
 test('accepts a current blank project', () => {
   const project = createBlankProject('Test')
+  expect(project.schemaVersion).toBe(13)
   expect(isValidEditorProject(project)).toBe(true)
   expect(parseImportedEditorProject(project)).toEqual(project)
 })
 
-test('migrates a structurally valid schema 11 text element to schema 12', () => {
+test('migrates schema 12 solid backgrounds to schema 13 fills', () => {
   const project = createBlankProject('Legacy')
+  const page = project.pages[0]
   const text = createEditorElement({
     id: 'text-1',
     request: { kind: 'text' },
     existingElements: [],
   })
   if (text.kind !== 'text') throw new Error('Expected text element.')
+  if (page.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid page.')
+  if (text.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid text.')
 
   const legacy = {
     ...project,
-    schemaVersion: 11,
+    schemaVersion: 12,
     pages: [{
-      ...project.pages[0],
+      ...page,
+      appearance: { backgroundColor: page.appearance.backgroundFill.color },
       elements: [{
         ...text,
         appearance: {
-          backgroundColor: text.appearance.backgroundColor,
+          backgroundColor: text.appearance.backgroundFill.color,
+          frame: text.appearance.frame,
         },
       }],
     }],
   }
 
   const migrated = parseImportedEditorProject(legacy)
-  expect(migrated?.schemaVersion).toBe(12)
+  expect(migrated?.schemaVersion).toBe(13)
+  expect(migrated?.pages[0].appearance.backgroundFill).toEqual({
+    type: 'solid',
+    color: '#FFFFFF',
+  })
   const migratedText = migrated?.pages[0].elements[0]
   expect(migratedText?.kind).toBe('text')
   if (migratedText?.kind !== 'text') throw new Error('Expected migrated text.')
+  expect(migratedText.appearance.backgroundFill).toEqual({
+    type: 'solid',
+    color: '#FFFFFF',
+  })
   expect(migratedText.appearance.frame.width).toBe(1)
 })
 
-test('rejects duplicate element IDs and malformed projects', () => {
+test('rejects duplicate element IDs, invalid fills and unsupported schemas', () => {
   const project = createBlankProject('Invalid')
   const first = createEditorElement({
     id: 'duplicate',
@@ -58,13 +72,24 @@ test('rejects duplicate element IDs and malformed projects', () => {
 
   const duplicateProject = {
     ...project,
+    pages: [{ ...project.pages[0], elements: [first, second] }],
+  }
+  const invalidFillProject = {
+    ...project,
     pages: [{
       ...project.pages[0],
-      elements: [first, second],
+      appearance: {
+        backgroundFill: {
+          type: 'linear-gradient',
+          angle: 361,
+          stops: ['#FFFFFF', '#000000'],
+        },
+      },
     }],
   }
 
   expect(isValidEditorProject(duplicateProject)).toBe(false)
-  expect(parseImportedEditorProject({ schemaVersion: 12, pages: [] })).toBeNull()
+  expect(isValidEditorProject(invalidFillProject)).toBe(false)
+  expect(parseImportedEditorProject({ schemaVersion: 13, pages: [] })).toBeNull()
   expect(parseImportedEditorProject({ ...project, schemaVersion: 99 })).toBeNull()
 })
