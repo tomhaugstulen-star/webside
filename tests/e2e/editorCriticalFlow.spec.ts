@@ -40,9 +40,9 @@ test('creates a text element and edits its persisted background color', async ({
   await expect(textColorGroup).toBeVisible()
   await expect(
     textColorGroup.locator('.color-swatch-input > span:first-child'),
-  ).toHaveText(['Bakgrunn', 'Tekstfarge'])
+  ).toHaveText(['Bakgrunn farge', 'Tekstfarge'])
 
-  const backgroundInput = textColorGroup.getByLabel(/Bakgrunn\. Nåværende farge/)
+  const backgroundInput = textColorGroup.getByLabel(/Bakgrunn farge\. Nåværende farge/)
   await backgroundInput.fill('#e8f1ff')
 
   await expect(backgroundInput).toHaveValue('#e8f1ff')
