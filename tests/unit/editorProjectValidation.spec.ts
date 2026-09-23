@@ -8,12 +8,12 @@ import {
 
 test('accepts a current blank project', () => {
   const project = createBlankProject('Test')
-  expect(project.schemaVersion).toBe(13)
+  expect(project.schemaVersion).toBe(14)
   expect(isValidEditorProject(project)).toBe(true)
   expect(parseImportedEditorProject(project)).toEqual(project)
 })
 
-test('migrates schema 12 solid backgrounds to schema 13 fills', () => {
+test('migrates schema 12 solid backgrounds to schema 14 fills', () => {
   const project = createBlankProject('Legacy')
   const page = project.pages[0]
   const text = createEditorElement({
@@ -42,7 +42,7 @@ test('migrates schema 12 solid backgrounds to schema 13 fills', () => {
   }
 
   const migrated = parseImportedEditorProject(legacy)
-  expect(migrated?.schemaVersion).toBe(13)
+  expect(migrated?.schemaVersion).toBe(14)
   expect(migrated?.pages[0].appearance.backgroundFill).toEqual({
     type: 'solid',
     color: '#FFFFFF',
@@ -90,6 +90,6 @@ test('rejects duplicate element IDs, invalid fills and unsupported schemas', () 
 
   expect(isValidEditorProject(duplicateProject)).toBe(false)
   expect(isValidEditorProject(invalidFillProject)).toBe(false)
-  expect(parseImportedEditorProject({ schemaVersion: 13, pages: [] })).toBeNull()
+  expect(parseImportedEditorProject({ schemaVersion: 14, pages: [] })).toBeNull()
   expect(parseImportedEditorProject({ ...project, schemaVersion: 99 })).toBeNull()
 })
