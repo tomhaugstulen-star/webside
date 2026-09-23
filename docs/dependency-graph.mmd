@@ -38,6 +38,7 @@ subgraph src["src"]
     src_model_sectionAppearance_ts["sectionAppearance.ts"]
     src_model_textAppearance_ts["textAppearance.ts"]
     src_model_elementCreation_ts["elementCreation.ts"]
+    src_model_sectionContents_ts["sectionContents.ts"]
     src_model_editorProjectValidation_ts["editorProjectValidation.ts"]
     src_model_editorElementValidation_ts["editorElementValidation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
@@ -254,6 +255,7 @@ src_assets_images_imageAssetStoreContext_ts-->src_model_imageAsset_ts
 src_components_editor_EditorShell_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
 src_components_editor_EditorShell_tsx-->src_model_elementCreation_ts
+src_components_editor_EditorShell_tsx-->src_model_sectionContents_ts
 src_components_editor_EditorShell_tsx-->src_persistence_useEditorPersistence_ts
 src_components_editor_EditorShell_tsx-->src_projectFiles_downloadDuplicateProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
@@ -305,6 +307,7 @@ src_model_textAppearance_ts-->src_model_elementFrame_ts
 src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
 src_model_elementCreation_ts-->src_model_imageAsset_ts
+src_model_sectionContents_ts-->src_model_editorProject_ts
 src_persistence_useEditorPersistence_ts-->src_persistence_editorPersistenceContext_ts
 src_projectFiles_downloadDuplicateProject_ts-->src_assets_images_imageAssetStoreContext_ts
 src_projectFiles_downloadDuplicateProject_ts-->src_model_editorProject_ts
@@ -415,6 +418,7 @@ src_model_createEditorProject_ts-->src_model_pageAppearance_ts
 src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
 src_state_addElementToActivePage_ts-->src_model_editorProject_ts
 src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
+src_state_addElementToActivePage_ts-->src_model_findElementCreationPosition_ts
 src_state_addElementToActivePage_ts-->src_state_isValidElementCreationRequest_ts
 src_model_createEditorElement_ts-->src_model_buttonAsset_ts
 src_model_createEditorElement_ts-->src_model_editorProject_ts
@@ -437,6 +441,7 @@ src_state_isValidElementCreationRequest_ts-->src_model_headerElement_ts
 src_state_isValidElementCreationRequest_ts-->src_model_imageAsset_ts
 src_state_deleteElementFromActivePage_ts-->src_model_editorProject_ts
 src_state_deleteElementFromActivePage_ts-->src_model_navigation_ts
+src_state_deleteElementFromActivePage_ts-->src_model_sectionContents_ts
 src_state_insertElementsToActivePage_ts-->src_model_editorProject_ts
 src_state_insertElementsToActivePage_ts-->src_model_editorProjectValidation_ts
 src_state_reduceColorProjectAction_ts-->src_model_editorColor_ts
@@ -924,6 +929,7 @@ src_templates_SectionTemplateLibraryProvider_tsx-->src_templates_sectionTemplate
 src_templates_captureSectionTemplate_ts-->src_assets_images_imageAssetStoreContext_ts
 src_templates_captureSectionTemplate_ts-->src_model_editorProject_ts
 src_templates_captureSectionTemplate_ts-->src_model_imageAsset_ts
+src_templates_captureSectionTemplate_ts-->src_model_sectionContents_ts
 src_templates_captureSectionTemplate_ts-->src_projectFiles_projectAssetReferences_ts
 src_templates_captureSectionTemplate_ts-->src_templates_sectionTemplate_ts
 src_templates_instantiateSectionTemplate_ts-->src_assets_images_imageAssetStoreContext_ts
