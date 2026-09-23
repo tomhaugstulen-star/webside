@@ -31,7 +31,6 @@
   border: 1px solid var(--border-strong);
   background: #ffffff;
   box-shadow: 0 16px 44px rgba(83, 59, 45, 0.1);
-  transition: width 180ms ease;
 }
 
 .canvas-page--desktop {
@@ -117,10 +116,4 @@
   border-style: solid;
   cursor: text;
   user-select: text;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .canvas-page {
-    transition: none;
-  }
 }
