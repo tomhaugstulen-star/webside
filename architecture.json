@@ -921,6 +921,23 @@
         },
         {
           "dynamic": false,
+          "module": "./editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./elementFrame",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -957,6 +974,7 @@
       "dependents": [
         "src/model/editorProject.ts",
         "src/model/editorElementValidation.ts",
+        "src/model/editorProjectMigration.ts",
         "src/model/createEditorElement.ts",
         "src/state/reduceHeaderAppearanceAction.ts"
       ],
@@ -975,11 +993,9 @@
       "dependencies": [],
       "dependents": [
         "src/model/headerAppearance.ts",
+        "src/model/editorFill.ts",
         "src/model/elementFrame.ts",
         "src/model/textElementStyle.ts",
-        "src/model/pageAppearance.ts",
-        "src/model/sectionAppearance.ts",
-        "src/model/textAppearance.ts",
         "src/state/editorProjectAction.ts",
         "src/state/useHeaderAppearance.ts",
         "src/state/useSectionAppearance.ts",
@@ -987,6 +1003,57 @@
         "src/components/colors/ColorSwatchInput.tsx",
         "src/model/projectColorEntries.ts",
         "src/state/useProjectColors.ts",
+        "src/model/editorProjectMigration.ts",
+        "src/state/reduceColorProjectAction.ts",
+        "src/state/reduceHeaderAppearanceAction.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/model/editorFill.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./editorColor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/model/headerAppearance.ts",
+        "src/model/pageAppearance.ts",
+        "src/model/sectionAppearance.ts",
+        "src/model/textAppearance.ts",
+        "src/state/editorProjectAction.ts",
+        "src/components/canvas/EditorCanvas.tsx",
+        "src/components/canvas/getElementAppearanceCssStyle.ts",
+        "src/state/useHeaderAppearance.ts",
+        "src/state/useSectionAppearance.ts",
+        "src/state/useTextAppearance.ts",
+        "src/components/sidebar/ColorsPanel.tsx",
+        "src/model/projectColorEntries.ts",
+        "src/state/useProjectColors.ts",
+        "src/components/colors/BackgroundFillControl.tsx",
+        "src/model/editorProjectMigration.ts",
         "src/state/reduceColorProjectAction.ts",
         "src/state/reduceHeaderAppearanceAction.ts"
       ],
@@ -1187,14 +1254,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "./editorColor",
+          "module": "./editorFill",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "src/model/editorColor.ts",
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1224,14 +1291,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "./editorColor",
+          "module": "./editorFill",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "src/model/editorColor.ts",
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1298,14 +1365,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "./editorColor",
+          "module": "./editorFill",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "src/model/editorColor.ts",
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1334,7 +1401,6 @@
       "dependents": [
         "src/model/editorProject.ts",
         "src/model/editorElementValidation.ts",
-        "src/model/editorProjectMigration.ts",
         "src/model/createEditorElement.ts",
         "src/state/reduceColorProjectAction.ts"
       ],
@@ -1574,6 +1640,24 @@
             "import"
           ],
           "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2370,6 +2454,23 @@
     {
       "source": "src/components/canvas/EditorCanvas.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../../model/editorProject",
@@ -3864,6 +3965,23 @@
     {
       "source": "src/components/canvas/getElementAppearanceCssStyle.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../../model/editorProject",
@@ -5500,6 +5618,23 @@
         },
         {
           "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../model/elementFrame",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -5589,6 +5724,23 @@
         },
         {
           "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../model/sectionAppearance",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -5650,6 +5802,23 @@
             "import"
           ],
           "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -5730,7 +5899,8 @@
       ],
       "dependents": [
         "src/components/properties/FramePropertiesSection.tsx",
-        "src/components/sidebar/ColorsPanel.tsx"
+        "src/components/sidebar/ColorsPanel.tsx",
+        "src/components/colors/BackgroundFillControl.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -6499,6 +6669,24 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../model/projectColorEntries",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -6541,6 +6729,23 @@
             "import"
           ],
           "resolved": "src/state/useProjectColors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../colors/BackgroundFillControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/colors/BackgroundFillControl.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -6602,6 +6807,24 @@
         },
         {
           "dynamic": false,
+          "module": "./editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./editorProject",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -6645,6 +6868,23 @@
             "import"
           ],
           "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -6730,6 +6970,57 @@
             "import"
           ],
           "resolved": "src/state/useTextElementStyle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/ColorsPanel.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/colors/BackgroundFillControl.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ColorSwatchInput",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/colors/ColorSwatchInput.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8134,6 +8425,41 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "./editorColor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./editorProject",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -8168,14 +8494,15 @@
         },
         {
           "dynamic": false,
-          "module": "./siteStructure",
+          "module": "./headerAppearance",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
-          "resolved": "src/model/siteStructure.ts",
+          "resolved": "src/model/headerAppearance.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8185,15 +8512,14 @@
         },
         {
           "dynamic": false,
-          "module": "./textAppearance",
+          "module": "./siteStructure",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "type-only",
             "import"
           ],
-          "resolved": "src/model/textAppearance.ts",
+          "resolved": "src/model/siteStructure.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -9826,6 +10152,23 @@
         },
         {
           "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../model/editorProject",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -9955,6 +10298,23 @@
             "import"
           ],
           "resolved": "src/model/editorColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -11055,10 +11415,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 150,
-    "totalDependenciesCruised": 470,
+    "totalCruised": 152,
+    "totalDependenciesCruised": 488,
     "optionsUsed": {
-      "baseDir": "/workspace/scratch/2ff356a2ebd0/webside",
+      "baseDir": "/home/runner/work/webside/webside",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

@@ -19,7 +19,6 @@ function createTextElement(id = 'text-1') {
     request: { kind: 'text' },
     existingElements: [],
   })
-
   if (element.kind !== 'text') throw new Error('Expected text element.')
   return element
 }
@@ -72,25 +71,26 @@ test.describe('editor polish frames', () => {
     })
   })
 
-  test('migrates schema 11 text appearance to schema 12 deterministically', () => {
+  test('migrates schema 11 text appearance through schema 13 deterministically', () => {
     const project = createBlankProject('Migrering')
+    const page = project.pages[0]
     const text = createTextElement('legacy-text')
+    if (page.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid page.')
+    if (text.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid text.')
+
     const legacy: EditorProjectV11 = {
       ...project,
       schemaVersion: 11,
-      pages: [
-        {
-          ...project.pages[0],
-          elements: [
-            {
-              ...text,
-              appearance: {
-                backgroundColor: text.appearance.backgroundColor,
-              },
-            },
-          ],
-        },
-      ],
+      pages: [{
+        id: page.id,
+        name: page.name,
+        slug: page.slug,
+        appearance: { backgroundColor: page.appearance.backgroundFill.color },
+        elements: [{
+          ...text,
+          appearance: { backgroundColor: text.appearance.backgroundFill.color },
+        }],
+      }],
     }
 
     const first = migrateEditorProjectV11(legacy)
@@ -102,5 +102,8 @@ test.describe('editor polish frames', () => {
     expect(migratedText.kind === 'text' && migratedText.appearance.frame).toEqual(
       DEFAULT_ELEMENT_FRAME,
     )
+    expect(
+      migratedText.kind === 'text' && migratedText.appearance.backgroundFill,
+    ).toEqual({ type: 'solid', color: '#FFFFFF' })
   })
 })

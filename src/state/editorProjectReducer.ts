@@ -178,16 +178,16 @@ function reduceEditorProjectState(
         action.updatedAt,
       )
 
-    case 'set-active-page-background-color':
-    case 'set-section-background-color':
+    case 'set-active-page-background-fill':
+    case 'set-section-background-fill':
     case 'set-section-frame-width':
     case 'set-section-frame-color':
-    case 'set-text-background-color':
+    case 'set-text-background-fill':
     case 'set-text-frame-width':
     case 'set-text-frame-color':
       return reduceColorProjectAction(state, action)
 
-    case 'set-header-background-color':
+    case 'set-header-background-fill':
     case 'set-header-text-color':
     case 'set-header-font-family':
     case 'set-header-font-size':

@@ -1,29 +1,42 @@
 import type { EditorColor } from './editorColor'
+import type { EditorFill } from './editorFill'
 import type { EditorPage } from './editorProject'
 
-export type ProjectColorTarget =
+export type ProjectFillTarget =
   | { type: 'page-background' }
   | { type: 'section-background'; elementId: string }
-  | { type: 'section-frame'; elementId: string }
   | { type: 'text-background'; elementId: string }
-  | { type: 'text-color'; elementId: string }
   | { type: 'header-background'; elementId: string }
+
+export type ProjectColorTarget =
+  | { type: 'section-frame'; elementId: string }
+  | { type: 'text-color'; elementId: string }
   | { type: 'header-text'; elementId: string }
   | { type: 'header-frame'; elementId: string }
 
-export type ProjectColorEntry = {
-  id: string
-  label: string
-  value: EditorColor
-  disabled: boolean
-  target: ProjectColorTarget
-}
+export type ProjectAppearanceEntry =
+  | {
+      kind: 'fill'
+      id: string
+      label: string
+      fill: EditorFill
+      disabled: boolean
+      target: ProjectFillTarget
+    }
+  | {
+      kind: 'color'
+      id: string
+      label: string
+      value: EditorColor
+      disabled: boolean
+      target: ProjectColorTarget
+    }
 
 export type ProjectColorGroup = {
   id: string
   label: string
   locked: boolean
-  entries: ProjectColorEntry[]
+  entries: ProjectAppearanceEntry[]
 }
 
 export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
@@ -32,15 +45,14 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
       id: `page-${page.id}`,
       label: 'Bakgrunn',
       locked: false,
-      entries: [
-        {
-          id: `page-${page.id}-background`,
-          label: 'Sidebakgrunn',
-          value: page.appearance.backgroundColor,
-          disabled: false,
-          target: { type: 'page-background' },
-        },
-      ],
+      entries: [{
+        kind: 'fill',
+        id: `page-${page.id}-background`,
+        label: 'Sidebakgrunn',
+        fill: page.appearance.backgroundFill,
+        disabled: false,
+        target: { type: 'page-background' },
+      }],
     },
   ]
   let sectionNumber = 0
@@ -50,18 +62,18 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
   page.elements.forEach((element) => {
     if (element.kind === 'section') {
       sectionNumber += 1
-      const entries: ProjectColorEntry[] = [
-        {
-          id: `${element.id}-background`,
-          label: 'Bakgrunn',
-          value: element.appearance.backgroundColor,
-          disabled: element.locked,
-          target: { type: 'section-background', elementId: element.id },
-        },
-      ]
+      const entries: ProjectAppearanceEntry[] = [{
+        kind: 'fill',
+        id: `${element.id}-background`,
+        label: 'Bakgrunn',
+        fill: element.appearance.backgroundFill,
+        disabled: element.locked,
+        target: { type: 'section-background', elementId: element.id },
+      }]
 
       if (element.appearance.frame.width > 0) {
         entries.push({
+          kind: 'color',
           id: `${element.id}-frame`,
           label: 'Ramme',
           value: element.appearance.frame.color,
@@ -87,13 +99,15 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
         locked: element.locked,
         entries: [
           {
+            kind: 'fill',
             id: `${element.id}-background`,
             label: 'Bakgrunn',
-            value: element.appearance.backgroundColor,
+            fill: element.appearance.backgroundFill,
             disabled: element.locked,
             target: { type: 'text-background', elementId: element.id },
           },
           {
+            kind: 'color',
             id: `${element.id}-text`,
             label: 'Tekstfarge',
             value: element.textStyle.color,
@@ -107,15 +121,17 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
 
     if (element.kind === 'header') {
       headerNumber += 1
-      const entries: ProjectColorEntry[] = [
+      const entries: ProjectAppearanceEntry[] = [
         {
+          kind: 'fill',
           id: `${element.id}-background`,
           label: 'Bakgrunn',
-          value: element.appearance.backgroundColor,
+          fill: element.appearance.backgroundFill,
           disabled: element.locked,
           target: { type: 'header-background', elementId: element.id },
         },
         {
+          kind: 'color',
           id: `${element.id}-text`,
           label: 'Tekstfarge',
           value: element.appearance.textColor,
@@ -126,6 +142,7 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
 
       if (element.appearance.frame.width > 0) {
         entries.push({
+          kind: 'color',
           id: `${element.id}-frame`,
           label: 'Ramme',
           value: element.appearance.frame.color,

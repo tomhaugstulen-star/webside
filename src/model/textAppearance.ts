@@ -1,8 +1,8 @@
 import {
-  createEditorColor,
-  isEditorColor,
-  type EditorColor,
-} from './editorColor'
+  createDefaultSolidFill,
+  isEditorFill,
+  type EditorFill,
+} from './editorFill'
 import {
   DEFAULT_ELEMENT_FRAME,
   isValidElementFrame,
@@ -10,12 +10,12 @@ import {
 } from './elementFrame'
 
 export type TextAppearance = {
-  backgroundColor: EditorColor
+  backgroundFill: EditorFill
   frame: ElementFrame
 }
 
 export const DEFAULT_TEXT_APPEARANCE: TextAppearance = {
-  backgroundColor: createEditorColor('#FFFFFF'),
+  backgroundFill: createDefaultSolidFill('#FFFFFF'),
   frame: { ...DEFAULT_ELEMENT_FRAME },
 }
 
@@ -34,7 +34,7 @@ export function isValidTextAppearance(
 
   return (
     Object.keys(value).length === 2 &&
-    isEditorColor(value.backgroundColor) &&
+    isEditorFill(value.backgroundFill) &&
     isValidElementFrame(value.frame)
   )
 }

@@ -10,6 +10,7 @@ import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
 export {
   migrateEditorProjectV10,
   migrateEditorProjectV11,
+  migrateEditorProjectV12,
 } from './editorProjectMigration'
 
 export function createEditorPage(

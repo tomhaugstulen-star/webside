@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { normalizeEditorColor } from '../model/editorColor'
+import { isEditorFill, type EditorFill } from '../model/editorFill'
 import { useEditorProject } from './useEditorProject'
 import { useHeaderAppearance } from './useHeaderAppearance'
 import { useSectionAppearance } from './useSectionAppearance'
@@ -8,27 +9,19 @@ import { useTextElementStyle } from './useTextElementStyle'
 
 export function useProjectColors() {
   const { dispatch } = useEditorProject()
-  const {
-    updateHeaderBackgroundColor,
-    updateHeaderTextColor,
-    updateHeaderFrameColor,
-  } = useHeaderAppearance()
-  const { updateSectionBackgroundColor, updateSectionFrameColor } =
+  const { updateHeaderBackgroundFill, updateHeaderTextColor, updateHeaderFrameColor } =
+    useHeaderAppearance()
+  const { updateSectionBackgroundFill, updateSectionFrameColor } =
     useSectionAppearance()
-  const { updateTextBackgroundColor } = useTextAppearance()
+  const { updateTextBackgroundFill } = useTextAppearance()
   const { updateTextElementStyle } = useTextElementStyle()
 
-  const updatePageBackgroundColor = useCallback(
-    (value: string) => {
-      const color = normalizeEditorColor(value)
-
-      if (!color) {
-        return false
-      }
-
+  const updatePageBackgroundFill = useCallback(
+    (fill: EditorFill) => {
+      if (!isEditorFill(fill)) return false
       dispatch({
-        type: 'set-active-page-background-color',
-        color,
+        type: 'set-active-page-background-fill',
+        fill,
         updatedAt: new Date().toISOString(),
       })
       return true
@@ -39,11 +32,7 @@ export function useProjectColors() {
   const updateTextColor = useCallback(
     (elementId: string, value: string) => {
       const color = normalizeEditorColor(value)
-
-      if (!color) {
-        return false
-      }
-
+      if (!color) return false
       updateTextElementStyle(elementId, { color })
       return true
     },
@@ -51,12 +40,12 @@ export function useProjectColors() {
   )
 
   return {
-    updatePageBackgroundColor,
-    updateSectionBackgroundColor,
+    updatePageBackgroundFill,
+    updateSectionBackgroundFill,
     updateSectionFrameColor,
-    updateTextBackgroundColor,
+    updateTextBackgroundFill,
     updateTextColor,
-    updateHeaderBackgroundColor,
+    updateHeaderBackgroundFill,
     updateHeaderTextColor,
     updateHeaderFrameColor,
   }

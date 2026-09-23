@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { EditorElement } from '../../model/editorProject'
+import { editorFillToCssBackground } from '../../model/editorFill'
 import { getTextFontFamilyCssValue } from './getTextElementCssStyle'
 
 export function getElementAppearanceCssStyle(
@@ -7,7 +8,7 @@ export function getElementAppearanceCssStyle(
 ): CSSProperties {
   if (element.kind === 'section') {
     return {
-      backgroundColor: element.appearance.backgroundColor,
+      background: editorFillToCssBackground(element.appearance.backgroundFill),
       borderColor: element.appearance.frame.color,
       borderStyle: 'solid',
       borderWidth: element.appearance.frame.width,
@@ -16,7 +17,7 @@ export function getElementAppearanceCssStyle(
 
   if (element.kind === 'text') {
     return {
-      backgroundColor: element.appearance.backgroundColor,
+      background: editorFillToCssBackground(element.appearance.backgroundFill),
       borderColor: element.appearance.frame.color,
       borderStyle: 'solid',
       borderWidth: element.appearance.frame.width,
@@ -25,7 +26,7 @@ export function getElementAppearanceCssStyle(
 
   if (element.kind === 'header') {
     return {
-      backgroundColor: element.appearance.backgroundColor,
+      background: editorFillToCssBackground(element.appearance.backgroundFill),
       color: element.appearance.textColor,
       fontFamily: getTextFontFamilyCssValue(element.appearance.fontFamily),
       fontSize: element.appearance.fontSize,

@@ -8,9 +8,9 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
-- aktiv grunnlagsleveranse er #66 på `feature/project-import-before-phase-20`
-- #63/#64 er merget i PR #65; ny grunnlagsleveranse #66 flytter prosjektfil/import-round-trip frem før fase 20
-- neste produksjonsfase etter #66 er fase 20 – nettstedets Header og menynavigasjon
+- #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
+- aktiv vedlikeholdsleveranse er #67 på `feature/gradient-fill-before-phase-20`: typet helfarge/lineær gradient og schema 13
+- neste produksjonsfase etter vedlikeholdsgaten er fase 20 – nettstedets Header og menynavigasjon
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -66,7 +66,7 @@ git diff --stat
 
 Brukeren har uttrykkelig prioritert muligheten til å fortsette tidligere arbeid før fase 20.
 
-Implementert på aktiv branch:
+Levert og merget i PR #70:
 
 - eksportere hele editorprosjektet til én lokal prosjektfil med prosjektdata og refererte bilder/logoer
 - åpne/importere samme prosjektfil i en senere editorøkt
@@ -75,11 +75,28 @@ Implementert på aktiv branch:
 - gjøre eksisterende bildeimport lettere å oppdage uten parallell assetmodell
 - være rent filbasert; ingen backend, konto, sky eller IndexedDB/autolagring
 
-Sluttkontroll på branchen: full `npm run verify` er grønn med 64 unit-tester og 12 E2E-tester. Nettlesertestene dekker ny editorøkt, flere sider, bilder/logoer, PC-/Telefon-visning, feilimport og rollback av objekt-URL-er. PR/review, CI på endelig head og uttrykkelig mergegodkjenning gjenstår.
+Sluttkontrollen var grønn med 64 unit-tester og 12 E2E-tester. Nettlesertestene dekker ny editorøkt, flere sider, bilder/logoer, PC-/Telefon-visning, feilimport og rollback av objekt-URL-er.
 
 Formatet er `.website-project` med versjonert JSON og innebygde base64-assets. Import kontrollerer schema, layout, assetreferanser, unike assets, binært bildeformat, dimensjoner og metadata før state/assets erstattes. Feil ved klargjøring av objekt-URL-er rulles tilbake; lukking av panelet avbryter ventende import.
 
 Dette er ikke fase 25-lagring, fase 27 Preview eller fase 30 nettstedseksport. Full fase 26 beholder senere ansvar for videre backup/import/migrering utover dette nødvendige round-trip-grunnlaget.
+
+## Vedlikeholdsgate #67 før fase 20 – lineære bakgrunnsgradienter
+
+Aktiv leveranse:
+
+- schema 13
+- typet `EditorFill` som source of truth
+- helfarge eller lineær gradient
+- nøyaktig to fargestopp
+- vinkel 0–360°
+- støtte på side, seksjon, Header og tekstboks
+- ramme- og tekstfarger forblir helfarge
+- schema 12 → 13 migrerer eksisterende bakgrunnsfarger uten visuelt avvik
+- schema 10/11 går fortsatt gjennom migreringskjeden til siste schema
+- gradientdata følger eksisterende `.website-project`-round-trip
+- #68, #69 og #71 er ikke del av leveransen
+- fase 20 starter ikke på denne branchen
 
 ## Fase 18 – arbeidsportalnavigasjon og navigator
 
@@ -143,6 +160,24 @@ Auditen før fase 20 fant:
 
 Levert i PR #65: dedikerte resize-/target-tester og HEX-/pipette-tester, deaktivert planlagt UI med opprydding av døde callbacks, fjernet BOM og ubrukt `hero.png`, samt regenererte arkitekturrapporter. Knappbibliotekets SVG-er er beholdt. Ingen senere funksjonsfase er implementert.
 
+## #67 – fargegradienter før fase 20
+
+Aktiv vedlikeholdsleveranse på `feature/gradient-fill-before-phase-20`.
+
+Låst leveranse:
+
+- schema 13 med typet `EditorFill` i stedet for rå CSS som prosjektdata
+- helfarge eller lineær gradient med nøyaktig to `EditorColor`-stopp
+- vinkel 0–360°
+- gradient på side-, Seksjon-, Header- og tekstboksbakgrunn
+- eksisterende HEX, native picker og EyeDropper gjenbrukes for begge gradientfargene
+- tekstfarge og rammefarge forblir helfarge
+- deterministisk schema 12 → 13-migrering uten visuelt avvik; schema 10/11 går videre gjennom eksisterende migreringskjede
+- gradientdata skal overleve `.website-project` round-trip
+- #68, #69 og #71 skal ikke blandes inn
+
+Fase 20 starter først etter separat review og uttrykkelig mergegodkjenning av denne vedlikeholdsleveransen.
+
 ## Synlige UI-handlinger som skal bli funksjonelle
 
 Knappene som allerede finnes i editoren er ikke ment som permanent dødt UI. De kobles til roadmapen slik:
@@ -178,7 +213,7 @@ Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fr
 
 Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 
-- #67 gradienter, #68 telefonpresets og #69 eksakte elementmål er kun planlagt. Separator/divider er bare notert.
+- #68 telefonpresets, #69 eksakte elementmål og #71 Paint-light er planlagt og holdes utenfor #67. Separator/divider er bare notert.
 - nettstedet er responsivt; senere telefonmodeller er kun forhåndsvisningspresets, ikke separate enhetsdesign
 - #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer

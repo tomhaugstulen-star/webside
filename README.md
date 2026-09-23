@@ -14,9 +14,9 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 - PC- og Telefon-visning
 - Seksjon, Bilde, Tekst, Knapp og Header
 - markering, flytting, størrelsesendring, låsing og sikker sletting
-- tekstredigering, tekststil, tekstfarge, tekstboksbakgrunn, rammer og lenker
+- tekstredigering, tekststil, tekstfarge, helfarge/lineær gradient på bakgrunner, rammer og lenker
 - lokal bilde- og logoimport for PNG, JPEG og WebP
-- bildeutsnitt, zoom, prosjektfarger og rammer
+- bildeutsnitt, zoom, prosjektfarger, lineære bakgrunnsgradienter og rammer
 - sideoppretting, sidenavn, slug, rekkefølge og sletting
 - stabile offentlige seksjons-ID-er og serialiserbar nettstednavigasjon
 - korrigeringslinjer og snapping; aktiv vedlikeholdsbranch har også snapping til lik bredde/høyde
@@ -27,11 +27,11 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - #63/#64 er merget i PR #65
-- aktiv grunnlagsleveranse er #66 på `feature/project-import-before-phase-20`
-- Prosjekt-panelet kan lagre og åpne én `.website-project`-fil med alle sider, elementer, bilder og logoer; filformatet er versjonert JSON med innebygde base64-assets
-- import valideres og schema 10/11 migreres til schema 12 før aktivt prosjekt og asset-store erstattes; ugyldige filer avvises uten å endre arbeidsøkten
-- bildeimport finnes både i Prosjekt-panelet og under Elementer → Bilde
-- neste produksjonsfase etter #66 er fase 20 – nettstedets Header og menynavigasjon
+- #66 er merget i PR #70; Prosjekt-panelet kan lagre og åpne én `.website-project`-fil med alle sider, elementer, bilder og logoer
+- aktiv vedlikeholdsleveranse før fase 20 er #67 på `feature/gradient-fill-before-phase-20`
+- #67 oppgraderer prosjektmodellen til schema 13 med typet bakgrunnsfyll: helfarge eller lineær gradient med to farger og vinkel 0–360°
+- schema 10/11/12 migreres kontrollert til schema 13 ved prosjektimport; ugyldige filer avvises uten å endre arbeidsøkten
+- neste produksjonsfase etter vedlikeholdsgaten er fase 20 – nettstedets Header og menynavigasjon
 - eksisterende synlige editorhandlinger som Lagre, Forhåndsvisning og Publiser er planlagte funksjoner; fase 30 skal kunne generere en komplett statisk nettsidemappe som kan lastes direkte opp til vanlig webhotell/domene
 - fase 25 leverer lokal prosjektlagring, automatisk lagring og gjenoppretting
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke brukes som aktiv leveranse

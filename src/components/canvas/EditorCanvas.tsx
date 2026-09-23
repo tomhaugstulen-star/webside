@@ -5,6 +5,7 @@ import {
   type CSSProperties,
 } from 'react'
 import type { EditorElement } from '../../model/editorProject'
+import { editorFillToCssBackground } from '../../model/editorFill'
 import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
 import type { ViewportMode } from '../../types/editor'
@@ -77,7 +78,7 @@ export function EditorCanvas({
     layoutPreview,
   )
   const pageStyle: CSSProperties = {
-    backgroundColor: activePage.appearance.backgroundColor,
+    background: editorFillToCssBackground(activePage.appearance.backgroundFill),
     ...(contentHeight > 0 ? { height: contentHeight } : {}),
   }
   const renderElements = orderElementsForRendering(activePage.elements)

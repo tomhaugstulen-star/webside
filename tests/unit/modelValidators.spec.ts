@@ -73,12 +73,10 @@ test.describe('model validators', () => {
   })
 
   test('validates the exact text appearance shape', () => {
-    expect(DEFAULT_TEXT_APPEARANCE.backgroundColor).toBe('#FFFFFF')
+    expect(DEFAULT_TEXT_APPEARANCE.backgroundFill).toEqual({ type: 'solid', color: '#FFFFFF' })
     expect(isValidTextAppearance(DEFAULT_TEXT_APPEARANCE)).toBe(true)
-    expect(isValidTextAppearance({ backgroundColor: '#ffffff' })).toBe(false)
-    expect(isValidTextAppearance({ backgroundColor: '#FFFFFF', extra: true })).toBe(
-      false,
-    )
+    expect(isValidTextAppearance({ backgroundFill: { type: 'solid', color: '#ffffff' }, frame: DEFAULT_TEXT_APPEARANCE.frame })).toBe(false)
+    expect(isValidTextAppearance({ ...DEFAULT_TEXT_APPEARANCE, extra: true })).toBe(false)
     expect(isValidTextAppearance(null)).toBe(false)
   })
 

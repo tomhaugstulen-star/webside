@@ -1,6 +1,7 @@
 import type { ButtonAssetId } from '../model/buttonAsset'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import type { EditorColor } from '../model/editorColor'
+import type { EditorFill } from '../model/editorFill'
 import type { ElementFrameWidth } from '../model/elementFrame'
 import type { ElementLayout } from '../model/elementLayout'
 import type { EditorProject } from '../model/editorProject'
@@ -17,14 +18,14 @@ import type { PageProjectAction } from './pageProjectAction'
 
 export type ColorProjectAction =
   | {
-      type: 'set-active-page-background-color'
-      color: EditorColor
+      type: 'set-active-page-background-fill'
+      fill: EditorFill
       updatedAt: string
     }
   | {
-      type: 'set-section-background-color'
+      type: 'set-section-background-fill'
       elementId: string
-      color: EditorColor
+      fill: EditorFill
       updatedAt: string
     }
   | {
@@ -40,9 +41,9 @@ export type ColorProjectAction =
       updatedAt: string
     }
   | {
-      type: 'set-text-background-color'
+      type: 'set-text-background-fill'
       elementId: string
-      color: EditorColor
+      fill: EditorFill
       updatedAt: string
     }
   | {
@@ -60,9 +61,9 @@ export type ColorProjectAction =
 
 export type HeaderAppearanceAction =
   | {
-      type: 'set-header-background-color'
+      type: 'set-header-background-fill'
       elementId: string
-      color: EditorColor
+      fill: EditorFill
       updatedAt: string
     }
   | {

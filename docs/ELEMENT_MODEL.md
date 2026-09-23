@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 12
+EDITOR_PROJECT_SCHEMA_VERSION = 13
 ```
 
 ```text
@@ -21,9 +21,10 @@ EDITOR_PROJECT_SCHEMA_VERSION = 12
 10 Tekstutseende med varig tekstboksbakgrunn
 11 Sider, offentlige seksjons-ID-er og nettstednavigasjon
 12 Tekstboksramme og 1 px standardramme for nye innrammede elementer
+13 Typet bakgrunnsfyll: helfarge eller lineær gradient
 ```
 
-Prosjekt-panelet i #66 kan lagre og åpne `.website-project`. Schema 10/11 migreres deterministisk til schema 12. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
+Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12 migreres deterministisk til schema 13. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
 
 Kontrollert migreringsretning:
 
@@ -31,6 +32,7 @@ Kontrollert migreringsretning:
 - versjon 9 til 10 må legge til `TextAppearance.backgroundColor`, standard `#FFFFFF`
 - versjon 10 til 11 legger til stabile seksjonsankere og tom `WebsiteNavigation`
 - versjon 11 til 12 legger til `TextAppearance.frame` med 1 px standardramme
+- versjon 12 til 13 erstatter bakgrunnens `backgroundColor` med typet `backgroundFill` uten visuelt avvik
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -39,7 +41,7 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 12
+  schemaVersion: 13
   id: string
   name: string
   pages: EditorPage[]
@@ -96,7 +98,7 @@ type SectionEditorElement = BaseEditorElement & {
   kind: 'section'
   anchorId: string
   appearance: {
-    backgroundColor: EditorColor
+    backgroundFill: EditorFill
     frame: ElementFrame
   }
 }
@@ -159,7 +161,7 @@ type TextEditorElement = BaseEditorElement & {
 }
 
 type TextAppearance = {
-  backgroundColor: EditorColor
+  backgroundFill: EditorFill
   frame: ElementFrame
 }
 ```
@@ -167,7 +169,7 @@ type TextAppearance = {
 Standardstørrelse: `240 × 96 px`  
 Minimum: `120 × 48 px`
 
-Teksttypografi og tekstfarge ligger fortsatt i `TextElementStyle`. Tekstboksens varige bakgrunn og ramme ligger i `TextAppearance`. Ny Tekst opprettes med kanonisk `#FFFFFF` og 1 px ramme. Rammen kan eksplisitt settes til `Ingen`/0 px eller 1–10 px med egen rammefarge.
+Teksttypografi og tekstfarge ligger fortsatt i `TextElementStyle`. Tekstboksens varige bakgrunnsfyll og ramme ligger i `TextAppearance`. Ny Tekst opprettes med helfarge `#FFFFFF` og 1 px ramme. Rammen kan eksplisitt settes til `Ingen`/0 px eller 1–10 px med egen rammefarge.
 
 ## Knapp
 
@@ -198,7 +200,7 @@ type HeaderEditorElement = BaseEditorElement & {
 }
 
 type HeaderAppearance = {
-  backgroundColor: EditorColor
+  backgroundFill: EditorFill
   textColor: EditorColor
   fontFamily: TextFontFamily
   fontSize: TextFontSize
@@ -246,6 +248,14 @@ Ved normalt pekerslipp committes bare ferdig `ElementLayout`. Ved cancel eller t
 ```ts
 type EditorColor = string // kanonisk #RRGGBB
 
+type EditorFill =
+  | { type: 'solid'; color: EditorColor }
+  | {
+      type: 'linear-gradient'
+      angle: number // 0–360
+      stops: [EditorColor, EditorColor]
+    }
+
 type ElementFrame = {
   width: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
   color: EditorColor
@@ -257,9 +267,13 @@ type ElementFrame = {
 - rammefargen beholdes når bredden settes til `0`
 - rammen ligger innenfor elementets ytre størrelse
 - `Farger` er avledet UI og lagres ikke som egen palett
+- Side, Seksjon, Tekst og Header kan bruke helfarge eller lineær gradient som bakgrunnsfyll
+- lineær gradient har nøyaktig to fargestopp ved 0 % og 100 % og vinkel 0–360°
+- gradient lagres som typet prosjektdata; CSS `linear-gradient(...)` avledes bare ved rendering
 - Seksjon, Tekst og Header viser bakgrunn og eventuell rammefarge
 - Tekst viser Bakgrunn før Tekstfarge
 - Header viser bakgrunn og tekstfarge
+- tekstfarge og rammefarge forblir helfarge
 - fargekontroller viser redigerbar kanonisk HEX-kode
 - pipette er transient UI og endrer bare den valgte fargeverdien; den lagres ikke som prosjektdata
 
@@ -300,7 +314,7 @@ Seksjons-ID kan bare endres eksplisitt på en eksisterende ulåst Seksjon og må
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
-- versjon 8 migreres kontrollert til versjon 9, deretter 10, 11 og 12
+- versjon 8 migreres kontrollert til versjon 9, deretter 10, 11, 12 og 13
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions

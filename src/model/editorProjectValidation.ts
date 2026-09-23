@@ -7,8 +7,10 @@ import { isValidEditorElement } from './editorElementValidation'
 import {
   migrateEditorProjectV10,
   migrateEditorProjectV11,
+  migrateEditorProjectV12,
   type EditorProjectV10,
   type EditorProjectV11,
+  type EditorProjectV12,
 } from './editorProjectMigration'
 import { isValidPageAppearance } from './pageAppearance'
 import {
@@ -97,6 +99,8 @@ export function parseImportedEditorProject(value: unknown): EditorProject | null
       migrated = migrateEditorProjectV10(value as unknown as EditorProjectV10)
     } else if (value.schemaVersion === 11) {
       migrated = migrateEditorProjectV11(value as unknown as EditorProjectV11)
+    } else if (value.schemaVersion === 12) {
+      migrated = migrateEditorProjectV12(value as unknown as EditorProjectV12)
     } else if (value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION) {
       return null
     }
