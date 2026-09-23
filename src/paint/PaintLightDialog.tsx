@@ -32,6 +32,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [busy, setBusy] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
   const { canvasRef, overlayRef, ...paint } = usePaintCanvas(file, tool, color, size)
   const { overlayRef: importOverlayRef, imported: importPending, ...importActions } =
@@ -139,6 +140,25 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
         <header className="paint-dialog__header">
           <div><h2>Rediger bilde</h2><p>Originalen beholdes. Endringene lagres som nytt bilde.</p></div>
           <div className="paint-dialog__header-actions">
+            <input ref={importInputRef} className="paint-dialog__file-input" type="file"
+              accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
+              onChange={(event) => {
+                const next = event.target.files?.[0]
+                event.target.value = ''
+                if (next) void importActions.importFile(next).then(() => {
+                  paint.clearSelection()
+                  setTool('select')
+                  setMessage(null)
+                }).catch((error: unknown) => setMessage(
+                  error instanceof Error ? error.message : 'Bildet kunne ikke importeres.',
+                ))
+              }} />
+            <button type="button" disabled={!paint.ready || importPending}
+              onClick={() => importInputRef.current?.click()}>Importer til lerret…</button>
+            {importPending && <>
+              <button type="button" onClick={importActions.merge}>Slå sammen</button>
+              <button type="button" onClick={importActions.cancel}>Fjern import</button>
+            </>}
             <div className="paint-dialog__history-actions" aria-label="Historikk">
               <button type="button" className="paint-dialog__icon-button"
                 aria-label="Angre" title="Angre" disabled={!paint.canUndo || importPending}
@@ -150,6 +170,23 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 onClick={() => void paint.redo()}>
                 <span aria-hidden="true">↷</span>
               </button>
+            </div>
+            <div className="paint-dialog__save-menu">
+              <button type="button" aria-haspopup="menu" aria-expanded={saveMenuOpen}
+                disabled={!paint.ready || busy || importPending}
+                onClick={() => setSaveMenuOpen((open) => !open)}>Lagre</button>
+              {saveMenuOpen && (
+                <div className="paint-dialog__save-menu-popover" role="menu">
+                  <button type="button" role="menuitem" onClick={() => {
+                    setSaveMenuOpen(false)
+                    void save()
+                  }}>Lagre som nytt bilde på siden</button>
+                  <button type="button" role="menuitem" onClick={() => {
+                    setSaveMenuOpen(false)
+                    void exportFile()
+                  }}>Eksporter til fil…</button>
+                </div>
+              )}
             </div>
             <button type="button" onClick={() => setFullscreen(!fullscreen)}>
               {fullscreen ? 'Avslutt fullskjerm' : 'Fullskjerm'}
@@ -172,31 +209,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 onChange={(event) => setColor(event.target.value)} /></label>
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
-            </div>
-
-            <div className="paint-dialog__panel-group" role="group"
-              aria-label="Importer og slå sammen bilder">
-              <h3>Importer</h3>
-              <input ref={importInputRef} className="paint-dialog__file-input" type="file"
-                accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
-                onChange={(event) => {
-                  const next = event.target.files?.[0]
-                  event.target.value = ''
-                  if (next) void importActions.importFile(next).then(() => {
-                    paint.clearSelection()
-                    setTool('select')
-                    setMessage(null)
-                  }).catch((error: unknown) => setMessage(
-                    error instanceof Error ? error.message : 'Bildet kunne ikke importeres.',
-                  ))
-                }} />
-              <button type="button" disabled={!paint.ready || importPending}
-                onClick={() => importInputRef.current?.click()}>Importer til lerret…</button>
-              {importPending && <>
-                <span className="paint-dialog__hint">Flytt bildet på lerretet, og trykk Slå sammen.</span>
-                <button type="button" onClick={importActions.merge}>Slå sammen</button>
-                <button type="button" onClick={importActions.cancel}>Fjern import</button>
-              </>}
             </div>
 
             <div className="paint-dialog__panel-group" role="group" aria-label="Markering">
@@ -226,17 +238,13 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             </fieldset>
 
             <div className="paint-dialog__save">
-              <h3>Lagre</h3>
+              <h3>Fil</h3>
               <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
               <label>Format <select value={format} onChange={(event) =>
                 setFormat(event.target.value as SupportedImageMimeType)}>
                 <option value="image/png">PNG</option><option value="image/jpeg">JPEG</option>
                 <option value="image/webp">WebP</option>
               </select></label>
-              <button type="button" disabled={!paint.ready || busy || importPending}
-                onClick={() => void save()}>Lagre som nytt bilde på siden</button>
-              <button type="button" disabled={!paint.ready || busy || importPending}
-                onClick={() => void exportFile()}>Eksporter til fil…</button>
             </div>
 
             {(message || paint.error) &&
