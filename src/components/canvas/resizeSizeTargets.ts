@@ -4,6 +4,7 @@ import type {
   ResponsiveViewport,
 } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
+import { resolveResponsiveElementLayout } from '../../model/resolveResponsiveElementLayout'
 
 export type ResizeSizeTarget = {
   elementId: string
@@ -15,22 +16,6 @@ type GetResizeSizeTargetsOptions = {
   activeElementId: string
   viewport: ResponsiveViewport
   canvasWidth: number
-}
-
-function getResolvedLayout(
-  element: EditorElement,
-  viewport: ResponsiveViewport,
-  canvasWidth: number,
-): ElementLayout {
-  const position = resolveResponsiveValue(element.position, viewport)
-  const size = resolveResponsiveValue(element.size, viewport)
-
-  return element.kind === 'header'
-    ? {
-        position: { x: 0, y: 0 },
-        size: { width: canvasWidth, height: size.height },
-      }
-    : { position, size }
 }
 
 export function getResizeSizeTargets({
@@ -50,7 +35,7 @@ export function getResizeSizeTargets({
     return [
       {
         elementId: element.id,
-        layout: getResolvedLayout(element, viewport, canvasWidth),
+        layout: resolveResponsiveElementLayout(element, viewport, canvasWidth),
       },
     ]
   })
