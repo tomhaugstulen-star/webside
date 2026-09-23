@@ -25,9 +25,9 @@ export function HeaderElementContent({
   const { getImageAsset } = useImageAssetStore()
   const { state } = useEditorProject()
   const resource = getImageAsset(element.logoAssetId)
-  const pages = navigationContext?.pages ?? pages
+  const pages = navigationContext?.pages ?? state.project.pages
   const navigation = navigationContext?.navigation ?? state.project.navigation
-  const activePageId = navigationContext?.activePageId ?? activePageId
+  const activePageId = navigationContext?.activePageId ?? state.activePageId
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigationRef = useRef<HTMLElement>(null)
