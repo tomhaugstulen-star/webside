@@ -1,0 +1,137 @@
+.preview-shell {
+  width: 100vw;
+  height: 100vh;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--portal-text);
+  background: #ece8e3;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.preview-toolbar {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--portal-border);
+  background: var(--portal-toolbar-surface);
+}
+
+.preview-toolbar__actions,
+.preview-toolbar__viewport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-toolbar button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  cursor: pointer;
+}
+
+.preview-toolbar__viewport button[aria-pressed='true'] {
+  border-color: var(--portal-accent);
+  background: var(--portal-accent-soft);
+}
+
+.preview-toolbar__close {
+  font-weight: 700;
+}
+
+.preview-workspace {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.preview-stage {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 24px;
+}
+
+.preview-page {
+  margin: 0 auto;
+  border: 0;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
+}
+
+.preview-page--desktop {
+  width: min(1080px, calc(100vw - 48px));
+}
+
+.preview-page--mobile {
+  width: 390px;
+  max-width: calc(100vw - 48px);
+}
+
+.preview-element {
+  cursor: default;
+  outline: 0;
+  touch-action: auto;
+  user-select: text;
+}
+
+.preview-element--section {
+  place-items: initial;
+}
+
+.preview-element__text {
+  display: block;
+  width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.preview-element--text > a,
+.preview-element__link {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.preview-element__link {
+  display: block;
+}
+
+.preview-element .image-element__content--crop {
+  cursor: default;
+  touch-action: auto;
+}
+
+.preview-element .hero-element__cta {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (max-width: 520px) {
+  .preview-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .preview-toolbar__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .preview-stage {
+    padding: 12px;
+  }
+
+  .preview-page--mobile {
+    max-width: calc(100vw - 24px);
+  }
+}

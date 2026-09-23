@@ -3,14 +3,29 @@ import type { HeroEditorElement } from '../../model/editorProject'
 
 export function HeroElementContent({
   element,
+  previewLinks = false,
 }: {
   element: HeroEditorElement
+  previewLinks?: boolean
 }) {
   const { getImageAsset } = useImageAssetStore()
   const resource = getImageAsset(element.imageAssetId)
+  const cta =
+    previewLinks && element.ctaLink.type === 'external-url' ? (
+      <a
+        className="hero-element__cta"
+        href={element.ctaLink.url}
+        target={element.ctaLink.openInNewTab ? '_blank' : undefined}
+        rel={element.ctaLink.openInNewTab ? 'noreferrer' : undefined}
+      >
+        {element.ctaLabel}
+      </a>
+    ) : (
+      <span className="hero-element__cta">{element.ctaLabel}</span>
+    )
 
   return (
-    <div className="hero-element__content" aria-hidden="true">
+    <div className="hero-element__content" aria-hidden={!previewLinks}>
       {resource ? (
         <img
           className="hero-element__image"
@@ -29,9 +44,7 @@ export function HeroElementContent({
         {element.subtitle && (
           <span className="hero-element__subtitle">{element.subtitle}</span>
         )}
-        {element.ctaLabel && (
-          <span className="hero-element__cta">{element.ctaLabel}</span>
-        )}
+        {element.ctaLabel && cta}
       </div>
     </div>
   )
