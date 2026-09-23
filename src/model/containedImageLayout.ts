@@ -99,15 +99,12 @@ export function resizeContainedImageLayout(
     desiredWidth *= getCornerScale(initialLayout, delta, handle)
   }
 
-  let maximumWidth = Number.POSITIVE_INFINITY
-
-  if (handle.includes('east') && !handle.includes('west')) {
-    maximumWidth = canvasWidth - initialLayout.position.x
-  } else if (handle.includes('west')) {
-    maximumWidth = right
-  } else {
-    maximumWidth = 2 * Math.min(centerX, canvasWidth - centerX)
-  }
+  let maximumWidth =
+    handle.includes('east') && !handle.includes('west')
+      ? canvasWidth - initialLayout.position.x
+      : handle.includes('west')
+        ? right
+        : 2 * Math.min(centerX, canvasWidth - centerX)
 
   if (handle === 'north') {
     maximumWidth = Math.min(maximumWidth, bottom * ratio)
