@@ -63,6 +63,7 @@
 
 .preview-page {
   margin: 0 auto;
+  overflow-x: clip;
   border: 0;
   box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
 }
