@@ -1,4 +1,5 @@
 import type { ElementSize, EditorElement } from '../../model/editorProject'
+import type { NavigationTarget } from '../../model/navigation'
 import { ButtonElementContent } from './ButtonElementContent'
 import { HeaderElementContent } from './HeaderElementContent'
 import { ImageElementContent } from './ImageElementContent'
@@ -12,6 +13,7 @@ type EditorCanvasElementContentProps = {
   onSelect: (elementId: string) => void
   onCommitText: (content: string) => void
   onFinishTextEditing: (reason: TextEditFinishReason) => void
+  onNavigate: (target: NavigationTarget) => void
 }
 
 export function EditorCanvasElementContent({
@@ -22,6 +24,7 @@ export function EditorCanvasElementContent({
   onSelect,
   onCommitText,
   onFinishTextEditing,
+  onNavigate,
 }: EditorCanvasElementContentProps) {
   switch (element.kind) {
     case 'section':
@@ -57,7 +60,7 @@ export function EditorCanvasElementContent({
     case 'button':
       return <ButtonElementContent element={element} />
     case 'header':
-      return <HeaderElementContent element={element} />
+      return <HeaderElementContent element={element} onNavigate={onNavigate} />
   }
 
   const unhandledElement: never = element
