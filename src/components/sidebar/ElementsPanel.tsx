@@ -4,6 +4,7 @@ import type {
   StandardElementKind,
 } from '../../model/elementCreation'
 import { ButtonLibraryPanel } from './ButtonLibraryPanel'
+import { HeroImportControl } from './HeroImportControl'
 import { ImageImportControl } from './ImageImportControl'
 import { SidebarIcon, type SidebarIconName } from './SidebarIcon'
 
@@ -81,6 +82,7 @@ export function ElementsPanel({
           item={sectionItem}
           onCreateElement={onCreateElement}
         />
+        <HeroImportControl onCreateHero={onCreateElement} />
         <ImageImportControl onCreateImage={onCreateElement} />
         <StandardElementCard item={textItem} onCreateElement={onCreateElement} />
 
