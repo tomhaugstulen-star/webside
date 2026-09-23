@@ -18,7 +18,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 24 er fullført og merget i PR #84
 - fase 25 er fullført og merget i PR #87
 - fase 26 er fullført og merget i PR #89
-- fase 27 er aktiv i sak #90 på `feature/phase-27-local-preview`
+- fase 27 er fullført og merget i PR #91
+- fase 28 er aktiv i sak #92 på `feature/phase-28-template-library`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -258,7 +259,7 @@ Låst hovedomfang:
 
 ## Fase 27 – lokal forhåndsvisning
 
-Fasen er aktiv i sak #90 på `feature/phase-27-local-preview`.
+Fasen er fullført og merget i PR #91. Sak #90 er avsluttet.
 
 Låst hovedomfang:
 
@@ -269,6 +270,20 @@ Låst hovedomfang:
 - PC-/Telefon-preview med samme responsive data og mobile overrides
 - preview-state er transient og skal ikke lagres i prosjektet eller påvirke undo/redo
 - ingen statisk eksport, SEO, domene eller publisering før fase 30
+
+## Fase 28 – malbibliotek og gjenbrukbare seksjoner
+
+Fasen er aktiv i sak #92 på `feature/phase-28-template-library`.
+
+Låst hovedomfang:
+
+- lagre valgt seksjon og geometrisk inneholdte elementer som navngitt lokal mal
+- lokalt malbibliotek separat fra `EditorProject`, tilgjengelig på tvers av lokale prosjekter
+- nødvendige bilde-/Hero-assets følger malen slik at den kan brukes i andre prosjekter
+- innsetting lager nye element-ID-er og kollisjonsfri seksjons-`anchorId`
+- relative desktop-/mobile data, styling, innhold, lenker og synlighet bevares
+- innsetting skal være én angrebar editorhandling og gå gjennom eksisterende autosave
+- ingen sky, nettbasert malbutikk, komplette nettstedstemaer eller fase 29+
 
 ## Separat backlog
 
