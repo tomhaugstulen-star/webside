@@ -1,5 +1,8 @@
-import type { EditorColor } from './editorColor'
-import { isEditorColor } from './editorColor'
+import {
+  createEditorColor,
+  isEditorColor,
+  type EditorColor,
+} from './editorColor'
 import {
   createDefaultSolidFill,
   isEditorFill,
@@ -19,7 +22,7 @@ export type HeroAppearance = {
 
 export const DEFAULT_HERO_APPEARANCE: HeroAppearance = {
   backgroundFill: createDefaultSolidFill('#1F2937'),
-  textColor: '#FFFFFF',
+  textColor: createEditorColor('#FFFFFF'),
   frame: { ...DEFAULT_ELEMENT_FRAME },
 }
 
@@ -29,13 +32,9 @@ export function isValidHeroAppearance(value: unknown): value is HeroAppearance {
   }
 
   const appearance = value as Record<string, unknown>
-  const keys = Object.keys(appearance)
 
   return (
-    keys.length === 3 &&
-    keys.every((key) =>
-      ['backgroundFill', 'textColor', 'frame'].includes(key),
-    ) &&
+    Object.keys(appearance).length === 3 &&
     isEditorFill(appearance.backgroundFill) &&
     isEditorColor(appearance.textColor) &&
     isValidElementFrame(appearance.frame)

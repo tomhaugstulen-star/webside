@@ -62,6 +62,10 @@ export type EditorProjectV12 = Omit<EditorProject, 'schemaVersion' | 'pages'> & 
   pages: EditorPageV12[]
 }
 
+export type EditorProjectV13 = Omit<EditorProject, 'schemaVersion'> & {
+  schemaVersion: 13
+}
+
 type TextAppearanceV11 = Pick<TextAppearanceV12, 'backgroundColor'>
 type TextEditorElementV11 = Omit<TextEditorElementV12, 'appearance'> & {
   appearance: TextAppearanceV11
@@ -99,6 +103,12 @@ export type EditorProjectV10 = Omit<
 > & {
   schemaVersion: 10
   pages: EditorPageV10[]
+}
+
+function assertNoHeroElements(pages: readonly { elements: readonly { kind: string }[] }[]) {
+  if (pages.some((page) => page.elements.some((element) => element.kind === 'hero'))) {
+    throw new Error('Hero is not valid before schema 14.')
+  }
 }
 
 function migrateTextElementV11(
@@ -193,7 +203,18 @@ function migratePageV12ToCurrent(page: EditorPageV12): EditorPage {
   }
 }
 
+export function migrateEditorProjectV13(project: EditorProjectV13): EditorProject {
+  assertNoHeroElements(project.pages)
+
+  return {
+    ...project,
+    schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
+  }
+}
+
 export function migrateEditorProjectV12(project: EditorProjectV12): EditorProject {
+  assertNoHeroElements(project.pages)
+
   return {
     ...project,
     schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
@@ -202,6 +223,8 @@ export function migrateEditorProjectV12(project: EditorProjectV12): EditorProjec
 }
 
 export function migrateEditorProjectV11(project: EditorProjectV11): EditorProject {
+  assertNoHeroElements(project.pages)
+
   const v12: EditorProjectV12 = {
     ...project,
     schemaVersion: 12,
@@ -211,6 +234,8 @@ export function migrateEditorProjectV11(project: EditorProjectV11): EditorProjec
 }
 
 export function migrateEditorProjectV10(project: EditorProjectV10): EditorProject {
+  assertNoHeroElements(project.pages)
+
   const v12: EditorProjectV12 = {
     ...project,
     schemaVersion: 12,
