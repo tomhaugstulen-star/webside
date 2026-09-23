@@ -133,3 +133,38 @@ test('history retains only the latest 100 project states', () => {
     content: 'Tekst 8',
   })
 })
+
+
+test('undo keeps active page and selection valid when page history changes', () => {
+  let history = getInitialEditorHistoryState()
+  const firstPageId = history.present.activePageId
+
+  history = editorHistoryReducer(history, {
+    type: 'add-page',
+    pageId: 'page-2',
+    name: 'Side 2',
+    slug: '/side-2',
+    updatedAt: AT,
+  })
+  history = editorHistoryReducer(history, {
+    type: 'set-active-page',
+    pageId: 'page-2',
+  })
+  history = editorHistoryReducer(history, {
+    type: 'add-element-to-active-page',
+    elementId: 'text-page-2',
+    request: { kind: 'text' },
+    updatedAt: AT,
+  })
+
+  expect(history.present.activePageId).toBe('page-2')
+  expect(history.present.selectedElementId).toBe('text-page-2')
+
+  history = editorHistoryReducer(history, { type: 'undo' })
+  expect(history.present.activePageId).toBe('page-2')
+  expect(history.present.selectedElementId).toBeNull()
+
+  history = editorHistoryReducer(history, { type: 'undo' })
+  expect(history.present.activePageId).toBe(firstPageId)
+  expect(history.present.selectedElementId).toBeNull()
+})
