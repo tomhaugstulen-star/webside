@@ -14,7 +14,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 21 er fullført og merget i PR #76
 - forbedring av Prosjekt-panelet og nettstedmenyen er fullført og merget i PR #78
 - fase 22 er fullført og merget i PR #80
-- fase 23 er aktiv i sak #81 på `feature/phase-23-responsive-mobile`
+- fase 23 er fullført og merget i PR #82
+- fase 24 er aktiv i sak #83 på `feature/phase-24-undo-redo`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
