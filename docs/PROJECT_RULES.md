@@ -63,7 +63,7 @@ hard grense: 300+ linjer, alltid blokkert
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er 13.
+- Gjeldende prosjektskjema er 14.
 - `EditorProject` eier alle varige serialiserbare prosjektdata.
 - Bakgrunnsfyll lagres som typet `EditorFill`: helfarge eller lineær gradient med nøyaktig to fargestopp og vinkel 0–360°. Rå CSS-gradientstrenger er ikke prosjektdata.
 - Varige prosjektendringer går gjennom typede reducerhandlinger.
@@ -74,7 +74,7 @@ hard grense: 300+ linjer, alltid blokkert
 - ID-er er stabile og kryptografisk generert.
 - Header lagres ved `x = 0`, `y = 0` og kanonisk bredde.
 - Manglende `mobile` betyr arv fra desktop.
-- Bakgrunner på side, Seksjon, Tekst og Header bruker en typet serialiserbar fill-modell: helfarge eller lineær gradient med nøyaktig to `EditorColor`-stopp og vinkel 0–360°. Rå CSS-gradientstrenger er ikke prosjektdata.
+- Bakgrunner på side, Seksjon, Tekst, Header og Hero bruker en typet serialiserbar fill-modell: helfarge eller lineær gradient med nøyaktig to `EditorColor`-stopp og vinkel 0–360°. Rå CSS-gradientstrenger er ikke prosjektdata.
 - Tekstfarge og rammefarge forblir `EditorColor` og støtter ikke gradient.
 
 ## Varig og transient state
@@ -107,7 +107,7 @@ Transient state serialiseres ikke i `EditorProject`.
 - Automatisk lagring bygges i fase 25 og reagerer bare på reelle prosjektmutasjoner.
 - Et gyldig lagret prosjekt skal aldri overskrives av et standardprosjekt under oppstart.
 - Ugyldige eller ustøttede data skal ikke injiseres i reducer-state.
-- #66 leverte manuell prosjektfil og nødvendig import/migrering før fase 20 i PR #70. Prosjektimport migrerer schema 10/11/12 kontrollert til gjeldende schema. Øvrig backup/import/migrering følger fase 26; autolagring følger fase 25.
+- #66 leverte manuell prosjektfil og nødvendig import/migrering før fase 20 i PR #70. Prosjektimport migrerer schema 10/11/12/13 kontrollert til gjeldende schema. Øvrig backup/import/migrering følger fase 26; autolagring følger fase 25.
 
 ## Navigasjonsgrenser
 
@@ -115,7 +115,7 @@ Arbeidsportalens navigasjon og nettstedets navigasjon er separate ansvar.
 
 - portalnavigasjon er editor-UI og serialiseres ikke som nettsideinnhold
 - nettstedets serialiserbare navigasjonsmodell og stabile side-/seksjonsmål ble levert i fase 19
-- faktisk Header-meny og navigasjonsrendering bygges først i fase 20
+- faktisk Header-meny og navigasjonsrendering ble levert i fase 20
 - navigatoren skal lese eksisterende state, ikke opprette en parallell prosjektkopi
 
 ## Kvalitetskontroll
