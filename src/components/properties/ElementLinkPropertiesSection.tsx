@@ -1,6 +1,7 @@
 import { useId, useState, type FormEvent } from 'react'
 import type {
   ButtonEditorElement,
+  HeroEditorElement,
   TextEditorElement,
 } from '../../model/editorProject'
 import {
@@ -14,12 +15,19 @@ const invalidUrlMessage =
   'Skriv inn en fullstendig adresse som starter med http:// eller https://.'
 
 type LinkType = ElementLink['type']
-type LinkableEditorElement = TextEditorElement | ButtonEditorElement
+type LinkableEditorElement =
+  | TextEditorElement
+  | ButtonEditorElement
+  | HeroEditorElement
 
 type LinkDraft = {
   type: LinkType
   url: string
   openInNewTab: boolean
+}
+
+function getLink(element: LinkableEditorElement) {
+  return element.kind === 'hero' ? element.ctaLink : element.link
 }
 
 function createDraft(link: ElementLink): LinkDraft {
@@ -33,9 +41,10 @@ function createDraft(link: ElementLink): LinkDraft {
 }
 
 function createFormKey(element: LinkableEditorElement) {
-  return element.link.type === 'none'
+  const link = getLink(element)
+  return link.type === 'none'
     ? `${element.id}:none`
-    : `${element.id}:external-url:${element.link.url}:${element.link.openInNewTab}`
+    : `${element.id}:external-url:${link.url}:${link.openInNewTab}`
 }
 
 type ElementLinkPropertiesSectionProps = {
@@ -50,7 +59,8 @@ export function ElementLinkPropertiesSection({
 
 function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
   const { updateElementLink } = useElementLink()
-  const initialDraft = createDraft(element.link)
+  const link = getLink(element)
+  const initialDraft = createDraft(link)
   const [draftType, setDraftType] = useState<LinkType>(initialDraft.type)
   const [urlDraft, setUrlDraft] = useState(initialDraft.url)
   const [openInNewTab, setOpenInNewTab] = useState(initialDraft.openInNewTab)
@@ -62,21 +72,26 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
   const helpId = `${idPrefix}-help`
   const errorId = `${idPrefix}-error`
   const disabled = element.locked
-  const targetLabel = element.kind === 'button' ? 'knappen' : 'tekstboksen'
+  const targetLabel =
+    element.kind === 'button'
+      ? 'knappen'
+      : element.kind === 'hero'
+        ? 'Hero-knappen'
+        : 'tekstboksen'
   const hasPendingChanges =
-    draftType !== element.link.type ||
+    draftType !== link.type ||
     (draftType === 'external-url' &&
-      element.link.type === 'external-url' &&
-      (urlDraft.trim() !== element.link.url ||
-        openInNewTab !== element.link.openInNewTab))
-  const linkSaved = element.link.type === 'external-url' && !hasPendingChanges
+      link.type === 'external-url' &&
+      (urlDraft.trim() !== link.url ||
+        openInNewTab !== link.openInNewTab))
+  const linkSaved = link.type === 'external-url' && !hasPendingChanges
 
   const submitLabel =
     draftType === 'none'
-      ? element.link.type === 'none'
+      ? link.type === 'none'
         ? 'Ingen lenke'
         : 'Fjern lenke'
-      : element.link.type === 'none'
+      : link.type === 'none'
         ? 'Lag lenke'
         : linkSaved
           ? 'Lenke lagret'
@@ -92,7 +107,6 @@ function ElementLinkForm({ element }: ElementLinkPropertiesSectionProps) {
     }
 
     const normalizedUrl = normalizeExternalUrl(urlDraft)
-
     if (!normalizedUrl) {
       setValidationMessage(invalidUrlMessage)
       return

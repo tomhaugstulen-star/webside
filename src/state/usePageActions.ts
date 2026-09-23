@@ -1,15 +1,10 @@
 import { useCallback } from 'react'
 import { useImageAssetStore } from '../assets/images/useImageAssetStore'
 import { createStableId } from '../model/createStableId'
-import type { EditorElement, EditorProject } from '../model/editorProject'
+import type { EditorProject } from '../model/editorProject'
 import type { ImageAssetId } from '../model/imageAsset'
+import { getElementImageAssetId } from '../model/projectImageAssets'
 import { useEditorProject } from './useEditorProject'
-
-function getElementImageAssetId(element: EditorElement): ImageAssetId | null {
-  if (element.kind === 'image') return element.assetId
-  if (element.kind === 'header') return element.logoAssetId
-  return null
-}
 
 function getAssetsReleasedByPageDeletion(
   project: EditorProject,

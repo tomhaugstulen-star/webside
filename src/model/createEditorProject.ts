@@ -11,6 +11,7 @@ export {
   migrateEditorProjectV10,
   migrateEditorProjectV11,
   migrateEditorProjectV12,
+  migrateEditorProjectV13,
 } from './editorProjectMigration'
 
 export function createEditorPage(

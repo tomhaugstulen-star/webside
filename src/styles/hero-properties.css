@@ -1,0 +1,100 @@
+.hero-properties {
+  margin: 0 0 28px;
+}
+
+.hero-properties__form,
+.hero-properties__appearance,
+.hero-properties__image {
+  display: grid;
+  gap: 12px;
+}
+
+.hero-properties__appearance,
+.hero-properties__image {
+  margin-top: 18px;
+}
+
+.hero-properties__field {
+  display: grid;
+  gap: 7px;
+  color: var(--portal-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero-properties input:not([type='file']),
+.hero-properties textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  font: inherit;
+}
+
+.hero-properties textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.hero-properties__primary,
+.hero-properties__secondary {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--portal-accent);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hero-properties__primary {
+  color: #ffffff;
+  background: var(--portal-accent);
+}
+
+.hero-properties__secondary {
+  color: var(--portal-accent);
+  background: var(--portal-control-surface);
+}
+
+.hero-properties__file-input {
+  display: none;
+}
+
+.hero-properties__file-name,
+.hero-properties__message,
+.hero-properties__warning,
+.hero-properties__locked-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.hero-properties__file-name,
+.hero-properties__locked-note {
+  color: var(--portal-text-muted);
+}
+
+.hero-properties__message {
+  margin-top: 12px;
+  color: var(--portal-success);
+  font-weight: 650;
+}
+
+.hero-properties__warning {
+  color: var(--portal-warning);
+  font-weight: 650;
+}
+
+.hero-properties input:disabled,
+.hero-properties textarea:disabled,
+.hero-properties button:disabled {
+  color: var(--portal-text-muted);
+  background: var(--portal-control-disabled);
+  border-color: var(--portal-border);
+  cursor: not-allowed;
+}

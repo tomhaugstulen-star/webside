@@ -5,9 +5,15 @@ import type {
 } from './editorProject'
 import { isValidElementLayout, isValidElementDesktopLayout } from './elementLayout'
 import { HEADER_SERIALIZED_WIDTH } from './elementDimensions'
-import { isValidHeaderSiteName, isValidHeaderSubtitle } from './headerElement'
 import { isValidElementLink } from './elementLink'
 import { isValidHeaderAppearance } from './headerAppearance'
+import { isValidHeaderSiteName, isValidHeaderSubtitle } from './headerElement'
+import { isValidHeroAppearance } from './heroAppearance'
+import {
+  isValidHeroCtaLabel,
+  isValidHeroSubtitle,
+  isValidHeroTitle,
+} from './heroElement'
 import {
   isImageAssetId,
   isValidImageAssetMetadata,
@@ -89,6 +95,7 @@ function hasValidLayouts(element: Record<string, unknown>, kind: EditorElement['
     position: positions.mobile ?? positions.desktop,
     size: sizes.mobile ?? sizes.desktop,
   })
+
   if (kind === 'header') {
     return desktopValid && mobileValid && element.locked === false &&
       [positions.desktop, positions.mobile ?? positions.desktop].every(
@@ -104,6 +111,7 @@ function hasValidLayouts(element: Record<string, unknown>, kind: EditorElement['
 function isExactImageTransform(value: unknown): value is ImageTransform {
   const normalized = normalizeImageTransform(value)
   if (!normalized || !isRecord(value)) return false
+
   return (
     hasExactKeys(value, ['zoom', 'offsetX', 'offsetY']) &&
     value.zoom === normalized.zoom &&
@@ -200,6 +208,25 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
         typeof value.subtitle === 'string' &&
         isValidHeaderSubtitle(value.subtitle) &&
         isValidHeaderAppearance(value.appearance)
+      )
+    case 'hero':
+      return (
+        hasExactKeys(value, [
+          'id', 'position', 'size', 'visibility', 'locked', 'kind',
+          'imageAssetId', 'imageAssetMetadata', 'title', 'subtitle',
+          'ctaLabel', 'ctaLink', 'appearance',
+        ]) &&
+        hasValidCommonFields(value, 'hero') &&
+        isImageAssetId(value.imageAssetId) &&
+        isValidImageAssetMetadata(value.imageAssetMetadata) &&
+        typeof value.title === 'string' &&
+        isValidHeroTitle(value.title) &&
+        typeof value.subtitle === 'string' &&
+        isValidHeroSubtitle(value.subtitle) &&
+        typeof value.ctaLabel === 'string' &&
+        isValidHeroCtaLabel(value.ctaLabel) &&
+        isValidElementLink(value.ctaLink) &&
+        isValidHeroAppearance(value.appearance)
       )
     default:
       return false

@@ -43,12 +43,12 @@
   border-top: 1px solid var(--portal-border);
 }
 
-.colors-panel__field .color-swatch-input {
+.colors-panel__field > .color-swatch-input {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
 }
 
-.colors-panel__field .color-swatch-input__control {
+.colors-panel__field > .color-swatch-input > .color-swatch-input__control {
   justify-content: flex-end;
 }

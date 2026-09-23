@@ -1,28 +1,10 @@
 import { useCallback } from 'react'
 import { useImageAssetStore } from '../assets/images/useImageAssetStore'
-import type { EditorElement, EditorProject } from '../model/editorProject'
-import type { ImageAssetId } from '../model/imageAsset'
+import {
+  getElementImageAssetId,
+  projectReferencesImageAsset,
+} from '../model/projectImageAssets'
 import { useEditorProject } from './useEditorProject'
-
-function getElementImageAssetId(element: EditorElement): ImageAssetId | null {
-  if (element.kind === 'image') return element.assetId
-  if (element.kind === 'header') return element.logoAssetId
-  return null
-}
-
-function projectReferencesImageAsset(
-  project: EditorProject,
-  assetId: ImageAssetId,
-  excludedElementId: string,
-) {
-  return project.pages.some((page) =>
-    page.elements.some(
-      (element) =>
-        element.id !== excludedElementId &&
-        getElementImageAssetId(element) === assetId,
-    ),
-  )
-}
 
 export function useElementDeletion() {
   const { state, activePage, dispatch } = useEditorProject()

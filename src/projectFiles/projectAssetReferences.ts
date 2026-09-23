@@ -31,7 +31,12 @@ export function getProjectAssetReferences(
                 assetId: element.logoAssetId,
                 metadata: element.logoAssetMetadata,
               }
-            : null
+            : element.kind === 'hero'
+              ? {
+                  assetId: element.imageAssetId,
+                  metadata: element.imageAssetMetadata,
+                }
+              : null
 
       if (!reference) continue
 

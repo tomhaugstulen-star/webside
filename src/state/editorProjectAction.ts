@@ -13,6 +13,7 @@ import type {
   TextFontFamily,
   TextFontSize,
 } from '../model/textElementStyle'
+import type { HeroProjectAction } from './heroProjectAction'
 import type { NavigationProjectAction } from './navigationProjectAction'
 import type { PageProjectAction } from './pageProjectAction'
 
@@ -186,5 +187,6 @@ export type EditorProjectAction =
     }
   | ColorProjectAction
   | HeaderAppearanceAction
+  | HeroProjectAction
   | PageProjectAction
   | NavigationProjectAction

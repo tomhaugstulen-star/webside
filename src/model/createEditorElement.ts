@@ -5,6 +5,12 @@ import type { EditorElement } from './editorProject'
 import { NO_ELEMENT_LINK } from './elementLink'
 import { findElementCreationPosition } from './findElementCreationPosition'
 import { DEFAULT_HEADER_APPEARANCE } from './headerAppearance'
+import { DEFAULT_HERO_APPEARANCE } from './heroAppearance'
+import {
+  DEFAULT_HERO_CTA_LABEL,
+  DEFAULT_HERO_SUBTITLE,
+  DEFAULT_HERO_TITLE,
+} from './heroElement'
 import {
   DEFAULT_IMAGE_MODE,
   DEFAULT_IMAGE_TRANSFORM,
@@ -100,6 +106,22 @@ export function createEditorElement({
           fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
           fontSize: DEFAULT_HEADER_APPEARANCE.fontSize,
           frame: { ...DEFAULT_HEADER_APPEARANCE.frame },
+        },
+      }
+    case 'hero':
+      return {
+        ...common,
+        kind: 'hero',
+        imageAssetId: request.imageAssetId,
+        imageAssetMetadata: { ...request.imageAssetMetadata },
+        title: DEFAULT_HERO_TITLE,
+        subtitle: DEFAULT_HERO_SUBTITLE,
+        ctaLabel: DEFAULT_HERO_CTA_LABEL,
+        ctaLink: { ...NO_ELEMENT_LINK },
+        appearance: {
+          backgroundFill: { ...DEFAULT_HERO_APPEARANCE.backgroundFill },
+          textColor: DEFAULT_HERO_APPEARANCE.textColor,
+          frame: { ...DEFAULT_HERO_APPEARANCE.frame },
         },
       }
   }

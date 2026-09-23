@@ -9,13 +9,18 @@ async function openFile(page: Page, content: unknown) {
 }
 
 async function expectImages(page: Page) {
-  for (const selector of ['.image-element__image', '.header-element__logo']) {
+  for (const selector of [
+    '.image-element__image',
+    '.header-element__logo',
+    '.hero-element__image',
+  ]) {
     const image = page.locator(selector)
     await expect(image).toBeVisible()
     await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(1)
   }
   await expect(page.getByText('Bildet mangler', { exact: true })).toHaveCount(0)
   await expect(page.getByText('Logo mangler', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Hero-bildet mangler', { exact: true })).toHaveCount(0)
 }
 
 test('shared image/logo round-trip survives a new session, mobile view and editing', async ({ page }) => {
@@ -25,7 +30,7 @@ test('shared image/logo round-trip survives a new session, mobile view and editi
   await openFile(page, fixture)
   await expect(page.getByRole('status')).toHaveText('Åpnet «Bilder og logo».')
   await expectImages(page)
-  await expect(page.locator('.project-navigator__element')).toHaveCount(3)
+  await expect(page.locator('.project-navigator__element')).toHaveCount(4)
   const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Lagre prosjektfil', exact: true }).click()
   const download = await downloadPromise

@@ -60,13 +60,14 @@ Seksjon  320 × 180 px
 Bilde    240 × 160 px
 Tekst    240 × 96 px
 Knapp    160 × 48 px
+Hero     340 × 220 px
 ```
 
 Størrelsene er startverdier, ikke endelige designbegrensninger. Minimumsstørrelser ble senere fastsatt i drag/resize-fasen.
 
 ## Gjeldende tillegg etter denne fasen
 
-I gjeldende prosjektskjema 12 opprettes innrammede elementer med en faktisk 1 px designramme som standard. Dette gjelder Seksjon og Tekst i den vanlige elementflyten, og Header i sin separate opprettingsflyt. Brukeren kan senere velge `Ingen`/0 px på elementtyper som støtter `ElementFrame`.
+I gjeldende prosjektskjema 14 opprettes innrammede elementer med en faktisk 1 px designramme som standard. Dette gjelder Seksjon og Tekst i den vanlige elementflyten, og Header i sin separate opprettingsflyt. Brukeren kan senere velge `Ingen`/0 px på elementtyper som støtter `ElementFrame`.
 
 Bilde og Knapp har ikke fått en ny serialiserbar designramme gjennom denne endringen. Se `docs/ELEMENT_MODEL.md` for den autoritative nåværende elementformen.
 
@@ -92,7 +93,7 @@ Oppretting er foreløpig desktop-autoritativ:
 
 - nytt element får desktopverdi for posisjon, størrelse og synlighet
 - mobil arver desktopverdien når mobilverdi mangler
-- standardbreddene passer innenfor 390 px mobilvisning med startpunkt x 24 px
+- standardbreddene, inkludert Hero, passer innenfor 390 px mobilvisning med startpunkt x 24 px
 
 Når full mobilredigering bygges, må følgende vurderes på nytt:
 

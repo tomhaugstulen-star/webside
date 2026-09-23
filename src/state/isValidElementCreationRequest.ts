@@ -1,3 +1,4 @@
+import { isKnownButtonAssetId } from '../model/buttonAsset'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import {
   isValidHeaderSiteName,
@@ -7,7 +8,6 @@ import {
   isImageAssetId,
   isValidImageAssetMetadata,
 } from '../model/imageAsset'
-import { isKnownButtonAssetId } from '../model/buttonAsset'
 
 export function isValidElementCreationRequest(
   request: ElementCreationRequest,
@@ -29,6 +29,11 @@ export function isValidElementCreationRequest(
         isValidImageAssetMetadata(request.logoAssetMetadata) &&
         isValidHeaderSiteName(request.siteName) &&
         isValidHeaderSubtitle(request.subtitle)
+      )
+    case 'hero':
+      return (
+        isImageAssetId(request.imageAssetId) &&
+        isValidImageAssetMetadata(request.imageAssetMetadata)
       )
   }
 

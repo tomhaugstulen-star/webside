@@ -6,21 +6,17 @@ import { getTextFontFamilyCssValue } from './getTextElementCssStyle'
 export function getElementAppearanceCssStyle(
   element: EditorElement,
 ): CSSProperties {
-  if (element.kind === 'section') {
+  if (
+    element.kind === 'section' ||
+    element.kind === 'text' ||
+    element.kind === 'hero'
+  ) {
     return {
       background: editorFillToCssBackground(element.appearance.backgroundFill),
       borderColor: element.appearance.frame.color,
       borderStyle: 'solid',
       borderWidth: element.appearance.frame.width,
-    }
-  }
-
-  if (element.kind === 'text') {
-    return {
-      background: editorFillToCssBackground(element.appearance.backgroundFill),
-      borderColor: element.appearance.frame.color,
-      borderStyle: 'solid',
-      borderWidth: element.appearance.frame.width,
+      ...(element.kind === 'hero' ? { color: element.appearance.textColor } : {}),
     }
   }
 
