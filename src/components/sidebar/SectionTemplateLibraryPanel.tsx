@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { useSectionTemplateLibrary } from '../../templates/useSectionTemplateLibrary'
 
+function formatCreatedAt(value: string) {
+  return new Intl.DateTimeFormat('nb-NO', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
+
 export function SectionTemplateLibraryPanel({
   onBack,
 }: {
@@ -67,6 +74,9 @@ export function SectionTemplateLibraryPanel({
             <div>
               <strong>{template.name}</strong>
               <span>{template.elements.length} elementer</span>
+              <time dateTime={template.createdAt}>
+                {formatCreatedAt(template.createdAt)}
+              </time>
             </div>
             <div className="template-library__actions">
               <button
