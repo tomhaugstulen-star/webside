@@ -6,6 +6,7 @@ export type NavigationProjectAction =
       itemId: string
       label: string
       target: NavigationTarget
+      parentId?: string
       updatedAt: string
     }
   | {
@@ -18,6 +19,12 @@ export type NavigationProjectAction =
       type: 'set-navigation-item-target'
       itemId: string
       target: NavigationTarget
+      updatedAt: string
+    }
+  | {
+      type: 'set-navigation-item-parent'
+      itemId: string
+      parentId: string | null
       updatedAt: string
     }
   | {

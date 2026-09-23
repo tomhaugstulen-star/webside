@@ -284,4 +284,32 @@ test.describe('site structure reducer', () => {
     })
     expect(pageDeleted.project.navigation.items).toEqual([])
   })
+
+  test('creates one-level dropdowns and preserves children when parent is deleted', () => {
+    const initial = getInitialEditorProjectState()
+    const target = { type: 'page' as const, pageId: initial.activePageId }
+    const parent = editorProjectReducer(initial, {
+      type: 'add-navigation-item', itemId: 'parent', label: 'Tjenester',
+      target, updatedAt: UPDATED_AT,
+    })
+    const child = editorProjectReducer(parent, {
+      type: 'add-navigation-item', itemId: 'child', label: 'Samtale',
+      target, parentId: 'parent', updatedAt: LATER_AT,
+    })
+    expect(child.project.navigation.items[1].parentId).toBe('parent')
+    expect(editorProjectReducer(child, {
+      type: 'set-navigation-item-parent', itemId: 'parent', parentId: 'child',
+      updatedAt: LATER_AT,
+    })).toBe(child)
+    expect(editorProjectReducer(child, {
+      type: 'set-navigation-item-parent', itemId: 'parent', parentId: 'parent',
+      updatedAt: LATER_AT,
+    })).toBe(child)
+    const deleted = editorProjectReducer(child, {
+      type: 'delete-navigation-item', itemId: 'parent', updatedAt: LATER_AT,
+    })
+    expect(deleted.project.navigation.items).toEqual([{
+      id: 'child', label: 'Samtale', target,
+    }])
+  })
 })

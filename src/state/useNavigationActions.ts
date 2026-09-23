@@ -7,12 +7,13 @@ export function useNavigationActions() {
   const { dispatch } = useEditorProject()
 
   const addNavigationItem = useCallback(
-    (label: string, target: NavigationTarget) => {
+    (label: string, target: NavigationTarget, parentId?: string) => {
       dispatch({
         type: 'add-navigation-item',
         itemId: createStableId(),
         label,
         target,
+        parentId,
         updatedAt: new Date().toISOString(),
       })
     },
@@ -55,6 +56,13 @@ export function useNavigationActions() {
     [dispatch],
   )
 
+  const setNavigationItemParent = useCallback(
+    (itemId: string, parentId: string | null) => {
+      dispatch({ type: 'set-navigation-item-parent', itemId, parentId,
+        updatedAt: new Date().toISOString() })
+    }, [dispatch],
+  )
+
   const deleteNavigationItem = useCallback(
     (itemId: string) => {
       dispatch({
@@ -70,6 +78,7 @@ export function useNavigationActions() {
     addNavigationItem,
     setNavigationItemLabel,
     setNavigationItemTarget,
+    setNavigationItemParent,
     moveNavigationItem,
     deleteNavigationItem,
   }

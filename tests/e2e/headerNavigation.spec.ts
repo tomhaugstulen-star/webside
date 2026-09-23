@@ -58,6 +58,11 @@ test('renders project navigation in Header and navigates to pages and sections',
     .getByRole('button', { name: 'Legg til menypunkt' })
     .click()
 
+  await addForm.getByLabel('Menutekst').fill('Detaljer')
+  await addForm.getByLabel('Mål').selectOption({ label: 'Side: Side 2' })
+  await addForm.getByLabel('Plassering').selectOption({ label: 'Under Om oss (rullegardin)' })
+  await navigation.getByRole('button', { name: 'Legg til menypunkt' }).click()
+
   await addForm.getByLabel('Menutekst').fill('Kontakt')
   await addForm.getByLabel('Mål').selectOption({ label: 'Side 2 → #seksjon' })
   await navigation
@@ -78,6 +83,15 @@ test('renders project navigation in Header and navigates to pages and sections',
     'data-public-href',
     '/side-2#seksjon',
   )
+
+  await expect(menu.getByRole('button', { name: 'Detaljer' })).toHaveCount(0)
+  await menu.getByRole('button', { name: 'Vis undermeny for Om oss' }).click()
+  const childLink = menu.getByRole('button', { name: 'Detaljer' })
+  await expect(childLink).toHaveAttribute('data-public-href', '/side-2')
+  await childLink.click()
+  await expect(page.getByLabel('Nettside: Side 2')).toBeVisible()
+
+  await page.getByLabel('Velg side').selectOption({ label: 'Forside' })
 
   await pageLink.click()
   await expect(page.getByLabel('Nettside: Side 2')).toBeVisible()

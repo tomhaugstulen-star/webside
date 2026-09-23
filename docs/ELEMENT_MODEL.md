@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 14
+EDITOR_PROJECT_SCHEMA_VERSION = 15
 ```
 
 ```text
@@ -23,9 +23,10 @@ EDITOR_PROJECT_SCHEMA_VERSION = 14
 12 Tekstboksramme og 1 px standardramme for nye innrammede elementer
 13 Typet bakgrunnsfyll: helfarge eller lineær gradient
 14 Hero med bilde, innhold, CTA-lenke og utseende
+15 Valgfrie menypunkt-underpunkter for rullegardin i Header
 ```
 
-Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12/13 migreres deterministisk til schema 14. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
+Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12/13/14 migreres deterministisk til schema 15. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
 
 Kontrollert migreringsretning:
 
@@ -35,6 +36,7 @@ Kontrollert migreringsretning:
 - versjon 11 til 12 legger til `TextAppearance.frame` med 1 px standardramme
 - versjon 12 til 13 erstatter bakgrunnens `backgroundColor` med typet `backgroundFill` uten visuelt avvik
 - versjon 13 til 14 er identitetsbevarende for eksisterende prosjektdata og åpner for Hero-varianten
+- versjon 14 til 15 er identitetsbevarende for eksisterende menypunkter; `parentId` er valgfri
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -43,7 +45,7 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 14
+  schemaVersion: 15
   id: string
   name: string
   pages: EditorPage[]
@@ -124,6 +126,7 @@ type WebsiteNavigation = {
 type NavigationItem = {
   id: string
   label: string
+  parentId?: string
   target:
     | { type: 'page'; pageId: string }
     | { type: 'section'; pageId: string; elementId: string }
@@ -133,6 +136,8 @@ type NavigationItem = {
 Navigasjonsmål peker på stabile prosjekt-ID-er, ikke DOM-noder, slugs, ankertekst eller visningstekst. Seksjonsmål bruker den interne stabile element-ID-en for referanseintegritet; offentlig URL-fragment avledes senere fra seksjonens `anchorId`.
 
 Side- og seksjonssletting rydder navigasjonspunkter som ellers ville blitt hengende. Ugyldige mål avvises ved reducergrensen. Menymodellen er serialiserbar prosjektdata. Fase 20 renderer den samme modellen i Header. Offentlig href avledes fra sidens `slug` og, for seksjonsmål, seksjonens `anchorId`; href lagres ikke som separat prosjektdata.
+
+Et menypunkt kan ha ett nivå med underpunkter ved `parentId` til et menypunkt på toppnivå. Sykluser og dypere nivåer avvises. Når et overordnet menypunkt slettes, flyttes underpunktene til toppnivå uten å miste målene sine.
 
 ## Bilde
 

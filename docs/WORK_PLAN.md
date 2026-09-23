@@ -11,7 +11,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
 - #67 er fullført og merget i PR #72: typet helfarge/lineær gradient og schema 13
 - fase 20 er fullført og merget i PR #74
-- aktiv produksjonsfase er #75 på `feature/phase-21-hero`: Hero
+- fase 21 er fullført og merget i PR #76; neste roadmapfase er 22
+- separat forbedring av Prosjekt-panelet og nettstedmenyen er under arbeid på `feature/project-panel-menu-usability`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -113,7 +114,7 @@ Fullført og merget i PR #74:
 
 ## Fase 21 – Hero
 
-Aktiv leveranse i #75 / PR #76:
+Fullført og merget i #75 / PR #76:
 
 - ny serialiserbar `hero`-variant i `EditorProject.pages[].elements`
 - schema 14 med identitetsbevarende migrering fra schema 13

@@ -15,6 +15,7 @@ export type NavigationItem = {
   id: string
   label: string
   target: NavigationTarget
+  parentId?: string
 }
 
 export type WebsiteNavigation = {
@@ -78,21 +79,23 @@ export function isValidNavigationTarget(value: unknown): value is NavigationTarg
 export function isValidNavigationItem(value: unknown): value is NavigationItem {
   return (
     isRecord(value) &&
-    hasExactKeys(value, ['id', 'label', 'target']) &&
+    hasExactKeys(value, value.parentId === undefined
+      ? ['id', 'label', 'target'] : ['id', 'label', 'target', 'parentId']) &&
     isStableReference(value.id) &&
     isValidNavigationLabel(value.label) &&
-    isValidNavigationTarget(value.target)
+    isValidNavigationTarget(value.target) &&
+    (value.parentId === undefined || isStableReference(value.parentId))
   )
 }
 
 export function isValidWebsiteNavigation(value: unknown): value is WebsiteNavigation {
-  return (
-    isRecord(value) &&
-    hasExactKeys(value, ['items']) &&
-    Array.isArray(value.items) &&
-    value.items.every(isValidNavigationItem) &&
-    new Set(value.items.map((item) => item.id)).size === value.items.length
-  )
+  if (!isRecord(value) || !hasExactKeys(value, ['items']) ||
+    !Array.isArray(value.items) || !value.items.every(isValidNavigationItem)) return false
+  const items: NavigationItem[] = value.items
+  return new Set(items.map((item) => item.id)).size === items.length &&
+    items.every((item) => !item.parentId || items.some(
+      (parent) => parent.id === item.parentId && !parent.parentId,
+    ))
 }
 
 type NavigationProjectPage = {
@@ -130,9 +133,13 @@ export function pruneDanglingNavigationItems(
   navigation: WebsiteNavigation,
   pages: readonly NavigationProjectPage[],
 ): WebsiteNavigation {
-  const items = navigation.items.filter((item) =>
+  const remaining = navigation.items.filter((item) =>
     navigationTargetExists(pages, item.target),
   )
+  const topLevelIds = new Set(remaining.filter((item) => !item.parentId).map((item) => item.id))
+  const items = remaining.map((item) => item.parentId && !topLevelIds.has(item.parentId)
+    ? { id: item.id, label: item.label, target: item.target } : item)
 
-  return items.length === navigation.items.length ? navigation : { items }
+  return items.every((item, index) => item === navigation.items[index]) &&
+    items.length === navigation.items.length ? navigation : { items }
 }

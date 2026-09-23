@@ -14,6 +14,7 @@ import {
   type EditorProjectV12,
   type EditorProjectV13,
 } from './editorProjectMigration'
+import { migrateEditorProjectV14, type EditorProjectV14 } from './editorProjectMigrationV14'
 import { isValidPageAppearance } from './pageAppearance'
 import {
   isValidPageName,
@@ -105,6 +106,8 @@ export function parseImportedEditorProject(value: unknown): EditorProject | null
       migrated = migrateEditorProjectV12(value as unknown as EditorProjectV12)
     } else if (value.schemaVersion === 13) {
       migrated = migrateEditorProjectV13(value as unknown as EditorProjectV13)
+    } else if (value.schemaVersion === 14) {
+      migrated = migrateEditorProjectV14(value as unknown as EditorProjectV14)
     } else if (value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION) {
       return null
     }

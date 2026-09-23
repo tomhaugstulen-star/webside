@@ -30,7 +30,11 @@ test('shared image/logo round-trip survives a new session, mobile view and editi
   await openFile(page, fixture)
   await expect(page.getByRole('status')).toHaveText('Åpnet «Bilder og logo».')
   await expectImages(page)
-  await expect(page.locator('.project-navigator__element')).toHaveCount(4)
+  await page.getByRole('button', { name: 'Vis elementer (3)' }).click()
+  await expect(page.locator('.project-navigator__element')).toHaveCount(3)
+  await page.locator('.project-navigator__page-button').filter({ hasText: 'Side 2' }).click()
+  await expect(page.locator('.project-navigator__element')).toHaveCount(1)
+  await page.locator('.project-navigator__page-button').filter({ hasText: 'Forside' }).click()
   const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Lagre prosjektfil', exact: true }).click()
   const download = await downloadPromise

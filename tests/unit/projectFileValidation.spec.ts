@@ -52,7 +52,7 @@ test('migrates schema 10 and safely rejects malformed schema 10/11', () => {
       elements: [],
     }],
   }
-  expect(parseImportedEditorProject(JSON.parse(JSON.stringify(legacy)))?.schemaVersion).toBe(14)
+  expect(parseImportedEditorProject(JSON.parse(JSON.stringify(legacy)))?.schemaVersion).toBe(15)
   for (const schemaVersion of [10, 11]) {
     expect(parseImportedEditorProject({
       ...legacy,

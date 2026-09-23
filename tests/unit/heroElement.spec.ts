@@ -116,7 +116,7 @@ test('rejects Hero mutations while locked', () => {
 test('migrates schema 13 to 14 and rejects Hero injected into schema 13', () => {
   const project = createBlankProject('Legacy')
   const legacy = { ...project, schemaVersion: 13 }
-  expect(parseImportedEditorProject(legacy)?.schemaVersion).toBe(14)
+  expect(parseImportedEditorProject(legacy)?.schemaVersion).toBe(15)
 
   const assetId = createImageAssetId()
   const hero = createEditorElement({

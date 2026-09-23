@@ -8,12 +8,24 @@ import {
 
 test('accepts a current blank project', () => {
   const project = createBlankProject('Test')
-  expect(project.schemaVersion).toBe(14)
+  expect(project.schemaVersion).toBe(15)
   expect(isValidEditorProject(project)).toBe(true)
   expect(parseImportedEditorProject(project)).toEqual(project)
 })
 
-test('migrates schema 12 solid backgrounds to schema 14 fills', () => {
+test('migrates a schema 14 project and rejects orphan menu children', () => {
+  const project = createBlankProject('Meny')
+  const target = { type: 'page' as const, pageId: project.pages[0].id }
+  const old = { ...project, schemaVersion: 14, navigation: { items: [
+    { id: 'nav-1', label: 'Forside', target },
+  ] } }
+  expect(parseImportedEditorProject(old)?.schemaVersion).toBe(15)
+  expect(isValidEditorProject({ ...project, navigation: { items: [
+    { id: 'orphan', label: 'Feil', target, parentId: 'missing' },
+  ] } })).toBe(false)
+})
+
+test('migrates schema 12 solid backgrounds to current fills', () => {
   const project = createBlankProject('Legacy')
   const page = project.pages[0]
   const text = createEditorElement({
@@ -42,7 +54,7 @@ test('migrates schema 12 solid backgrounds to schema 14 fills', () => {
   }
 
   const migrated = parseImportedEditorProject(legacy)
-  expect(migrated?.schemaVersion).toBe(14)
+  expect(migrated?.schemaVersion).toBe(15)
   expect(migrated?.pages[0].appearance.backgroundFill).toEqual({
     type: 'solid',
     color: '#FFFFFF',
