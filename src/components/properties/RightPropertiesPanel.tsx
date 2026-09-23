@@ -4,6 +4,7 @@ import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
 import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
+import { HeroPropertiesSection } from './HeroPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { SectionAnchorPropertiesSection } from './SectionAnchorPropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
@@ -64,13 +65,18 @@ export function RightPropertiesPanel({
               <HeaderFontPropertiesSection element={element} />
             )}
 
+            {element.kind === 'hero' && (
+              <HeroPropertiesSection key={element.id} element={element} />
+            )}
+
             {element.kind === 'section' && (
               <SectionAnchorPropertiesSection key={element.id} element={element} />
             )}
 
             {(element.kind === 'section' ||
               element.kind === 'header' ||
-              element.kind === 'text') && (
+              element.kind === 'text' ||
+              element.kind === 'hero') && (
               <FramePropertiesSection element={element} />
             )}
 
@@ -86,7 +92,9 @@ export function RightPropertiesPanel({
               <ButtonPropertiesSection key={element.id} element={element} />
             )}
 
-            {(element.kind === 'text' || element.kind === 'button') && (
+            {(element.kind === 'text' ||
+              element.kind === 'button' ||
+              element.kind === 'hero') && (
               <ElementLinkPropertiesSection element={element} />
             )}
 
