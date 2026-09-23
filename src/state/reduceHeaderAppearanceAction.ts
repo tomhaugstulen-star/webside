@@ -1,4 +1,5 @@
 import { isEditorColor } from '../model/editorColor'
+import { editorFillsEqual, isEditorFill } from '../model/editorFill'
 import { isElementFrameWidth } from '../model/elementFrame'
 import type {
   EditorProjectState,
@@ -69,8 +70,8 @@ export function reduceHeaderAppearanceAction(
   action: HeaderAppearanceAction,
 ): EditorProjectState {
   switch (action.type) {
-    case 'set-header-background-color':
-      if (!isEditorColor(action.color)) {
+    case 'set-header-background-fill':
+      if (!isEditorFill(action.fill)) {
         return state
       }
 
@@ -79,9 +80,9 @@ export function reduceHeaderAppearanceAction(
         action.elementId,
         action.updatedAt,
         (element) =>
-          element.appearance.backgroundColor === action.color
+          editorFillsEqual(element.appearance.backgroundFill, action.fill)
             ? null
-            : { ...element.appearance, backgroundColor: action.color },
+            : { ...element.appearance, backgroundFill: action.fill },
       )
 
     case 'set-header-text-color':
