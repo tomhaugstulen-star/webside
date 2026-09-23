@@ -230,7 +230,8 @@ export function EditorCanvasElement({
       </div>
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
-          elementId={element.id}
+          element={element}
+          viewport={viewport}
           lockable={!isHeader}
           locked={element.locked}
           layout={layout}
