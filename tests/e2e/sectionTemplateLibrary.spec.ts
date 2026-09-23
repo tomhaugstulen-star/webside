@@ -17,6 +17,7 @@ test('saves, reloads and inserts a reusable section template as one undo step', 
   await saveRegion.getByLabel('Malnavn').fill('Kontaktblokk')
   await saveRegion.getByRole('button', { name: 'Lagre som mal' }).click()
   await expect(saveRegion).toContainText('Malen er lagret i malbiblioteket.')
+  await page.waitForTimeout(900)
 
   await page.reload()
   await expect(page.getByLabel('Nettside: Forside')).toBeVisible()
