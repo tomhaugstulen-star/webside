@@ -1,8 +1,8 @@
 import {
-  createEditorColor,
-  isEditorColor,
-  type EditorColor,
-} from './editorColor'
+  createDefaultSolidFill,
+  isEditorFill,
+  type EditorFill,
+} from './editorFill'
 import {
   DEFAULT_ELEMENT_FRAME,
   isValidElementFrame,
@@ -19,12 +19,12 @@ export type {
 } from './elementFrame'
 
 export type SectionAppearance = {
-  backgroundColor: EditorColor
+  backgroundFill: EditorFill
   frame: ElementFrame
 }
 
 export const DEFAULT_SECTION_APPEARANCE: SectionAppearance = {
-  backgroundColor: createEditorColor('#FFFDFB'),
+  backgroundFill: createDefaultSolidFill('#FFFDFB'),
   frame: { ...DEFAULT_ELEMENT_FRAME },
 }
 
@@ -39,7 +39,7 @@ export function isValidSectionAppearance(
 
   return (
     Object.keys(appearance).length === 2 &&
-    isEditorColor(appearance.backgroundColor) &&
+    isEditorFill(appearance.backgroundFill) &&
     isValidElementFrame(appearance.frame)
   )
 }
