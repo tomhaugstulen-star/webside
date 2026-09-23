@@ -78,6 +78,7 @@ export function EditorCanvas({
   const contentHeight = getCanvasContentHeight(
     activePage.elements,
     viewport,
+    canvasWidth,
     layoutPreview,
   )
   const pageStyle: CSSProperties = {
