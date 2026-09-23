@@ -32,6 +32,11 @@ test('renders project navigation in Header and navigates to pages and sections',
   await page.goto('/')
   await createHeader(page)
 
+  const logoBox = await page.locator('.header-element__logo').boundingBox()
+  expect(logoBox).not.toBeNull()
+  expect(logoBox!.width).toBeLessThanOrEqual(64.5)
+  expect(logoBox!.height).toBeLessThanOrEqual(64.5)
+
   await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
   const pagesRegion = page.getByRole('region', { name: 'Sider' })
   await pagesRegion.getByRole('button', { name: '+ Ny side' }).click()
