@@ -1,52 +1,109 @@
-import { DEFAULT_ELEMENT_FRAME } from './elementFrame'
+import type { EditorColor } from './editorColor'
+import { createSolidFill } from './editorFill'
+import { DEFAULT_ELEMENT_FRAME, type ElementFrame } from './elementFrame'
 import {
   EDITOR_PROJECT_SCHEMA_VERSION,
   type EditorElement,
   type EditorPage,
   type EditorProject,
+  type HeaderEditorElement,
   type SectionEditorElement,
   type TextEditorElement,
 } from './editorProject'
+import type { HeaderAppearance } from './headerAppearance'
 import { createUniqueSectionAnchorId } from './siteStructure'
-import type { TextAppearance } from './textAppearance'
 
-type LegacyTextAppearance = Pick<TextAppearance, 'backgroundColor'>
-type LegacyTextEditorElement = Omit<TextEditorElement, 'appearance'> & {
-  appearance: LegacyTextAppearance
+type PageAppearanceV12 = {
+  backgroundColor: EditorColor
 }
 
-type LegacySectionEditorElementV10 = Omit<SectionEditorElement, 'anchorId'>
-type LegacyEditorElementV10 =
-  | LegacySectionEditorElementV10
-  | LegacyTextEditorElement
-  | Exclude<EditorElement, SectionEditorElement | TextEditorElement>
+type SectionAppearanceV12 = {
+  backgroundColor: EditorColor
+  frame: ElementFrame
+}
 
-type EditorPageV10 = Omit<EditorPage, 'elements'> & {
-  elements: LegacyEditorElementV10[]
+type TextAppearanceV12 = {
+  backgroundColor: EditorColor
+  frame: ElementFrame
+}
+
+type HeaderAppearanceV12 = Omit<HeaderAppearance, 'backgroundFill'> & {
+  backgroundColor: EditorColor
+}
+
+type SectionEditorElementV12 = Omit<SectionEditorElement, 'appearance'> & {
+  appearance: SectionAppearanceV12
+}
+
+type TextEditorElementV12 = Omit<TextEditorElement, 'appearance'> & {
+  appearance: TextAppearanceV12
+}
+
+type HeaderEditorElementV12 = Omit<HeaderEditorElement, 'appearance'> & {
+  appearance: HeaderAppearanceV12
+}
+
+type EditorElementV12 =
+  | SectionEditorElementV12
+  | TextEditorElementV12
+  | HeaderEditorElementV12
+  | Exclude<
+      EditorElement,
+      SectionEditorElement | TextEditorElement | HeaderEditorElement
+    >
+
+type EditorPageV12 = Omit<EditorPage, 'appearance' | 'elements'> & {
+  appearance: PageAppearanceV12
+  elements: EditorElementV12[]
+}
+
+export type EditorProjectV12 = Omit<EditorProject, 'schemaVersion' | 'pages'> & {
+  schemaVersion: 12
+  pages: EditorPageV12[]
+}
+
+type TextAppearanceV11 = Pick<TextAppearanceV12, 'backgroundColor'>
+type TextEditorElementV11 = Omit<TextEditorElementV12, 'appearance'> & {
+  appearance: TextAppearanceV11
+}
+
+type EditorElementV11 =
+  | TextEditorElementV11
+  | Exclude<EditorElementV12, TextEditorElementV12>
+
+type EditorPageV11 = Omit<EditorPageV12, 'elements'> & {
+  elements: EditorElementV11[]
+}
+
+export type EditorProjectV11 = Omit<EditorProjectV12, 'schemaVersion' | 'pages'> & {
+  schemaVersion: 11
+  pages: EditorPageV11[]
+}
+
+type SectionEditorElementV10 = Omit<SectionEditorElementV12, 'anchorId'>
+type EditorElementV10 =
+  | SectionEditorElementV10
+  | TextEditorElementV11
+  | Exclude<
+      EditorElementV12,
+      SectionEditorElementV12 | TextEditorElementV12
+    >
+
+type EditorPageV10 = Omit<EditorPageV12, 'elements'> & {
+  elements: EditorElementV10[]
 }
 
 export type EditorProjectV10 = Omit<
-  EditorProject,
+  EditorProjectV12,
   'schemaVersion' | 'pages' | 'navigation'
 > & {
   schemaVersion: 10
   pages: EditorPageV10[]
 }
 
-type EditorElementV11 =
-  | LegacyTextEditorElement
-  | Exclude<EditorElement, TextEditorElement>
-
-type EditorPageV11 = Omit<EditorPage, 'elements'> & {
-  elements: EditorElementV11[]
-}
-
-export type EditorProjectV11 = Omit<EditorProject, 'schemaVersion' | 'pages'> & {
-  schemaVersion: 11
-  pages: EditorPageV11[]
-}
-
-function migrateTextElement(element: LegacyTextEditorElement): TextEditorElement {
+function migrateTextElementV11(
+  element: TextEditorElementV11,
+): TextEditorElementV12 {
   return {
     ...element,
     appearance: {
@@ -56,23 +113,23 @@ function migrateTextElement(element: LegacyTextEditorElement): TextEditorElement
   }
 }
 
-function migratePageV11(page: EditorPageV11): EditorPage {
+function migratePageV11(page: EditorPageV11): EditorPageV12 {
   return {
     ...page,
     elements: page.elements.map((element) =>
-      element.kind === 'text' ? migrateTextElement(element) : element,
+      element.kind === 'text' ? migrateTextElementV11(element) : element,
     ),
   }
 }
 
-function migratePageV10(page: EditorPageV10): EditorPage {
+function migratePageV10(page: EditorPageV10): EditorPageV12 {
   const usedAnchorIds: string[] = []
 
   return {
     ...page,
     elements: page.elements.map((element) => {
       if (element.kind === 'text') {
-        return migrateTextElement(element)
+        return migrateTextElementV11(element)
       }
 
       if (element.kind !== 'section') {
@@ -90,19 +147,75 @@ function migratePageV10(page: EditorPageV10): EditorPage {
   }
 }
 
-export function migrateEditorProjectV11(project: EditorProjectV11): EditorProject {
+function migrateElementV12(element: EditorElementV12): EditorElement {
+  if (element.kind === 'section') {
+    return {
+      ...element,
+      appearance: {
+        backgroundFill: createSolidFill(element.appearance.backgroundColor),
+        frame: { ...element.appearance.frame },
+      },
+    }
+  }
+
+  if (element.kind === 'text') {
+    return {
+      ...element,
+      appearance: {
+        backgroundFill: createSolidFill(element.appearance.backgroundColor),
+        frame: { ...element.appearance.frame },
+      },
+    }
+  }
+
+  if (element.kind === 'header') {
+    const { backgroundColor, ...appearance } = element.appearance
+    return {
+      ...element,
+      appearance: {
+        ...appearance,
+        backgroundFill: createSolidFill(backgroundColor),
+        frame: { ...appearance.frame },
+      },
+    }
+  }
+
+  return element
+}
+
+function migratePageV12ToCurrent(page: EditorPageV12): EditorPage {
   return {
-    ...project,
-    schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
-    pages: project.pages.map(migratePageV11),
+    ...page,
+    appearance: {
+      backgroundFill: createSolidFill(page.appearance.backgroundColor),
+    },
+    elements: page.elements.map(migrateElementV12),
   }
 }
 
-export function migrateEditorProjectV10(project: EditorProjectV10): EditorProject {
+export function migrateEditorProjectV12(project: EditorProjectV12): EditorProject {
   return {
     ...project,
     schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
+    pages: project.pages.map(migratePageV12ToCurrent),
+  }
+}
+
+export function migrateEditorProjectV11(project: EditorProjectV11): EditorProject {
+  const v12: EditorProjectV12 = {
+    ...project,
+    schemaVersion: 12,
+    pages: project.pages.map(migratePageV11),
+  }
+  return migrateEditorProjectV12(v12)
+}
+
+export function migrateEditorProjectV10(project: EditorProjectV10): EditorProject {
+  const v12: EditorProjectV12 = {
+    ...project,
+    schemaVersion: 12,
     pages: project.pages.map(migratePageV10),
     navigation: { items: [] },
   }
+  return migrateEditorProjectV12(v12)
 }
