@@ -15,7 +15,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - forbedring av Prosjekt-panelet og nettstedmenyen er fullført og merget i PR #78
 - fase 22 er fullført og merget i PR #80
 - fase 23 er fullført og merget i PR #82
-- fase 24 er aktiv i sak #83 på `feature/phase-24-undo-redo`
+- fase 24 er fullført og merget i PR #84
+- fase 25 er aktiv i sak #86 på `feature/phase-25-local-persistence-v2`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -224,7 +225,7 @@ Fase 30 skal låse den konkrete publiseringsmodellen før kodearbeid starter, in
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
-Fasen er planlagt, men ikke aktiv.
+Fasen er aktiv i sak #86 på `feature/phase-25-local-persistence-v2`.
 
 Låste hovedkrav:
 
