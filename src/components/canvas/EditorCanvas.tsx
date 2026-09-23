@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useLayoutEffect,
   useRef,
   useState,
@@ -62,8 +63,7 @@ export function EditorCanvas({
   const [textEditingState, setTextEditingState] =
     useState<TextEditingState | null>(null)
   const [canvasWidth, setCanvasWidth] = useState(0)
-  const [pendingNavigation, setPendingNavigation] =
-    useState<NavigationTarget | null>(null)
+  const pendingNavigationRef = useRef<NavigationTarget | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const layoutPreview =
@@ -134,49 +134,57 @@ export function EditorCanvas({
     onCloseProperties()
   }
 
+  const scrollToNavigationTarget = useCallback(
+    (target: NavigationTarget) => {
+      const scrollContainer = scrollContainerRef.current
+
+      if (!scrollContainer) {
+        return
+      }
+
+      if (target.type === 'page') {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' })
+        return
+      }
+
+      requestAnimationFrame(() => {
+        const section = Array.from(
+          canvasRef.current?.querySelectorAll<HTMLElement>(
+            '[data-element-id]',
+          ) ?? [],
+        ).find(
+          (candidate) => candidate.dataset.elementId === target.elementId,
+        )
+
+        section?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
+    },
+    [],
+  )
+
   const navigateFromHeader = (target: NavigationTarget) => {
     clearSelectionAndProperties()
     setTextEditingState(null)
-    setPendingNavigation(target)
 
-    if (target.pageId !== activePage.id) {
-      dispatch({ type: 'set-active-page', pageId: target.pageId })
+    if (target.pageId === activePage.id) {
+      scrollToNavigationTarget(target)
+      return
     }
+
+    pendingNavigationRef.current = target
+    dispatch({ type: 'set-active-page', pageId: target.pageId })
   }
 
   useLayoutEffect(() => {
+    const pendingNavigation = pendingNavigationRef.current
+
     if (!pendingNavigation || pendingNavigation.pageId !== activePage.id) {
       return
     }
 
-    const scrollContainer = scrollContainerRef.current
-
-    if (!scrollContainer) {
-      setPendingNavigation(null)
-      return
-    }
-
-    if (pendingNavigation.type === 'page') {
-      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' })
-      setPendingNavigation(null)
-      return
-    }
-
-    const frame = requestAnimationFrame(() => {
-      const target = Array.from(
-        canvasRef.current?.querySelectorAll<HTMLElement>('[data-element-id]') ??
-          [],
-      ).find(
-        (candidate) =>
-          candidate.dataset.elementId === pendingNavigation.elementId,
-      )
-
-      target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      setPendingNavigation(null)
-    })
-
-    return () => cancelAnimationFrame(frame)
-  }, [activePage.id, pendingNavigation])
+    pendingNavigationRef.current = null
+    scrollToNavigationTarget(pendingNavigation)
+  }, [activePage.id, scrollToNavigationTarget])
 
   return (
     <main
