@@ -102,7 +102,7 @@ export function PreviewCanvas({ viewport }: { viewport: ViewportMode }) {
       <div className="preview-stage" ref={stageRef}>
         <div
           ref={canvasRef}
-          className={`preview-page preview-page--${viewport}`}
+          className={`canvas-page canvas-page--${viewport} preview-page preview-page--${viewport}`}
           style={pageStyle}
           aria-label={`Forhåndsvisning: ${page.name}`}
         >
