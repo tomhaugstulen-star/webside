@@ -93,14 +93,14 @@ test('updates Hero content and CTA link through typed reducer actions', () => {
   })
 })
 
-test('allows Hero title and subtitle to be removed by saving empty values', () => {
+test('allows Hero title, subtitle and CTA to be removed by saving empty values', () => {
   const { state } = addHero()
   const updated = editorProjectReducer(state, {
     type: 'set-hero-content',
     elementId: 'hero-1',
     title: '',
     subtitle: '',
-    ctaLabel: 'Les mer',
+    ctaLabel: '',
     updatedAt: UPDATED_AT,
   })
 
@@ -109,6 +109,8 @@ test('allows Hero title and subtitle to be removed by saving empty values', () =
 
   expect(hero.title).toBe('')
   expect(hero.subtitle).toBe('')
+  expect(hero.ctaLabel).toBe('')
+  expect(hero.ctaLink).toEqual({ type: 'none' })
   expect(isValidEditorProject(updated.project)).toBe(true)
 })
 
