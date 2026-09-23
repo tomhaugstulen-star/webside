@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { createEditorColor } from '../../src/model/editorColor'
+import { createSolidFill } from '../../src/model/editorFill'
 import { getElementDesktopLayout } from '../../src/model/elementLayout'
 import type {
   EditorPage,
@@ -84,7 +85,7 @@ test.describe('editor project reducer', () => {
       id: 'text-1',
       kind: 'text',
       locked: false,
-      appearance: { backgroundColor: '#FFFFFF' },
+      appearance: { backgroundFill: { type: 'solid', color: '#FFFFFF' } },
     })
     expect(created.selectedElementId).toBe('text-1')
     expect(created.project.updatedAt).toBe(CREATED_AT)
@@ -98,41 +99,41 @@ test.describe('editor project reducer', () => {
 
     expect(
       editorProjectReducer(created, {
-        type: 'set-text-background-color',
+        type: 'set-text-background-fill',
         elementId: 'text-1',
-        color: createEditorColor('#FFFFFF'),
+        fill: createSolidFill(createEditorColor('#FFFFFF')),
         updatedAt: UPDATED_AT,
       }),
     ).toBe(created)
 
     expect(
       editorProjectReducer(created, {
-        type: 'set-text-background-color',
+        type: 'set-text-background-fill',
         elementId: 'missing-text',
-        color: createEditorColor('#E8F1FF'),
+        fill: createSolidFill(createEditorColor('#E8F1FF')),
         updatedAt: UPDATED_AT,
       }),
     ).toBe(created)
 
     expect(
       editorProjectReducer(created, {
-        type: 'set-text-background-color',
+        type: 'set-text-background-fill',
         elementId: 'text-1',
-        color: '#e8f1ff' as never,
+        fill: { type: 'solid', color: '#e8f1ff' } as never,
         updatedAt: UPDATED_AT,
       }),
     ).toBe(created)
     expect(created.project.updatedAt).toBe(originalUpdatedAt)
 
     const updated = editorProjectReducer(created, {
-      type: 'set-text-background-color',
+      type: 'set-text-background-fill',
       elementId: 'text-1',
-      color: createEditorColor('#E8F1FF'),
+      fill: createSolidFill(createEditorColor('#E8F1FF')),
       updatedAt: UPDATED_AT,
     })
 
     expect(updated).not.toBe(created)
-    expect(getTextElement(updated).appearance.backgroundColor).toBe('#E8F1FF')
+    expect(getTextElement(updated).appearance.backgroundFill).toEqual({ type: 'solid', color: '#E8F1FF' })
     expect(updated.project.updatedAt).toBe(UPDATED_AT)
   })
 
@@ -146,9 +147,9 @@ test.describe('editor project reducer', () => {
 
     expect(
       editorProjectReducer(locked, {
-        type: 'set-text-background-color',
+        type: 'set-text-background-fill',
         elementId: 'text-1',
-        color: createEditorColor('#E8F1FF'),
+        fill: createSolidFill(createEditorColor('#E8F1FF')),
         updatedAt: UPDATED_AT,
       }),
     ).toBe(locked)
