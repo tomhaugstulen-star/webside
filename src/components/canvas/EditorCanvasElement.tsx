@@ -64,8 +64,7 @@ export function EditorCanvasElement({
   onNavigate,
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
-  const { commitElementDesktopLayout, commitImageDesktopFrame } =
-    useElementLayout()
+  const { commitElementLayout, commitImageFrame } = useElementLayout()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
   const isHeader = element.kind === 'header'
@@ -94,8 +93,10 @@ export function EditorCanvasElement({
     onSelect,
     onTransformStart: onCloseProperties,
     onClickWithoutTransform: onOpenProperties,
-    onCommitLayout: commitElementDesktopLayout,
-    onCommitImageFrame: commitImageDesktopFrame,
+    onCommitLayout: (elementId, layout) =>
+      commitElementLayout(elementId, viewport, layout),
+    onCommitImageFrame: (elementId, layout, transform) =>
+      commitImageFrame(elementId, viewport, layout, transform),
     onPreviewLayoutChange,
   })
 
@@ -148,8 +149,10 @@ export function EditorCanvasElement({
       onOpenProperties,
       onCloseProperties,
       onStartTextEditing,
-      onCommitLayout: commitElementDesktopLayout,
-      onCommitImageFrame: commitImageDesktopFrame,
+      onCommitLayout: (elementId, layout) =>
+        commitElementLayout(elementId, viewport, layout),
+      onCommitImageFrame: (elementId, layout, transform) =>
+        commitImageFrame(elementId, viewport, layout, transform),
     })
   }
 
