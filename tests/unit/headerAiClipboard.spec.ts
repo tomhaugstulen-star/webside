@@ -3,6 +3,7 @@ import {
   createHeaderAiClip,
   parseHeaderAiProposal,
 } from '../../src/ai/headerAiClipboard'
+import { createEditorColor } from '../../src/model/editorColor'
 import { createImageAssetId } from '../../src/model/imageAsset'
 import {
   editorProjectReducer,
@@ -129,7 +130,7 @@ test('applies a valid AI Header proposal through one typed action', () => {
     subtitle: 'Roligere uttrykk',
     appearance: {
       ...header.appearance,
-      textColor: '#112233',
+      textColor: createEditorColor('#112233'),
       fontSize: 28,
     },
     updatedAt: '2026-09-24T00:01:00.000Z',
