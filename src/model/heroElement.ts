@@ -13,7 +13,6 @@ export function normalizeHeroText(value: string) {
 export function isValidHeroTitle(value: string) {
   return (
     normalizeHeroText(value) === value &&
-    value.length > 0 &&
     value.length <= MAX_HERO_TITLE_LENGTH
   )
 }
