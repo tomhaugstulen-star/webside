@@ -51,7 +51,7 @@ export function createEditorElement({
         kind: 'section',
         anchorId,
         appearance: {
-          backgroundColor: DEFAULT_SECTION_APPEARANCE.backgroundColor,
+          backgroundFill: { ...DEFAULT_SECTION_APPEARANCE.backgroundFill },
           frame: { ...DEFAULT_SECTION_APPEARANCE.frame },
         },
       }
@@ -72,7 +72,7 @@ export function createEditorElement({
         kind: 'text',
         content: '',
         appearance: {
-          backgroundColor: DEFAULT_TEXT_APPEARANCE.backgroundColor,
+          backgroundFill: { ...DEFAULT_TEXT_APPEARANCE.backgroundFill },
           frame: { ...DEFAULT_TEXT_APPEARANCE.frame },
         },
         textStyle: { ...DEFAULT_TEXT_ELEMENT_STYLE },
@@ -95,7 +95,7 @@ export function createEditorElement({
         siteName: request.siteName,
         subtitle: request.subtitle,
         appearance: {
-          backgroundColor: DEFAULT_HEADER_APPEARANCE.backgroundColor,
+          backgroundFill: { ...DEFAULT_HEADER_APPEARANCE.backgroundFill },
           textColor: DEFAULT_HEADER_APPEARANCE.textColor,
           fontFamily: DEFAULT_HEADER_APPEARANCE.fontFamily,
           fontSize: DEFAULT_HEADER_APPEARANCE.fontSize,
