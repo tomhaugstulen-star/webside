@@ -18,6 +18,7 @@ type TopToolbarProps = {
   onUndo: () => void
   onRedo: () => void
   persistenceStatus: EditorPersistenceStatus
+  onDuplicateProject: () => void
 }
 
 type IconName =
@@ -82,6 +83,7 @@ export function TopToolbar({
   onUndo,
   onRedo,
   persistenceStatus,
+  onDuplicateProject,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -202,7 +204,15 @@ export function TopToolbar({
           {menuOpen && (
             <div className="main-menu-popover">
               <button type="button" disabled title="Kommer senere">Prosjektinnstillinger</button>
-              <button type="button" disabled title="Kommer senere">Dupliser prosjekt</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false)
+                  onDuplicateProject()
+                }}
+              >
+                Dupliser prosjekt
+              </button>
               <button type="button" disabled title="Kommer senere">Hjelp</button>
             </div>
           )}
