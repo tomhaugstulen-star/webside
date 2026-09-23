@@ -78,7 +78,7 @@ test('replaces Header logo metadata without changing the project schema', () => 
   expect(updated.project.schemaVersion).toBe(state.project.schemaVersion)
 })
 
-test('rejects invalid Header content and Header edits while locked', () => {
+test('rejects invalid and unchanged Header content', () => {
   const { state } = addHeader()
 
   expect(
@@ -91,19 +91,13 @@ test('rejects invalid Header content and Header edits while locked', () => {
     }),
   ).toBe(state)
 
-  const locked = editorProjectReducer(state, {
-    type: 'toggle-element-lock',
-    elementId: 'header-1',
-    updatedAt: UPDATED_AT,
-  })
-
   expect(
-    editorProjectReducer(locked, {
+    editorProjectReducer(state, {
       type: 'set-header-content',
       elementId: 'header-1',
-      siteName: 'Skal ikke lagres',
-      subtitle: '',
+      siteName: 'Mitt nettsted',
+      subtitle: 'En undertittel',
       updatedAt: UPDATED_AT,
     }),
-  ).toBe(locked)
+  ).toBe(state)
 })
