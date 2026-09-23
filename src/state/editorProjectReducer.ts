@@ -2,10 +2,11 @@ import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import { isValidProjectSiteStructure } from '../model/siteStructure'
 import { addElementToActivePage } from './addElementToActivePage'
-import type { EditorProjectAction } from './editorProjectAction'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import type { EditorProjectAction } from './editorProjectAction'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
 import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
+import { reduceHeroProjectAction } from './reduceHeroProjectAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
 import { reducePageProjectAction } from './reducePageProjectAction'
@@ -26,9 +27,7 @@ function activePageContainsElement(state: EditorProjectState, elementId: string)
   const activePage = state.project.pages.find(
     (page) => page.id === state.activePageId,
   )
-  return (
-    activePage?.elements.some((element) => element.id === elementId) ?? false
-  )
+  return activePage?.elements.some((element) => element.id === elementId) ?? false
 }
 
 function selectedElementExists(state: EditorProjectState) {
@@ -40,7 +39,6 @@ function selectedElementExists(state: EditorProjectState) {
 
 function ensureValidSelection(state: EditorProjectState): EditorProjectState {
   if (selectedElementExists(state)) return state
-
   return { ...state, selectedElementId: null }
 }
 
@@ -51,13 +49,10 @@ function reduceEditorProjectState(
   switch (action.type) {
     case 'replace-project': {
       const activePageId = action.project.pages[0]?.id
-
       if (!activePageId) {
         throw new Error('An editor project must contain at least one page.')
       }
-
       if (!isValidProjectSiteStructure(action.project)) return state
-
       return {
         project: action.project,
         activePageId,
@@ -67,12 +62,10 @@ function reduceEditorProjectState(
 
     case 'set-active-page': {
       if (action.pageId === state.activePageId) return state
-
       const pageExists = state.project.pages.some(
         (page) => page.id === action.pageId,
       )
       if (!pageExists) return state
-
       return {
         ...state,
         activePageId: action.pageId,
@@ -194,6 +187,14 @@ function reduceEditorProjectState(
     case 'set-header-frame-width':
     case 'set-header-frame-color':
       return reduceHeaderAppearanceAction(state, action)
+
+    case 'set-hero-content':
+    case 'set-hero-image':
+    case 'set-hero-background-fill':
+    case 'set-hero-text-color':
+    case 'set-hero-frame-width':
+    case 'set-hero-frame-color':
+      return reduceHeroProjectAction(state, action)
 
     case 'set-image-alt-text':
     case 'set-image-mode':
