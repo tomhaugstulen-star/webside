@@ -112,25 +112,17 @@ function reduceEditorProjectState(
 
     case 'insert-elements-to-active-page':
       return insertElementsToActivePage(
-        state,
-        action.elements,
-        action.selectedElementId,
-        action.updatedAt,
+        state, action.elements, action.selectedElementId, action.updatedAt,
       )
 
     case 'delete-element-from-active-page':
       return deleteElementFromActivePage(
-        state,
-        action.elementId,
-        action.updatedAt,
+        state, action.elementId, action.updatedAt,
       )
 
     case 'set-section-anchor-id':
       return setSectionAnchorId(
-        state,
-        action.elementId,
-        action.anchorId,
-        action.updatedAt,
+        state, action.elementId, action.anchorId, action.updatedAt,
       )
 
     case 'set-element-desktop-layout':
