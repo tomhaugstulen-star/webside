@@ -1,4 +1,5 @@
 import { isEditorColor } from '../model/editorColor'
+import { editorFillsEqual, isEditorFill } from '../model/editorFill'
 import { isElementFrameWidth } from '../model/elementFrame'
 import type {
   EditorProjectState,
@@ -31,39 +32,31 @@ function updateActiveSectionAppearance(
   updatedAt: string,
   updateAppearance: SectionAppearanceUpdater,
 ): EditorProjectState {
-  const activePage = state.project.pages.find(
-    (page) => page.id === state.activePageId,
-  )
-  const element = activePage?.elements.find(
-    (candidate) => candidate.id === elementId,
-  )
-
-  if (!activePage || !element || element.kind !== 'section' || element.locked) {
-    return state
-  }
+  const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+  const element = activePage?.elements.find((candidate) => candidate.id === elementId)
+  if (!activePage || !element || element.kind !== 'section' || element.locked) return state
 
   const nextAppearance = updateAppearance(element)
-
-  if (!nextAppearance || !isValidSectionAppearance(nextAppearance)) {
-    return state
-  }
-
-  const pages = state.project.pages.map((page) =>
-    page.id === state.activePageId
-      ? {
-          ...page,
-          elements: page.elements.map((candidate) =>
-            candidate.id === elementId && candidate.kind === 'section'
-              ? { ...candidate, appearance: nextAppearance }
-              : candidate,
-          ),
-        }
-      : page,
-  )
+  if (!nextAppearance || !isValidSectionAppearance(nextAppearance)) return state
 
   return {
     ...state,
-    project: { ...state.project, pages, updatedAt },
+    project: {
+      ...state.project,
+      pages: state.project.pages.map((page) =>
+        page.id === state.activePageId
+          ? {
+              ...page,
+              elements: page.elements.map((candidate) =>
+                candidate.id === elementId && candidate.kind === 'section'
+                  ? { ...candidate, appearance: nextAppearance }
+                  : candidate,
+              ),
+            }
+          : page,
+      ),
+      updatedAt,
+    },
   }
 }
 
@@ -73,39 +66,31 @@ function updateActiveTextAppearance(
   updatedAt: string,
   updateAppearance: TextAppearanceUpdater,
 ): EditorProjectState {
-  const activePage = state.project.pages.find(
-    (page) => page.id === state.activePageId,
-  )
-  const element = activePage?.elements.find(
-    (candidate) => candidate.id === elementId,
-  )
-
-  if (!activePage || !element || element.kind !== 'text' || element.locked) {
-    return state
-  }
+  const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+  const element = activePage?.elements.find((candidate) => candidate.id === elementId)
+  if (!activePage || !element || element.kind !== 'text' || element.locked) return state
 
   const nextAppearance = updateAppearance(element)
-
-  if (!nextAppearance || !isValidTextAppearance(nextAppearance)) {
-    return state
-  }
-
-  const pages = state.project.pages.map((page) =>
-    page.id === state.activePageId
-      ? {
-          ...page,
-          elements: page.elements.map((candidate) =>
-            candidate.id === elementId && candidate.kind === 'text'
-              ? { ...candidate, appearance: nextAppearance }
-              : candidate,
-          ),
-        }
-      : page,
-  )
+  if (!nextAppearance || !isValidTextAppearance(nextAppearance)) return state
 
   return {
     ...state,
-    project: { ...state.project, pages, updatedAt },
+    project: {
+      ...state.project,
+      pages: state.project.pages.map((page) =>
+        page.id === state.activePageId
+          ? {
+              ...page,
+              elements: page.elements.map((candidate) =>
+                candidate.id === elementId && candidate.kind === 'text'
+                  ? { ...candidate, appearance: nextAppearance }
+                  : candidate,
+              ),
+            }
+          : page,
+      ),
+      updatedAt,
+    },
   }
 }
 
@@ -114,116 +99,72 @@ export function reduceColorProjectAction(
   action: ColorProjectAction,
 ): EditorProjectState {
   switch (action.type) {
-    case 'set-active-page-background-color': {
-      if (!isEditorColor(action.color)) return state
-
-      const activePage = state.project.pages.find(
-        (page) => page.id === state.activePageId,
-      )
-
-      if (!activePage || activePage.appearance.backgroundColor === action.color) {
+    case 'set-active-page-background-fill': {
+      if (!isEditorFill(action.fill)) return state
+      const activePage = state.project.pages.find((page) => page.id === state.activePageId)
+      if (!activePage || editorFillsEqual(activePage.appearance.backgroundFill, action.fill)) {
         return state
       }
-
-      const nextAppearance = { backgroundColor: action.color }
+      const nextAppearance = { backgroundFill: action.fill }
       if (!isValidPageAppearance(nextAppearance)) return state
-
       return {
         ...state,
         project: {
           ...state.project,
           pages: state.project.pages.map((page) =>
-            page.id === state.activePageId
-              ? { ...page, appearance: nextAppearance }
-              : page,
+            page.id === state.activePageId ? { ...page, appearance: nextAppearance } : page,
           ),
           updatedAt: action.updatedAt,
         },
       }
     }
 
-    case 'set-section-background-color':
-      if (!isEditorColor(action.color)) return state
-      return updateActiveSectionAppearance(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) =>
-          element.appearance.backgroundColor === action.color
-            ? null
-            : { ...element.appearance, backgroundColor: action.color },
+    case 'set-section-background-fill':
+      if (!isEditorFill(action.fill)) return state
+      return updateActiveSectionAppearance(state, action.elementId, action.updatedAt, (element) =>
+        editorFillsEqual(element.appearance.backgroundFill, action.fill)
+          ? null
+          : { ...element.appearance, backgroundFill: action.fill },
       )
 
     case 'set-section-frame-width':
       if (!isSectionFrameWidth(action.width)) return state
-      return updateActiveSectionAppearance(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) =>
-          element.appearance.frame.width === action.width
-            ? null
-            : {
-                ...element.appearance,
-                frame: { ...element.appearance.frame, width: action.width },
-              },
+      return updateActiveSectionAppearance(state, action.elementId, action.updatedAt, (element) =>
+        element.appearance.frame.width === action.width
+          ? null
+          : { ...element.appearance, frame: { ...element.appearance.frame, width: action.width } },
       )
 
     case 'set-section-frame-color':
       if (!isEditorColor(action.color)) return state
-      return updateActiveSectionAppearance(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) =>
-          element.appearance.frame.color === action.color
-            ? null
-            : {
-                ...element.appearance,
-                frame: { ...element.appearance.frame, color: action.color },
-              },
+      return updateActiveSectionAppearance(state, action.elementId, action.updatedAt, (element) =>
+        element.appearance.frame.color === action.color
+          ? null
+          : { ...element.appearance, frame: { ...element.appearance.frame, color: action.color } },
       )
 
-    case 'set-text-background-color':
-      if (!isEditorColor(action.color)) return state
-      return updateActiveTextAppearance(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) =>
-          element.appearance.backgroundColor === action.color
-            ? null
-            : { ...element.appearance, backgroundColor: action.color },
+    case 'set-text-background-fill':
+      if (!isEditorFill(action.fill)) return state
+      return updateActiveTextAppearance(state, action.elementId, action.updatedAt, (element) =>
+        editorFillsEqual(element.appearance.backgroundFill, action.fill)
+          ? null
+          : { ...element.appearance, backgroundFill: action.fill },
       )
 
     case 'set-text-frame-width':
       if (!isElementFrameWidth(action.width)) return state
-      return updateActiveTextAppearance(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) =>
-          element.appearance.frame.width === action.width
-            ? null
-            : {
-                ...element.appearance,
-                frame: { ...element.appearance.frame, width: action.width },
-              },
+      return updateActiveTextAppearance(state, action.elementId, action.updatedAt, (element) =>
+        element.appearance.frame.width === action.width
+          ? null
+          : { ...element.appearance, frame: { ...element.appearance.frame, width: action.width } },
       )
 
     case 'set-text-frame-color':
       if (!isEditorColor(action.color)) return state
-      return updateActiveTextAppearance(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) =>
-          element.appearance.frame.color === action.color
-            ? null
-            : {
-                ...element.appearance,
-                frame: { ...element.appearance.frame, color: action.color },
-              },
+      return updateActiveTextAppearance(state, action.elementId, action.updatedAt, (element) =>
+        element.appearance.frame.color === action.color
+          ? null
+          : { ...element.appearance, frame: { ...element.appearance.frame, color: action.color } },
       )
   }
 
