@@ -83,8 +83,10 @@ test('template image survives insertion, undo and redo', async ({ page }) => {
   await page.mouse.down()
   await page.mouse.move(startX, startY + 210, { steps: 8 })
   await page.mouse.up()
+  await section.click({ position: { x: 300, y: 30 } })
 
   const saveRegion = page.getByRole('region', { name: 'Gjenbrukbar seksjon' })
+  await expect(saveRegion).toBeVisible()
   await saveRegion.getByLabel('Malnavn').fill('Bildemal')
   await saveRegion.getByRole('button', { name: 'Lagre seksjon som mal' }).click()
   await expect(saveRegion).toContainText('Åpne Elementer → Maler')
