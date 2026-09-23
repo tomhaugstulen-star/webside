@@ -96,6 +96,8 @@ export function parseHeaderAiProposal(
   }
 
   if (
+    typeof parsed.siteName !== 'string' ||
+    typeof parsed.subtitle !== 'string' ||
     !isValidHeaderSiteName(parsed.siteName) ||
     !isValidHeaderSubtitle(parsed.subtitle) ||
     !isValidHeaderAppearance(parsed.appearance)
