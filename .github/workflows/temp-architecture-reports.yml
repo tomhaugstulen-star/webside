@@ -22,9 +22,8 @@ jobs:
         run: |
           npm run architecture:json
           npm run architecture:diagram
+          git diff -- architecture.json docs/dependency-graph.mmd > architecture-reports.diff
       - uses: actions/upload-artifact@v4
         with:
-          name: gradient-architecture-reports
-          path: |
-            architecture.json
-            docs/dependency-graph.mmd
+          name: gradient-architecture-diff
+          path: architecture-reports.diff
