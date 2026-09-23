@@ -75,7 +75,7 @@ test('edits a copy of an image with history, crop and project save', async ({ pa
   })
   const images = page.locator('.canvas-element--image')
   await expect(images).toHaveCount(1)
-  await page.locator('.canvas-page').click({ position: { x: 2, y: 2 } })
+  await page.locator('.canvas-page').click({ position: { x: 2, y: 2 }, force: true })
   await editButton.click()
   await expect(picker.getByRole('button', { name: 'original.png' })).toBeVisible()
   await picker.getByRole('button', { name: 'original.png' }).click()
