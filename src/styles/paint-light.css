@@ -76,6 +76,15 @@
   text-align: left;
   white-space: nowrap;
 }
+.paint-dialog__save-menu-popover--sidebar {
+  left: 0;
+  right: auto;
+}
+.paint-dialog__file-actions > button,
+.paint-dialog__file-actions .paint-dialog__save-menu > button {
+  width: 100%;
+  text-align: left;
+}
 .paint-dialog--fullscreen {
   width: 100vw;
   height: 100dvh;
