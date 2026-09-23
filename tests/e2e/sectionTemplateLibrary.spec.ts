@@ -56,6 +56,7 @@ test('template image survives insertion, undo and redo', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Elementer', exact: true }).click()
   await page.getByRole('button', { name: 'Seksjon', exact: true }).click()
+  await page.getByRole('button', { name: 'Elementer', exact: true }).click()
 
   const imageInput = page.locator(
     '.image-import-control:has(.element-card--image) input[type="file"]',
