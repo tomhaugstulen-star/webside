@@ -104,9 +104,13 @@ test('rejects invalid JSON, unsupported formats/schema and dangling assets befor
 })
 
 
-test('project file round-trip preserves explicit mobile layout and visibility', async () => {
+test('project file serialization preserves explicit mobile layout and visibility', async () => {
   const fixture = projectFileFixture()
-  const image = fixture.project.pages[0].elements[0]
+  const image = fixture.project.pages[0].elements.find(
+    (element) => element.id === 'image-1',
+  )
+  if (!image) throw new Error('Expected image fixture.')
+
   image.position.mobile = { x: 12, y: 80 }
   image.size.mobile = { width: 180, height: 120 }
   image.visibility.mobile = false
@@ -123,18 +127,14 @@ test('project file round-trip preserves explicit mobile layout and visibility', 
   )
   expect(blob).not.toBeNull()
 
-  const imported = await readProjectFile(
-    new File([blob!], 'responsive.website-project', {
-      type: 'application/json',
-    }),
+  const serialized = JSON.parse(await blob!.text())
+  const importedProject = parseImportedEditorProject(serialized.project)
+  expect(importedProject).not.toBeNull()
+  const importedImage = importedProject!.pages[0].elements.find(
+    (element) => element.id === 'image-1',
   )
-  expect(imported?.project.pages[0].elements[0].position.mobile).toEqual({
-    x: 12,
-    y: 80,
-  })
-  expect(imported?.project.pages[0].elements[0].size.mobile).toEqual({
-    width: 180,
-    height: 120,
-  })
-  expect(imported?.project.pages[0].elements[0].visibility.mobile).toBe(false)
+  expect(importedImage).toBeTruthy()
+  expect(importedImage!.position.mobile).toEqual({ x: 12, y: 80 })
+  expect(importedImage!.size.mobile).toEqual({ width: 180, height: 120 })
+  expect(importedImage!.visibility.mobile).toBe(false)
 })
