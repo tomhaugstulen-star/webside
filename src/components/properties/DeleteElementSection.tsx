@@ -6,6 +6,7 @@ const deleteButtonLabels: Record<ElementKind, string> = {
   text: 'Slett tekstboks',
   button: 'Slett knapp',
   header: 'Slett header',
+  hero: 'Slett Hero',
 }
 
 type DeleteElementSectionProps = {
