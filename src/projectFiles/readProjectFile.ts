@@ -128,12 +128,16 @@ export async function readProjectFileResult(
   const seenIds = new Set<ImageAssetId>()
 
   for (const value of parsed.assets) {
-    const assetResult = await parseAsset(value)
-    if (!assetResult.ok) return assetResult
-
-    if (seenIds.has(assetResult.value.assetId)) {
+    if (
+      isRecord(value) &&
+      isImageAssetId(value.assetId) &&
+      seenIds.has(value.assetId)
+    ) {
       return { ok: false, error: 'duplicate-asset' }
     }
+
+    const assetResult = await parseAsset(value)
+    if (!assetResult.ok) return assetResult
 
     seenIds.add(assetResult.value.assetId)
     assets.push(assetResult.value)
