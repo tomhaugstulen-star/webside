@@ -37,7 +37,7 @@ export function EditorShell() {
     undo,
     redo,
   } = useEditorProject()
-  const { status: persistenceStatus, saveNow } = useEditorPersistence()
+  const { status: persistenceStatus } = useEditorPersistence()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
@@ -161,7 +161,6 @@ export function EditorShell() {
         onUndo={undo}
         onRedo={redo}
         persistenceStatus={persistenceStatus}
-        onSave={saveNow}
       />
       <div className="editor-shell__body">
         <LeftSidebar
