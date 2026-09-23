@@ -27,7 +27,6 @@ export function isValidHeroSubtitle(value: string) {
 export function isValidHeroCtaLabel(value: string) {
   return (
     normalizeHeroText(value) === value &&
-    value.length > 0 &&
     value.length <= MAX_HERO_CTA_LABEL_LENGTH
   )
 }
