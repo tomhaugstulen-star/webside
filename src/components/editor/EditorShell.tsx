@@ -14,6 +14,7 @@ import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
 import { useElementDeletionShortcut } from './useElementDeletionShortcut'
 import { useSelectedImageCropKeyboard } from './useSelectedImageCropKeyboard'
+import { getEditorHistoryShortcut } from './editorHistoryShortcut'
 
 type DeletionRequest = {
   elementId: string
@@ -26,7 +27,15 @@ export function EditorShell() {
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
-  const { activePage, state, dispatch } = useEditorProject()
+  const {
+    activePage,
+    state,
+    dispatch,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+  } = useEditorProject()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
@@ -107,16 +116,30 @@ export function EditorShell() {
   })
 
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const historyShortcut = getEditorHistoryShortcut(event)
+
+      if (historyShortcut === 'undo' && canUndo) {
+        event.preventDefault()
+        undo()
+        return
+      }
+
+      if (historyShortcut === 'redo' && canRedo) {
+        event.preventDefault()
+        redo()
+        return
+      }
+
       if (event.key === 'Escape' && !deletionDialogOpen) {
         setActiveTool(null)
         setPropertiesPanelOpen(false)
       }
     }
 
-    window.addEventListener('keydown', closeOnEscape)
-    return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [deletionDialogOpen])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [canRedo, canUndo, deletionDialogOpen, redo, undo])
 
   const visiblePropertiesElement =
     propertiesPanelOpen && selectedElement ? selectedElement : null
@@ -131,6 +154,10 @@ export function EditorShell() {
         viewport={viewport}
         onPageChange={changeActivePage}
         onViewportChange={setViewport}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={undo}
+        onRedo={redo}
       />
       <div className="editor-shell__body">
         <LeftSidebar
