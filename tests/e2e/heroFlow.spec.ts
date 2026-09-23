@@ -20,9 +20,7 @@ test('creates and edits a Hero without navigating away from the editor', async (
     buffer: onePixelPng,
   })
 
-  const hero = page.getByRole('button', {
-    name: /Hero: Din overskrift/,
-  })
+  const hero = page.locator('.canvas-element--hero')
   await expect(hero).toBeVisible()
   await expect(hero).toHaveAttribute('aria-pressed', 'true')
 
