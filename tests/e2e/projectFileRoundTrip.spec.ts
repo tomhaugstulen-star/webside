@@ -23,7 +23,8 @@ test('project file round-trip restores pages and imported image assets', async (
   await page.getByRole('button', { name: '+ Ny side', exact: true }).click()
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
 
-  const imageInput = page.locator('.project-image-import input[type="file"]')
+  await page.getByRole('button', { name: 'Elementer', exact: true }).click()
+  const imageInput = page.locator('.image-import-control__input')
   await imageInput.setInputFiles({
     name: 'pixel.png',
     mimeType: 'image/png',
@@ -31,6 +32,7 @@ test('project file round-trip restores pages and imported image assets', async (
   })
 
   await openProject(page)
+  await page.getByRole('button', { name: 'Vis elementer (1)' }).click()
   await expect(page.locator('.project-navigator__element').filter({ hasText: 'Bilde' })).toHaveCount(1)
 
   const downloadPromise = page.waitForEvent('download')
@@ -47,8 +49,10 @@ test('project file round-trip restores pages and imported image assets', async (
   await projectInput.setInputFiles(projectPath!)
   await expect(page.getByText('Åpnet «Nytt prosjekt».', { exact: true })).toBeVisible()
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
+  await page.locator('.project-navigator__page-button').filter({ hasText: 'Side 2' }).click()
   await expect(page.locator('.project-navigator__element').filter({ hasText: 'Bilde' })).toHaveCount(1)
 
+  await page.locator('.project-navigator__page-button').filter({ hasText: 'Forside' }).click()
   const restoredLogo = page.locator('.header-element__logo')
   await expect(restoredLogo).toBeVisible()
   await expect.poll(() => restoredLogo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBe(1)
