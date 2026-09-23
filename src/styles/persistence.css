@@ -1,20 +1,8 @@
-.top-toolbar__save-status {
-  max-width: 132px;
-  overflow: hidden;
-  color: var(--portal-text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.top-toolbar__save-status--dirty,
-.top-toolbar__save-status--saving {
-  color: var(--portal-text);
-}
-
-.top-toolbar__save-status--error {
+.top-toolbar__save-error {
   color: #a43c32;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .persistence-gate {
@@ -58,8 +46,3 @@
   opacity: 0.55;
 }
 
-@media (max-width: 1320px) {
-  .top-toolbar__save-status {
-    display: none;
-  }
-}
