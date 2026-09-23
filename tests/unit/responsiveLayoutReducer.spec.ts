@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test'
-import { createEditorElement } from '../../src/model/createEditorElement'
 import { createImageAssetId } from '../../src/model/imageAsset'
 import {
   editorProjectReducer,
