@@ -2,6 +2,7 @@ import type { ElementSize, EditorElement } from '../../model/editorProject'
 import type { NavigationTarget } from '../../model/navigation'
 import { ButtonElementContent } from './ButtonElementContent'
 import { HeaderElementContent } from './HeaderElementContent'
+import { HeroElementContent } from './HeroElementContent'
 import { ImageElementContent } from './ImageElementContent'
 import { TextElementEditor, type TextEditFinishReason } from './TextElementEditor'
 
@@ -61,6 +62,8 @@ export function EditorCanvasElementContent({
       return <ButtonElementContent element={element} />
     case 'header':
       return <HeaderElementContent element={element} onNavigate={onNavigate} />
+    case 'hero':
+      return <HeroElementContent element={element} />
   }
 
   const unhandledElement: never = element
