@@ -43,7 +43,9 @@ export function EditorPersistenceProvider({
     null,
   )
 
-  latestProjectRef.current = state.project
+  useEffect(() => {
+    latestProjectRef.current = state.project
+  }, [state.project])
 
   const saveProject = useCallback(
     async (project: EditorProject) => {
