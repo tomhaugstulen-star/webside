@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useImageAssetStore } from '../assets/images/useImageAssetStore'
+import { HeaderElementContent } from '../components/canvas/HeaderElementContent'
+import { getElementAppearanceCssStyle } from '../components/canvas/getElementAppearanceCssStyle'
 import type {
   HeaderEditorElement,
   ResponsiveViewport,
@@ -108,6 +110,15 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
     setMessage('AI-forslaget er brukt.')
   }
 
+  const previewElement = proposal
+    ? {
+        ...element,
+        siteName: proposal.siteName,
+        subtitle: proposal.subtitle,
+        appearance: proposal.appearance,
+      }
+    : null
+
   return (
     <>
       <button
@@ -131,6 +142,22 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
             aria-label="AI-forslag til Header">
             <h2>AI-forslag til Header</h2>
             <p>{proposal.width} × {proposal.height} px · {proposal.viewport}</p>
+            {previewElement && (
+              <div className={`ai-preview-dialog__canvas${proposal.viewport === 'mobile' ? ' canvas-page--mobile' : ''}`}>
+                <div className="canvas-element--header ai-preview-dialog__header"
+                  style={getElementAppearanceCssStyle(previewElement)}>
+                  <HeaderElementContent
+                    element={previewElement}
+                    onNavigate={() => undefined}
+                    navigationContext={{
+                      pages: state.project.pages,
+                      navigation: state.project.navigation,
+                      activePageId: state.activePageId,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
             <div className="ai-preview-dialog__summary">
               <div>
                 <strong>Navn</strong>
