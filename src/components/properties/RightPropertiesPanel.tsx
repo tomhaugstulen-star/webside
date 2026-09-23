@@ -99,7 +99,7 @@ export function RightPropertiesPanel({
 
             {(element.kind === 'text' ||
               element.kind === 'button' ||
-              element.kind === 'hero') && (
+              (element.kind === 'hero' && element.ctaLabel)) && (
               <ElementLinkPropertiesSection element={element} />
             )}
 
