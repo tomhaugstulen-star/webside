@@ -10,7 +10,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - separat header-descender-fiks er merget i PR #59
 - #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
 - #67 er fullført og merget i PR #72: typet helfarge/lineær gradient og schema 13
-- aktiv produksjonsfase er #73 på `feature/phase-20-header-navigation`: nettstedets Header og menynavigasjon
+- fase 20 er fullført og merget i PR #74
+- aktiv produksjonsfase er #75 på `feature/phase-21-hero`: Hero
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -100,15 +101,28 @@ Fullført og merget i PR #72:
 
 ## Fase 20 – nettstedets Header og menynavigasjon
 
-Aktiv leveranse i #73:
+Fullført og merget i PR #74:
 
 - renderer eksisterende `WebsiteNavigation.items` i Header
 - bruker samme prosjektmeny på alle sider som har Header
 - avleder offentlig href fra side-slug og seksjonens `anchorId`
 - editorens menypunkter kan bytte side og navigere til seksjoner uten å mutere prosjektdata
 - PC og Mobil bruker samme menydata; hamburger-/breakpoint-adferd utsettes til fase 23
-- ingen schema-bump er planlagt
-- fase 21+ og backlog #68/#69/#71 holdes utenfor
+- schema forble 13
+- fase 21+ og backlog #68/#69/#71 ble holdt utenfor
+
+## Fase 21 – Hero
+
+Aktiv leveranse i #75 / PR #76:
+
+- ny serialiserbar `hero`-variant i `EditorProject.pages[].elements`
+- schema 14 med identitetsbevarende migrering fra schema 13
+- bilde via eksisterende image asset-system og `.website-project`
+- overskrift, undertittel, CTA-tekst og CTA-lenke
+- bakgrunnsfyll, tekstfarge og ramme via eksisterende typede modeller
+- oppretting fra Elementer-panelet, canvas-rendering, navigator og høyrepanel
+- samme Hero-data i PC og Telefon; breakpoint-overstyringer utsettes til fase 23
+- fase 22+, #68, #69 og #71 holdes utenfor
 
 ## Fase 18 – arbeidsportalnavigasjon og navigator
 
