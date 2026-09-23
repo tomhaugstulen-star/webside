@@ -16,7 +16,7 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 - markering, flytting, størrelsesendring, låsing og sikker sletting
 - tekstredigering, tekststil, tekstfarge, helfarge/lineær gradient på bakgrunner, rammer og lenker
 - lokal bilde- og logoimport for PNG, JPEG og WebP
-- bildeutsnitt, zoom, prosjektfarger og rammer
+- bildeutsnitt, zoom, prosjektfarger, lineære bakgrunnsgradienter og rammer
 - sideoppretting, sidenavn, slug, rekkefølge og sletting
 - stabile offentlige seksjons-ID-er og serialiserbar nettstednavigasjon
 - korrigeringslinjer og snapping; aktiv vedlikeholdsbranch har også snapping til lik bredde/høyde
