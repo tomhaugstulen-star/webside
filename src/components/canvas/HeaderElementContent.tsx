@@ -18,14 +18,21 @@ export function HeaderElementContent({
   const { state } = useEditorProject()
   const resource = getImageAsset(element.logoAssetId)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigationRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const closeOutside = (event: globalThis.PointerEvent) => {
-      if (!navigationRef.current?.contains(event.target as Node)) setOpenMenuId(null)
+      if (!navigationRef.current?.contains(event.target as Node)) {
+        setOpenMenuId(null)
+        setMobileMenuOpen(false)
+      }
     }
     const closeEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpenMenuId(null)
+      if (event.key === 'Escape') {
+        setOpenMenuId(null)
+        setMobileMenuOpen(false)
+      }
     }
     document.addEventListener('pointerdown', closeOutside)
     document.addEventListener('keydown', closeEscape)
@@ -67,7 +74,26 @@ export function HeaderElementContent({
       </div>
 
       {state.project.navigation.items.length > 0 && (
-        <nav ref={navigationRef} className="header-element__navigation" aria-label="Nettstedmeny">
+        <>
+        <button
+          type="button"
+          className="header-element__mobile-menu-toggle"
+          aria-label={mobileMenuOpen ? 'Lukk meny' : 'Åpne meny'}
+          aria-expanded={mobileMenuOpen}
+          onPointerDown={stopHeaderSelection}
+          onClick={(event) => {
+            event.stopPropagation()
+            setMobileMenuOpen((open) => !open)
+            setOpenMenuId(null)
+          }}
+        >
+          Meny
+        </button>
+        <nav
+          ref={navigationRef}
+          className={`header-element__navigation${mobileMenuOpen ? ' header-element__navigation--mobile-open' : ''}`}
+          aria-label="Nettstedmeny"
+        >
           {state.project.navigation.items.filter((item) => !item.parentId).map((item) => {
             const href = resolveNavigationTargetHref(
               state.project.pages,
@@ -96,6 +122,7 @@ export function HeaderElementContent({
                 onClick={(event) => {
                   event.stopPropagation()
                   setOpenMenuId(null)
+                  setMobileMenuOpen(false)
                   onNavigate(item.target)
                 }}
               >
@@ -121,6 +148,7 @@ export function HeaderElementContent({
                         onClick={(event) => {
                           event.stopPropagation()
                           setOpenMenuId(null)
+                          setMobileMenuOpen(false)
                           onNavigate(child.target)
                         }}>{child.label}</button>
                     })}
@@ -131,6 +159,7 @@ export function HeaderElementContent({
             )
           })}
         </nav>
+        </>
       )}
     </div>
   )
