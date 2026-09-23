@@ -1,17 +1,17 @@
 import { useMemo, useReducer, type PropsWithChildren } from 'react'
 import { EditorProjectContext } from './editorProjectContext'
 import {
-  editorProjectReducer,
-  getInitialEditorProjectState,
-} from './editorProjectReducer'
+  editorHistoryReducer,
+  getInitialEditorHistoryState,
+} from './editorHistoryReducer'
 
 export function EditorProjectProvider({ children }: PropsWithChildren) {
-  const [state, dispatch] = useReducer(
-    editorProjectReducer,
+  const [history, dispatch] = useReducer(
+    editorHistoryReducer,
     undefined,
-    getInitialEditorProjectState,
+    getInitialEditorHistoryState,
   )
-
+  const state = history.present
   const activePage = state.project.pages.find((page) => page.id === state.activePageId)
 
   if (!activePage) {
@@ -19,8 +19,16 @@ export function EditorProjectProvider({ children }: PropsWithChildren) {
   }
 
   const value = useMemo(
-    () => ({ state, activePage, dispatch }),
-    [state, activePage],
+    () => ({
+      state,
+      activePage,
+      dispatch,
+      canUndo: history.past.length > 0,
+      canRedo: history.future.length > 0,
+      undo: () => dispatch({ type: 'undo' }),
+      redo: () => dispatch({ type: 'redo' }),
+    }),
+    [state, activePage, history.past.length, history.future.length],
   )
 
   return (
