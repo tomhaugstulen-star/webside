@@ -7,12 +7,13 @@ import { ButtonLibraryPanel } from './ButtonLibraryPanel'
 import { HeroImportControl } from './HeroImportControl'
 import { ImageImportControl } from './ImageImportControl'
 import { SidebarIcon, type SidebarIconName } from './SidebarIcon'
+import { SectionTemplateLibraryPanel } from './SectionTemplateLibraryPanel'
 
 type ElementsPanelProps = {
   onCreateElement: (request: ElementCreationRequest) => boolean
 }
 
-type ElementsPanelView = 'elements' | 'buttons'
+type ElementsPanelView = 'elements' | 'buttons' | 'templates'
 
 type StandardElementItem = {
   kind: StandardElementKind
@@ -56,6 +57,10 @@ export function ElementsPanel({
 }: ElementsPanelProps) {
   const [view, setView] = useState<ElementsPanelView>('elements')
 
+  if (view === 'templates') {
+    return <SectionTemplateLibraryPanel onBack={() => setView('elements')} />
+  }
+
   if (view === 'buttons') {
     return (
       <ButtonLibraryPanel
@@ -85,6 +90,15 @@ export function ElementsPanel({
         <HeroImportControl onCreateHero={onCreateElement} />
         <ImageImportControl onCreateImage={onCreateElement} />
         <StandardElementCard item={textItem} onCreateElement={onCreateElement} />
+
+        <button
+          className="element-card element-card--template"
+          type="button"
+          onClick={() => setView('templates')}
+        >
+          <SidebarIcon name="section" />
+          <span>Maler</span>
+        </button>
 
         <button
           className="element-card element-card--button"
