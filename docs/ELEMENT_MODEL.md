@@ -92,7 +92,7 @@ type EditorElement =
   | HeroEditorElement
 ```
 
-Telefon arver desktopverdien når `mobile` mangler. Dagens UI oppretter ikke mobiloverstyringer.
+Telefon bruker desktop som source of truth når `mobile` mangler. Under mobilbreakpointet på 768 CSS-piksler avledes en deterministisk responsiv fallback som holder elementet innenfor mobilviewporten uten å serialisere skjulte mobilverdier. Eksplisitte `mobile`-verdier overstyrer denne fallbacken. Fase 23 innfører viewport-spesifikke mutasjoner kontrollert.
 
 `locked` beholdes som felles data. Seksjon, Bilde, Tekst og Knapp kan endre feltet. Header er ikke låsbar: nye Header-elementer opprettes med `locked: false`, UI eksponerer ingen låsing, og reduceren avviser Header-låsehandlinger.
 
@@ -260,7 +260,7 @@ type HeroAppearance = {
 Standardstørrelse: `340 × 220 px`  
 Minimum: `280 × 160 px`
 
-Hero-bildet bruker samme validerte asset-/metadata-system som Bilde og Header. Overskrift og CTA-tekst er obligatoriske og normaliserte; undertittel er valgfri. CTA bruker eksisterende `ElementLink`. Hero kan flyttes, resize, låses og slettes som ordinære elementer. Telefon arver desktopverdier frem til breakpoint-redigering leveres i fase 23.
+Hero-bildet bruker samme validerte asset-/metadata-system som Bilde og Header. Overskrift, undertittel og CTA-tekst er valgfrie og normaliserte. Tomme felt rendres ikke; når CTA-teksten fjernes nullstilles CTA-lenken. CTA bruker eksisterende `ElementLink`. Hero kan flyttes, resize, låses og slettes som ordinære elementer. Uten eksplisitt mobiloverride tilpasses bred Hero deterministisk til mobilviewporten i fase 23.
 
 ## Alignment preview
 
@@ -352,4 +352,5 @@ Seksjons-ID kan bare endres eksplisitt på en eksisterende ulåst Seksjon og må
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
+- mobilbreakpointet er under 768 CSS-piksler; 390 px er standard editor-preview, ikke en egen enhetsmodell
 - autolagring reagerer på gyldige prosjektmutasjoner, ikke transient state
