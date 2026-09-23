@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 13
+EDITOR_PROJECT_SCHEMA_VERSION = 14
 ```
 
 ```text
@@ -22,9 +22,10 @@ EDITOR_PROJECT_SCHEMA_VERSION = 13
 11 Sider, offentlige seksjons-ID-er og nettstednavigasjon
 12 Tekstboksramme og 1 px standardramme for nye innrammede elementer
 13 Typet bakgrunnsfyll: helfarge eller lineær gradient
+14 Hero med bilde, innhold, CTA-lenke og utseende
 ```
 
-Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12 migreres deterministisk til schema 13. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
+Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12/13 migreres deterministisk til schema 14. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
 
 Kontrollert migreringsretning:
 
@@ -33,6 +34,7 @@ Kontrollert migreringsretning:
 - versjon 10 til 11 legger til stabile seksjonsankere og tom `WebsiteNavigation`
 - versjon 11 til 12 legger til `TextAppearance.frame` med 1 px standardramme
 - versjon 12 til 13 erstatter bakgrunnens `backgroundColor` med typet `backgroundFill` uten visuelt avvik
+- versjon 13 til 14 er identitetsbevarende for eksisterende prosjektdata og åpner for Hero-varianten
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -41,7 +43,7 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 13
+  schemaVersion: 14
   id: string
   name: string
   pages: EditorPage[]
@@ -85,6 +87,7 @@ type EditorElement =
   | TextEditorElement
   | ButtonEditorElement
   | HeaderEditorElement
+  | HeroEditorElement
 ```
 
 Telefon arver desktopverdien når `mobile` mangler. Dagens UI oppretter ikke mobiloverstyringer.
@@ -228,6 +231,32 @@ Regler:
 
 Baseelementet krever fortsatt `position` og `size`. For Header er `x`, `y` og serialisert bredde deterministiske kompatibilitetsverdier. De er ikke frie brukerredigerbare layoutverdier.
 
+## Hero
+
+```ts
+type HeroEditorElement = BaseEditorElement & {
+  kind: 'hero'
+  imageAssetId: ImageAssetId
+  imageAssetMetadata: ImageAssetMetadata
+  title: string
+  subtitle: string
+  ctaLabel: string
+  ctaLink: ElementLink
+  appearance: HeroAppearance
+}
+
+type HeroAppearance = {
+  backgroundFill: EditorFill
+  textColor: EditorColor
+  frame: ElementFrame
+}
+```
+
+Standardstørrelse: `340 × 220 px`  
+Minimum: `280 × 160 px`
+
+Hero-bildet bruker samme validerte asset-/metadata-system som Bilde og Header. Overskrift og CTA-tekst er obligatoriske og normaliserte; undertittel er valgfri. CTA bruker eksisterende `ElementLink`. Hero kan flyttes, resize, låses og slettes som ordinære elementer. Telefon arver desktopverdier frem til breakpoint-redigering leveres i fase 23.
+
 ## Alignment preview
 
 Korrigeringslinjer og snapping lagres ikke i `EditorProject`.
@@ -267,10 +296,10 @@ type ElementFrame = {
 - rammefargen beholdes når bredden settes til `0`
 - rammen ligger innenfor elementets ytre størrelse
 - `Farger` er avledet UI og lagres ikke som egen palett
-- Side, Seksjon, Tekst og Header kan bruke helfarge eller lineær gradient som bakgrunnsfyll
+- Side, Seksjon, Tekst, Header og Hero kan bruke helfarge eller lineær gradient som bakgrunnsfyll
 - lineær gradient har nøyaktig to fargestopp ved 0 % og 100 % og vinkel 0–360°
 - gradient lagres som typet prosjektdata; CSS `linear-gradient(...)` avledes bare ved rendering
-- Seksjon, Tekst og Header viser bakgrunn og eventuell rammefarge
+- Seksjon, Tekst, Header og Hero viser bakgrunn og eventuell rammefarge
 - Tekst viser Bakgrunn før Tekstfarge
 - Header viser bakgrunn og tekstfarge
 - tekstfarge og rammefarge forblir helfarge
@@ -286,7 +315,7 @@ Prosjektet lagrer stabil asset-ID og serialiserbar metadata. Følgende lagres ik
 - Object URL
 - lokal filsti
 
-Det transiente ressurslageret eier faktisk fil og Object URL. Sletting fjerner ressursen bare når ingen Bilde- eller Header-elementer refererer til asset-ID-en.
+Det transiente ressurslageret eier faktisk fil og Object URL. Sletting fjerner ressursen bare når ingen Bilde-, Header- eller Hero-elementer refererer til asset-ID-en.
 
 Ved sletting av en hel side ryddes bilde- og logoressurser som ikke lenger refereres av andre sider, uten å legge `File`, Blob eller Object URL inn i prosjektstate.
 
@@ -314,7 +343,7 @@ Seksjons-ID kan bare endres eksplisitt på en eksisterende ulåst Seksjon og må
 ## Senere utvidelser
 
 - prosjektimport validerer hele skjemaet før prosjektbytte
-- versjon 8 migreres kontrollert til versjon 9, deretter 10, 11, 12 og 13
+- versjon 8 migreres kontrollert til versjon 9, deretter 10, 11, 12, 13 og 14
 - prosjektbytte avstemmer eller tømmer ressurslageret
 - historikk lagrer bare serialiserbar prosjektstate
 - mobiloverstyringer bruker viewport-spesifikke actions
