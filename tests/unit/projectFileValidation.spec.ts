@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { projectFileFixture, pngBase64 } from '../fixtures/projectFileFixture'
 import { isValidEditorProject, parseImportedEditorProject } from '../../src/model/editorProjectValidation'
-import { createEditorElement } from '../../src/model/createEditorElement'
 import { base64ToBytes, arrayBufferToBase64 } from '../../src/projectFiles/projectFileBase64'
 import { readProjectFile } from '../../src/projectFiles/readProjectFile'
 import { createProjectFileBlob } from '../../src/projectFiles/createProjectFile'
@@ -41,11 +40,25 @@ test('independent responsive fields inherit desktop without rejecting valid data
 
 test('migrates schema 10 and safely rejects malformed schema 10/11', () => {
   const { project } = projectFileFixture()
-  const section = createEditorElement({ id: 'section', request: { kind: 'section' }, existingElements: [] })
-  const legacy = { ...project, schemaVersion: 10, navigation: undefined, pages: [{ ...project.pages[0], elements: [section] }] }
+  const page = project.pages[0]
+  if (page.appearance.backgroundFill.type !== 'solid') throw Error('Expected solid page')
+  const legacy = {
+    ...project,
+    schemaVersion: 10,
+    navigation: undefined,
+    pages: [{
+      ...page,
+      appearance: { backgroundColor: page.appearance.backgroundFill.color },
+      elements: [],
+    }],
+  }
   expect(parseImportedEditorProject(JSON.parse(JSON.stringify(legacy)))?.schemaVersion).toBe(13)
   for (const schemaVersion of [10, 11]) {
-    expect(parseImportedEditorProject({ ...legacy, schemaVersion, pages: [{ ...legacy.pages[0], elements: [null] }] })).toBeNull()
+    expect(parseImportedEditorProject({
+      ...legacy,
+      schemaVersion,
+      pages: [{ ...legacy.pages[0], elements: [null] }],
+    })).toBeNull()
   }
 })
 
