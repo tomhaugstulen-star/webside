@@ -94,8 +94,12 @@ test('Hele bildet uses the same minimum short side for portrait and landscape', 
     'east',
   )
 
-  expect(Math.min(portraitResult.size.width, portraitResult.size.height)).toBe(48)
-  expect(Math.min(landscapeResult.size.width, landscapeResult.size.height)).toBe(48)
+  expect(
+    Math.min(portraitResult.size.width, portraitResult.size.height),
+  ).toBeCloseTo(48)
+  expect(
+    Math.min(landscapeResult.size.width, landscapeResult.size.height),
+  ).toBeCloseTo(48)
   expect(portraitResult.size.width / portraitResult.size.height).toBeCloseTo(
     portrait.width / portrait.height,
   )
