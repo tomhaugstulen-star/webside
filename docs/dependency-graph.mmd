@@ -156,6 +156,7 @@ subgraph src["src"]
     src_paint_PaintLightDialog_tsx["PaintLightDialog.tsx"]
     src_paint_paintCanvasFiles_ts["paintCanvasFiles.ts"]
     src_paint_paintGeometry_ts["paintGeometry.ts"]
+    src_paint_PaintLightToolbar_tsx["PaintLightToolbar.tsx"]
     src_paint_usePaintCanvas_ts["usePaintCanvas.ts"]
     src_paint_paintDrawing_ts["paintDrawing.ts"]
     src_paint_usePaintImport_ts["usePaintImport.ts"]
@@ -239,6 +240,11 @@ subgraph src["src"]
   end
   subgraph src_types["types"]
     src_types_editor_ts["editor.ts"]
+  end
+  subgraph src_ai["ai"]
+    src_ai_HeaderAiControls_tsx["HeaderAiControls.tsx"]
+    src_ai_headerAiClipboard_ts["headerAiClipboard.ts"]
+    src_ai_headerAiImage_ts["headerAiImage.ts"]
   end
   subgraph src_templates["templates"]
     src_templates_useSectionTemplateLibrary_ts["useSectionTemplateLibrary.ts"]
@@ -335,6 +341,7 @@ src_paint_PaintImagePicker_tsx-->src_model_imageAsset_ts
 src_paint_PaintLightDialog_tsx-->src_model_imageAsset_ts
 src_paint_PaintLightDialog_tsx-->src_paint_paintCanvasFiles_ts
 src_paint_PaintLightDialog_tsx-->src_paint_paintGeometry_ts
+src_paint_PaintLightDialog_tsx-->src_paint_PaintLightToolbar_tsx
 src_paint_PaintLightDialog_tsx-->src_paint_usePaintCanvas_ts
 src_paint_PaintLightDialog_tsx-->src_paint_usePaintImport_ts
 src_paint_paintCanvasFiles_ts-->src_model_imageAsset_ts
@@ -416,6 +423,7 @@ src_state_editorProjectAction_ts-->src_state_headerProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_heroProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_navigationProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_pageProjectAction_ts
+src_state_headerProjectAction_ts-->src_model_headerAppearance_ts
 src_state_headerProjectAction_ts-->src_model_imageAsset_ts
 src_state_heroProjectAction_ts-->src_model_editorColor_ts
 src_state_heroProjectAction_ts-->src_model_editorFill_ts
@@ -495,6 +503,7 @@ src_state_reduceHeaderAppearanceAction_ts-->src_model_headerAppearance_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_model_textElementStyle_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_state_editorProjectAction_ts
 src_state_reduceHeaderProjectAction_ts-->src_model_editorProject_ts
+src_state_reduceHeaderProjectAction_ts-->src_model_headerAppearance_ts
 src_state_reduceHeaderProjectAction_ts-->src_model_headerElement_ts
 src_state_reduceHeaderProjectAction_ts-->src_model_imageAsset_ts
 src_state_reduceHeaderProjectAction_ts-->src_state_headerProjectAction_ts
@@ -644,13 +653,30 @@ src_components_canvas_ImageElementContent_tsx-->src_components_canvas_useImageCr
 src_components_canvas_useImageCropTransform_ts-->src_model_editorProject_ts
 src_components_canvas_useImageCropTransform_ts-->src_model_imagePresentation_ts
 src_components_canvas_useImageCropTransform_ts-->src_state_useImageProperties_ts
+src_components_canvas_ElementSelectionToolbar_tsx-->src_ai_HeaderAiControls_tsx
+src_components_canvas_ElementSelectionToolbar_tsx-->src_model_editorProject_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_model_elementLayout_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_state_useElementLocking_ts
-src_state_useElementLocking_ts-->src_state_useEditorProject_ts
+src_ai_HeaderAiControls_tsx-->src_assets_images_useImageAssetStore_ts
+src_ai_HeaderAiControls_tsx-->src_components_canvas_getElementAppearanceCssStyle_ts
+src_ai_HeaderAiControls_tsx-->src_components_canvas_HeaderElementContent_tsx
+src_ai_HeaderAiControls_tsx-->src_model_editorProject_ts
+src_ai_HeaderAiControls_tsx-->src_model_elementLayout_ts
+src_ai_HeaderAiControls_tsx-->src_state_useEditorProject_ts
+src_ai_HeaderAiControls_tsx-->src_ai_headerAiClipboard_ts
+src_ai_HeaderAiControls_tsx-->src_ai_headerAiImage_ts
 src_components_canvas_getElementAppearanceCssStyle_ts-->src_model_editorFill_ts
 src_components_canvas_getElementAppearanceCssStyle_ts-->src_model_editorProject_ts
 src_components_canvas_getElementAppearanceCssStyle_ts-->src_components_canvas_getTextElementCssStyle_ts
 src_components_canvas_getTextElementCssStyle_ts-->src_model_textElementStyle_ts
+src_ai_headerAiClipboard_ts-->src_model_editorProject_ts
+src_ai_headerAiClipboard_ts-->src_model_elementLayout_ts
+src_ai_headerAiClipboard_ts-->src_model_headerAppearance_ts
+src_ai_headerAiClipboard_ts-->src_model_headerElement_ts
+src_ai_headerAiImage_ts-->src_model_editorFill_ts
+src_ai_headerAiImage_ts-->src_model_editorProject_ts
+src_ai_headerAiImage_ts-->src_model_elementLayout_ts
+src_state_useElementLocking_ts-->src_state_useEditorProject_ts
 src_components_canvas_ImageResizeHandles_tsx-->src_model_elementLayout_ts
 src_components_canvas_useElementPointerTransform_ts-->src_model_editorProject_ts
 src_components_canvas_useElementPointerTransform_ts-->src_model_elementLayout_ts
