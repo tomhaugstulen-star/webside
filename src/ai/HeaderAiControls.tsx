@@ -53,17 +53,22 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
       )
 
       if (typeof ClipboardItem === 'function' && navigator.clipboard.write) {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'text/plain': new Blob([clip], { type: 'text/plain' }),
-            'image/png': png,
-          }),
-        ])
-        setMessage('ChatGPT-utklipp og Header-bilde kopiert.')
-      } else {
-        await navigator.clipboard.writeText(clip)
-        setMessage('ChatGPT-utklipp kopiert. Nettleseren støtter ikke bilde på utklippstavlen.')
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'text/plain': new Blob([clip], { type: 'text/plain' }),
+              'image/png': png,
+            }),
+          ])
+          setMessage('ChatGPT-utklipp og Header-bilde kopiert.')
+          return
+        } catch {
+          // Fall back to the portable text format below.
+        }
       }
+
+      await navigator.clipboard.writeText(clip)
+      setMessage('ChatGPT-utklipp kopiert. Header-bildet kunne ikke legges på utklippstavlen.')
     } catch {
       setMessage('Kunne ikke kopiere til utklippstavlen.')
     }
