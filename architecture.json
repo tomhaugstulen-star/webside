@@ -56,6 +56,23 @@
         },
         {
           "dynamic": false,
+          "module": "./persistence/EditorPersistenceProvider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/EditorPersistenceProvider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./state/EditorProjectProvider",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -210,7 +227,10 @@
         "src/model/editorElementValidation.ts",
         "src/projectFiles/projectAssetReferences.ts",
         "src/projectFiles/projectFileFormat.ts",
-        "src/projectFiles/readProjectFile.ts"
+        "src/projectFiles/readProjectFile.ts",
+        "src/persistence/createLocalProjectSnapshot.ts",
+        "src/persistence/localProjectStorage.ts",
+        "src/persistence/indexedDbLocalProjectStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -267,7 +287,8 @@
       "dependents": [
         "src/assets/images/ImageAssetStoreProvider.tsx",
         "src/assets/images/useImageAssetStore.ts",
-        "src/projectFiles/createProjectFile.ts"
+        "src/projectFiles/createProjectFile.ts",
+        "src/persistence/createLocalProjectSnapshot.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -311,6 +332,23 @@
             "import"
           ],
           "resolved": "src/model/elementCreation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../persistence/useEditorPersistence",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/useEditorPersistence.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -878,7 +916,10 @@
         "src/projectFiles/projectFileFormat.ts",
         "src/components/sidebar/navigationTargetOptions.ts",
         "src/components/editor/useElementDeletionShortcut.ts",
-        "src/components/editor/useSelectedImageCropKeyboard.ts"
+        "src/components/editor/useSelectedImageCropKeyboard.ts",
+        "src/persistence/EditorPersistenceProvider.tsx",
+        "src/persistence/createLocalProjectSnapshot.ts",
+        "src/persistence/localProjectStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -1650,6 +1691,58 @@
       "valid": true
     },
     {
+      "source": "src/persistence/useEditorPersistence.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./editorPersistenceContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/editorPersistenceContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/persistence/editorPersistenceContext.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/persistence/useEditorPersistence.ts",
+        "src/components/toolbar/TopToolbar.tsx",
+        "src/persistence/EditorPersistenceProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/state/useEditorProject.ts",
       "dependencies": [
         {
@@ -1699,7 +1792,8 @@
         "src/state/useNavigationActions.ts",
         "src/state/usePageActions.ts",
         "src/components/sidebar/ProjectFileControls.tsx",
-        "src/components/sidebar/WebsiteNavigationSection.tsx"
+        "src/components/sidebar/WebsiteNavigationSection.tsx",
+        "src/persistence/EditorPersistenceProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -2881,7 +2975,8 @@
       ],
       "dependents": [
         "src/state/editorProjectReducer.ts",
-        "src/state/reducePageProjectAction.ts"
+        "src/state/reducePageProjectAction.ts",
+        "src/persistence/EditorPersistenceProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -7202,7 +7297,8 @@
         "src/components/sidebar/ImageImportControl.tsx",
         "src/components/sidebar/HeaderCreationControl.tsx",
         "src/state/usePageActions.ts",
-        "src/components/sidebar/ProjectFileControls.tsx"
+        "src/components/sidebar/ProjectFileControls.tsx",
+        "src/persistence/EditorPersistenceProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -12800,7 +12896,9 @@
       ],
       "dependents": [
         "src/projectFiles/createProjectFile.ts",
-        "src/projectFiles/readProjectFile.ts"
+        "src/projectFiles/readProjectFile.ts",
+        "src/persistence/createLocalProjectSnapshot.ts",
+        "src/persistence/indexedDbLocalProjectStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -13144,7 +13242,9 @@
       ],
       "dependents": [
         "src/projectFiles/createProjectFile.ts",
-        "src/projectFiles/readProjectFile.ts"
+        "src/projectFiles/readProjectFile.ts",
+        "src/persistence/createLocalProjectSnapshot.ts",
+        "src/persistence/indexedDbLocalProjectStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -13594,6 +13694,24 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../persistence/editorPersistenceContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/persistence/editorPersistenceContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../types/editor",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -13761,6 +13879,423 @@
       "valid": true
     },
     {
+      "source": "src/persistence/EditorPersistenceProvider.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/useImageAssetStore",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/images/useImageAssetStore.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/createEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/createEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../state/useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./createLocalProjectSnapshot",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/createLocalProjectSnapshot.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./editorPersistenceContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/editorPersistenceContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./indexedDbLocalProjectStorage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/indexedDbLocalProjectStorage.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./localProjectStorage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/persistence/localProjectStorage.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/persistence/createLocalProjectSnapshot.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProjectValidation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProjectValidation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../projectFiles/projectAssetReferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectAssetReferences.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./localProjectStorage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/localProjectStorage.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/persistence/EditorPersistenceProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/persistence/localProjectStorage.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/persistence/EditorPersistenceProvider.tsx",
+        "src/persistence/createLocalProjectSnapshot.ts",
+        "src/persistence/indexedDbLocalProjectStorage.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/persistence/indexedDbLocalProjectStorage.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProjectValidation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProjectValidation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../projectFiles/projectAssetReferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectAssetReferences.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./localProjectStorage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/persistence/localProjectStorage.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/persistence/EditorPersistenceProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/state/EditorProjectProvider.tsx",
       "dependencies": [
         {
@@ -13884,8 +14419,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 178,
-    "totalDependenciesCruised": 600,
+    "totalCruised": 184,
+    "totalDependenciesCruised": 624,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
