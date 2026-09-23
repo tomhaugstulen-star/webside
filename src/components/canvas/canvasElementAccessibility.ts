@@ -44,9 +44,14 @@ function getElementSummary(element: EditorElement) {
   if (element.kind === 'hero') {
     const title = summarizeText(element.title)
     const subtitle = summarizeText(element.subtitle)
-    return subtitle
-      ? `Hero: ${title}. Undertittel: ${subtitle}.`
-      : `Hero: ${title}.`
+
+    if (title && subtitle) {
+      return `Hero: ${title}. Undertittel: ${subtitle}.`
+    }
+
+    if (title) return `Hero: ${title}.`
+    if (subtitle) return `Hero. Undertittel: ${subtitle}.`
+    return 'Hero uten tekst.'
   }
 
   return `${elementKindLabels[element.kind]}.`
