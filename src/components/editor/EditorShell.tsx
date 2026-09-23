@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { useEditorPersistence } from '../../persistence/useEditorPersistence'
+import { downloadDuplicateProject } from '../../projectFiles/downloadDuplicateProject'
 import { useElementCreation } from '../../state/useElementCreation'
 import { useElementDeletion } from '../../state/useElementDeletion'
 import { useElementSelection } from '../../state/useElementSelection'
@@ -38,6 +40,7 @@ export function EditorShell() {
     redo,
   } = useEditorProject()
   const { status: persistenceStatus } = useEditorPersistence()
+  const { getImageAsset } = useImageAssetStore()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
@@ -143,6 +146,18 @@ export function EditorShell() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [canRedo, canUndo, deletionDialogOpen, redo, undo])
 
+  const duplicateProject = useCallback(() => {
+    void downloadDuplicateProject(state.project, getImageAsset)
+      .then((created) => {
+        if (!created) {
+          window.alert('Prosjektkopien kunne ikke opprettes. Kontroller bildene.')
+        }
+      })
+      .catch(() => {
+        window.alert('Prosjektkopien kunne ikke opprettes.')
+      })
+  }, [getImageAsset, state.project])
+
   const visiblePropertiesElement =
     propertiesPanelOpen && selectedElement ? selectedElement : null
 
@@ -161,6 +176,7 @@ export function EditorShell() {
         onUndo={undo}
         onRedo={redo}
         persistenceStatus={persistenceStatus}
+        onDuplicateProject={duplicateProject}
       />
       <div className="editor-shell__body">
         <LeftSidebar

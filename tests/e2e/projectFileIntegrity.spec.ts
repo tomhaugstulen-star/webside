@@ -63,23 +63,51 @@ test('corrupt files preserve project, image/logo URLs and editability', async ({
   await expectImages(page)
   const originalSrc = await page.locator('.image-element__image').getAttribute('src')
   const corruptions = [
-    (f: ReturnType<typeof projectFileFixture>) => { f.formatVersion = 99 as 1 },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets = [] },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets.push({ ...f.assets[0] }) },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].base64 = '%'.repeat(f.assets[0].base64.length) },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].base64 = 'A'.repeat(f.assets[0].base64.length) },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].metadata.width = 2 },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].metadata.mimeType = 'image/jpeg' },
-    (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].assetId = 'cfa1cdee-86a6-4dee-affe-542181600034' as typeof f.assets[0]['assetId'] },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.formatVersion = 99 as 1 },
+      message: 'Prosjektfilen bruker en formatversjon som ikke støttes.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets = [] },
+      message: 'Prosjektfilen mangler en bildefil som prosjektet bruker.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets.push({ ...f.assets[0] }) },
+      message: 'Prosjektfilen inneholder dupliserte bildefiler.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].base64 = '%'.repeat(f.assets[0].base64.length) },
+      message: 'En bildefil samsvarer ikke med lagrede metadata.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].base64 = 'A'.repeat(f.assets[0].base64.length) },
+      message: 'En bildefil samsvarer ikke med lagrede metadata.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].metadata.width = 2 },
+      message: 'En bildefil samsvarer ikke med lagrede metadata.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].metadata.mimeType = 'image/jpeg' },
+      message: 'En bildefil samsvarer ikke med lagrede metadata.',
+    },
+    {
+      change: (f: ReturnType<typeof projectFileFixture>) => { f.assets[0].assetId = 'cfa1cdee-86a6-4dee-affe-542181600034' as typeof f.assets[0]['assetId'] },
+      message: 'Prosjektfilen mangler en bildefil som prosjektet bruker.',
+    },
   ]
-  const candidates: unknown[] = ['{', { broken: true }, ...corruptions.map((corrupt) => {
-    const fixture = projectFileFixture()
-    corrupt(fixture)
-    return fixture
-  })]
+  const candidates = [
+    { content: '{', message: 'Prosjektfilen inneholder ugyldig JSON.' },
+    { content: { broken: true }, message: 'Prosjektfilen har ugyldig format.' },
+    ...corruptions.map(({ change, message }) => {
+      const fixture = projectFileFixture()
+      change(fixture)
+      return { content: fixture, message }
+    }),
+  ]
   for (const candidate of candidates) {
-    await openFile(page, candidate)
-    await expect(page.getByRole('status')).toHaveText('Prosjektfilen er ugyldig eller skadet.')
+    await openFile(page, candidate.content)
+    await expect(page.getByRole('status')).toHaveText(candidate.message)
     await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
     await expect(page.locator('.image-element__image')).toHaveAttribute('src', originalSrc!)
     await expectImages(page)

@@ -25,6 +25,10 @@
   gap: 8px;
 }
 
+.project-file-controls__backup {
+  grid-column: 1 / -1;
+}
+
 .project-file-controls__actions button {
   min-height: 40px;
   border: 1px solid var(--portal-border);

@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test'
 import { projectFileFixture, pngBase64 } from '../fixtures/projectFileFixture'
 import { isValidEditorProject, parseImportedEditorProject } from '../../src/model/editorProjectValidation'
 import { base64ToBytes, arrayBufferToBase64 } from '../../src/projectFiles/projectFileBase64'
-import { readProjectFile } from '../../src/projectFiles/readProjectFile'
+import { readProjectFile, readProjectFileResult } from '../../src/projectFiles/readProjectFile'
+import { createDuplicateProject } from '../../src/projectFiles/createDuplicateProject'
+import { createProjectBackupFileName } from '../../src/projectFiles/projectFileFormat'
 import { createProjectFileBlob } from '../../src/projectFiles/createProjectFile'
 import { getProjectAssetReferences } from '../../src/projectFiles/projectAssetReferences'
 import { imageBytesMatchMimeType } from '../../src/assets/images/imageFileSignature'
@@ -95,12 +97,40 @@ test('export includes a shared image/logo exactly once and refuses missing resou
   expect(await createProjectFileBlob(fixture.project, () => null)).toBeNull()
 })
 
-test('rejects invalid JSON, unsupported formats/schema and dangling assets before decoding', async () => {
+test('reports typed project-file import failures', async () => {
   const fixture = projectFileFixture()
-  const candidates = ['{', JSON.stringify({ ...fixture, formatVersion: 2 }), JSON.stringify({ ...fixture, assets: [] }), JSON.stringify({ ...fixture, project: { ...fixture.project, schemaVersion: 99 } })]
-  for (const content of candidates) {
+  const cases = [
+    ['{', 'invalid-json'],
+    [JSON.stringify({ broken: true }), 'invalid-envelope'],
+    [JSON.stringify({ ...fixture, formatVersion: 2 }), 'unsupported-format-version'],
+    [JSON.stringify({ ...fixture, project: { ...fixture.project, schemaVersion: 99 } }), 'invalid-project'],
+    [JSON.stringify({ ...fixture, assets: [] }), 'missing-asset'],
+    [JSON.stringify({ ...fixture, assets: [...fixture.assets, { ...fixture.assets[0] }] }), 'duplicate-asset'],
+  ] as const
+
+  for (const [content, error] of cases) {
+    const result = await readProjectFileResult(
+      new File([content], 'broken.website-project'),
+    )
+    expect(result).toEqual({ ok: false, error })
     expect(await readProjectFile(new File([content], 'broken.website-project'))).toBeNull()
   }
+})
+
+test('creates deterministic backup names and independent project copies', () => {
+  const { project } = projectFileFixture()
+  const date = new Date('2026-09-23T16:30:45.123Z')
+  const duplicate = createDuplicateProject(project, date)
+
+  expect(createProjectBackupFileName('Ærlig Øvelse Å', date)).toBe(
+    'aerlig-ovelse-a-backup-2026-09-23-16-30-45.website-project',
+  )
+  expect(duplicate.id).not.toBe(project.id)
+  expect(duplicate.name).toBe(`Kopi av ${project.name}`)
+  expect(duplicate.createdAt).toBe(date.toISOString())
+  expect(duplicate.updatedAt).toBe(date.toISOString())
+  expect(duplicate.pages).toBe(project.pages)
+  expect(duplicate.navigation).toBe(project.navigation)
 })
 
 

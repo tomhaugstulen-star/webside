@@ -38,23 +38,23 @@ subgraph src["src"]
     src_model_sectionAppearance_ts["sectionAppearance.ts"]
     src_model_textAppearance_ts["textAppearance.ts"]
     src_model_elementCreation_ts["elementCreation.ts"]
+    src_model_editorProjectValidation_ts["editorProjectValidation.ts"]
+    src_model_editorElementValidation_ts["editorElementValidation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
-    src_model_createEditorProject_ts["createEditorProject.ts"]
+    src_model_headerElement_ts["headerElement.ts"]
+    src_model_heroElement_ts["heroElement.ts"]
     src_model_editorProjectMigration_ts["editorProjectMigration.ts"]
     src_model_siteStructure_ts["siteStructure.ts"]
+    src_model_editorProjectMigrationV14_ts["editorProjectMigrationV14.ts"]
+    src_model_createEditorProject_ts["createEditorProject.ts"]
     src_model_createEditorElement_ts["createEditorElement.ts"]
     src_model_findElementCreationPosition_ts["findElementCreationPosition.ts"]
-    src_model_heroElement_ts["heroElement.ts"]
-    src_model_headerElement_ts["headerElement.ts"]
     src_model_resolveResponsiveElementLayout_ts["resolveResponsiveElementLayout.ts"]
     src_model_containedImageLayout_ts["containedImageLayout.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
     src_model_navigationHref_ts["navigationHref.ts"]
     src_model_projectColorEntries_ts["projectColorEntries.ts"]
     src_model_projectImageAssets_ts["projectImageAssets.ts"]
-    src_model_editorProjectValidation_ts["editorProjectValidation.ts"]
-    src_model_editorElementValidation_ts["editorElementValidation.ts"]
-    src_model_editorProjectMigrationV14_ts["editorProjectMigrationV14.ts"]
   end
   subgraph src_components["components"]
     subgraph src_components_editor["editor"]
@@ -150,6 +150,17 @@ subgraph src["src"]
     src_persistence_localProjectStorage_ts["localProjectStorage.ts"]
     src_persistence_indexedDbLocalProjectStorage_ts["indexedDbLocalProjectStorage.ts"]
   end
+  subgraph src_projectFiles["projectFiles"]
+    src_projectFiles_downloadDuplicateProject_ts["downloadDuplicateProject.ts"]
+    src_projectFiles_createDuplicateProject_ts["createDuplicateProject.ts"]
+    src_projectFiles_createProjectFile_ts["createProjectFile.ts"]
+    src_projectFiles_projectAssetReferences_ts["projectAssetReferences.ts"]
+    src_projectFiles_projectFileBase64_ts["projectFileBase64.ts"]
+    src_projectFiles_projectFileFormat_ts["projectFileFormat.ts"]
+    src_projectFiles_downloadProjectBlob_ts["downloadProjectBlob.ts"]
+    src_projectFiles_projectFileErrorMessage_ts["projectFileErrorMessage.ts"]
+    src_projectFiles_readProjectFile_ts["readProjectFile.ts"]
+  end
   subgraph src_state["state"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
@@ -210,13 +221,6 @@ subgraph src["src"]
   subgraph src_types["types"]
     src_types_editor_ts["editor.ts"]
   end
-  subgraph src_projectFiles["projectFiles"]
-    src_projectFiles_createProjectFile_ts["createProjectFile.ts"]
-    src_projectFiles_projectAssetReferences_ts["projectAssetReferences.ts"]
-    src_projectFiles_projectFileBase64_ts["projectFileBase64.ts"]
-    src_projectFiles_projectFileFormat_ts["projectFileFormat.ts"]
-    src_projectFiles_readProjectFile_ts["readProjectFile.ts"]
-  end
   src_main_tsx["main.tsx"]
   src_index_css["index.css"]
 end
@@ -229,9 +233,11 @@ src_assets_images_ImageAssetStoreProvider_tsx-->src_model_imageAsset_ts
 src_assets_images_ImageAssetStoreProvider_tsx-->src_assets_images_imageAssetStoreContext_ts
 src_model_imageAsset_ts-->src_model_createStableId_ts
 src_assets_images_imageAssetStoreContext_ts-->src_model_imageAsset_ts
+src_components_editor_EditorShell_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
 src_components_editor_EditorShell_tsx-->src_model_elementCreation_ts
 src_components_editor_EditorShell_tsx-->src_persistence_useEditorPersistence_ts
+src_components_editor_EditorShell_tsx-->src_projectFiles_downloadDuplicateProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementCreation_ts
 src_components_editor_EditorShell_tsx-->src_state_useElementDeletion_ts
@@ -246,6 +252,7 @@ src_components_editor_EditorShell_tsx-->src_components_toolbar_TopToolbar_tsx
 src_components_editor_EditorShell_tsx-->src_components_editor_editorHistoryShortcut_ts
 src_components_editor_EditorShell_tsx-->src_components_editor_useElementDeletionShortcut_ts
 src_components_editor_EditorShell_tsx-->src_components_editor_useSelectedImageCropKeyboard_ts
+src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
 src_model_editorProject_ts-->src_model_buttonAsset_ts
 src_model_editorProject_ts-->src_model_elementDimensions_ts
 src_model_editorProject_ts-->src_model_elementLink_ts
@@ -280,6 +287,57 @@ src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
 src_model_elementCreation_ts-->src_model_imageAsset_ts
 src_persistence_useEditorPersistence_ts-->src_persistence_editorPersistenceContext_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_assets_images_imageAssetStoreContext_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_model_editorProject_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_model_imageAsset_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_projectFiles_createDuplicateProject_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_projectFiles_createProjectFile_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_projectFiles_downloadProjectBlob_ts
+src_projectFiles_downloadDuplicateProject_ts-->src_projectFiles_projectFileFormat_ts
+src_projectFiles_createDuplicateProject_ts-->src_model_createStableId_ts
+src_projectFiles_createDuplicateProject_ts-->src_model_editorProject_ts
+src_projectFiles_createProjectFile_ts-->src_assets_images_imageAssetStoreContext_ts
+src_projectFiles_createProjectFile_ts-->src_model_editorProject_ts
+src_projectFiles_createProjectFile_ts-->src_model_editorProjectValidation_ts
+src_projectFiles_createProjectFile_ts-->src_model_imageAsset_ts
+src_projectFiles_createProjectFile_ts-->src_projectFiles_projectAssetReferences_ts
+src_projectFiles_createProjectFile_ts-->src_projectFiles_projectFileBase64_ts
+src_projectFiles_createProjectFile_ts-->src_projectFiles_projectFileFormat_ts
+src_model_editorProjectValidation_ts-->src_model_editorElementValidation_ts
+src_model_editorProjectValidation_ts-->src_model_editorProject_ts
+src_model_editorProjectValidation_ts-->src_model_editorProjectMigration_ts
+src_model_editorProjectValidation_ts-->src_model_editorProjectMigrationV14_ts
+src_model_editorProjectValidation_ts-->src_model_pageAppearance_ts
+src_model_editorProjectValidation_ts-->src_model_siteStructure_ts
+src_model_editorElementValidation_ts-->src_model_buttonAsset_ts
+src_model_editorElementValidation_ts-->src_model_editorProject_ts
+src_model_editorElementValidation_ts-->src_model_elementDimensions_ts
+src_model_editorElementValidation_ts-->src_model_elementLayout_ts
+src_model_editorElementValidation_ts-->src_model_elementLink_ts
+src_model_editorElementValidation_ts-->src_model_headerAppearance_ts
+src_model_editorElementValidation_ts-->src_model_headerElement_ts
+src_model_editorElementValidation_ts-->src_model_heroAppearance_ts
+src_model_editorElementValidation_ts-->src_model_heroElement_ts
+src_model_editorElementValidation_ts-->src_model_imageAsset_ts
+src_model_editorElementValidation_ts-->src_model_imagePresentation_ts
+src_model_editorElementValidation_ts-->src_model_sectionAppearance_ts
+src_model_editorElementValidation_ts-->src_model_textAppearance_ts
+src_model_editorElementValidation_ts-->src_model_textElementStyle_ts
+src_model_elementLayout_ts-->src_model_editorProject_ts
+src_model_elementLayout_ts-->src_model_elementDimensions_ts
+src_model_elementLayout_ts-->src_model_imagePresentation_ts
+src_model_editorProjectMigration_ts-->src_model_editorColor_ts
+src_model_editorProjectMigration_ts-->src_model_editorFill_ts
+src_model_editorProjectMigration_ts-->src_model_editorProject_ts
+src_model_editorProjectMigration_ts-->src_model_elementFrame_ts
+src_model_editorProjectMigration_ts-->src_model_headerAppearance_ts
+src_model_editorProjectMigration_ts-->src_model_siteStructure_ts
+src_model_siteStructure_ts-->src_model_navigation_ts
+src_model_editorProjectMigrationV14_ts-->src_model_editorProject_ts
+src_projectFiles_projectAssetReferences_ts-->src_model_editorProject_ts
+src_projectFiles_projectAssetReferences_ts-->src_model_imageAsset_ts
+src_projectFiles_projectFileFormat_ts-->src_model_editorProject_ts
+src_projectFiles_projectFileFormat_ts-->src_model_imageAsset_ts
 src_state_useEditorProject_ts-->src_state_editorProjectContext_ts
 src_state_editorProjectContext_ts-->src_model_editorProject_ts
 src_state_editorProjectContext_ts-->src_state_editorHistoryReducer_ts
@@ -301,9 +359,6 @@ src_state_editorProjectAction_ts-->src_state_headerProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_heroProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_navigationProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_pageProjectAction_ts
-src_model_elementLayout_ts-->src_model_editorProject_ts
-src_model_elementLayout_ts-->src_model_elementDimensions_ts
-src_model_elementLayout_ts-->src_model_imagePresentation_ts
 src_state_headerProjectAction_ts-->src_model_imageAsset_ts
 src_state_heroProjectAction_ts-->src_model_editorColor_ts
 src_state_heroProjectAction_ts-->src_model_editorFill_ts
@@ -337,13 +392,6 @@ src_model_createEditorProject_ts-->src_model_createStableId_ts
 src_model_createEditorProject_ts-->src_model_editorProject_ts
 src_model_createEditorProject_ts-->src_model_editorProjectMigration_ts
 src_model_createEditorProject_ts-->src_model_pageAppearance_ts
-src_model_editorProjectMigration_ts-->src_model_editorColor_ts
-src_model_editorProjectMigration_ts-->src_model_editorFill_ts
-src_model_editorProjectMigration_ts-->src_model_editorProject_ts
-src_model_editorProjectMigration_ts-->src_model_elementFrame_ts
-src_model_editorProjectMigration_ts-->src_model_headerAppearance_ts
-src_model_editorProjectMigration_ts-->src_model_siteStructure_ts
-src_model_siteStructure_ts-->src_model_navigation_ts
 src_state_addElementToActivePage_ts-->src_model_createEditorElement_ts
 src_state_addElementToActivePage_ts-->src_model_editorProject_ts
 src_state_addElementToActivePage_ts-->src_model_elementCreation_ts
@@ -524,7 +572,6 @@ src_components_canvas_HeaderElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_HeaderElementContent_tsx-->src_model_navigation_ts
 src_components_canvas_HeaderElementContent_tsx-->src_model_navigationHref_ts
 src_components_canvas_HeaderElementContent_tsx-->src_state_useEditorProject_ts
-src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
 src_model_navigationHref_ts-->src_model_navigation_ts
 src_components_canvas_HeroElementContent_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_canvas_HeroElementContent_tsx-->src_model_editorProject_ts
@@ -762,41 +809,12 @@ src_model_projectImageAssets_ts-->src_model_editorProject_ts
 src_model_projectImageAssets_ts-->src_model_imageAsset_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_projectFiles_createProjectFile_ts
+src_components_sidebar_ProjectFileControls_tsx-->src_projectFiles_downloadProjectBlob_ts
+src_components_sidebar_ProjectFileControls_tsx-->src_projectFiles_projectFileErrorMessage_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_projectFiles_projectFileFormat_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_projectFiles_readProjectFile_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_state_useEditorProject_ts
-src_projectFiles_createProjectFile_ts-->src_assets_images_imageAssetStoreContext_ts
-src_projectFiles_createProjectFile_ts-->src_model_editorProject_ts
-src_projectFiles_createProjectFile_ts-->src_model_editorProjectValidation_ts
-src_projectFiles_createProjectFile_ts-->src_model_imageAsset_ts
-src_projectFiles_createProjectFile_ts-->src_projectFiles_projectAssetReferences_ts
-src_projectFiles_createProjectFile_ts-->src_projectFiles_projectFileBase64_ts
-src_projectFiles_createProjectFile_ts-->src_projectFiles_projectFileFormat_ts
-src_model_editorProjectValidation_ts-->src_model_editorElementValidation_ts
-src_model_editorProjectValidation_ts-->src_model_editorProject_ts
-src_model_editorProjectValidation_ts-->src_model_editorProjectMigration_ts
-src_model_editorProjectValidation_ts-->src_model_editorProjectMigrationV14_ts
-src_model_editorProjectValidation_ts-->src_model_pageAppearance_ts
-src_model_editorProjectValidation_ts-->src_model_siteStructure_ts
-src_model_editorElementValidation_ts-->src_model_buttonAsset_ts
-src_model_editorElementValidation_ts-->src_model_editorProject_ts
-src_model_editorElementValidation_ts-->src_model_elementDimensions_ts
-src_model_editorElementValidation_ts-->src_model_elementLayout_ts
-src_model_editorElementValidation_ts-->src_model_elementLink_ts
-src_model_editorElementValidation_ts-->src_model_headerAppearance_ts
-src_model_editorElementValidation_ts-->src_model_headerElement_ts
-src_model_editorElementValidation_ts-->src_model_heroAppearance_ts
-src_model_editorElementValidation_ts-->src_model_heroElement_ts
-src_model_editorElementValidation_ts-->src_model_imageAsset_ts
-src_model_editorElementValidation_ts-->src_model_imagePresentation_ts
-src_model_editorElementValidation_ts-->src_model_sectionAppearance_ts
-src_model_editorElementValidation_ts-->src_model_textAppearance_ts
-src_model_editorElementValidation_ts-->src_model_textElementStyle_ts
-src_model_editorProjectMigrationV14_ts-->src_model_editorProject_ts
-src_projectFiles_projectAssetReferences_ts-->src_model_editorProject_ts
-src_projectFiles_projectAssetReferences_ts-->src_model_imageAsset_ts
-src_projectFiles_projectFileFormat_ts-->src_model_editorProject_ts
-src_projectFiles_projectFileFormat_ts-->src_model_imageAsset_ts
+src_projectFiles_projectFileErrorMessage_ts-->src_projectFiles_readProjectFile_ts
 src_projectFiles_readProjectFile_ts-->src_assets_images_prepareImageFile_ts
 src_projectFiles_readProjectFile_ts-->src_model_editorProjectValidation_ts
 src_projectFiles_readProjectFile_ts-->src_model_imageAsset_ts

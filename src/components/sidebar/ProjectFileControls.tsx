@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import { createProjectFileBlob } from '../../projectFiles/createProjectFile'
+import { downloadProjectBlob } from '../../projectFiles/downloadProjectBlob'
+import { getProjectFileErrorMessage } from '../../projectFiles/projectFileErrorMessage'
 import {
+  createProjectBackupFileName,
   createProjectFileName,
   PROJECT_FILE_EXTENSION,
 } from '../../projectFiles/projectFileFormat'
-import { readProjectFile } from '../../projectFiles/readProjectFile'
+import { readProjectFileResult } from '../../projectFiles/readProjectFile'
 import { useEditorProject } from '../../state/useEditorProject'
 
-type BusyMode = 'export' | 'import' | null
+type BusyMode = 'export' | 'backup' | 'import' | null
 
 export function ProjectFileControls() {
   const mountedRef = useRef(true)
@@ -38,17 +41,38 @@ export function ProjectFileControls() {
         return
       }
 
-      const objectUrl = URL.createObjectURL(blob)
-      const anchor = document.createElement('a')
-      anchor.href = objectUrl
-      anchor.download = createProjectFileName(state.project.name)
-      document.body.append(anchor)
-      anchor.click()
-      anchor.remove()
-      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0)
+      downloadProjectBlob(blob, createProjectFileName(state.project.name))
       setMessage('Prosjektfilen er klar.')
     } catch {
       setMessage('Prosjektet kunne ikke eksporteres.')
+    } finally {
+      operationRef.current = false
+      if (mountedRef.current) setBusy(null)
+    }
+  }
+
+  const backupProject = async () => {
+    if (operationRef.current) return
+    operationRef.current = true
+    setBusy('backup')
+    setMessage(null)
+
+    try {
+      const blob = await createProjectFileBlob(state.project, getImageAsset)
+
+      if (!mountedRef.current) return
+      if (!blob) {
+        setMessage('Sikkerhetskopien kunne ikke opprettes. Kontroller bildene.')
+        return
+      }
+
+      downloadProjectBlob(
+        blob,
+        createProjectBackupFileName(state.project.name),
+      )
+      setMessage('Sikkerhetskopien er klar.')
+    } catch {
+      setMessage('Sikkerhetskopien kunne ikke opprettes.')
     } finally {
       operationRef.current = false
       if (mountedRef.current) setBusy(null)
@@ -66,14 +90,15 @@ export function ProjectFileControls() {
     setMessage(null)
 
     try {
-      const imported = await readProjectFile(file)
+      const result = await readProjectFileResult(file)
 
       if (!mountedRef.current) return
-      if (!imported) {
-        setMessage('Prosjektfilen er ugyldig eller skadet.')
+      if (!result.ok) {
+        setMessage(getProjectFileErrorMessage(result.error))
         return
       }
 
+      const imported = result.value
       if (!replaceImageAssets(imported.assets)) {
         setMessage('Bildene i prosjektfilen kunne ikke lastes inn.')
         return
@@ -109,6 +134,14 @@ export function ProjectFileControls() {
           onClick={() => inputRef.current?.click()}
         >
           {busy === 'import' ? 'Åpner…' : 'Åpne prosjekt'}
+        </button>
+        <button
+          className="project-file-controls__backup"
+          type="button"
+          disabled={busy !== null}
+          onClick={() => void backupProject()}
+        >
+          {busy === 'backup' ? 'Sikrer…' : 'Last ned sikkerhetskopi'}
         </button>
       </div>
       <input
