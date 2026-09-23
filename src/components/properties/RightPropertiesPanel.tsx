@@ -9,6 +9,7 @@ import { HeroPropertiesSection } from './HeroPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { MobilePropertiesSection } from './MobilePropertiesSection'
 import { SectionAnchorPropertiesSection } from './SectionAnchorPropertiesSection'
+import { SaveSectionTemplateControl } from './SaveSectionTemplateControl'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
 const elementKindLabels: Record<ElementKind, string> = {
@@ -76,7 +77,10 @@ export function RightPropertiesPanel({
             )}
 
             {element.kind === 'section' && (
-              <SectionAnchorPropertiesSection key={element.id} element={element} />
+              <>
+                <SectionAnchorPropertiesSection key={element.id} element={element} />
+                <SaveSectionTemplateControl element={element} />
+              </>
             )}
 
             {(element.kind === 'section' ||
