@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
 import { createEditorColor } from '../../src/model/editorColor'
 import { createSolidFill } from '../../src/model/editorFill'
 import { getElementDesktopLayout } from '../../src/model/elementLayout'
@@ -91,6 +92,43 @@ test.describe('editor project reducer', () => {
     expect(created.project.updatedAt).toBe(CREATED_AT)
 
     expect(addTextElement(created)).toBe(created)
+  })
+
+  test('adds text and buttons inside the selected section without moving other elements', () => {
+    const initial = getInitialEditorProjectState()
+    const withSection = editorProjectReducer(initial, {
+      type: 'add-element-to-active-page',
+      elementId: 'section-1',
+      request: { kind: 'section' },
+      updatedAt: CREATED_AT,
+    })
+    const withText = addTextElement(withSection)
+    const section = getActivePage(withText).elements[0]
+    const text = getTextElement(withText)
+    expect(text.position.desktop).toEqual({ x: 32, y: 32 })
+
+    const selectedAgain = editorProjectReducer(withText, {
+      type: 'set-selected-element',
+      elementId: section.id,
+    })
+    const withButton = editorProjectReducer(selectedAgain, {
+      type: 'add-element-to-active-page',
+      elementId: 'button-1',
+      request: { kind: 'button', assetId: DEFAULT_BUTTON_ASSET_ID },
+      updatedAt: UPDATED_AT,
+    })
+    const button = getActivePage(withButton).elements[2]
+    expect(button.position.desktop).toEqual({ x: 32, y: 136 })
+    expect(getActivePage(withButton).elements[0]).toBe(section)
+    expect(getActivePage(withButton).elements[1]).toBe(text)
+
+    const noSelection = editorProjectReducer(withButton, {
+      type: 'set-selected-element', elementId: null,
+    })
+    const outside = addTextElement(noSelection, 'outside')
+    expect(getTextElement(outside, 'outside').position.desktop.y).toBeGreaterThan(
+      section.position.desktop.y + section.size.desktop.height,
+    )
   })
 
   test('validates text background changes and preserves identity when rejected', () => {

@@ -71,18 +71,6 @@ test('template image survives insertion, undo and redo', async ({ page }) => {
   await expect(images).toHaveCount(1)
 
   const section = page.locator('.canvas-element--section').first()
-  await section.click()
-  // New elements are placed below the section. Extend its frame to include
-  // the imported image before capturing the template.
-  const resizeHandle = section.locator('.canvas-element__resize-handle')
-  const handleBounds = await resizeHandle.boundingBox()
-  if (!handleBounds) throw new Error('Section resize handle is unavailable')
-  const startX = handleBounds.x + handleBounds.width / 2
-  const startY = handleBounds.y + handleBounds.height / 2
-  await page.mouse.move(startX, startY)
-  await page.mouse.down()
-  await page.mouse.move(startX, startY + 210, { steps: 8 })
-  await page.mouse.up()
   await section.click({ position: { x: 300, y: 30 } })
 
   const saveRegion = page.getByRole('region', { name: 'Gjenbrukbar seksjon' })

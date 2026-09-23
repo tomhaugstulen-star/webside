@@ -1,6 +1,7 @@
 import { createEditorElement } from '../model/createEditorElement'
 import type { ElementCreationRequest } from '../model/elementCreation'
 import type { EditorProjectState } from '../model/editorProject'
+import { findPositionInSection } from '../model/findElementCreationPosition'
 import { isValidElementCreationRequest } from './isValidElementCreationRequest'
 
 function projectContainsElement(state: EditorProjectState, elementId: string) {
@@ -27,11 +28,28 @@ export function addElementToActivePage(
     return state
   }
 
-  const element = createEditorElement({
+  const created = createEditorElement({
     id: elementId,
     request,
     existingElements: activePage.elements,
   })
+  const selectedSection = activePage.elements.find(
+    (candidate) => candidate.id === state.selectedElementId && candidate.kind === 'section',
+  )
+  const sectionPosition =
+    selectedSection?.kind === 'section' &&
+    !selectedSection.locked &&
+    request.kind !== 'section' &&
+    request.kind !== 'header'
+      ? findPositionInSection(
+          selectedSection,
+          created.size.desktop,
+          activePage.elements,
+        )
+      : null
+  const element = sectionPosition
+    ? { ...created, position: { ...created.position, desktop: sectionPosition } }
+    : created
   const pages = state.project.pages.map((page) =>
     page.id === state.activePageId
       ? { ...page, elements: [...page.elements, element] }
