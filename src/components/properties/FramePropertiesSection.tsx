@@ -1,7 +1,7 @@
 import { useId } from 'react'
-import { ColorSwatchInput } from '../colors/ColorSwatchInput'
 import type {
   HeaderEditorElement,
+  HeroEditorElement,
   SectionEditorElement,
   TextEditorElement,
 } from '../../model/editorProject'
@@ -11,13 +11,16 @@ import {
   type ElementFrameWidth,
 } from '../../model/elementFrame'
 import { useHeaderAppearance } from '../../state/useHeaderAppearance'
+import { useHeroProperties } from '../../state/useHeroProperties'
 import { useSectionAppearance } from '../../state/useSectionAppearance'
 import { useTextAppearance } from '../../state/useTextAppearance'
+import { ColorSwatchInput } from '../colors/ColorSwatchInput'
 
 type FramedEditorElement =
   | SectionEditorElement
   | HeaderEditorElement
   | TextEditorElement
+  | HeroEditorElement
 
 type FramePropertiesSectionProps = {
   element: FramedEditorElement
@@ -35,28 +38,41 @@ export function FramePropertiesSection({
   const { updateHeaderFrameWidth, updateHeaderFrameColor } =
     useHeaderAppearance()
   const { updateTextFrameWidth, updateTextFrameColor } = useTextAppearance()
+  const { updateHeroFrameWidth, updateHeroFrameColor } = useHeroProperties()
   const idPrefix = useId()
   const widthId = `${idPrefix}-width`
   const colorId = `${idPrefix}-color`
   const disabled = element.locked
 
   const updateFrameWidth = (width: ElementFrameWidth) => {
-    if (element.kind === 'section') {
-      updateSectionFrameWidth(element.id, width)
-    } else if (element.kind === 'header') {
-      updateHeaderFrameWidth(element.id, width)
-    } else {
-      updateTextFrameWidth(element.id, width)
+    switch (element.kind) {
+      case 'section':
+        updateSectionFrameWidth(element.id, width)
+        return
+      case 'header':
+        updateHeaderFrameWidth(element.id, width)
+        return
+      case 'text':
+        updateTextFrameWidth(element.id, width)
+        return
+      case 'hero':
+        updateHeroFrameWidth(element.id, width)
     }
   }
 
   const updateFrameColor = (value: string) => {
-    if (element.kind === 'section') {
-      updateSectionFrameColor(element.id, value)
-    } else if (element.kind === 'header') {
-      updateHeaderFrameColor(element.id, value)
-    } else {
-      updateTextFrameColor(element.id, value)
+    switch (element.kind) {
+      case 'section':
+        updateSectionFrameColor(element.id, value)
+        return
+      case 'header':
+        updateHeaderFrameColor(element.id, value)
+        return
+      case 'text':
+        updateTextFrameColor(element.id, value)
+        return
+      case 'hero':
+        updateHeroFrameColor(element.id, value)
     }
   }
 
@@ -73,10 +89,7 @@ export function FramePropertiesSection({
             disabled={disabled}
             onChange={(event) => {
               const width = Number(event.target.value)
-
-              if (isElementFrameWidth(width)) {
-                updateFrameWidth(width)
-              }
+              if (isElementFrameWidth(width)) updateFrameWidth(width)
             }}
           >
             {elementFrameWidths.map((width) => (
