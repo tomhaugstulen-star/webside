@@ -43,7 +43,7 @@ test('migrates schema 10 and safely rejects malformed schema 10/11', () => {
   const { project } = projectFileFixture()
   const section = createEditorElement({ id: 'section', request: { kind: 'section' }, existingElements: [] })
   const legacy = { ...project, schemaVersion: 10, navigation: undefined, pages: [{ ...project.pages[0], elements: [section] }] }
-  expect(parseImportedEditorProject(JSON.parse(JSON.stringify(legacy)))?.schemaVersion).toBe(12)
+  expect(parseImportedEditorProject(JSON.parse(JSON.stringify(legacy)))?.schemaVersion).toBe(13)
   for (const schemaVersion of [10, 11]) {
     expect(parseImportedEditorProject({ ...legacy, schemaVersion, pages: [{ ...legacy.pages[0], elements: [null] }] })).toBeNull()
   }
