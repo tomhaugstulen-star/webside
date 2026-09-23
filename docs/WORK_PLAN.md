@@ -16,7 +16,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 22 er fullført og merget i PR #80
 - fase 23 er fullført og merget i PR #82
 - fase 24 er fullført og merget i PR #84
-- fase 25 er aktiv i sak #86 på `feature/phase-25-local-persistence-v2`
+- fase 25 er fullført og merget i PR #87
+- fase 26 er aktiv i sak #88 på `feature/phase-26-backup-project-format`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -214,7 +215,7 @@ Fase 20 starter først etter separat review og uttrykkelig mergegodkjenning av d
 Knappene som allerede finnes i editoren er ikke ment som permanent dødt UI. De kobles til roadmapen slik:
 
 - `Angre` / `Gjør om` → fase 24
-- `Lagre` → fase 25
+- lokal autosave/gjenoppretting → fase 25
 - `Dupliser prosjekt` → fase 26
 - `Forhåndsvisning` → fase 27
 - `Prosjektnavn`, `Prosjektinnstillinger`, `Domene`, `SEO`, `Publiser` og `Hjelp` → fase 30
@@ -225,7 +226,7 @@ Fase 30 skal låse den konkrete publiseringsmodellen før kodearbeid starter, in
 
 ## Fase 25 – lokal prosjektlagring, autolagring og gjenoppretting
 
-Fasen er aktiv i sak #86 på `feature/phase-25-local-persistence-v2`.
+Fasen er fullført og merget i PR #87. Sak #86 er avsluttet.
 
 Låste hovedkrav:
 
