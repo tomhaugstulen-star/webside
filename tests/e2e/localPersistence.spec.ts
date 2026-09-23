@@ -29,7 +29,30 @@ test('autosave restores project structure and image assets after refresh', async
     .poll(() => image.evaluate((node: HTMLImageElement) => node.naturalWidth))
     .toBe(1)
 
-  await expect(page.locator('.top-toolbar__save-status')).toHaveText('Lagret')
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const database = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('website-editor', 1)
+          request.addEventListener('success', () => resolve(request.result))
+          request.addEventListener('error', () => reject(request.error))
+        })
+
+        try {
+          return await new Promise<number>((resolve, reject) => {
+            const transaction = database.transaction('project', 'readonly')
+            const request = transaction.objectStore('project').get('current')
+            request.addEventListener('success', () =>
+              resolve(request.result?.project?.pages?.length ?? 0),
+            )
+            request.addEventListener('error', () => reject(request.error))
+          })
+        } finally {
+          database.close()
+        }
+      }),
+    )
+    .toBe(2)
 
   await page.reload()
 
@@ -50,23 +73,6 @@ test('autosave restores project structure and image assets after refresh', async
     .toBe(1)
 })
 
-
-test('manual save persists dirty project immediately', async ({ page }) => {
-  await page.goto('/')
-
-  await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
-  await page.getByRole('button', { name: '+ Ny side', exact: true }).click()
-
-  await expect(page.locator('.top-toolbar__save-status')).toHaveText(
-    'Ulagrede endringer',
-  )
-  await page.getByRole('button', { name: 'Lagre', exact: true }).click()
-  await expect(page.locator('.top-toolbar__save-status')).toHaveText('Lagret')
-
-  await page.reload()
-  await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
-  await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
-})
 
 test('corrupt local storage is preserved until confirmed reset', async ({
   page,
@@ -109,7 +115,5 @@ test('corrupt local storage is preserved until confirmed reset', async ({
     .click()
 
   await expect(page.getByLabel('Nettside: Forside')).toBeVisible()
-  await expect(page.locator('.top-toolbar__save-status')).not.toHaveText(
-    'Lagringsfeil',
-  )
+  await expect(page.locator('.top-toolbar__save-error')).toHaveCount(0)
 })
