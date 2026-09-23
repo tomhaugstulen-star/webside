@@ -47,7 +47,9 @@ export function ElementSelectionToolbar({
 }: ElementSelectionToolbarProps) {
   const { toggleElementLocked } = useElementLocking()
   const style: CSSProperties = {
-    left: layout.position.x + layout.size.width,
+    left: element.kind === 'header'
+      ? layout.position.x
+      : layout.position.x + layout.size.width,
     top: layout.position.y,
   }
 
@@ -57,7 +59,7 @@ export function ElementSelectionToolbar({
 
   return (
     <div
-      className="canvas-object-toolbar"
+      className={`canvas-object-toolbar${element.kind === 'header' ? ' canvas-object-toolbar--header' : ''}`}
       style={style}
       role="toolbar"
       aria-label="Objektverktøy"
