@@ -9,8 +9,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
 - #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
-- aktiv vedlikeholdsleveranse er #67 på `feature/gradient-fill-before-phase-20`: typet helfarge/lineær gradient og schema 13
-- neste produksjonsfase etter vedlikeholdsgaten er fase 20 – nettstedets Header og menynavigasjon
+- #67 er fullført og merget i PR #72: typet helfarge/lineær gradient og schema 13
+- aktiv produksjonsfase er #73 på `feature/phase-20-header-navigation`: nettstedets Header og menynavigasjon
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -83,7 +83,7 @@ Dette er ikke fase 25-lagring, fase 27 Preview eller fase 30 nettstedseksport. F
 
 ## Vedlikeholdsgate #67 før fase 20 – lineære bakgrunnsgradienter
 
-Aktiv leveranse:
+Fullført og merget i PR #72:
 
 - schema 13
 - typet `EditorFill` som source of truth
@@ -97,6 +97,18 @@ Aktiv leveranse:
 - gradientdata følger eksisterende `.website-project`-round-trip
 - #68, #69 og #71 er ikke del av leveransen
 - fase 20 starter ikke på denne branchen
+
+## Fase 20 – nettstedets Header og menynavigasjon
+
+Aktiv leveranse i #73:
+
+- renderer eksisterende `WebsiteNavigation.items` i Header
+- bruker samme prosjektmeny på alle sider som har Header
+- avleder offentlig href fra side-slug og seksjonens `anchorId`
+- editorens menypunkter kan bytte side og navigere til seksjoner uten å mutere prosjektdata
+- PC og Mobil bruker samme menydata; hamburger-/breakpoint-adferd utsettes til fase 23
+- ingen schema-bump er planlagt
+- fase 21+ og backlog #68/#69/#71 holdes utenfor
 
 ## Fase 18 – arbeidsportalnavigasjon og navigator
 

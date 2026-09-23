@@ -1230,6 +1230,11 @@
       "dependents": [
         "src/model/editorProject.ts",
         "src/state/navigationProjectAction.ts",
+        "src/components/canvas/EditorCanvas.tsx",
+        "src/components/canvas/EditorCanvasElement.tsx",
+        "src/components/canvas/EditorCanvasElementContent.tsx",
+        "src/components/canvas/HeaderElementContent.tsx",
+        "src/model/navigationHref.ts",
         "src/model/siteStructure.ts",
         "src/components/sidebar/WebsiteNavigationSection.tsx",
         "src/state/useNavigationActions.ts",
@@ -1526,6 +1531,7 @@
         "src/components/canvas/EditorCanvas.tsx",
         "src/state/useElementLayout.ts",
         "src/state/useTextElementContent.ts",
+        "src/components/canvas/HeaderElementContent.tsx",
         "src/state/useElementLocking.ts",
         "src/state/useButtonProperties.ts",
         "src/state/useElementLink.ts",
@@ -2491,6 +2497,24 @@
         },
         {
           "dynamic": false,
+          "module": "../../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../state/useEditorProject",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -2789,6 +2813,24 @@
             "import"
           ],
           "resolved": "src/model/elementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3320,6 +3362,24 @@
         },
         {
           "dynamic": false,
+          "module": "../../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./ButtonElementContent",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -3689,10 +3749,97 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/navigationHref",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/navigationHref.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../state/useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
         "src/components/canvas/EditorCanvasElementContent.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/model/navigationHref.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/canvas/HeaderElementContent.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -11415,8 +11562,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 152,
-    "totalDependenciesCruised": 488,
+    "totalCruised": 153,
+    "totalDependenciesCruised": 495,
     "optionsUsed": {
       "baseDir": "/home/runner/work/webside/webside",
       "combinedDependencies": false,

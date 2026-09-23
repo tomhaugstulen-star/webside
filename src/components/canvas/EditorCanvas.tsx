@@ -1,10 +1,12 @@
 import {
+  useCallback,
   useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
 } from 'react'
 import type { EditorElement } from '../../model/editorProject'
+import type { NavigationTarget } from '../../model/navigation'
 import { editorFillToCssBackground } from '../../model/editorFill'
 import { useElementSelection } from '../../state/useElementSelection'
 import { useEditorProject } from '../../state/useEditorProject'
@@ -53,7 +55,7 @@ export function EditorCanvas({
   onOpenProperties,
   onCloseProperties,
 }: EditorCanvasProps) {
-  const { activePage } = useEditorProject()
+  const { activePage, dispatch } = useEditorProject()
   const { selectedElementId, selectElement, clearSelection } =
     useElementSelection()
   const [previewState, setPreviewState] =
@@ -61,6 +63,7 @@ export function EditorCanvas({
   const [textEditingState, setTextEditingState] =
     useState<TextEditingState | null>(null)
   const [canvasWidth, setCanvasWidth] = useState(0)
+  const pendingNavigationRef = useRef<NavigationTarget | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const layoutPreview =
@@ -131,6 +134,58 @@ export function EditorCanvas({
     onCloseProperties()
   }
 
+  const scrollToNavigationTarget = useCallback(
+    (target: NavigationTarget) => {
+      const scrollContainer = scrollContainerRef.current
+
+      if (!scrollContainer) {
+        return
+      }
+
+      if (target.type === 'page') {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' })
+        return
+      }
+
+      requestAnimationFrame(() => {
+        const section = Array.from(
+          canvasRef.current?.querySelectorAll<HTMLElement>(
+            '[data-element-id]',
+          ) ?? [],
+        ).find(
+          (candidate) => candidate.dataset.elementId === target.elementId,
+        )
+
+        section?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
+    },
+    [],
+  )
+
+  const navigateFromHeader = (target: NavigationTarget) => {
+    clearSelectionAndProperties()
+    setTextEditingState(null)
+
+    if (target.pageId === activePage.id) {
+      scrollToNavigationTarget(target)
+      return
+    }
+
+    pendingNavigationRef.current = target
+    dispatch({ type: 'set-active-page', pageId: target.pageId })
+  }
+
+  useLayoutEffect(() => {
+    const pendingNavigation = pendingNavigationRef.current
+
+    if (!pendingNavigation || pendingNavigation.pageId !== activePage.id) {
+      return
+    }
+
+    pendingNavigationRef.current = null
+    scrollToNavigationTarget(pendingNavigation)
+  }, [activePage.id, scrollToNavigationTarget])
+
   return (
     <main
       className="editor-workspace"
@@ -162,6 +217,7 @@ export function EditorCanvas({
                 onStartTextEditing={startTextEditing}
                 onFinishTextEditing={finishTextEditing}
                 onPreviewLayoutChange={handlePreviewLayoutChange}
+                onNavigate={navigateFromHeader}
               />
             ))}
             <AlignmentGuideOverlay guides={alignmentGuides} />

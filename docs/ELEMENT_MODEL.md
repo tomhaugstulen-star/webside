@@ -129,7 +129,7 @@ type NavigationItem = {
 
 Navigasjonsmål peker på stabile prosjekt-ID-er, ikke DOM-noder, slugs, ankertekst eller visningstekst. Seksjonsmål bruker den interne stabile element-ID-en for referanseintegritet; offentlig URL-fragment avledes senere fra seksjonens `anchorId`.
 
-Side- og seksjonssletting rydder navigasjonspunkter som ellers ville blitt hengende. Ugyldige mål avvises ved reducergrensen. Menymodellen er serialiserbar prosjektdata; faktisk Header-meny og navigasjonsrendering bygges i fase 20.
+Side- og seksjonssletting rydder navigasjonspunkter som ellers ville blitt hengende. Ugyldige mål avvises ved reducergrensen. Menymodellen er serialiserbar prosjektdata. Fase 20 renderer den samme modellen i Header. Offentlig href avledes fra sidens `slug` og, for seksjonsmål, seksjonens `anchorId`; href lagres ikke som separat prosjektdata.
 
 ## Bilde
 

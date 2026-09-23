@@ -8,6 +8,7 @@ import {
 } from 'react'
 import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
+import type { NavigationTarget } from '../../model/navigation'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
 import { useElementLayout } from '../../state/useElementLayout'
 import { useTextElementContent } from '../../state/useTextElementContent'
@@ -41,6 +42,7 @@ type EditorCanvasElementProps = {
   onStartTextEditing: (elementId: string) => void
   onFinishTextEditing: (elementId: string) => void
   onPreviewLayoutChange: (preview: ElementLayoutPreview | null) => void
+  onNavigate: (target: NavigationTarget) => void
 }
 
 export function EditorCanvasElement({
@@ -58,6 +60,7 @@ export function EditorCanvasElement({
   onStartTextEditing,
   onFinishTextEditing,
   onPreviewLayoutChange,
+  onNavigate,
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
   const { commitElementDesktopLayout, commitImageDesktopFrame } =
@@ -180,7 +183,7 @@ export function EditorCanvasElement({
         ref={elementRef}
         className={`canvas-element canvas-element--${element.kind} ${selected ? 'canvas-element--selected' : ''}${transformClass}${lockedClass}${editingClass}`}
         style={style}
-        role={isTextEditing ? undefined : 'button'}
+        role={isTextEditing ? undefined : isHeader ? 'group' : 'button'}
         tabIndex={isTextEditing ? -1 : 0}
         aria-label={isTextEditing ? undefined : accessibleLabel}
         aria-keyshortcuts={
@@ -188,7 +191,7 @@ export function EditorCanvasElement({
             ? undefined
             : getCanvasElementKeyboardShortcuts(element)
         }
-        aria-pressed={isTextEditing ? undefined : selected}
+        aria-pressed={isTextEditing || isHeader ? undefined : selected}
         data-element-id={element.id}
         onPointerDown={isTextEditing ? undefined : handleElementPointerDown}
         onPointerMove={isTextEditing ? undefined : handlePointerMove}
@@ -210,6 +213,7 @@ export function EditorCanvasElement({
             commitTextElementContent(element.id, content)
           }
           onFinishTextEditing={finishTextEditing}
+          onNavigate={onNavigate}
         />
         {selected && !element.locked && !isTextEditing &&
           (element.kind === 'image' ? (
