@@ -46,16 +46,15 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
         layout,
         project: state.project,
       })
-      const logoUrl = getImageAsset(element.logoAssetId)?.objectUrl ?? undefined
-      const png = await renderHeaderAiPreviewPng(
-        element,
-        layout,
-        state.project.navigation.items.map((item) => item.label),
-        logoUrl,
-      )
-
       if (typeof ClipboardItem === 'function' && navigator.clipboard.write) {
         try {
+          const logoUrl = getImageAsset(element.logoAssetId)?.objectUrl ?? undefined
+          const png = await renderHeaderAiPreviewPng(
+            element,
+            layout,
+            state.project.navigation.items.map((item) => item.label),
+            logoUrl,
+          )
           await navigator.clipboard.write([
             new ClipboardItem({
               'text/plain': new Blob([clip], { type: 'text/plain' }),
@@ -65,7 +64,7 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
           setMessage('ChatGPT-utklipp og Header-bilde kopiert.')
           return
         } catch {
-          // Fall back to the portable text format below.
+          // Image generation or rich clipboard support failed; keep the text workflow usable.
         }
       }
 
