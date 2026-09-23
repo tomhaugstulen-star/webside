@@ -4,7 +4,7 @@ import type { EditorColor } from '../model/editorColor'
 import type { EditorFill } from '../model/editorFill'
 import type { ElementFrameWidth } from '../model/elementFrame'
 import type { ElementLayout } from '../model/elementLayout'
-import type { EditorProject, ResponsiveViewport } from '../model/editorProject'
+import type { EditorElement, EditorProject, ResponsiveViewport } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
 import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import type { SectionFrameWidth } from '../model/sectionAppearance'
@@ -107,6 +107,12 @@ export type EditorProjectAction =
       type: 'add-element-to-active-page'
       elementId: string
       request: ElementCreationRequest
+      updatedAt: string
+    }
+  | {
+      type: 'insert-elements-to-active-page'
+      elements: EditorElement[]
+      selectedElementId: string
       updatedAt: string
     }
   | {

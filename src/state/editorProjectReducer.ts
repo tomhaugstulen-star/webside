@@ -3,6 +3,7 @@ import type { EditorProjectState } from '../model/editorProject'
 import { isValidProjectSiteStructure } from '../model/siteStructure'
 import { addElementToActivePage } from './addElementToActivePage'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { insertElementsToActivePage } from './insertElementsToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
 import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
@@ -109,19 +110,19 @@ function reduceEditorProjectState(
         action.updatedAt,
       )
 
+    case 'insert-elements-to-active-page':
+      return insertElementsToActivePage(
+        state, action.elements, action.selectedElementId, action.updatedAt,
+      )
+
     case 'delete-element-from-active-page':
       return deleteElementFromActivePage(
-        state,
-        action.elementId,
-        action.updatedAt,
+        state, action.elementId, action.updatedAt,
       )
 
     case 'set-section-anchor-id':
       return setSectionAnchorId(
-        state,
-        action.elementId,
-        action.anchorId,
-        action.updatedAt,
+        state, action.elementId, action.anchorId, action.updatedAt,
       )
 
     case 'set-element-desktop-layout':

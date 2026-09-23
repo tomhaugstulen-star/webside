@@ -2,6 +2,7 @@ import type {
   CanvasPosition,
   EditorElement,
   ElementSize,
+  SectionEditorElement,
 } from './editorProject'
 
 const CREATION_ORIGIN: CanvasPosition = { x: 24, y: 24 }
@@ -57,4 +58,36 @@ export function findElementCreationPosition(
   }
 
   return { x: CREATION_ORIGIN.x, y }
+}
+
+export function findPositionInSection(
+  section: SectionEditorElement,
+  size: ElementSize,
+  existingElements: readonly EditorElement[],
+): CanvasPosition | null {
+  const inset = 8
+  const gap = 8
+  const x = section.position.desktop.x + inset
+  const right = section.position.desktop.x + section.size.desktop.width - inset
+  const bottom = section.position.desktop.y + section.size.desktop.height - inset
+  if (x + size.width > right) return null
+
+  let y = section.position.desktop.y + inset
+  const occupied = existingElements
+    .filter((element) => element.kind !== 'section' && element.kind !== 'header')
+    .filter((element) => {
+      const position = element.position.desktop
+      return position.x < x + size.width && position.x + element.size.desktop.width > x
+    })
+    .sort((first, second) => first.position.desktop.y - second.position.desktop.y)
+
+  for (const element of occupied) {
+    const top = element.position.desktop.y
+    if (y + size.height <= top) break
+    if (y < top + element.size.desktop.height) {
+      y = top + element.size.desktop.height + gap
+    }
+  }
+
+  return y + size.height <= bottom ? { x, y } : null
 }

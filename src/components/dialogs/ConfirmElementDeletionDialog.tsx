@@ -19,6 +19,8 @@ type ConfirmElementDeletionDialogProps = {
   kind: ElementKind
   targetExists: boolean
   targetLocked: boolean
+  containedCount: number
+  containsLockedElement: boolean
   onCancel: () => void
   onConfirm: () => void
 }
@@ -27,16 +29,20 @@ export function ConfirmElementDeletionDialog({
   kind,
   targetExists,
   targetLocked,
+  containedCount,
+  containsLockedElement,
   onCancel,
   onConfirm,
 }: ConfirmElementDeletionDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
-  const canConfirm = targetExists && !targetLocked
+  const canConfirm = targetExists && !targetLocked && !containsLockedElement
   const unavailableMessage = !targetExists
     ? 'Elementet finnes ikke lenger.'
     : targetLocked
       ? 'Elementet er låst og kan ikke slettes.'
+      : containsLockedElement
+        ? 'Lås opp elementene i seksjonen før du sletter den.'
       : null
 
   useEffect(() => {
@@ -83,7 +89,11 @@ export function ConfirmElementDeletionDialog({
     >
       <div className="element-deletion-dialog__content">
         <h2 id="element-deletion-dialog-title">{deletionTitles[kind]}</h2>
-        <p id="element-deletion-dialog-description">Du kan angre slettingen etterpå.</p>
+        <p id="element-deletion-dialog-description">
+          {kind === 'section' && containedCount > 0
+            ? `Seksjonen og ${containedCount} elementer innenfor den slettes. Du kan angre etterpå.`
+            : 'Du kan angre slettingen etterpå.'}
+        </p>
         {unavailableMessage && (
           <p className="element-deletion-dialog__unavailable" role="status">
             {unavailableMessage}

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
 import { createEditorColor } from '../../src/model/editorColor'
 import { createSolidFill } from '../../src/model/editorFill'
 import { getElementDesktopLayout } from '../../src/model/elementLayout'
@@ -91,6 +92,43 @@ test.describe('editor project reducer', () => {
     expect(created.project.updatedAt).toBe(CREATED_AT)
 
     expect(addTextElement(created)).toBe(created)
+  })
+
+  test('adds text and buttons inside the selected section without moving other elements', () => {
+    const initial = getInitialEditorProjectState()
+    const withSection = editorProjectReducer(initial, {
+      type: 'add-element-to-active-page',
+      elementId: 'section-1',
+      request: { kind: 'section' },
+      updatedAt: CREATED_AT,
+    })
+    const withText = addTextElement(withSection)
+    const section = getActivePage(withText).elements[0]
+    const text = getTextElement(withText)
+    expect(text.position.desktop).toEqual({ x: 32, y: 32 })
+
+    const selectedAgain = editorProjectReducer(withText, {
+      type: 'set-selected-element',
+      elementId: section.id,
+    })
+    const withButton = editorProjectReducer(selectedAgain, {
+      type: 'add-element-to-active-page',
+      elementId: 'button-1',
+      request: { kind: 'button', assetId: DEFAULT_BUTTON_ASSET_ID },
+      updatedAt: UPDATED_AT,
+    })
+    const button = getActivePage(withButton).elements[2]
+    expect(button.position.desktop).toEqual({ x: 32, y: 136 })
+    expect(getActivePage(withButton).elements[0]).toBe(section)
+    expect(getActivePage(withButton).elements[1]).toBe(text)
+
+    const noSelection = editorProjectReducer(withButton, {
+      type: 'set-selected-element', elementId: null,
+    })
+    const outside = addTextElement(noSelection, 'outside')
+    expect(getTextElement(outside, 'outside').position.desktop.y).toBeGreaterThan(
+      section.position.desktop.y + section.size.desktop.height,
+    )
   })
 
   test('validates text background changes and preserves identity when rejected', () => {
@@ -225,6 +263,42 @@ test.describe('editor project reducer', () => {
     })
 
     expect(getActivePage(deleted).elements).toEqual([])
+    expect(deleted.selectedElementId).toBeNull()
+  })
+
+  test('deletes a section and its contained elements as one action, preserving outside elements', () => {
+    const sectionState = editorProjectReducer(getInitialEditorProjectState(), {
+      type: 'add-element-to-active-page',
+      elementId: 'section-1',
+      request: { kind: 'section' },
+      updatedAt: CREATED_AT,
+    })
+    const section = getActivePage(sectionState).elements[0]
+    const insideState = addTextElement(sectionState)
+    const inside = getTextElement(insideState)
+    const outsideState = addTextElement(insideState, 'outside')
+    const outside = getTextElement(outsideState, 'outside')
+    const project = {
+      ...outsideState.project,
+      pages: outsideState.project.pages.map((page) => ({
+        ...page,
+        elements: page.elements.map((element) =>
+          element.id === inside.id
+            ? { ...element, position: { desktop: { x: 40, y: 40 } } }
+            : element,
+        ),
+      })),
+    }
+    const withContents = { ...outsideState, project, selectedElementId: inside.id }
+    expect(section.kind).toBe('section')
+    expect(outside.id).toBe('outside')
+
+    const deleted = editorProjectReducer(withContents, {
+      type: 'delete-element-from-active-page',
+      elementId: section.id,
+      updatedAt: UPDATED_AT,
+    })
+    expect(getActivePage(deleted).elements.map((element) => element.id)).toEqual(['outside'])
     expect(deleted.selectedElementId).toBeNull()
   })
 

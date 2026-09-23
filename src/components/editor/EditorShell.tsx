@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
+import { getSectionContents } from '../../model/sectionContents'
 import { useEditorPersistence } from '../../persistence/useEditorPersistence'
 import { downloadDuplicateProject } from '../../projectFiles/downloadDuplicateProject'
 import { useElementCreation } from '../../state/useElementCreation'
@@ -53,6 +54,9 @@ export function EditorShell() {
         (element) => element.id === deletionRequest.elementId,
       ) ?? null
     : null
+  const deletionContents = deletionTarget?.kind === 'section'
+    ? getSectionContents(deletionTarget, activePage.elements)
+    : []
 
   const toggleToolPanel = (tool: EditorTool) => {
     setActiveTool((currentTool) => (currentTool === tool ? null : tool))
@@ -103,7 +107,8 @@ export function EditorShell() {
   }, [deletionRequest])
 
   const confirmElementDeletion = () => {
-    if (!deletionRequest || !deletionTarget || deletionTarget.locked) {
+    if (!deletionRequest || !deletionTarget || deletionTarget.locked ||
+      deletionContents.some((element) => element.locked)) {
       return
     }
 
@@ -223,6 +228,8 @@ export function EditorShell() {
           kind={deletionRequest.kind}
           targetExists={deletionTarget !== null}
           targetLocked={deletionTarget?.locked ?? false}
+          containedCount={deletionContents.length}
+          containsLockedElement={deletionContents.some((element) => element.locked)}
           onCancel={cancelElementDeletion}
           onConfirm={confirmElementDeletion}
         />
