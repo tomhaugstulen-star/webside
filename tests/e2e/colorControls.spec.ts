@@ -4,10 +4,10 @@ async function openColors(page: Page) {
   await page.goto('/')
   await page.getByRole('button', { name: 'Farger', exact: true }).click()
   return {
-    hex: page.getByRole('textbox', { name: 'Sidebakgrunn HEX-kode', exact: true }),
-    native: page.getByLabel(/Sidebakgrunn\. Nåværende farge/),
+    hex: page.getByRole('textbox', { name: 'Sidebakgrunn farge HEX-kode', exact: true }),
+    native: page.getByLabel(/Sidebakgrunn farge\. Nåværende farge/),
     canvas: page.getByLabel('Nettside: Forside'),
-    pipette: page.getByRole('button', { name: 'Pipette for sidebakgrunn', exact: true }),
+    pipette: page.getByRole('button', { name: 'Pipette for sidebakgrunn farge', exact: true }),
   }
 }
 
