@@ -99,7 +99,7 @@ export function BackgroundFillControl({
       {fill.type === 'solid' ? (
         <ColorSwatchInput
           id={`${id}-solid`}
-          label="Farge"
+          label={`${label} farge`}
           value={fill.color}
           disabled={disabled}
           onChange={(color) => onChange({ type: 'solid', color: color as typeof fill.color })}
@@ -108,7 +108,7 @@ export function BackgroundFillControl({
         <div className="background-fill-control__gradient-fields">
           <ColorSwatchInput
             id={`${id}-stop-1`}
-            label="Farge 1"
+            label={`${label} farge 1`}
             value={fill.stops[0]}
             disabled={disabled}
             onChange={(color) =>
@@ -117,7 +117,7 @@ export function BackgroundFillControl({
           />
           <ColorSwatchInput
             id={`${id}-stop-2`}
-            label="Farge 2"
+            label={`${label} farge 2`}
             value={fill.stops[1]}
             disabled={disabled}
             onChange={(color) =>
