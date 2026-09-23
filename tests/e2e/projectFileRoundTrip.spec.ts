@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
 
 const onePixelPng = Buffer.from(
@@ -78,4 +79,56 @@ test('invalid project file is rejected without replacing the current project', a
     page.getByText('Prosjektfilen har ugyldig format.', { exact: true }),
   ).toBeVisible()
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
+})
+
+
+test('backup and duplicate downloads remain importable project files', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await openProject(page)
+
+  const backupPromise = page.waitForEvent('download')
+  await page
+    .getByRole('button', { name: 'Last ned sikkerhetskopi', exact: true })
+    .click()
+  const backup = await backupPromise
+  expect(backup.suggestedFilename()).toMatch(
+    /^nytt-prosjekt-backup-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.website-project$/,
+  )
+  const backupPath = await backup.path()
+  expect(backupPath).not.toBeNull()
+
+  await page.locator('.project-file-controls__input').setInputFiles(backupPath!)
+  await expect(page.getByText('Åpnet «Nytt prosjekt».', { exact: true })).toBeVisible()
+
+  const originalDownloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Lagre prosjektfil', exact: true }).click()
+  const originalDownload = await originalDownloadPromise
+  const originalPath = await originalDownload.path()
+  expect(originalPath).not.toBeNull()
+  const original = JSON.parse(await readFile(originalPath!, 'utf8'))
+
+  const duplicatePromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Åpne hovedmeny' }).click()
+  await page.getByRole('button', { name: 'Dupliser prosjekt', exact: true }).click()
+  const duplicateDownload = await duplicatePromise
+  expect(duplicateDownload.suggestedFilename()).toBe(
+    'kopi-av-nytt-prosjekt.website-project',
+  )
+  const duplicatePath = await duplicateDownload.path()
+  expect(duplicatePath).not.toBeNull()
+  const duplicate = JSON.parse(await readFile(duplicatePath!, 'utf8'))
+
+  expect(duplicate.project.id).not.toBe(original.project.id)
+  expect(duplicate.project.name).toBe('Kopi av Nytt prosjekt')
+  expect(duplicate.project.pages).toEqual(original.project.pages)
+  expect(duplicate.project.navigation).toEqual(original.project.navigation)
+  expect(duplicate.assets).toEqual(original.assets)
+
+  await openProject(page)
+  await page.locator('.project-file-controls__input').setInputFiles(duplicatePath!)
+  await expect(
+    page.getByText('Åpnet «Kopi av Nytt prosjekt».', { exact: true }),
+  ).toBeVisible()
 })
