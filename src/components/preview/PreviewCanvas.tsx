@@ -58,25 +58,20 @@ export function PreviewCanvas({ viewport }: { viewport: ViewportMode }) {
       return
     }
 
+    const targetPage = state.project.pages.find(
+      (candidate) => candidate.id === target.pageId,
+    )
+    const section = targetPage?.elements.find(
+      (element) =>
+        element.kind === 'section' && element.id === target.elementId,
+    )
+
+    if (!section || section.kind !== 'section') return
+
     requestAnimationFrame(() => {
-      document.getElementById(
-        state.project.pages
-          .find((candidate) => candidate.id === target.pageId)
-          ?.elements.find(
-            (element) =>
-              element.kind === 'section' && element.id === target.elementId,
-          )?.kind === 'section'
-          ? (
-              state.project.pages
-                .find((candidate) => candidate.id === target.pageId)
-                ?.elements.find(
-                  (element) =>
-                    element.kind === 'section' &&
-                    element.id === target.elementId,
-                ) as Extract<EditorElement, { kind: 'section' }>
-            ).anchorId
-          : '',
-      )?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document
+        .getElementById(section.anchorId)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
   }, [state.project.pages])
 
@@ -97,6 +92,7 @@ export function PreviewCanvas({ viewport }: { viewport: ViewportMode }) {
   useLayoutEffect(() => {
     const target = pendingTarget.current
     if (!target || target.pageId !== page.id) return
+
     pendingTarget.current = null
     scrollToTarget(target)
   }, [page.id, scrollToTarget])
