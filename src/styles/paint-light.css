@@ -30,7 +30,25 @@
 }
 .paint-dialog__header-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+.paint-dialog__history-actions {
+  display: flex;
+  gap: 4px;
+  margin-right: 4px;
+}
+.paint-dialog .paint-dialog__icon-button {
+  width: 34px;
+  min-width: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+  line-height: 1;
+}
+.paint-dialog__icon-button span {
+  transform: translateY(-1px);
 }
 .paint-dialog--fullscreen {
   width: 100vw;
