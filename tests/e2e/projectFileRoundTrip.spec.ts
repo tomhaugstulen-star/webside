@@ -75,7 +75,7 @@ test('invalid project file is rejected without replacing the current project', a
   })
 
   await expect(
-    page.getByText('Prosjektfilen er ugyldig eller skadet.', { exact: true }),
+    page.getByText('Prosjektfilen har ugyldig format.', { exact: true }),
   ).toBeVisible()
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
 })
