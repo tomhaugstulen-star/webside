@@ -27,8 +27,15 @@
   align-items: center;
   gap: 8px;
 }
-.paint-dialog__header-title {
+.paint-dialog__header-left {
+  display: flex;
+  align-items: center;
   justify-self: start;
+  gap: 8px;
+  min-width: 0;
+}
+.paint-dialog__header-title {
+  flex: 0 0 auto;
 }
 .paint-dialog__header-actions {
   display: flex;
@@ -76,14 +83,9 @@
   text-align: left;
   white-space: nowrap;
 }
-.paint-dialog__save-menu-popover--sidebar {
+.paint-dialog__save-menu-popover--header {
   left: 0;
   right: auto;
-}
-.paint-dialog__file-actions > button,
-.paint-dialog__file-actions .paint-dialog__save-menu > button {
-  width: 100%;
-  text-align: left;
 }
 .paint-dialog--fullscreen {
   width: 100vw;
@@ -311,7 +313,10 @@
 
 @media (max-width: 980px) {
   .paint-dialog__header {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
+  }
+  .paint-dialog__header-left {
+    flex-wrap: wrap;
   }
   .paint-dialog__history-actions {
     grid-column: 1 / -1;
