@@ -1,0 +1,65 @@
+.top-toolbar__save-status {
+  max-width: 132px;
+  overflow: hidden;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-toolbar__save-status--dirty,
+.top-toolbar__save-status--saving {
+  color: var(--portal-text);
+}
+
+.top-toolbar__save-status--error {
+  color: #a43c32;
+}
+
+.persistence-gate {
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px;
+  text-align: center;
+  color: var(--portal-text);
+  background: var(--portal-workspace);
+}
+
+.persistence-gate h1,
+.persistence-gate p {
+  margin: 0;
+}
+
+.persistence-gate p {
+  max-width: 560px;
+  color: var(--portal-text-muted);
+  line-height: 1.55;
+}
+
+.persistence-gate button {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 18px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 10px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.persistence-gate button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+@media (max-width: 1320px) {
+  .top-toolbar__save-status {
+    display: none;
+  }
+}
