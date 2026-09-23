@@ -6,6 +6,7 @@ import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
 import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
+import { reduceHeaderProjectAction } from './reduceHeaderProjectAction'
 import { reduceHeroProjectAction } from './reduceHeroProjectAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
@@ -180,6 +181,10 @@ function reduceEditorProjectState(
     case 'set-text-frame-width':
     case 'set-text-frame-color':
       return reduceColorProjectAction(state, action)
+
+    case 'set-header-content':
+    case 'set-header-logo':
+      return reduceHeaderProjectAction(state, action)
 
     case 'set-header-background-fill':
     case 'set-header-text-color':
