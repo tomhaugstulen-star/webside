@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { EditorPersistenceStatus } from '../../persistence/editorPersistenceContext'
 import type { ViewportMode } from '../../types/editor'
 
 type ToolbarPage = {
@@ -16,6 +17,8 @@ type TopToolbarProps = {
   canRedo: boolean
   onUndo: () => void
   onRedo: () => void
+  persistenceStatus: EditorPersistenceStatus
+  onSave: () => void
 }
 
 type IconName =
@@ -82,8 +85,17 @@ export function TopToolbar({
   canRedo,
   onUndo,
   onRedo,
+  persistenceStatus,
+  onSave,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const saveStatusLabel = {
+    loading: 'Laster lokalt…',
+    dirty: 'Ulagrede endringer',
+    saving: 'Lagrer…',
+    saved: 'Lagret',
+    error: 'Lagringsfeil',
+  }[persistenceStatus]
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -183,7 +195,24 @@ export function TopToolbar({
 
       <div className="top-toolbar__actions">
         <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" disabled title="Kommer senere"><Icon name="eye" /><span>Forhåndsvisning</span></button>
-        <button className="toolbar-action" type="button" aria-label="Lagre" disabled title="Kommer senere"><Icon name="save" /><span>Lagre</span></button>
+        <span
+          className={`top-toolbar__save-status top-toolbar__save-status--${persistenceStatus}`}
+          role="status"
+        >
+          {saveStatusLabel}
+        </span>
+        <button
+          className="toolbar-action"
+          type="button"
+          aria-label="Lagre"
+          disabled={
+            persistenceStatus === 'loading' || persistenceStatus === 'saving'
+          }
+          title="Lagre lokalt nå"
+          onClick={onSave}
+        >
+          <Icon name="save" /><span>Lagre</span>
+        </button>
         <button className="publish-button" type="button" aria-label="Publiser" disabled title="Kommer senere"><Icon name="publish" /><span>Publiser</span></button>
         <div className="main-menu-wrap" ref={menuRef}>
           <button
