@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
+import { PaintLightToolbar } from './PaintLightToolbar'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
 
@@ -137,72 +138,46 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     <div className="paint-backdrop">
       <section className={`paint-dialog${fullscreen ? ' paint-dialog--fullscreen' : ''}`}
         role="dialog" aria-modal="true" aria-label="Rediger bilde">
-        <header className="paint-dialog__header">
-          <div className="paint-dialog__header-left">
-            <div className="paint-dialog__header-title"><h2>Rediger bilde</h2></div>
-            <input ref={importInputRef} className="paint-dialog__file-input" type="file"
-              accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
-              onChange={(event) => {
-                const next = event.target.files?.[0]
-                event.target.value = ''
-                if (next) void importActions.importFile(next).then(() => {
-                  paint.clearSelection()
-                  setTool('select')
-                  setMessage(null)
-                }).catch((error: unknown) => setMessage(
-                  error instanceof Error ? error.message : 'Bildet kunne ikke importeres.',
-                ))
-              }} />
-            <button type="button" disabled={!paint.ready || importPending}
-              onClick={() => importInputRef.current?.click()}>Importer til lerret…</button>
-            {importPending && <>
-              <button type="button" onClick={importActions.merge}>Slå sammen</button>
-              <button type="button" onClick={importActions.cancel}>Fjern import</button>
-            </>}
-            <div className="paint-dialog__save-menu">
-              <button type="button" aria-haspopup="menu" aria-expanded={saveMenuOpen}
-                disabled={!paint.ready || busy || importPending}
-                onClick={() => setSaveMenuOpen((open) => !open)}>Lagre</button>
-              {saveMenuOpen && (
-                <div className="paint-dialog__save-menu-popover paint-dialog__save-menu-popover--header"
-                  role="menu">
-                  <button type="button" role="menuitem" onClick={() => {
-                    setSaveMenuOpen(false)
-                    void save()
-                  }}>Lagre som nytt bilde på siden</button>
-                  <button type="button" role="menuitem" onClick={() => {
-                    setSaveMenuOpen(false)
-                    void exportFile()
-                  }}>Eksporter til fil…</button>
-                </div>
-              )}
-            </div>
-            <div className="paint-dialog__selection-actions" aria-label="Markering">
-              <button type="button" disabled={!paint.selection || importPending} onClick={paint.copy}>Kopier</button>
-              <button type="button" disabled={!paint.selection || importPending} onClick={paint.cut}>Klipp ut</button>
-              <button type="button" disabled={!paint.canPaste || importPending} onClick={paint.paste}>Lim inn</button>
-              <button type="button" disabled={!paint.selection || importPending} onClick={paint.crop}>Beskjær</button>
-            </div>
-          </div>
-          <div className="paint-dialog__history-actions" aria-label="Historikk">
-            <button type="button" className="paint-dialog__icon-button"
-              aria-label="Angre" title="Angre" disabled={!paint.canUndo || importPending}
-              onClick={() => void paint.undo()}>
-              <span aria-hidden="true">↶</span>
-            </button>
-            <button type="button" className="paint-dialog__icon-button"
-              aria-label="Gjør om" title="Gjør om" disabled={!paint.canRedo || importPending}
-              onClick={() => void paint.redo()}>
-              <span aria-hidden="true">↷</span>
-            </button>
-          </div>
-          <div className="paint-dialog__header-actions">
-            <button type="button" onClick={() => setFullscreen(!fullscreen)}>
-              {fullscreen ? 'Avslutt fullskjerm' : 'Fullskjerm'}
-            </button>
-            <button type="button" onClick={onClose} disabled={busy} aria-label="Lukk bildeeditor">Lukk</button>
-          </div>
-        </header>
+        <PaintLightToolbar
+          importInputRef={importInputRef}
+          ready={paint.ready}
+          importPending={importPending}
+          busy={busy}
+          fullscreen={fullscreen}
+          saveMenuOpen={saveMenuOpen}
+          canUndo={paint.canUndo}
+          canRedo={paint.canRedo}
+          hasSelection={!!paint.selection}
+          canPaste={paint.canPaste}
+          onImportFile={(next) => {
+            void importActions.importFile(next).then(() => {
+              paint.clearSelection()
+              setTool('select')
+              setMessage(null)
+            }).catch((error: unknown) => setMessage(
+              error instanceof Error ? error.message : 'Bildet kunne ikke importeres.',
+            ))
+          }}
+          onMergeImport={importActions.merge}
+          onCancelImport={importActions.cancel}
+          onToggleSaveMenu={() => setSaveMenuOpen((open) => !open)}
+          onSave={() => {
+            setSaveMenuOpen(false)
+            void save()
+          }}
+          onExport={() => {
+            setSaveMenuOpen(false)
+            void exportFile()
+          }}
+          onUndo={() => void paint.undo()}
+          onRedo={() => void paint.redo()}
+          onCopy={paint.copy}
+          onCut={paint.cut}
+          onPaste={paint.paste}
+          onCrop={paint.crop}
+          onToggleFullscreen={() => setFullscreen(!fullscreen)}
+          onClose={onClose}
+        />
 
         <div className="paint-dialog__workspace">
           <aside className="paint-dialog__sidebar" aria-label="Bildeverktøy og innstillinger">
