@@ -10,6 +10,7 @@ import {
   getImageTransformForResizedFrame,
   type ImageTransform,
 } from '../../model/imagePresentation'
+import { resizeContainedImageLayout } from '../../model/containedImageLayout'
 
 const keyboardDirections: Partial<Record<string, CanvasPosition>> = {
   ArrowUp: { x: 0, y: -1 },
@@ -108,14 +109,22 @@ export function handleCanvasElementKeyDown(
       ? getImageCropSize(element.assetMetadata, element.transform)
       : undefined
   const nextLayout = resizing
-    ? resizeElementLayout(
-        element.kind,
-        initialLayout,
-        delta,
-        canvasWidth,
-        element.kind === 'header' ? 'south' : 'south-east',
-        maximumSize,
-      )
+    ? element.kind === 'image' && element.mode === 'contain'
+      ? resizeContainedImageLayout(
+          element.assetMetadata,
+          initialLayout,
+          delta,
+          canvasWidth,
+          'south-east',
+        )
+      : resizeElementLayout(
+          element.kind,
+          initialLayout,
+          delta,
+          canvasWidth,
+          element.kind === 'header' ? 'south' : 'south-east',
+          maximumSize,
+        )
     : moveElementLayout(initialLayout, delta, canvasWidth)
 
   if (resizing && element.kind === 'image' && element.mode === 'crop') {

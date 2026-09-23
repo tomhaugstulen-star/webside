@@ -10,6 +10,7 @@ import {
   getImageTransformForResizedFrame,
   type ImageTransform,
 } from '../../model/imagePresentation'
+import { resizeContainedImageLayout } from '../../model/containedImageLayout'
 
 export type TransformMode = 'move' | 'resize'
 
@@ -60,6 +61,16 @@ export function getNextPointerLayout(
       interaction.initialLayout,
       delta,
       interaction.canvasWidth,
+    )
+  }
+
+  if (element.kind === 'image' && element.mode === 'contain') {
+    return resizeContainedImageLayout(
+      element.assetMetadata,
+      interaction.initialLayout,
+      delta,
+      interaction.canvasWidth,
+      interaction.resizeHandle,
     )
   }
 

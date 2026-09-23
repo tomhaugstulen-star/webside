@@ -114,6 +114,8 @@ test('renders project navigation in Header and navigates to pages and sections',
 
   await page.getByLabel('Velg side').selectOption({ label: 'Forside' })
   await page.getByRole('button', { name: 'Mobil', exact: true }).click()
+  await expect(menu.getByRole('button', { name: 'Om oss', exact: true })).toBeHidden()
+  await header.getByRole('button', { name: 'Åpne meny' }).click()
   await expect(menu.getByRole('button', { name: 'Om oss', exact: true })).toBeVisible()
   await expect(menu.getByRole('button', { name: 'Kontakt', exact: true })).toBeVisible()
 })

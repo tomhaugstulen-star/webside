@@ -37,7 +37,7 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
 
 const minimumElementSizes: Record<ElementKind, ElementSize> = {
   section: { width: 160, height: 90 },
-  image: { width: 120, height: 80 },
+  image: { width: 48, height: 48 },
   text: { width: 120, height: 48 },
   button: { width: 80, height: 36 },
   header: { width: 240, height: HEADER_MINIMUM_HEIGHT },

@@ -10,6 +10,7 @@ import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import type { NavigationTarget } from '../../model/navigation'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
+import { resolveResponsiveElementLayout } from '../../model/resolveResponsiveElementLayout'
 import { useElementLayout } from '../../state/useElementLayout'
 import { useTextElementContent } from '../../state/useTextElementContent'
 import type { ViewportMode } from '../../types/editor'
@@ -63,23 +64,15 @@ export function EditorCanvasElement({
   onNavigate,
 }: EditorCanvasElementProps) {
   const elementRef = useRef<HTMLDivElement>(null)
-  const { commitElementDesktopLayout, commitImageDesktopFrame } =
-    useElementLayout()
+  const { commitElementLayout, commitImageFrame } = useElementLayout()
   const { commitTextElementContent } = useTextElementContent()
   const visible = resolveResponsiveValue(element.visibility, viewport)
-  const resolvedPosition = resolveResponsiveValue(element.position, viewport)
-  const resolvedSize = resolveResponsiveValue(element.size, viewport)
   const isHeader = element.kind === 'header'
-  const initialLayout: ElementLayout =
-    isHeader && canvasWidth > 0
-      ? {
-          position: { x: 0, y: 0 },
-          size: { width: canvasWidth, height: resolvedSize.height },
-        }
-      : {
-          position: resolvedPosition,
-          size: resolvedSize,
-        }
+  const initialLayout: ElementLayout = resolveResponsiveElementLayout(
+    element,
+    viewport,
+    canvasWidth,
+  )
   const {
     layout,
     imageTransform,
@@ -100,8 +93,10 @@ export function EditorCanvasElement({
     onSelect,
     onTransformStart: onCloseProperties,
     onClickWithoutTransform: onOpenProperties,
-    onCommitLayout: commitElementDesktopLayout,
-    onCommitImageFrame: commitImageDesktopFrame,
+    onCommitLayout: (elementId, layout) =>
+      commitElementLayout(elementId, viewport, layout),
+    onCommitImageFrame: (elementId, layout, transform) =>
+      commitImageFrame(elementId, viewport, layout, transform),
     onPreviewLayoutChange,
   })
 
@@ -154,8 +149,10 @@ export function EditorCanvasElement({
       onOpenProperties,
       onCloseProperties,
       onStartTextEditing,
-      onCommitLayout: commitElementDesktopLayout,
-      onCommitImageFrame: commitImageDesktopFrame,
+      onCommitLayout: (elementId, layout) =>
+        commitElementLayout(elementId, viewport, layout),
+      onCommitImageFrame: (elementId, layout, transform) =>
+        commitImageFrame(elementId, viewport, layout, transform),
     })
   }
 

@@ -7,6 +7,7 @@ import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
 import { HeaderPropertiesSection } from './HeaderPropertiesSection'
 import { HeroPropertiesSection } from './HeroPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
+import { MobilePropertiesSection } from './MobilePropertiesSection'
 import { SectionAnchorPropertiesSection } from './SectionAnchorPropertiesSection'
 import { TextPropertiesSection } from './TextPropertiesSection'
 
@@ -102,6 +103,8 @@ export function RightPropertiesPanel({
               (element.kind === 'hero' && element.ctaLabel)) && (
               <ElementLinkPropertiesSection element={element} />
             )}
+
+            <MobilePropertiesSection element={element} />
 
             <section aria-labelledby="right-properties-panel-element-title">
               <h3 id="right-properties-panel-element-title">Element</h3>

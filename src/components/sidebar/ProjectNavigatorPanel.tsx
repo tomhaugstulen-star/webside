@@ -31,6 +31,15 @@ export function ProjectNavigatorPanel() {
     dispatch({ type: 'set-selected-element', elementId })
   }
 
+  const showElementOnMobile = (elementId: string) => {
+    dispatch({
+      type: 'set-element-mobile-visibility',
+      elementId,
+      visible: true,
+      updatedAt: new Date().toISOString(),
+    })
+  }
+
   return (
     <>
       <h2>Prosjekt</h2>
@@ -120,27 +129,38 @@ export function ProjectNavigatorPanel() {
 
                     return (
                       <li key={element.id}>
-                        <button
-                          className={`project-navigator__element${
-                            selected
-                              ? ' project-navigator__element--selected'
-                              : ''
-                          }`}
-                          type="button"
-                          aria-pressed={selected}
-                          onClick={() => selectElement(page.id, element.id)}
-                        >
-                          <span className="project-navigator__element-main">
-                            <strong>{name}</strong>
-                            <small>{navigatorKindLabels[element.kind]}</small>
-                          </span>
-                          <span className="project-navigator__element-status">
-                            <small>
-                              {getNavigatorVisibilityLabel(element)}
-                            </small>
-                            {element.locked && <small>Låst</small>}
-                          </span>
-                        </button>
+                        <div className="project-navigator__element-row">
+                          <button
+                            className={`project-navigator__element${
+                              selected
+                                ? ' project-navigator__element--selected'
+                                : ''
+                            }`}
+                            type="button"
+                            aria-pressed={selected}
+                            onClick={() => selectElement(page.id, element.id)}
+                          >
+                            <span className="project-navigator__element-main">
+                              <strong>{name}</strong>
+                              <small>{navigatorKindLabels[element.kind]}</small>
+                            </span>
+                            <span className="project-navigator__element-status">
+                              <small>
+                                {getNavigatorVisibilityLabel(element)}
+                              </small>
+                              {element.locked && <small>Låst</small>}
+                            </span>
+                          </button>
+                          {element.visibility.mobile === false && (
+                            <button
+                              className="project-navigator__mobile-restore"
+                              type="button"
+                              onClick={() => showElementOnMobile(element.id)}
+                            >
+                              Vis på telefon
+                            </button>
+                          )}
+                        </div>
                       </li>
                     )
                   })}

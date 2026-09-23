@@ -11,9 +11,11 @@ import { reduceHeroProjectAction } from './reduceHeroProjectAction'
 import { reduceImageProjectAction } from './reduceImageProjectAction'
 import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
 import { reducePageProjectAction } from './reducePageProjectAction'
+import { resetElementMobileOverrides, setElementMobileVisibility } from './reduceResponsiveElementAction'
 import { setButtonAsset } from './setButtonAsset'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
+import { setElementViewportLayout } from './setElementViewportLayout'
 import { setElementLink } from './setElementLink'
 import { setSectionAnchorId } from './setSectionAnchorId'
 import { setTextElementContent } from './setTextElementContent'
@@ -130,8 +132,32 @@ function reduceEditorProjectState(
         action.updatedAt,
       )
 
+    case 'set-element-viewport-layout':
+      return setElementViewportLayout(
+        state,
+        action.elementId,
+        action.viewport,
+        action.layout,
+        action.updatedAt,
+      )
+
     case 'toggle-element-lock':
       return toggleElementLock(state, action.elementId, action.updatedAt)
+
+    case 'set-element-mobile-visibility':
+      return setElementMobileVisibility(
+        state,
+        action.elementId,
+        action.visible,
+        action.updatedAt,
+      )
+
+    case 'reset-element-mobile-overrides':
+      return resetElementMobileOverrides(
+        state,
+        action.elementId,
+        action.updatedAt,
+      )
 
     case 'set-text-element-content':
       return setTextElementContent(
@@ -206,6 +232,7 @@ function reduceEditorProjectState(
     case 'set-image-mode':
     case 'set-image-transform':
     case 'set-image-desktop-frame':
+    case 'set-image-viewport-frame':
       return reduceImageProjectAction(state, action)
   }
 

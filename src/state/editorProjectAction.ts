@@ -4,7 +4,7 @@ import type { EditorColor } from '../model/editorColor'
 import type { EditorFill } from '../model/editorFill'
 import type { ElementFrameWidth } from '../model/elementFrame'
 import type { ElementLayout } from '../model/elementLayout'
-import type { EditorProject } from '../model/editorProject'
+import type { EditorProject, ResponsiveViewport } from '../model/editorProject'
 import type { ElementLink } from '../model/elementLink'
 import type { ImageMode, ImageTransform } from '../model/imagePresentation'
 import type { SectionFrameWidth } from '../model/sectionAppearance'
@@ -127,7 +127,25 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'set-element-viewport-layout'
+      elementId: string
+      viewport: ResponsiveViewport
+      layout: ElementLayout
+      updatedAt: string
+    }
+  | {
       type: 'toggle-element-lock'
+      elementId: string
+      updatedAt: string
+    }
+  | {
+      type: 'set-element-mobile-visibility'
+      elementId: string
+      visible: boolean
+      updatedAt: string
+    }
+  | {
+      type: 'reset-element-mobile-overrides'
       elementId: string
       updatedAt: string
     }
@@ -182,6 +200,14 @@ export type EditorProjectAction =
   | {
       type: 'set-image-desktop-frame'
       elementId: string
+      layout: ElementLayout
+      transform: ImageTransform
+      updatedAt: string
+    }
+  | {
+      type: 'set-image-viewport-frame'
+      elementId: string
+      viewport: ResponsiveViewport
       layout: ElementLayout
       transform: ImageTransform
       updatedAt: string

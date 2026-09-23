@@ -102,3 +102,39 @@ test('rejects invalid JSON, unsupported formats/schema and dangling assets befor
     expect(await readProjectFile(new File([content], 'broken.website-project'))).toBeNull()
   }
 })
+
+
+test('project file serialization preserves explicit mobile layout and visibility', async () => {
+  const fixture = projectFileFixture()
+  const image = fixture.project.pages[0].elements.find(
+    (element) => element.id === 'image-1',
+  )
+  if (!image) throw new Error('Expected image fixture.')
+
+  image.position.mobile = { x: 12, y: 80 }
+  image.size.mobile = { width: 180, height: 120 }
+  image.visibility.mobile = false
+
+  const asset = fixture.assets[0]
+  const file = new File(
+    [base64ToBytes(asset.base64)!],
+    asset.metadata.fileName,
+    { type: asset.metadata.mimeType },
+  )
+  const blob = await createProjectFileBlob(
+    fixture.project,
+    () => ({ file, metadata: asset.metadata, objectUrl: 'blob:test' }),
+  )
+  expect(blob).not.toBeNull()
+
+  const serialized = JSON.parse(await blob!.text())
+  const importedProject = parseImportedEditorProject(serialized.project)
+  expect(importedProject).not.toBeNull()
+  const importedImage = importedProject!.pages[0].elements.find(
+    (element) => element.id === 'image-1',
+  )
+  expect(importedImage).toBeTruthy()
+  expect(importedImage!.position.mobile).toEqual({ x: 12, y: 80 })
+  expect(importedImage!.size.mobile).toEqual({ width: 180, height: 120 })
+  expect(importedImage!.visibility.mobile).toBe(false)
+})
