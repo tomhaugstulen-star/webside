@@ -55,7 +55,9 @@ export function captureSectionTemplate(
   const elements = page.elements.filter(
     (element) =>
       element.id === section.id ||
-      (element.kind !== 'header' && isInsideSection(element, section)),
+      (element.kind !== 'header' &&
+        element.kind !== 'section' &&
+        isInsideSection(element, section)),
   )
   const assetsById = new Map<ImageAssetId, SectionTemplateAsset>()
 
