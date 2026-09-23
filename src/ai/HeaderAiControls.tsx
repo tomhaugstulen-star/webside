@@ -143,7 +143,7 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
             <p>{proposal.width} × {proposal.height} px · {proposal.viewport}</p>
             {previewElement && (
               <div className={`ai-preview-dialog__canvas${proposal.viewport === 'mobile' ? ' canvas-page--mobile' : ''}`}>
-                <div className="canvas-element--header ai-preview-dialog__header"
+                <div className="ai-preview-dialog__header"
                   style={getElementAppearanceCssStyle(previewElement)}>
                   <HeaderElementContent
                     element={previewElement}
