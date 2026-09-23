@@ -17,6 +17,7 @@ import { RightPropertiesPanel } from '../properties/RightPropertiesPanel'
 import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
 import { PreviewShell } from '../preview/PreviewShell'
+import { usePaintLight } from '../../paint/usePaintLight'
 import { useElementDeletionShortcut } from './useElementDeletionShortcut'
 import { useSelectedImageCropKeyboard } from './useSelectedImageCropKeyboard'
 import { getEditorHistoryShortcut } from './editorHistoryShortcut'
@@ -47,6 +48,7 @@ export function EditorShell() {
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
+  const paint = usePaintLight(selectedElement, createElement)
   const { updateImageTransform } = useImageProperties()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
@@ -118,12 +120,12 @@ export function EditorShell() {
   }
 
   useElementDeletionShortcut({
-    element: previewOpen ? null : selectedElement,
+    element: previewOpen || paint.active ? null : selectedElement,
     onRequestDeletion: requestElementDeletion,
   })
   useSelectedImageCropKeyboard({
     element: selectedElement,
-    disabled: deletionDialogOpen || previewOpen,
+    disabled: deletionDialogOpen || previewOpen || paint.active,
     onCommitTransform: updateImageTransform,
   })
 
@@ -131,13 +133,13 @@ export function EditorShell() {
     const handleKeyDown = (event: KeyboardEvent) => {
       const historyShortcut = getEditorHistoryShortcut(event)
 
-      if (!previewOpen && historyShortcut === 'undo' && canUndo) {
+      if (!previewOpen && !paint.active && historyShortcut === 'undo' && canUndo) {
         event.preventDefault()
         undo()
         return
       }
 
-      if (!previewOpen && historyShortcut === 'redo' && canRedo) {
+      if (!previewOpen && !paint.active && historyShortcut === 'redo' && canRedo) {
         event.preventDefault()
         redo()
         return
@@ -148,7 +150,7 @@ export function EditorShell() {
         return
       }
 
-      if (event.key === 'Escape' && !deletionDialogOpen) {
+      if (event.key === 'Escape' && !deletionDialogOpen && !paint.active) {
         setActiveTool(null)
         setPropertiesPanelOpen(false)
       }
@@ -156,7 +158,7 @@ export function EditorShell() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [canRedo, canUndo, deletionDialogOpen, previewOpen, redo, undo])
+  }, [canRedo, canUndo, deletionDialogOpen, paint.active, previewOpen, redo, undo])
 
   const duplicateProject = useCallback(() => {
     void downloadDuplicateProject(state.project, getImageAsset)
@@ -204,6 +206,13 @@ export function EditorShell() {
           setPropertiesPanelOpen(false)
           setPreviewOpen(true)
         }}
+        canEditImage={paint.canEdit}
+        onEditImage={() => {
+          if (paint.canEdit) {
+            setPropertiesPanelOpen(false)
+            paint.open()
+          }
+        }}
       />
       <div className="editor-shell__body">
         <LeftSidebar
@@ -234,6 +243,7 @@ export function EditorShell() {
           onConfirm={confirmElementDeletion}
         />
       )}
+      {paint.dialog}
     </div>
   )
 }

@@ -19,7 +19,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 25 er fullført og merget i PR #87
 - fase 26 er fullført og merget i PR #89
 - fase 27 er fullført og merget i PR #91
-- fase 28 er aktiv i sak #92 på `feature/phase-28-template-library`
+- fase 28 er fullført og merget i PR #93; sak #92 er lukket
+- Paint-light (#71) leveres som egen fase 28A før fase 29, etter uttrykkelig beslutning 23.09.2026
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -39,6 +40,7 @@ fase 25  Lokal prosjektlagring, autolagring og gjenoppretting
 fase 26  Sikkerhetskopi, prosjektformat, import og migrering
 fase 27  Lokal forhåndsvisning
 fase 28  Malbibliotek og gjenbrukbare seksjoner
+fase 28A Lokal bilderedigering (Paint-light)
 fase 29  ChatGPT clipboard-arbeidsflyt
 fase 30  Prosjektinnstillinger, SEO, statisk eksport og publisering
 ```
@@ -273,7 +275,7 @@ Låst hovedomfang:
 
 ## Fase 28 – malbibliotek og gjenbrukbare seksjoner
 
-Fasen er aktiv i sak #92 på `feature/phase-28-template-library`.
+Fasen er fullført og merget i PR #93. Sak #92 er lukket.
 
 Låst hovedomfang:
 
@@ -285,11 +287,18 @@ Låst hovedomfang:
 - innsetting skal være én angrebar editorhandling og gå gjennom eksisterende autosave
 - ingen sky, nettbasert malbutikk, komplette nettstedstemaer eller fase 29+
 
+## Fase 28A – lokal bilderedigering
+
+Paint-light i sak #71 leveres før fase 29. Brukeren valgte denne rekkefølgen
+23.09.2026 for å kunne redigere bilder direkte i Website-editoren.
+Inngangen plasseres i toppverktøylinjen. Redigeringen bruker eksisterende
+bildeasset-modell og endrer ikke originalbildet.
+
 ## Separat backlog
 
 Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 
-- #68 telefonpresets, #69 eksakte elementmål og #71 Paint-light er planlagt og holdes utenfor #67. Separator/divider er bare notert.
+- #68 telefonpresets og #69 eksakte elementmål er separat planlagt. Paint-light #71 er aktiv fase 28A. Separator/divider er bare notert.
 - nettstedet er responsivt; senere telefonmodeller er kun forhåndsvisningspresets, ikke separate enhetsdesign
 - #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer

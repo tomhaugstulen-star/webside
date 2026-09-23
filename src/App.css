@@ -32,6 +32,7 @@
 @import './styles/element-deletion.css';
 @import './styles/preview.css';
 @import './styles/section-templates.css';
+@import './styles/paint-light.css';
 
 #root {
   min-height: 100vh;

@@ -1,0 +1,85 @@
+.paint-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(18, 26, 35, 0.68);
+}
+.paint-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(1180px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: hidden;
+  padding: 20px;
+  gap: 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 18px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+}
+.paint-dialog__header,
+.paint-dialog__tools,
+.paint-dialog__save,
+.paint-dialog__resize,
+.paint-dialog__bottom {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.paint-dialog__header { justify-content: space-between; }
+.paint-dialog__header h2 { margin: 0; font-size: 22px; }
+.paint-dialog__header p { margin: 4px 0 0; color: var(--portal-text-muted); }
+.paint-dialog button,
+.paint-dialog input,
+.paint-dialog select {
+  min-height: 36px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+}
+.paint-dialog button { padding: 5px 11px; cursor: pointer; }
+.paint-dialog button:hover:not(:disabled) { background: var(--portal-control-hover); }
+.paint-dialog button[aria-pressed='true'] { background: var(--portal-control-selected); border-color: var(--portal-accent); }
+.paint-dialog button:disabled { opacity: 0.48; cursor: default; }
+.paint-dialog label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.paint-dialog input[type='number'] { width: 86px; padding: 0 6px; }
+.paint-dialog input[type='color'] { width: 44px; padding: 2px; }
+.paint-dialog input[type='checkbox'] { min-height: auto; }
+.paint-dialog__canvas-scroll {
+  min-height: 150px;
+  flex: 1;
+  overflow: auto;
+  display: grid;
+  place-items: center;
+  background: repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 20px 20px;
+}
+.paint-dialog__canvas-wrap { position: relative; max-width: 100%; line-height: 0; }
+.paint-dialog__canvas-wrap canvas:first-child {
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  touch-action: none;
+}
+.paint-dialog__canvas-wrap canvas:last-child {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.paint-dialog__bottom { justify-content: space-between; }
+.paint-dialog__resize { margin: 0; min-width: 0; border: 1px solid var(--portal-border); border-radius: 8px; }
+.paint-dialog__resize legend { font-size: 12px; }
+.paint-dialog__save input { width: 155px; padding: 0 7px; }
+.paint-dialog__save select { padding: 0 7px; }
+.paint-dialog__message { margin: 0; font-size: 13px; }
+@media (max-width: 760px) {
+  .paint-dialog { padding: 12px; }
+  .paint-dialog__bottom { overflow-y: auto; }
+}
