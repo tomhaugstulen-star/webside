@@ -83,7 +83,7 @@ export function ConfirmElementDeletionDialog({
     >
       <div className="element-deletion-dialog__content">
         <h2 id="element-deletion-dialog-title">{deletionTitles[kind]}</h2>
-        <p id="element-deletion-dialog-description">Dette kan ikke angres.</p>
+        <p id="element-deletion-dialog-description">Du kan angre slettingen etterpå.</p>
         {unavailableMessage && (
           <p className="element-deletion-dialog__unavailable" role="status">
             {unavailableMessage}

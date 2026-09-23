@@ -12,8 +12,6 @@ import {
   supportedImageMimeTypes,
   type ImageAssetId,
 } from '../../model/imageAsset'
-import { projectReferencesImageAsset } from '../../model/projectImageAssets'
-import { useEditorProject } from '../../state/useEditorProject'
 import { useHeaderProperties } from '../../state/useHeaderProperties'
 
 export function HeaderLogoProperties({
@@ -25,7 +23,6 @@ export function HeaderLogoProperties({
   const mountedRef = useRef(true)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const { state } = useEditorProject()
   const { updateHeaderLogo } = useHeaderProperties()
   const { registerImageAsset, removeImageAsset, getImageAsset } =
     useImageAssetStore()
@@ -65,17 +62,9 @@ export function HeaderLogoProperties({
       }
 
       registeredAssetId = assetId
-      const previousAssetId = element.logoAssetId
-      const previousStillReferenced = projectReferencesImageAsset(
-        state.project,
-        previousAssetId,
-        element.id,
-      )
-
       updateHeaderLogo(element.id, assetId, prepared.value.metadata)
       registeredAssetId = null
 
-      if (!previousStillReferenced) removeImageAsset(previousAssetId)
       setMessage('Logoen er byttet.')
     } catch {
       if (registeredAssetId) removeImageAsset(registeredAssetId)
