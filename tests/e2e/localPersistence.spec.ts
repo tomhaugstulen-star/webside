@@ -33,9 +33,12 @@ test('autosave restores project structure and image assets after refresh', async
 
   await page.reload()
 
-  await expect(page.getByLabel('Nettside: Side 2')).toBeVisible()
+  await expect(page.getByLabel('Nettside: Forside')).toBeVisible()
   await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
+  await page.locator('.project-navigator__page-button').filter({
+    hasText: 'Side 2',
+  }).click()
   await expect(page.locator('.project-navigator__element').filter({
     hasText: 'Bilde',
   })).toHaveCount(1)
