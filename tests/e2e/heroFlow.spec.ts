@@ -31,9 +31,10 @@ test('creates and edits a Hero without navigating away from the editor', async (
     page.getByRole('heading', { name: 'Egenskaper', exact: true }),
   ).toBeVisible()
 
-  await page.getByLabel('Overskrift').fill('Et bedre førsteinntrykk')
-  await page.getByLabel('Undertittel').fill('Kort og tydelig introduksjon')
-  await page.getByLabel('CTA-tekst').fill('Se mer')
+  const heroProperties = page.locator('.hero-properties')
+  await heroProperties.getByLabel('Overskrift').fill('Et bedre førsteinntrykk')
+  await heroProperties.getByLabel('Undertittel').fill('Kort og tydelig introduksjon')
+  await heroProperties.getByLabel('CTA-tekst').fill('Se mer')
   await page.getByRole('button', { name: 'Lagre Hero-tekst' }).click()
 
   await expect(hero).toContainText('Et bedre førsteinntrykk')
