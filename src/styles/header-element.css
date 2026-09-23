@@ -17,6 +17,7 @@
 
 .header-element__brand {
   min-width: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -27,6 +28,7 @@
 
 .header-element__logo-frame {
   height: min(64px, 100%);
+  max-height: 64px;
   aspect-ratio: 1;
   flex: 0 0 auto;
   display: grid;
