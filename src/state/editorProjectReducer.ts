@@ -3,6 +3,7 @@ import type { EditorProjectState } from '../model/editorProject'
 import { isValidProjectSiteStructure } from '../model/siteStructure'
 import { addElementToActivePage } from './addElementToActivePage'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
+import { insertElementsToActivePage } from './insertElementsToActivePage'
 import type { EditorProjectAction } from './editorProjectAction'
 import { reduceColorProjectAction } from './reduceColorProjectAction'
 import { reduceHeaderAppearanceAction } from './reduceHeaderAppearanceAction'
@@ -106,6 +107,14 @@ function reduceEditorProjectState(
         state,
         action.elementId,
         action.request,
+        action.updatedAt,
+      )
+
+    case 'insert-elements-to-active-page':
+      return insertElementsToActivePage(
+        state,
+        action.elements,
+        action.selectedElementId,
         action.updatedAt,
       )
 
