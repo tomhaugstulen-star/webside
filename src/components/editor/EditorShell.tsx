@@ -48,7 +48,7 @@ export function EditorShell() {
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
-  const paint = usePaintLight(selectedElement, createElement)
+  const paint = usePaintLight(selectedElement, activePage.elements, createElement)
   const { updateImageTransform } = useImageProperties()
   const deletionDialogOpen = deletionRequest !== null
   const deletionTarget = deletionRequest
@@ -206,12 +206,9 @@ export function EditorShell() {
           setPropertiesPanelOpen(false)
           setPreviewOpen(true)
         }}
-        canEditImage={paint.canEdit}
         onEditImage={() => {
-          if (paint.canEdit) {
-            setPropertiesPanelOpen(false)
-            paint.open()
-          }
+          setPropertiesPanelOpen(false)
+          paint.open()
         }}
       />
       <div className="editor-shell__body">

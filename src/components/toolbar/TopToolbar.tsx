@@ -20,7 +20,6 @@ type TopToolbarProps = {
   persistenceStatus: EditorPersistenceStatus
   onDuplicateProject: () => void
   onPreview: () => void
-  canEditImage: boolean
   onEditImage: () => void
 }
 
@@ -91,7 +90,6 @@ export function TopToolbar({
   persistenceStatus,
   onDuplicateProject,
   onPreview,
-  canEditImage,
   onEditImage,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -194,7 +192,7 @@ export function TopToolbar({
 
       <div className="top-toolbar__actions">
         <button className="toolbar-action" type="button" aria-label="Rediger bilde"
-          disabled={!canEditImage} title={canEditImage ? 'Rediger valgt bilde' : 'Velg et bilde på siden'}
+          title="Rediger valgt bilde eller velg et bilde på siden"
           onClick={onEditImage}><Icon name="paint" /><span>Rediger bilde</span></button>
         <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" onClick={onPreview}><Icon name="eye" /><span>Forhåndsvisning</span></button>
         {persistenceStatus === 'error' && (

@@ -227,7 +227,8 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     canUndo: historyStatus.canUndo, canRedo: historyStatus.canRedo,
     undo: () => restore(historyRef.current.index - 1),
     redo: () => restore(historyRef.current.index + 1),
-    copy, cut, paste, canPaste, crop, resize,
+    copy, cut, paste, canPaste, crop, resize, commit: snapshot,
+    clearSelection: () => { setSelection(null); showSelection(null) },
     onPointerDown, onPointerMove, onPointerUp,
   }
 }

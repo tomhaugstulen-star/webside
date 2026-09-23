@@ -224,6 +224,7 @@
         "src/paint/usePaintLight.tsx",
         "src/assets/images/prepareImageFile.ts",
         "src/assets/images/imageFileSignature.ts",
+        "src/paint/PaintImagePicker.tsx",
         "src/paint/PaintLightDialog.tsx",
         "src/paint/paintCanvasFiles.ts",
         "src/projectFiles/downloadDuplicateProject.ts",
@@ -316,6 +317,8 @@
       "dependents": [
         "src/assets/images/ImageAssetStoreProvider.tsx",
         "src/assets/images/useImageAssetStore.ts",
+        "src/paint/usePaintLight.tsx",
+        "src/paint/PaintImagePicker.tsx",
         "src/projectFiles/downloadDuplicateProject.ts",
         "src/projectFiles/createProjectFile.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
@@ -1913,6 +1916,24 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../assets/images/prepareImageFile",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -2000,6 +2021,23 @@
         },
         {
           "dynamic": false,
+          "module": "./PaintImagePicker",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/paint/PaintImagePicker.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./PaintLightDialog",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -2069,6 +2107,7 @@
       ],
       "dependents": [
         "src/paint/usePaintLight.tsx",
+        "src/paint/usePaintImport.ts",
         "src/components/properties/HeaderLogoProperties.tsx",
         "src/components/properties/HeroImageProperties.tsx",
         "src/components/sidebar/HeroImportControl.tsx",
@@ -2110,6 +2149,59 @@
       ],
       "dependents": [
         "src/assets/images/prepareImageFile.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/paint/PaintImagePicker.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/paint/usePaintLight.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -2192,6 +2284,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./usePaintImport",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/paint/usePaintImport.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -2248,7 +2357,8 @@
       "dependents": [
         "src/paint/PaintLightDialog.tsx",
         "src/paint/usePaintCanvas.ts",
-        "src/paint/paintDrawing.ts"
+        "src/paint/paintDrawing.ts",
+        "src/paint/usePaintImport.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -2334,6 +2444,57 @@
       ],
       "dependents": [
         "src/paint/usePaintCanvas.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/paint/usePaintImport.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/prepareImageFile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/images/prepareImageFile.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./paintGeometry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/paint/paintGeometry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/paint/PaintLightDialog.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -16523,8 +16684,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 208,
-    "totalDependenciesCruised": 718,
+    "totalCruised": 210,
+    "totalDependenciesCruised": 725,
     "optionsUsed": {
       "baseDir": "/workspace/scratch/0b3a5f2e790c/webside",
       "combinedDependencies": false,
