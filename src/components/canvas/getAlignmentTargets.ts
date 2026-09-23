@@ -4,6 +4,7 @@ import type {
   ResponsiveViewport,
 } from '../../model/editorProject'
 import { resolveResponsiveValue } from '../../model/resolveResponsiveValue'
+import { resolveResponsiveElementLayout } from '../../model/resolveResponsiveElementLayout'
 import type {
   AlignmentAnchor,
   AlignmentTarget,
@@ -24,24 +25,6 @@ function getAnchorCoordinate(start: number, size: number, anchor: AlignmentAncho
   if (anchor === 'start') return start
   if (anchor === 'center') return start + size / 2
   return start + size
-}
-
-function getResolvedLayout(
-  element: EditorElement,
-  viewport: ResponsiveViewport,
-  canvasWidth: number,
-): ElementLayout {
-  const position = resolveResponsiveValue(element.position, viewport)
-  const size = resolveResponsiveValue(element.size, viewport)
-
-  if (element.kind === 'header') {
-    return {
-      position: { x: 0, y: 0 },
-      size: { width: canvasWidth, height: size.height },
-    }
-  }
-
-  return { position, size }
 }
 
 function addElementTargets(
@@ -123,7 +106,7 @@ export function getAlignmentTargets({
     addElementTargets(
       targets,
       element.id,
-      getResolvedLayout(element, viewport, canvasWidth),
+      resolveResponsiveElementLayout(element, viewport, canvasWidth),
     )
   })
 
