@@ -150,6 +150,16 @@ subgraph src["src"]
       src_components_toolbar_TopToolbar_tsx["TopToolbar.tsx"]
     end
   end
+  subgraph src_paint["paint"]
+    src_paint_usePaintLight_tsx["usePaintLight.tsx"]
+    src_paint_PaintImagePicker_tsx["PaintImagePicker.tsx"]
+    src_paint_PaintLightDialog_tsx["PaintLightDialog.tsx"]
+    src_paint_paintCanvasFiles_ts["paintCanvasFiles.ts"]
+    src_paint_paintGeometry_ts["paintGeometry.ts"]
+    src_paint_usePaintCanvas_ts["usePaintCanvas.ts"]
+    src_paint_paintDrawing_ts["paintDrawing.ts"]
+    src_paint_usePaintImport_ts["usePaintImport.ts"]
+  end
   subgraph src_persistence["persistence"]
     src_persistence_useEditorPersistence_ts["useEditorPersistence.ts"]
     src_persistence_editorPersistenceContext_ts["editorPersistenceContext.ts"]
@@ -256,6 +266,7 @@ src_components_editor_EditorShell_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_editor_EditorShell_tsx-->src_model_editorProject_ts
 src_components_editor_EditorShell_tsx-->src_model_elementCreation_ts
 src_components_editor_EditorShell_tsx-->src_model_sectionContents_ts
+src_components_editor_EditorShell_tsx-->src_paint_usePaintLight_tsx
 src_components_editor_EditorShell_tsx-->src_persistence_useEditorPersistence_ts
 src_components_editor_EditorShell_tsx-->src_projectFiles_downloadDuplicateProject_ts
 src_components_editor_EditorShell_tsx-->src_state_useEditorProject_ts
@@ -308,6 +319,30 @@ src_model_elementCreation_ts-->src_model_buttonAsset_ts
 src_model_elementCreation_ts-->src_model_editorProject_ts
 src_model_elementCreation_ts-->src_model_imageAsset_ts
 src_model_sectionContents_ts-->src_model_editorProject_ts
+src_paint_usePaintLight_tsx-->src_assets_images_imageAssetStoreContext_ts
+src_paint_usePaintLight_tsx-->src_assets_images_prepareImageFile_ts
+src_paint_usePaintLight_tsx-->src_assets_images_useImageAssetStore_ts
+src_paint_usePaintLight_tsx-->src_model_editorProject_ts
+src_paint_usePaintLight_tsx-->src_model_elementCreation_ts
+src_paint_usePaintLight_tsx-->src_model_imageAsset_ts
+src_paint_usePaintLight_tsx-->src_paint_PaintImagePicker_tsx
+src_paint_usePaintLight_tsx-->src_paint_PaintLightDialog_tsx
+src_assets_images_prepareImageFile_ts-->src_model_imageAsset_ts
+src_assets_images_prepareImageFile_ts-->src_assets_images_imageFileSignature_ts
+src_assets_images_imageFileSignature_ts-->src_model_imageAsset_ts
+src_paint_PaintImagePicker_tsx-->src_assets_images_imageAssetStoreContext_ts
+src_paint_PaintImagePicker_tsx-->src_model_imageAsset_ts
+src_paint_PaintLightDialog_tsx-->src_model_imageAsset_ts
+src_paint_PaintLightDialog_tsx-->src_paint_paintCanvasFiles_ts
+src_paint_PaintLightDialog_tsx-->src_paint_paintGeometry_ts
+src_paint_PaintLightDialog_tsx-->src_paint_usePaintCanvas_ts
+src_paint_PaintLightDialog_tsx-->src_paint_usePaintImport_ts
+src_paint_paintCanvasFiles_ts-->src_model_imageAsset_ts
+src_paint_usePaintCanvas_ts-->src_paint_paintDrawing_ts
+src_paint_usePaintCanvas_ts-->src_paint_paintGeometry_ts
+src_paint_paintDrawing_ts-->src_paint_paintGeometry_ts
+src_paint_usePaintImport_ts-->src_assets_images_prepareImageFile_ts
+src_paint_usePaintImport_ts-->src_paint_paintGeometry_ts
 src_persistence_useEditorPersistence_ts-->src_persistence_editorPersistenceContext_ts
 src_projectFiles_downloadDuplicateProject_ts-->src_assets_images_imageAssetStoreContext_ts
 src_projectFiles_downloadDuplicateProject_ts-->src_model_editorProject_ts
@@ -749,9 +784,6 @@ src_components_properties_HeaderLogoProperties_tsx-->src_assets_images_useImageA
 src_components_properties_HeaderLogoProperties_tsx-->src_model_editorProject_ts
 src_components_properties_HeaderLogoProperties_tsx-->src_model_imageAsset_ts
 src_components_properties_HeaderLogoProperties_tsx-->src_state_useHeaderProperties_ts
-src_assets_images_prepareImageFile_ts-->src_model_imageAsset_ts
-src_assets_images_prepareImageFile_ts-->src_assets_images_imageFileSignature_ts
-src_assets_images_imageFileSignature_ts-->src_model_imageAsset_ts
 src_components_properties_HeroPropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_HeroPropertiesSection_tsx-->src_model_heroElement_ts
 src_components_properties_HeroPropertiesSection_tsx-->src_state_useHeroProperties_ts

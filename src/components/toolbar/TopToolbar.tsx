@@ -20,6 +20,7 @@ type TopToolbarProps = {
   persistenceStatus: EditorPersistenceStatus
   onDuplicateProject: () => void
   onPreview: () => void
+  onEditImage: () => void
 }
 
 type IconName =
@@ -30,6 +31,7 @@ type IconName =
   | 'undo'
   | 'redo'
   | 'eye'
+  | 'paint'
   | 'publish'
   | 'menu'
 
@@ -66,6 +68,8 @@ function Icon({ name }: { name: IconName }) {
       return <svg {...common}><path d="m15 7 5 5-5 5" /><path d="M19 12h-8a6 6 0 0 0-6 6" /></svg>
     case 'eye':
       return <svg {...common}><path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
+    case 'paint':
+      return <svg {...common}><path d="m4 20 4-1 11-11-3-3L5 16l-1 4Z" /><path d="m14 7 3 3M18 3l3 3" /></svg>
     case 'publish':
       return <svg {...common}><path d="M12 16V3M7 8l5-5 5 5" /><path d="M5 14v6h14v-6" /></svg>
     case 'menu':
@@ -86,6 +90,7 @@ export function TopToolbar({
   persistenceStatus,
   onDuplicateProject,
   onPreview,
+  onEditImage,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -186,6 +191,9 @@ export function TopToolbar({
       </div>
 
       <div className="top-toolbar__actions">
+        <button className="toolbar-action" type="button" aria-label="Rediger bilde"
+          title="Rediger valgt bilde eller velg et bilde på siden"
+          onClick={onEditImage}><Icon name="paint" /><span>Rediger bilde</span></button>
         <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" onClick={onPreview}><Icon name="eye" /><span>Forhåndsvisning</span></button>
         {persistenceStatus === 'error' && (
           <span className="top-toolbar__save-error" role="alert">

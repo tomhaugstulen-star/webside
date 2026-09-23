@@ -1,0 +1,228 @@
+.paint-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(18, 26, 35, 0.68);
+}
+.paint-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(1280px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: hidden;
+  padding: 18px;
+  gap: 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 18px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+}
+.paint-dialog__header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.paint-dialog__header-left {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.paint-dialog__header-title {
+  flex: 0 0 auto;
+}
+.paint-dialog__header-actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
+}
+.paint-dialog__history-actions {
+  display: flex;
+  gap: 6px;
+  justify-self: center;
+}
+.paint-dialog__selection-actions {
+  display: flex;
+  gap: 4px;
+}
+.paint-dialog__selection-actions button {
+  padding-inline: 9px;
+}
+.paint-dialog .paint-dialog__icon-button {
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  line-height: 1;
+}
+.paint-dialog__icon-button span {
+  transform: translateY(-1px);
+}
+.paint-dialog__save-menu {
+  position: relative;
+}
+.paint-dialog__save-menu-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  display: grid;
+  min-width: 220px;
+  padding: 6px;
+  gap: 4px;
+  border: 1px solid var(--portal-border);
+  border-radius: 10px;
+  background: var(--portal-control-surface);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+.paint-dialog__save-menu-popover button {
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+}
+.paint-dialog__save-menu-popover--header {
+  left: 0;
+  right: auto;
+}
+.paint-dialog--fullscreen {
+  width: 100vw;
+  height: 100dvh;
+  max-height: none;
+  border-radius: 0;
+}
+.paint-backdrop:has(.paint-dialog--fullscreen) {
+  padding: 0;
+}
+.paint-dialog__header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.paint-dialog button,
+.paint-dialog input,
+.paint-dialog select {
+  min-height: 32px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+}
+.paint-dialog button {
+  padding: 5px 11px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.paint-dialog button:hover:not(:disabled) {
+  background: var(--portal-control-hover);
+}
+.paint-dialog button[aria-pressed='true'] {
+  background: var(--portal-control-selected);
+  border-color: var(--portal-accent);
+}
+.paint-dialog button:disabled {
+  opacity: 0.48;
+  cursor: default;
+}
+.paint-dialog label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--portal-text);
+}
+.paint-dialog input[type='number'] {
+  width: 76px;
+  padding: 0 6px;
+}
+.paint-dialog input[type='color'] {
+  width: 44px;
+  padding: 2px;
+}
+.paint-dialog input[type='checkbox'] {
+  min-height: auto;
+}
+.paint-dialog__workspace {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 12px;
+}
+.paint-dialog__sidebar {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.paint-dialog__panel-group,
+.paint-dialog__save,
+.paint-dialog__resize {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid var(--portal-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--portal-control-surface) 92%, var(--portal-text) 8%);
+}
+.paint-dialog__panel-group h3,
+.paint-dialog__save h3 {
+  margin: 0 0 1px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  color: var(--portal-text);
+}
+.paint-dialog__tool-grid,
+.paint-dialog__action-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+.paint-dialog__action-grid--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.paint-dialog__action-grid--compact button {
+  padding-inline: 7px;
+  text-align: center;
+}
+.paint-dialog__panel-divider {
+  height: 1px;
+  margin: 3px 0 1px;
+  background: var(--portal-border);
+}
+.paint-dialog__tool-grid button,
+.paint-dialog__action-grid button,
+.paint-dialog__panel-group > button,
+.paint-dialog__resize > button,
+.paint-dialog__save > button {
+  width: 100%;
+  text-align: left;
+}
+.paint-dialog__hint,
+.paint-dialog__meta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--portal-text);
+  opacity: 0.82;
+  overflow-wrap: anywhere;
+}
