@@ -132,3 +132,57 @@ test('mobile crop frame does not rewrite shared crop transform or desktop frame'
   expect(image.size.mobile).toEqual({ width: 200, height: 120 })
   expect(image.transform).toEqual(before.transform)
 })
+
+
+test('mobile visibility can be hidden, restored and reset to desktop inheritance', () => {
+  const state = addHero()
+  const withMobileLayout = editorProjectReducer(state, {
+    type: 'set-element-viewport-layout',
+    elementId: 'hero-1',
+    viewport: 'mobile',
+    layout: {
+      position: { x: 12, y: 100 },
+      size: { width: 360, height: 180 },
+    },
+    updatedAt: SECOND_AT,
+  })
+  const hidden = editorProjectReducer(withMobileLayout, {
+    type: 'set-element-mobile-visibility',
+    elementId: 'hero-1',
+    visible: false,
+    updatedAt: SECOND_AT,
+  })
+
+  let hero = hidden.project.pages[0].elements[0]
+  if (!hero || hero.kind !== 'hero') throw new Error('Expected Hero.')
+  expect(hero.visibility.desktop).toBe(true)
+  expect(hero.visibility.mobile).toBe(false)
+
+  const shown = editorProjectReducer(hidden, {
+    type: 'set-element-mobile-visibility',
+    elementId: 'hero-1',
+    visible: true,
+    updatedAt: SECOND_AT,
+  })
+  hero = shown.project.pages[0].elements[0]
+  if (!hero || hero.kind !== 'hero') throw new Error('Expected Hero.')
+  expect(hero.visibility.mobile).toBe(true)
+
+  const reset = editorProjectReducer(shown, {
+    type: 'reset-element-mobile-overrides',
+    elementId: 'hero-1',
+    updatedAt: SECOND_AT,
+  })
+  hero = reset.project.pages[0].elements[0]
+  if (!hero || hero.kind !== 'hero') throw new Error('Expected Hero.')
+
+  expect(hero.position.mobile).toBeUndefined()
+  expect(hero.size.mobile).toBeUndefined()
+  expect(hero.visibility.mobile).toBeUndefined()
+  expect(hero.position.desktop).toEqual(
+    state.project.pages[0].elements[0].position.desktop,
+  )
+  expect(hero.size.desktop).toEqual(
+    state.project.pages[0].elements[0].size.desktop,
+  )
+})
