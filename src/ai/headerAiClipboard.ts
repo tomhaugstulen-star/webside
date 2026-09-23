@@ -59,7 +59,7 @@ function hasExactProposalKeys(value: Record<string, unknown>) {
 
 function stripCodeFence(value: string) {
   const trimmed = value.trim()
-  const match = trimmed.match(/^\`\`\`(?:json)?\s*([\s\S]*?)\s*\`\`\`$/i)
+  const match = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i)
   return match?.[1] ?? trimmed
 }
 
