@@ -45,15 +45,16 @@ test('renders project navigation in Header and navigates to pages and sections',
 
   await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
   const navigation = page.getByRole('region', { name: 'Nettstedmeny' })
+  const addForm = navigation.locator('.website-navigation__add-form')
 
-  await navigation.getByLabel('Menutekst').fill('Om oss')
-  await navigation.getByLabel('Mål').selectOption({ label: 'Side: Side 2' })
+  await addForm.getByLabel('Menutekst').fill('Om oss')
+  await addForm.getByLabel('Mål').selectOption({ label: 'Side: Side 2' })
   await navigation
     .getByRole('button', { name: 'Legg til menypunkt' })
     .click()
 
-  await navigation.getByLabel('Menutekst').fill('Kontakt')
-  await navigation.getByLabel('Mål').selectOption({ label: 'Side 2 → #seksjon' })
+  await addForm.getByLabel('Menutekst').fill('Kontakt')
+  await addForm.getByLabel('Mål').selectOption({ label: 'Side 2 → #seksjon' })
   await navigation
     .getByRole('button', { name: 'Legg til menypunkt' })
     .click()
@@ -93,7 +94,7 @@ test('renders project navigation in Header and navigates to pages and sections',
     .toBe(sectionId)
 
   await page.getByLabel('Velg side').selectOption({ label: 'Forside' })
-  await page.getByRole('button', { name: 'Telefon', exact: true }).click()
+  await page.getByRole('button', { name: 'Mobil', exact: true }).click()
   await expect(menu.getByRole('button', { name: 'Om oss', exact: true })).toBeVisible()
   await expect(menu.getByRole('button', { name: 'Kontakt', exact: true })).toBeVisible()
 })
