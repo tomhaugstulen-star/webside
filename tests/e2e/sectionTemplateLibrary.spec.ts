@@ -20,8 +20,8 @@ test('saves, reloads and inserts a reusable section template as one undo step', 
   const saveRegion = page.getByRole('region', { name: 'Gjenbrukbar seksjon' })
   await expect(saveRegion).toBeVisible()
   await saveRegion.getByLabel('Malnavn').fill('Kontaktblokk')
-  await saveRegion.getByRole('button', { name: 'Lagre som mal' }).click()
-  await expect(saveRegion).toContainText('Malen er lagret i malbiblioteket.')
+  await saveRegion.getByRole('button', { name: 'Lagre seksjon som mal' }).click()
+  await expect(saveRegion).toContainText('Åpne Elementer → Maler')
   await page.waitForTimeout(900)
 
   await page.reload()
@@ -72,14 +72,27 @@ test('template image survives insertion, undo and redo', async ({ page }) => {
 
   const section = page.locator('.canvas-element--section').first()
   await section.click()
+  // New elements are placed below the section. Extend its frame to include
+  // the imported image before capturing the template.
+  const resizeHandle = section.locator('.canvas-element__resize-handle')
+  const handleBounds = await resizeHandle.boundingBox()
+  if (!handleBounds) throw new Error('Section resize handle is unavailable')
+  const startX = handleBounds.x + handleBounds.width / 2
+  const startY = handleBounds.y + handleBounds.height / 2
+  await page.mouse.move(startX, startY)
+  await page.mouse.down()
+  await page.mouse.move(startX, startY + 210, { steps: 8 })
+  await page.mouse.up()
+
   const saveRegion = page.getByRole('region', { name: 'Gjenbrukbar seksjon' })
   await saveRegion.getByLabel('Malnavn').fill('Bildemal')
-  await saveRegion.getByRole('button', { name: 'Lagre som mal' }).click()
-  await expect(saveRegion).toContainText('Malen er lagret i malbiblioteket.')
+  await saveRegion.getByRole('button', { name: 'Lagre seksjon som mal' }).click()
+  await expect(saveRegion).toContainText('Åpne Elementer → Maler')
 
   await page.getByRole('button', { name: 'Elementer', exact: true }).click()
   await page.getByRole('button', { name: 'Maler', exact: true }).click()
   const card = page.locator('.template-library__card').filter({ hasText: 'Bildemal' })
+  await expect(card).toContainText('2 elementer')
   await card.getByRole('button', { name: 'Sett inn' }).click()
 
   await expect(images).toHaveCount(2)

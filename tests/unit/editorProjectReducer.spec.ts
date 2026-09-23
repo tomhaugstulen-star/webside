@@ -228,6 +228,42 @@ test.describe('editor project reducer', () => {
     expect(deleted.selectedElementId).toBeNull()
   })
 
+  test('deletes a section and its contained elements as one action, preserving outside elements', () => {
+    const sectionState = editorProjectReducer(getInitialEditorProjectState(), {
+      type: 'add-element-to-active-page',
+      elementId: 'section-1',
+      request: { kind: 'section' },
+      updatedAt: CREATED_AT,
+    })
+    const section = getActivePage(sectionState).elements[0]
+    const insideState = addTextElement(sectionState)
+    const inside = getTextElement(insideState)
+    const outsideState = addTextElement(insideState, 'outside')
+    const outside = getTextElement(outsideState, 'outside')
+    const project = {
+      ...outsideState.project,
+      pages: outsideState.project.pages.map((page) => ({
+        ...page,
+        elements: page.elements.map((element) =>
+          element.id === inside.id
+            ? { ...element, position: { desktop: { x: 40, y: 40 } } }
+            : element,
+        ),
+      })),
+    }
+    const withContents = { ...outsideState, project, selectedElementId: inside.id }
+    expect(section.kind).toBe('section')
+    expect(outside.id).toBe('outside')
+
+    const deleted = editorProjectReducer(withContents, {
+      type: 'delete-element-from-active-page',
+      elementId: section.id,
+      updatedAt: UPDATED_AT,
+    })
+    expect(getActivePage(deleted).elements.map((element) => element.id)).toEqual(['outside'])
+    expect(deleted.selectedElementId).toBeNull()
+  })
+
   test('rejects a replacement project without a page', () => {
     const state = getInitialEditorProjectState()
     const invalidProject: EditorProject = {

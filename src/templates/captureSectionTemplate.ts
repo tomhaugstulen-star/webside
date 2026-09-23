@@ -1,27 +1,11 @@
 import type { ImageAssetResource } from '../assets/images/imageAssetStoreContext'
 import type { EditorElement, EditorPage } from '../model/editorProject'
 import type { ImageAssetId, ImageAssetMetadata } from '../model/imageAsset'
+import { getSectionContents } from '../model/sectionContents'
 import { imageAssetMetadataEqual } from '../projectFiles/projectAssetReferences'
 import type { SectionTemplate, SectionTemplateAsset } from './sectionTemplate'
 
 type GetImageAsset = (assetId: ImageAssetId) => ImageAssetResource | null
-
-function isInsideSection(
-  element: EditorElement,
-  section: Extract<EditorElement, { kind: 'section' }>,
-) {
-  const frame = section.position.desktop
-  const size = section.size.desktop
-  const position = element.position.desktop
-  const elementSize = element.size.desktop
-
-  return (
-    position.x >= frame.x &&
-    position.y >= frame.y &&
-    position.x + elementSize.width <= frame.x + size.width &&
-    position.y + elementSize.height <= frame.y + size.height
-  )
-}
 
 function getAssetReference(
   element: EditorElement,
@@ -52,12 +36,11 @@ export function captureSectionTemplate(
 
   if (!section || section.kind !== 'section') return null
 
+  const contents = new Set(
+    getSectionContents(section, page.elements).map((element) => element.id),
+  )
   const elements = page.elements.filter(
-    (element) =>
-      element.id === section.id ||
-      (element.kind !== 'header' &&
-        element.kind !== 'section' &&
-        isInsideSection(element, section)),
+    (element) => element.id === section.id || contents.has(element.id),
   )
   const assetsById = new Map<ImageAssetId, SectionTemplateAsset>()
 

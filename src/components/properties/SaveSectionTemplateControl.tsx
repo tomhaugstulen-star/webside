@@ -19,7 +19,7 @@ export function SaveSectionTemplateControl({
     setSaving(false)
 
     const messages = {
-      saved: 'Malen er lagret i malbiblioteket.',
+      saved: 'Malen er lagret. Åpne Elementer → Maler for å finne den.',
       'invalid-name': 'Skriv inn et gyldig navn på malen.',
       'section-missing': 'Seksjonen finnes ikke lenger.',
       'asset-missing': 'Malen kunne ikke lagres fordi et bilde mangler.',
@@ -48,7 +48,7 @@ export function SaveSectionTemplateControl({
           onChange={(event) => setName(event.target.value)}
         />
         <button type="submit" disabled={saving}>
-          {saving ? 'Lagrer…' : 'Lagre som mal'}
+          {saving ? 'Lagrer…' : 'Lagre seksjon som mal'}
         </button>
       </form>
       <p className="site-structure__feedback" aria-live="polite">
