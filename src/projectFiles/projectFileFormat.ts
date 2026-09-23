@@ -32,8 +32,8 @@ export type ImportedProjectFile = {
   assets: ImportedProjectAsset[]
 }
 
-export function createProjectFileName(projectName: string) {
-  const safeBase =
+function createSafeProjectBaseName(projectName: string) {
+  return (
     projectName
       .trim()
       .toLowerCase()
@@ -44,6 +44,22 @@ export function createProjectFileName(projectName: string) {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'prosjekt'
+  )
+}
 
-  return `${safeBase}${PROJECT_FILE_EXTENSION}`
+export function createProjectFileName(projectName: string) {
+  return `${createSafeProjectBaseName(projectName)}${PROJECT_FILE_EXTENSION}`
+}
+
+export function createProjectBackupFileName(
+  projectName: string,
+  date = new Date(),
+) {
+  const timestamp = date
+    .toISOString()
+    .replace(/\.\d{3}Z$/, 'Z')
+    .replace(/[:T]/g, '-')
+    .replace('Z', '')
+
+  return `${createSafeProjectBaseName(projectName)}-backup-${timestamp}${PROJECT_FILE_EXTENSION}`
 }
