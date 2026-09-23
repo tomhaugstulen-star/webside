@@ -1,9 +1,12 @@
 import type { CSSProperties, PointerEvent } from 'react'
+import { HeaderAiControls } from '../../ai/HeaderAiControls'
 import type { ElementLayout } from '../../model/elementLayout'
+import type { EditorElement, ResponsiveViewport } from '../../model/editorProject'
 import { useElementLocking } from '../../state/useElementLocking'
 
 type ElementSelectionToolbarProps = {
-  elementId: string
+  element: EditorElement
+  viewport: ResponsiveViewport
   lockable: boolean
   locked: boolean
   layout: ElementLayout
@@ -35,7 +38,8 @@ function LockIcon({ locked }: { locked: boolean }) {
 }
 
 export function ElementSelectionToolbar({
-  elementId,
+  element,
+  viewport,
   lockable,
   locked,
   layout,
@@ -66,6 +70,9 @@ export function ElementSelectionToolbar({
       >
         Egenskaper
       </button>
+      {element.kind === 'header' && (
+        <HeaderAiControls element={element} viewport={viewport} layout={layout} />
+      )}
       {lockable && (
         <button
           className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
@@ -73,7 +80,7 @@ export function ElementSelectionToolbar({
           aria-label={locked ? 'Lås opp element' : 'Lås element'}
           aria-pressed={locked}
           title={locked ? 'Lås opp' : 'Lås'}
-          onClick={() => toggleElementLocked(elementId)}
+          onClick={() => toggleElementLocked(element.id)}
         >
           <LockIcon locked={locked} />
         </button>
