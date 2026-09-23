@@ -126,7 +126,6 @@ test('backup and duplicate downloads remain importable project files', async ({
   expect(duplicate.project.navigation).toEqual(original.project.navigation)
   expect(duplicate.assets).toEqual(original.assets)
 
-  await openProject(page)
   await page.locator('.project-file-controls__input').setInputFiles(duplicatePath!)
   await expect(
     page.getByText('Åpnet «Kopi av Nytt prosjekt».', { exact: true }),
