@@ -1,9 +1,14 @@
+.section-template-save {
+  padding-right: 4px;
+}
+
 .section-template-save form {
   display: grid;
   gap: 8px;
 }
 
 .section-template-save input {
+  box-sizing: border-box;
   width: 100%;
   min-height: 38px;
   padding: 8px 10px;
@@ -32,7 +37,19 @@
 
 .template-library__card > div:first-child {
   display: grid;
-  gap: 3px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.template-library__card strong {
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+
+.template-library__card time,
+.template-library__card span {
+  display: block;
+  line-height: 1.35;
 }
 
 .template-library__card span {
