@@ -5,18 +5,29 @@ import type { NavigationTarget } from '../../model/navigation'
 import { resolveNavigationTargetHref } from '../../model/navigationHref'
 import { useEditorProject } from '../../state/useEditorProject'
 
+type HeaderNavigationContext = {
+  pages: readonly { id: string; slug: string; elements: Array<{ id: string; kind: string; anchorId?: unknown }> }[]
+  navigation: { items: Array<{ id: string; label: string; target: NavigationTarget; parentId?: string }> }
+  activePageId: string
+}
+
 type HeaderElementContentProps = {
   element: HeaderEditorElement
   onNavigate: (target: NavigationTarget) => void
+  navigationContext?: HeaderNavigationContext
 }
 
 export function HeaderElementContent({
   element,
   onNavigate,
+  navigationContext,
 }: HeaderElementContentProps) {
   const { getImageAsset } = useImageAssetStore()
   const { state } = useEditorProject()
   const resource = getImageAsset(element.logoAssetId)
+  const pages = navigationContext?.pages ?? pages
+  const navigation = navigationContext?.navigation ?? state.project.navigation
+  const activePageId = navigationContext?.activePageId ?? activePageId
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigationRef = useRef<HTMLElement>(null)
@@ -73,7 +84,7 @@ export function HeaderElementContent({
         </div>
       </div>
 
-      {state.project.navigation.items.length > 0 && (
+      {navigation.items.length > 0 && (
         <>
         <button
           type="button"
@@ -94,9 +105,9 @@ export function HeaderElementContent({
           className={`header-element__navigation${mobileMenuOpen ? ' header-element__navigation--mobile-open' : ''}`}
           aria-label="Nettstedmeny"
         >
-          {state.project.navigation.items.filter((item) => !item.parentId).map((item) => {
+          {navigation.items.filter((item) => !item.parentId).map((item) => {
             const href = resolveNavigationTargetHref(
-              state.project.pages,
+              pages,
               item.target,
             )
 
@@ -106,8 +117,8 @@ export function HeaderElementContent({
 
             const currentPage =
               item.target.type === 'page' &&
-              item.target.pageId === state.activePageId
-            const children = state.project.navigation.items.filter(
+              item.target.pageId === activePageId
+            const children = navigation.items.filter(
               (child) => child.parentId === item.id,
             )
 
@@ -140,7 +151,7 @@ export function HeaderElementContent({
                 {openMenuId === item.id && (
                   <div className="header-element__submenu" aria-label={`Undermeny for ${item.label}`}>
                     {children.map((child) => {
-                      const childHref = resolveNavigationTargetHref(state.project.pages, child.target)
+                      const childHref = resolveNavigationTargetHref(pages, child.target)
                       return childHref && <button key={child.id} type="button"
                         className="header-element__navigation-item"
                         data-public-href={childHref}
