@@ -29,7 +29,9 @@ export function HeroElementContent({
         {element.subtitle && (
           <span className="hero-element__subtitle">{element.subtitle}</span>
         )}
-        <span className="hero-element__cta">{element.ctaLabel}</span>
+        {element.ctaLabel && (
+          <span className="hero-element__cta">{element.ctaLabel}</span>
+        )}
       </div>
     </div>
   )
