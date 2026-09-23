@@ -20,7 +20,7 @@ test('excludes active and hidden elements but includes a visible locked target',
   }])
 })
 
-test('resolves mobile visibility and layout while falling back to desktop values', () => {
+test('resolves mobile visibility and applies responsive inherited layout', () => {
   const mobile = {
     ...text('mobile'), visibility: { desktop: false, mobile: true },
     position: { desktop: { x: 100, y: 100 }, mobile: { x: 10, y: 20 } },
@@ -33,7 +33,13 @@ test('resolves mobile visibility and layout while falling back to desktop values
     viewport: 'mobile', canvasWidth: 390,
   })).toEqual([
     { elementId: 'mobile', layout: { position: mobile.position.mobile, size: mobile.size.mobile } },
-    { elementId: 'inherited', layout: { position: inherited.position.desktop, size: inherited.size.desktop } },
+    {
+      elementId: 'inherited',
+      layout: {
+        position: { x: 5, y: inherited.position.desktop.y },
+        size: inherited.size.desktop,
+      },
+    },
   ])
 })
 
