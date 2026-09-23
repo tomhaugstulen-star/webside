@@ -1,4 +1,10 @@
-export type ElementKind = 'section' | 'image' | 'text' | 'button' | 'header'
+export type ElementKind =
+  | 'section'
+  | 'image'
+  | 'text'
+  | 'button'
+  | 'header'
+  | 'hero'
 
 export type ElementSize = {
   width: number
@@ -26,6 +32,7 @@ const defaultElementSizes: Record<ElementKind, ElementSize> = {
   text: { width: 240, height: 96 },
   button: { width: 160, height: 48 },
   header: { width: HEADER_SERIALIZED_WIDTH, height: HEADER_DEFAULT_HEIGHT },
+  hero: { width: 720, height: 360 },
 }
 
 const minimumElementSizes: Record<ElementKind, ElementSize> = {
@@ -34,6 +41,7 @@ const minimumElementSizes: Record<ElementKind, ElementSize> = {
   text: { width: 120, height: 48 },
   button: { width: 80, height: 36 },
   header: { width: 240, height: HEADER_MINIMUM_HEIGHT },
+  hero: { width: 320, height: 180 },
 }
 
 const maximumElementSizes: Partial<Record<ElementKind, ElementMaximumSize>> = {

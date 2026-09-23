@@ -7,6 +7,7 @@ import { useEditorProject } from './useEditorProject'
 function getElementImageAssetId(element: EditorElement): ImageAssetId | null {
   if (element.kind === 'image') return element.assetId
   if (element.kind === 'header') return element.logoAssetId
+  if (element.kind === 'hero') return element.imageAssetId
   return null
 }
 

@@ -2,6 +2,7 @@ import type { ButtonAssetId } from './buttonAsset'
 import type { ElementSize } from './elementDimensions'
 import type { ElementLink } from './elementLink'
 import type { HeaderAppearance } from './headerAppearance'
+import type { HeroAppearance } from './heroAppearance'
 import type { ImageAssetId, ImageAssetMetadata } from './imageAsset'
 import type { ImageMode, ImageTransform } from './imagePresentation'
 import type { WebsiteNavigation } from './navigation'
@@ -12,7 +13,7 @@ import type { TextElementStyle } from './textElementStyle'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 13 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 14 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -73,12 +74,24 @@ export type HeaderEditorElement = BaseEditorElement & {
   appearance: HeaderAppearance
 }
 
+export type HeroEditorElement = BaseEditorElement & {
+  kind: 'hero'
+  imageAssetId: ImageAssetId
+  imageAssetMetadata: ImageAssetMetadata
+  title: string
+  subtitle: string
+  ctaLabel: string
+  ctaLink: ElementLink
+  appearance: HeroAppearance
+}
+
 export type EditorElement =
   | SectionEditorElement
   | ImageEditorElement
   | TextEditorElement
   | ButtonEditorElement
   | HeaderEditorElement
+  | HeroEditorElement
 
 export type EditorPage = {
   id: string
