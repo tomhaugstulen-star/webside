@@ -32,10 +32,25 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [busy, setBusy] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
   const { canvasRef, overlayRef, ...paint } = usePaintCanvas(file, tool, color, size)
   const { overlayRef: importOverlayRef, imported: importPending, ...importActions } =
     usePaintImport(canvasRef, paint.width, paint.height, paint.commit)
   const importInputRef = useRef<HTMLInputElement>(null)
+  const canvasViewportRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const viewport = canvasViewportRef.current
+    if (!viewport) return
+    const update = () => setCanvasViewport({
+      width: viewport.clientWidth,
+      height: viewport.clientHeight,
+    })
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(viewport)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
@@ -95,6 +110,16 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       if (lockRatio && value > 0) setNewWidth(Math.round(value * ratio))
     }
   }
+  const fitScale = paint.width > 0 && paint.height > 0 && canvasViewport.width > 0 && canvasViewport.height > 0
+    ? Math.min(
+      1,
+      Math.max(1, canvasViewport.width - 24) / paint.width,
+      Math.max(1, canvasViewport.height - 24) / paint.height,
+    )
+    : 1
+  const displayWidth = Math.max(1, Math.round((paint.width || 1) * fitScale))
+  const displayHeight = Math.max(1, Math.round((paint.height || 1) * fitScale))
+
   const applyResize = () => {
     if (!validDimensions(newWidth, newHeight)) {
       setMessage('Bruk hele piksler, maks 16 384 per side og 40 megapiksler.')
@@ -210,8 +235,9 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <p className="paint-dialog__message" role="status">{message || paint.error}</p>}
           </aside>
 
-          <div className="paint-dialog__canvas-scroll">
-            <div className="paint-dialog__canvas-wrap" style={{ width: paint.width || 1 }}>
+          <div ref={canvasViewportRef} className="paint-dialog__canvas-scroll">
+            <div className="paint-dialog__canvas-wrap"
+              style={{ width: displayWidth, height: displayHeight }}>
               <canvas ref={canvasRef} aria-label="Bildearbeidsflate"
                 onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
                 onPointerUp={paint.onPointerUp} onPointerCancel={paint.onPointerUp} />
