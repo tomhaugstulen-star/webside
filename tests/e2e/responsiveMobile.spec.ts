@@ -52,7 +52,7 @@ test('Hero inherits responsively and mobile edits do not change desktop', async 
   await hero.click()
   await expect(mobileSection.getByText('Eget mobiloppsett')).toBeVisible()
 
-  await page.getByRole('button', { name: 'PC', exact: true }).click()
+  await page.getByRole('button', { name: 'Skrivebord', exact: true }).click()
   const desktopAfterMobileEdit = await hero.boundingBox()
   expect(desktopAfterMobileEdit).not.toBeNull()
   expect(desktopAfterMobileEdit!.width).toBeCloseTo(desktopWide!.width, 0)
