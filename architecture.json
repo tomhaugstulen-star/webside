@@ -87,6 +87,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./templates/SectionTemplateLibraryProvider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/SectionTemplateLibraryProvider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -223,6 +240,7 @@
         "src/assets/images/imageFileSignature.ts",
         "src/components/properties/HeroImageProperties.tsx",
         "src/components/properties/ImagePropertiesSection.tsx",
+        "src/templates/sectionTemplate.ts",
         "src/components/sidebar/HeroImportControl.tsx",
         "src/components/sidebar/ImageImportControl.tsx",
         "src/components/sidebar/HeaderCreationControl.tsx",
@@ -231,7 +249,11 @@
         "src/projectFiles/readProjectFile.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
         "src/persistence/localProjectStorage.ts",
-        "src/persistence/indexedDbLocalProjectStorage.ts"
+        "src/persistence/indexedDbLocalProjectStorage.ts",
+        "src/templates/SectionTemplateLibraryProvider.tsx",
+        "src/templates/captureSectionTemplate.ts",
+        "src/templates/instantiateSectionTemplate.ts",
+        "src/templates/sectionTemplateStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -252,7 +274,9 @@
         "src/model/createEditorProject.ts",
         "src/state/useElementCreation.ts",
         "src/state/useNavigationActions.ts",
-        "src/state/usePageActions.ts"
+        "src/state/usePageActions.ts",
+        "src/templates/SectionTemplateLibraryProvider.tsx",
+        "src/templates/instantiateSectionTemplate.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -291,7 +315,9 @@
         "src/assets/images/useImageAssetStore.ts",
         "src/projectFiles/downloadDuplicateProject.ts",
         "src/projectFiles/createProjectFile.ts",
-        "src/persistence/createLocalProjectSnapshot.ts"
+        "src/persistence/createLocalProjectSnapshot.ts",
+        "src/templates/captureSectionTemplate.ts",
+        "src/templates/instantiateSectionTemplate.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -697,7 +723,8 @@
         "src/components/sidebar/HeaderCreationControl.tsx",
         "src/state/usePageActions.ts",
         "src/components/sidebar/ProjectFileControls.tsx",
-        "src/persistence/EditorPersistenceProvider.tsx"
+        "src/persistence/EditorPersistenceProvider.tsx",
+        "src/templates/SectionTemplateLibraryProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -951,6 +978,7 @@
         "src/model/createEditorElement.ts",
         "src/model/findElementCreationPosition.ts",
         "src/state/deleteElementFromActivePage.ts",
+        "src/state/insertElementsToActivePage.ts",
         "src/state/reduceColorProjectAction.ts",
         "src/state/reduceHeaderAppearanceAction.ts",
         "src/state/reduceHeaderProjectAction.ts",
@@ -1011,6 +1039,8 @@
         "src/components/properties/HeroImageProperties.tsx",
         "src/components/properties/ImagePropertiesSection.tsx",
         "src/components/properties/MobilePropertiesSection.tsx",
+        "src/components/properties/SaveSectionTemplateControl.tsx",
+        "src/templates/sectionTemplate.ts",
         "src/components/properties/SectionAnchorPropertiesSection.tsx",
         "src/components/properties/TextPropertiesSection.tsx",
         "src/model/projectColorEntries.ts",
@@ -1023,7 +1053,10 @@
         "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/persistence/EditorPersistenceProvider.tsx",
         "src/persistence/createLocalProjectSnapshot.ts",
-        "src/persistence/localProjectStorage.ts"
+        "src/persistence/localProjectStorage.ts",
+        "src/templates/captureSectionTemplate.ts",
+        "src/templates/instantiateSectionTemplate.ts",
+        "src/templates/sectionTemplateStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -2288,9 +2321,11 @@
       ],
       "dependents": [
         "src/projectFiles/createProjectFile.ts",
+        "src/state/insertElementsToActivePage.ts",
         "src/projectFiles/readProjectFile.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
-        "src/persistence/indexedDbLocalProjectStorage.ts"
+        "src/persistence/indexedDbLocalProjectStorage.ts",
+        "src/templates/SectionTemplateLibraryProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -2546,7 +2581,8 @@
         }
       ],
       "dependents": [
-        "src/model/editorProjectValidation.ts"
+        "src/model/editorProjectValidation.ts",
+        "src/templates/sectionTemplateStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -2839,7 +2875,8 @@
         "src/state/reducePageProjectAction.ts",
         "src/state/setSectionAnchorId.ts",
         "src/components/properties/SectionAnchorPropertiesSection.tsx",
-        "src/components/sidebar/PageManagementSection.tsx"
+        "src/components/sidebar/PageManagementSection.tsx",
+        "src/templates/instantiateSectionTemplate.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -2929,7 +2966,9 @@
         "src/projectFiles/createProjectFile.ts",
         "src/projectFiles/readProjectFile.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
-        "src/persistence/indexedDbLocalProjectStorage.ts"
+        "src/persistence/indexedDbLocalProjectStorage.ts",
+        "src/templates/captureSectionTemplate.ts",
+        "src/templates/sectionTemplateStorage.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -3083,7 +3122,8 @@
         "src/state/usePageActions.ts",
         "src/components/sidebar/ProjectFileControls.tsx",
         "src/components/sidebar/WebsiteNavigationSection.tsx",
-        "src/persistence/EditorPersistenceProvider.tsx"
+        "src/persistence/EditorPersistenceProvider.tsx",
+        "src/templates/SectionTemplateLibraryProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -3790,6 +3830,23 @@
             "import"
           ],
           "resolved": "src/state/editorProjectAction.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./insertElementsToActivePage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/insertElementsToActivePage.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4684,6 +4741,58 @@
             "import"
           ],
           "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/state/editorProjectReducer.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/insertElementsToActivePage.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProjectValidation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProjectValidation.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -10310,6 +10419,23 @@
         },
         {
           "dynamic": false,
+          "module": "./SaveSectionTemplateControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/properties/SaveSectionTemplateControl.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./SectionAnchorPropertiesSection",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -12130,6 +12256,186 @@
       "valid": true
     },
     {
+      "source": "src/components/properties/SaveSectionTemplateControl.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../templates/useSectionTemplateLibrary",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/useSectionTemplateLibrary.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/properties/RightPropertiesPanel.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/templates/useSectionTemplateLibrary.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./sectionTemplateLibraryContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplateLibraryContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/properties/SaveSectionTemplateControl.tsx",
+        "src/components/sidebar/SectionTemplateLibraryPanel.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/templates/sectionTemplateLibraryContext.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./sectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/templates/useSectionTemplateLibrary.ts",
+        "src/templates/SectionTemplateLibraryProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/templates/sectionTemplate.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/templates/sectionTemplateLibraryContext.ts",
+        "src/templates/SectionTemplateLibraryProvider.tsx",
+        "src/templates/captureSectionTemplate.ts",
+        "src/templates/instantiateSectionTemplate.ts",
+        "src/templates/sectionTemplateStorage.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/components/properties/SectionAnchorPropertiesSection.tsx",
       "dependencies": [
         {
@@ -13017,6 +13323,23 @@
         },
         {
           "dynamic": false,
+          "module": "./SectionTemplateLibraryPanel",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/sidebar/SectionTemplateLibraryPanel.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./SidebarIcon",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -13283,6 +13606,40 @@
             "import"
           ],
           "resolved": "src/components/sidebar/SidebarIcon.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/ElementsPanel.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/sidebar/SectionTemplateLibraryPanel.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../templates/useSectionTemplateLibrary",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/useSectionTemplateLibrary.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -15100,6 +15457,524 @@
       "valid": true
     },
     {
+      "source": "src/templates/SectionTemplateLibraryProvider.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/useImageAssetStore",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/images/useImageAssetStore.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/createStableId",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/createStableId.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProjectValidation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProjectValidation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../state/useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./captureSectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/captureSectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./instantiateSectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/instantiateSectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sectionTemplateLibraryContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplateLibraryContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sectionTemplateStorage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplateStorage.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/templates/captureSectionTemplate.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../projectFiles/projectAssetReferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectAssetReferences.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/templates/SectionTemplateLibraryProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/templates/instantiateSectionTemplate.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/createStableId",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/createStableId.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/siteStructure",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/siteStructure.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/templates/SectionTemplateLibraryProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/templates/sectionTemplateStorage.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorElementValidation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorElementValidation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../projectFiles/projectAssetReferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectAssetReferences.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sectionTemplate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/templates/sectionTemplate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/templates/SectionTemplateLibraryProvider.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/main.tsx",
       "dependencies": [
         {
@@ -15172,8 +16047,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 191,
-    "totalDependenciesCruised": 659,
+    "totalCruised": 201,
+    "totalDependenciesCruised": 698,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
