@@ -1,0 +1,53 @@
+.mobile-properties {
+  margin: 0 0 28px;
+}
+
+.mobile-properties__status {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  background: var(--portal-control-subtle);
+  font-size: 13px;
+}
+
+.mobile-properties__status span {
+  color: var(--portal-text-muted);
+}
+
+.mobile-properties__actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mobile-properties__actions button {
+  min-height: 38px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.mobile-properties__actions button:hover:not(:disabled) {
+  background: var(--portal-control-hover);
+  border-color: var(--portal-border-strong);
+}
+
+.mobile-properties__actions button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.mobile-properties__actions button:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
+}
