@@ -101,7 +101,7 @@ export function instantiateSectionTemplate(
     elements,
     selectedElementId: section.id,
     assets: template.assets.map((asset) => ({
-      assetId: assetIdMap.get(asset.assetId) ?? createStableId(),
+      assetId: assetIdMap.get(asset.assetId) ?? createImageAssetId(),
       metadata: { ...asset.metadata },
       file: asset.file,
     })),
