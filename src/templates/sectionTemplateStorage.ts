@@ -2,7 +2,10 @@ import { isValidEditorElement } from '../model/editorElementValidation'
 import {
   isImageAssetId,
   isValidImageAssetMetadata,
+  type ImageAssetId,
+  type ImageAssetMetadata,
 } from '../model/imageAsset'
+import { imageAssetMetadataEqual } from '../projectFiles/projectAssetReferences'
 import {
   isValidSectionTemplateName,
   SECTION_TEMPLATE_VERSION,
@@ -80,7 +83,41 @@ export function isValidSectionTemplate(value: unknown): value is SectionTemplate
     Array.isArray(template.assets) &&
     template.assets.every(isValidAsset) &&
     new Set(template.assets.map((asset) => asset.assetId)).size ===
-      template.assets.length
+      template.assets.length &&
+    hasCompleteAssetSet(template as SectionTemplate)
+  )
+}
+
+
+function getElementAssetReference(
+  element: import('../model/editorProject').EditorElement,
+): { assetId: ImageAssetId; metadata: ImageAssetMetadata } | null {
+  if (element.kind === 'image') {
+    return { assetId: element.assetId, metadata: element.assetMetadata }
+  }
+
+  if (element.kind === 'hero') {
+    return {
+      assetId: element.imageAssetId,
+      metadata: element.imageAssetMetadata,
+    }
+  }
+
+  return null
+}
+
+function hasCompleteAssetSet(template: SectionTemplate) {
+  const assets = new Map(template.assets.map((asset) => [asset.assetId, asset]))
+  const references = template.elements
+    .map(getElementAssetReference)
+    .filter((reference): reference is NonNullable<typeof reference> => reference !== null)
+
+  return (
+    new Set(references.map((reference) => reference.assetId)).size === assets.size &&
+    references.every((reference) => {
+      const asset = assets.get(reference.assetId)
+      return asset && imageAssetMetadataEqual(reference.metadata, asset.metadata)
+    })
   )
 }
 
