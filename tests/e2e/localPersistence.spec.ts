@@ -49,3 +49,67 @@ test('autosave restores project structure and image assets after refresh', async
     )
     .toBe(1)
 })
+
+
+test('manual save persists dirty project immediately', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
+  await page.getByRole('button', { name: '+ Ny side', exact: true }).click()
+
+  await expect(page.locator('.top-toolbar__save-status')).toHaveText(
+    'Ulagrede endringer',
+  )
+  await page.getByRole('button', { name: 'Lagre', exact: true }).click()
+  await expect(page.locator('.top-toolbar__save-status')).toHaveText('Lagret')
+
+  await page.reload()
+  await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
+  await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
+})
+
+test('corrupt local storage is preserved until confirmed reset', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('website-editor', 1)
+      request.addEventListener('success', () => resolve(request.result))
+      request.addEventListener('error', () => reject(request.error))
+    })
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const transaction = database.transaction('project', 'readwrite')
+        transaction.objectStore('project').put({
+          key: 'current',
+          storageVersion: 999,
+          project: { invalid: true },
+        })
+        transaction.addEventListener('complete', () => resolve())
+        transaction.addEventListener('error', () => reject(transaction.error))
+        transaction.addEventListener('abort', () => reject(transaction.error))
+      })
+    } finally {
+      database.close()
+    }
+  })
+
+  await page.reload()
+
+  await expect(
+    page.getByRole('heading', { name: 'Lokalt prosjekt kunne ikke åpnes' }),
+  ).toBeVisible()
+
+  page.once('dialog', (dialog) => dialog.accept())
+  await page
+    .getByRole('button', { name: 'Start nytt lokalt prosjekt' })
+    .click()
+
+  await expect(page.getByLabel('Nettside: Forside')).toBeVisible()
+  await expect(page.locator('.top-toolbar__save-status')).not.toHaveText(
+    'Lagringsfeil',
+  )
+})
