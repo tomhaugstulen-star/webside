@@ -98,7 +98,7 @@ export function PreviewElement({
   return (
     <div
       id={element.kind === 'section' ? element.anchorId : undefined}
-      className={`preview-element preview-element--${element.kind}`}
+      className={`canvas-element canvas-element--${element.kind} preview-element preview-element--${element.kind}`}
       style={style}
       data-element-id={element.id}
     >
