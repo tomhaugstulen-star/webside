@@ -33,6 +33,7 @@
   justify-self: start;
   gap: 8px;
   min-width: 0;
+  flex-wrap: wrap;
 }
 .paint-dialog__header-title {
   flex: 0 0 auto;
@@ -47,6 +48,13 @@
   display: flex;
   gap: 6px;
   justify-self: center;
+}
+.paint-dialog__selection-actions {
+  display: flex;
+  gap: 4px;
+}
+.paint-dialog__selection-actions button {
+  padding-inline: 9px;
 }
 .paint-dialog .paint-dialog__icon-button {
   width: 38px;
@@ -112,6 +120,7 @@
 .paint-dialog button {
   padding: 5px 11px;
   cursor: pointer;
+  font-weight: 600;
 }
 .paint-dialog button:hover:not(:disabled) {
   background: var(--portal-control-hover);
@@ -130,6 +139,8 @@
   justify-content: space-between;
   gap: 8px;
   font-size: 13px;
+  font-weight: 600;
+  color: var(--portal-text);
 }
 .paint-dialog input[type='number'] {
   width: 76px;
@@ -174,10 +185,10 @@
 .paint-dialog__save h3 {
   margin: 0 0 1px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--portal-text-muted);
+  letter-spacing: 0.045em;
+  color: var(--portal-text);
 }
 .paint-dialog__tool-grid,
 .paint-dialog__action-grid {
@@ -210,7 +221,9 @@
   margin: 0;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--portal-text-muted);
+  font-weight: 600;
+  color: var(--portal-text);
+  opacity: 0.82;
   overflow-wrap: anywhere;
 }
 .paint-dialog__canvas-scroll {
