@@ -7,6 +7,7 @@ import type {
   ResponsiveViewport,
 } from './editorProject'
 import type { ElementLayout } from './elementLayout'
+import { normalizeContainedImageLayout } from './containedImageLayout'
 
 function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(Math.max(value, minimum), maximum)
@@ -84,10 +85,14 @@ export function resolveResponsiveElementLayout(
   }
 
   if (viewport === 'desktop') {
-    return {
+    const layout = {
       position: { ...element.position.desktop },
       size: { ...element.size.desktop },
     }
+
+    return element.kind === 'image' && element.mode === 'contain'
+      ? normalizeContainedImageLayout(element.assetMetadata, layout, canvasWidth)
+      : layout
   }
 
   const inheritedSize = getInheritedMobileSize(element, canvasWidth)
@@ -102,5 +107,9 @@ export function resolveResponsiveElementLayout(
     ? { ...element.position.mobile }
     : inheritedPosition
 
-  return { position, size }
+  const layout = { position, size }
+
+  return element.kind === 'image' && element.mode === 'contain'
+    ? normalizeContainedImageLayout(element.assetMetadata, layout, canvasWidth)
+    : layout
 }
