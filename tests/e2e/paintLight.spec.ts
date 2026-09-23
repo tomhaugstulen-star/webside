@@ -81,6 +81,7 @@ test('edits a copy of an image with history, crop and project save', async ({ pa
   await picker.getByRole('button', { name: 'original.png' }).click()
   const dialog = page.getByRole('dialog', { name: 'Rediger bilde' })
   await expect(dialog).toBeVisible()
+  await expect(dialog.getByLabel('Bildeverktøy og innstillinger')).toBeVisible()
   const canvas = dialog.getByLabel('Bildearbeidsflate')
   await expect.poll(() => canvas.evaluate((node: HTMLCanvasElement) => node.width)).toBe(160)
 
