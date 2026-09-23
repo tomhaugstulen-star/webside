@@ -1,46 +1,57 @@
 import { useId } from 'react'
+import type { EditorFill } from '../../model/editorFill'
 import {
   getProjectColorGroups,
   type ProjectColorTarget,
+  type ProjectFillTarget,
 } from '../../model/projectColorEntries'
 import { useEditorProject } from '../../state/useEditorProject'
 import { useProjectColors } from '../../state/useProjectColors'
+import { BackgroundFillControl } from '../colors/BackgroundFillControl'
 import { ColorSwatchInput } from '../colors/ColorSwatchInput'
 
 export function ColorsPanel() {
   const { activePage } = useEditorProject()
   const {
-    updatePageBackgroundColor,
-    updateSectionBackgroundColor,
+    updatePageBackgroundFill,
+    updateSectionBackgroundFill,
     updateSectionFrameColor,
-    updateTextBackgroundColor,
+    updateTextBackgroundFill,
     updateTextColor,
-    updateHeaderBackgroundColor,
+    updateHeaderBackgroundFill,
     updateHeaderTextColor,
     updateHeaderFrameColor,
   } = useProjectColors()
   const idPrefix = useId()
   const groups = getProjectColorGroups(activePage)
 
-  const updateColor = (target: ProjectColorTarget, value: string) => {
+  const updateFill = (target: ProjectFillTarget, fill: EditorFill) => {
     switch (target.type) {
       case 'page-background':
-        updatePageBackgroundColor(value)
+        updatePageBackgroundFill(fill)
         return
       case 'section-background':
-        updateSectionBackgroundColor(target.elementId, value)
+        updateSectionBackgroundFill(target.elementId, fill)
         return
+      case 'text-background':
+        updateTextBackgroundFill(target.elementId, fill)
+        return
+      case 'header-background':
+        updateHeaderBackgroundFill(target.elementId, fill)
+        return
+    }
+
+    const unhandledTarget: never = target
+    return unhandledTarget
+  }
+
+  const updateColor = (target: ProjectColorTarget, value: string) => {
+    switch (target.type) {
       case 'section-frame':
         updateSectionFrameColor(target.elementId, value)
         return
-      case 'text-background':
-        updateTextBackgroundColor(target.elementId, value)
-        return
       case 'text-color':
         updateTextColor(target.elementId, value)
-        return
-      case 'header-background':
-        updateHeaderBackgroundColor(target.elementId, value)
         return
       case 'header-text':
         updateHeaderTextColor(target.elementId, value)
@@ -58,7 +69,7 @@ export function ColorsPanel() {
     <div className="colors-panel">
       <h2>Farger</h2>
       <p className="panel-intro">
-        Endre fargen på én bestemt del. Andre deler med samme farge påvirkes ikke.
+        Endre bakgrunn, gradient og enkeltfarger. Andre deler påvirkes ikke.
       </p>
 
       <div className="colors-panel__groups">
@@ -66,26 +77,33 @@ export function ColorsPanel() {
           const titleId = `${idPrefix}-${group.id}-title`
 
           return (
-            <section
-              key={group.id}
-              className="colors-panel__group"
-              aria-labelledby={titleId}
-            >
+            <section key={group.id} className="colors-panel__group" aria-labelledby={titleId}>
               <div className="colors-panel__group-heading">
                 <h3 id={titleId}>{group.label}</h3>
-                {group.locked && <span> Låst</span>}
+                {group.locked && <span>Låst</span>}
               </div>
 
               <div className="colors-panel__fields">
                 {group.entries.map((entry) => (
-                  <ColorSwatchInput
-                    key={entry.id}
-                    id={`${idPrefix}-${entry.id}`}
-                    label={entry.label}
-                    value={entry.value}
-                    disabled={entry.disabled}
-                    onChange={(value) => updateColor(entry.target, value)}
-                  />
+                  <div className="colors-panel__field" key={entry.id}>
+                    {entry.kind === 'fill' ? (
+                      <BackgroundFillControl
+                        id={`${idPrefix}-${entry.id}`}
+                        label={entry.label}
+                        fill={entry.fill}
+                        disabled={entry.disabled}
+                        onChange={(fill) => updateFill(entry.target, fill)}
+                      />
+                    ) : (
+                      <ColorSwatchInput
+                        id={`${idPrefix}-${entry.id}`}
+                        label={entry.label}
+                        value={entry.value}
+                        disabled={entry.disabled}
+                        onChange={(value) => updateColor(entry.target, value)}
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
             </section>
