@@ -65,6 +65,7 @@ hard grense: 300+ linjer, alltid blokkert
 
 - Gjeldende prosjektskjema er 13.
 - `EditorProject` eier alle varige serialiserbare prosjektdata.
+- Bakgrunnsfyll lagres som typet `EditorFill`: helfarge eller lineær gradient med nøyaktig to fargestopp og vinkel 0–360°. Rå CSS-gradientstrenger er ikke prosjektdata.
 - Varige prosjektendringer går gjennom typede reducerhandlinger.
 - Reduceren er siste mutasjonsgrense.
 - Ugyldige, låste og uendrede handlinger returnerer samme state.
