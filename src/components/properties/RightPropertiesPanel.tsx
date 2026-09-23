@@ -14,6 +14,7 @@ const elementKindLabels: Record<ElementKind, string> = {
   text: 'Tekst',
   button: 'Knapp',
   header: 'Header',
+  hero: 'Hero',
 }
 
 type RightPropertiesPanelProps = {
