@@ -87,7 +87,13 @@ export function reduceHeroProjectAction(
             return null
           }
 
-          return { ...element, title, subtitle, ctaLabel }
+          return {
+            ...element,
+            title,
+            subtitle,
+            ctaLabel,
+            ctaLink: ctaLabel ? element.ctaLink : { type: 'none' },
+          }
         },
       )
 

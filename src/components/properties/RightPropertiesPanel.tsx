@@ -4,6 +4,7 @@ import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
 import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
+import { HeaderPropertiesSection } from './HeaderPropertiesSection'
 import { HeroPropertiesSection } from './HeroPropertiesSection'
 import { ImagePropertiesSection } from './ImagePropertiesSection'
 import { SectionAnchorPropertiesSection } from './SectionAnchorPropertiesSection'
@@ -62,6 +63,10 @@ export function RightPropertiesPanel({
             </div>
 
             {element.kind === 'header' && (
+              <HeaderPropertiesSection key={element.id} element={element} />
+            )}
+
+            {element.kind === 'header' && (
               <HeaderFontPropertiesSection element={element} />
             )}
 
@@ -94,7 +99,7 @@ export function RightPropertiesPanel({
 
             {(element.kind === 'text' ||
               element.kind === 'button' ||
-              element.kind === 'hero') && (
+              (element.kind === 'hero' && element.ctaLabel)) && (
               <ElementLinkPropertiesSection element={element} />
             )}
 

@@ -11,8 +11,9 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
 - #67 er fullført og merget i PR #72: typet helfarge/lineær gradient og schema 13
 - fase 20 er fullført og merget i PR #74
-- fase 21 er fullført og merget i PR #76; neste roadmapfase er 22
-- separat forbedring av Prosjekt-panelet og nettstedmenyen er under arbeid på `feature/project-panel-menu-usability`
+- fase 21 er fullført og merget i PR #76
+- forbedring av Prosjekt-panelet og nettstedmenyen er fullført og merget i PR #78
+- fase 22 er aktiv i sak #79 på `feature/phase-22-header-editing`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch

@@ -44,11 +44,11 @@
 }
 
 .colors-panel__field > .color-swatch-input {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 7px;
 }
 
 .colors-panel__field > .color-swatch-input > .color-swatch-input__control {
-  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
 }

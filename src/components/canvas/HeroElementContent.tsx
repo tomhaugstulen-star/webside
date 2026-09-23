@@ -23,11 +23,15 @@ export function HeroElementContent({
       )}
 
       <div className="hero-element__copy">
-        <strong className="hero-element__title">{element.title}</strong>
+        {element.title && (
+          <strong className="hero-element__title">{element.title}</strong>
+        )}
         {element.subtitle && (
           <span className="hero-element__subtitle">{element.subtitle}</span>
         )}
-        <span className="hero-element__cta">{element.ctaLabel}</span>
+        {element.ctaLabel && (
+          <span className="hero-element__cta">{element.ctaLabel}</span>
+        )}
       </div>
     </div>
   )
