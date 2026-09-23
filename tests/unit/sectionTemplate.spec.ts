@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { createEditorElement } from '../../src/model/createEditorElement'
 import { createBlankProject } from '../../src/model/createEditorProject'
 import type { EditorElement, EditorPage } from '../../src/model/editorProject'
+import { createImageAssetId } from '../../src/model/imageAsset'
 import { captureSectionTemplate } from '../../src/templates/captureSectionTemplate'
 import { instantiateSectionTemplate } from '../../src/templates/instantiateSectionTemplate'
 import type { SectionTemplate } from '../../src/templates/sectionTemplate'
@@ -138,4 +139,58 @@ test('template insertion is one undoable editor history mutation', () => {
 
   const redone = editorHistoryReducer(undone, { type: 'redo' })
   expect(redone.present.project.pages[0].elements).toHaveLength(2)
+})
+
+
+test('captures image assets and remaps them when a template is inserted', () => {
+  const sourceSection = section('section-image', 0, 0, 'bilder')
+  const assetId = createImageAssetId()
+  const file = new File([new Uint8Array([1])], 'template.png', {
+    type: 'image/png',
+  })
+  const metadata = {
+    fileName: 'template.png',
+    mimeType: 'image/png' as const,
+    byteSize: 1,
+    width: 1,
+    height: 1,
+  }
+  const created = createEditorElement({
+    id: 'image-1',
+    request: { kind: 'image', assetId, assetMetadata: metadata },
+    existingElements: [],
+  })
+  if (created.kind !== 'image') throw new Error('Expected image')
+  const image: EditorElement = {
+    ...created,
+    position: { desktop: { x: 20, y: 20 } },
+    size: { desktop: { width: 100, height: 100 } },
+  }
+
+  const template = captureSectionTemplate(
+    page([sourceSection, image]),
+    sourceSection.id,
+    { id: 'template-image', name: 'Bildeblokk', createdAt: AT },
+    (requestedId) =>
+      requestedId === assetId
+        ? { file, objectUrl: 'blob:test', metadata }
+        : null,
+  )
+
+  expect(template).not.toBeNull()
+  expect(template?.assets).toHaveLength(1)
+
+  const insertion = instantiateSectionTemplate(template!, [])
+  expect(insertion).not.toBeNull()
+  expect(insertion?.assets).toHaveLength(1)
+  expect(insertion?.assets[0].assetId).not.toBe(assetId)
+
+  const insertedImage = insertion?.elements.find(
+    (element) => element.kind === 'image',
+  )
+  expect(insertedImage?.kind).toBe('image')
+  if (!insertedImage || insertedImage.kind !== 'image') {
+    throw new Error('Expected inserted image')
+  }
+  expect(insertedImage.assetId).toBe(insertion?.assets[0].assetId)
 })
