@@ -113,6 +113,9 @@ test.describe('site structure model', () => {
     const page = project.pages[0]
     const first = createSection('legacy-section-a')
     const second = createSection('legacy-section-b', [first])
+    if (page.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid page.')
+    if (first.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid section.')
+    if (second.appearance.backgroundFill.type !== 'solid') throw new Error('Expected solid section.')
 
     const legacy: EditorProjectV10 = {
       schemaVersion: 10,
@@ -123,7 +126,7 @@ test.describe('site structure model', () => {
           id: page.id,
           name: page.name,
           slug: page.slug,
-          appearance: page.appearance,
+          appearance: { backgroundColor: page.appearance.backgroundFill.color },
           elements: [
             {
               id: first.id,
@@ -132,7 +135,10 @@ test.describe('site structure model', () => {
               size: first.size,
               visibility: first.visibility,
               locked: first.locked,
-              appearance: first.appearance,
+              appearance: {
+                backgroundColor: first.appearance.backgroundFill.color,
+                frame: first.appearance.frame,
+              },
             },
             {
               id: second.id,
@@ -141,7 +147,10 @@ test.describe('site structure model', () => {
               size: second.size,
               visibility: second.visibility,
               locked: second.locked,
-              appearance: second.appearance,
+              appearance: {
+                backgroundColor: second.appearance.backgroundFill.color,
+                frame: second.appearance.frame,
+              },
             },
           ],
         },
