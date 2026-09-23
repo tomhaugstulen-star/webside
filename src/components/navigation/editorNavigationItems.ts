@@ -18,6 +18,7 @@ export const navigatorKindLabels: Record<ElementKind, string> = {
   text: 'Tekst',
   button: 'Knapp',
   header: 'Header',
+  hero: 'Hero',
 }
 
 function getKindOrdinal(page: EditorPage, elementIndex: number) {
@@ -44,6 +45,8 @@ export function getNavigatorElementName(
       return element.assetMetadata.fileName
     case 'header':
       return element.siteName.trim() || 'Header'
+    case 'hero':
+      return element.title.trim() || 'Hero'
     case 'section':
       return `Seksjon ${getKindOrdinal(page, elementIndex)}`
   }
