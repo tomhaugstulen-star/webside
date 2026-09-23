@@ -1,4 +1,9 @@
 import {
+  createDefaultSolidFill,
+  isEditorFill,
+  type EditorFill,
+} from './editorFill'
+import {
   createEditorColor,
   isEditorColor,
   type EditorColor,
@@ -16,7 +21,7 @@ import {
 } from './textElementStyle'
 
 export type HeaderAppearance = {
-  backgroundColor: EditorColor
+  backgroundFill: EditorFill
   textColor: EditorColor
   fontFamily: TextFontFamily
   fontSize: TextFontSize
@@ -24,7 +29,7 @@ export type HeaderAppearance = {
 }
 
 export const DEFAULT_HEADER_APPEARANCE: HeaderAppearance = {
-  backgroundColor: createEditorColor('#FFFFFF'),
+  backgroundFill: createDefaultSolidFill('#FFFFFF'),
   textColor: createEditorColor('#282421'),
   fontFamily: 'system',
   fontSize: 24,
@@ -42,7 +47,7 @@ export function isValidHeaderAppearance(
 
   return (
     Object.keys(appearance).length === 5 &&
-    isEditorColor(appearance.backgroundColor) &&
+    isEditorFill(appearance.backgroundFill) &&
     isEditorColor(appearance.textColor) &&
     isTextFontFamily(appearance.fontFamily) &&
     isTextFontSize(appearance.fontSize) &&
