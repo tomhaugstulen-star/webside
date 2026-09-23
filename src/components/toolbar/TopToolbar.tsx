@@ -12,6 +12,10 @@ type TopToolbarProps = {
   viewport: ViewportMode
   onPageChange: (pageId: string) => void
   onViewportChange: (viewport: ViewportMode) => void
+  canUndo: boolean
+  canRedo: boolean
+  onUndo: () => void
+  onRedo: () => void
 }
 
 type IconName =
@@ -74,6 +78,10 @@ export function TopToolbar({
   viewport,
   onPageChange,
   onViewportChange,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -151,8 +159,26 @@ export function TopToolbar({
       </div>
 
       <div className="top-toolbar__history" aria-label="Historikk">
-        <button className="toolbar-icon-button" type="button" aria-label="Angre" disabled title="Kommer senere"><Icon name="undo" /></button>
-        <button className="toolbar-icon-button" type="button" aria-label="Gjør om" disabled title="Kommer senere"><Icon name="redo" /></button>
+        <button
+          className="toolbar-icon-button"
+          type="button"
+          aria-label="Angre"
+          disabled={!canUndo}
+          title="Angre (Ctrl/Cmd+Z)"
+          onClick={onUndo}
+        >
+          <Icon name="undo" />
+        </button>
+        <button
+          className="toolbar-icon-button"
+          type="button"
+          aria-label="Gjør om"
+          disabled={!canRedo}
+          title="Gjør om (Ctrl+Y / Ctrl/Cmd+Shift+Z)"
+          onClick={onRedo}
+        >
+          <Icon name="redo" />
+        </button>
       </div>
 
       <div className="top-toolbar__actions">
