@@ -119,6 +119,41 @@ test('instantiation creates new ids, a unique anchor and preserves relative offs
   ).toBe(60)
 })
 
+test('restores the saved section position after its original contents are deleted', () => {
+  const sourceSection = section('source', 20, 100)
+  const child = text('child', 60, 160)
+  const template: SectionTemplate = {
+    version: 1,
+    id: 'saved-section',
+    name: 'Lagret seksjon',
+    createdAt: AT,
+    elements: [sourceSection, child],
+    assets: [],
+  }
+  const distantElement = text('other', 60, 900)
+
+  const restored = instantiateSectionTemplate(template, [distantElement])
+  expect(restored?.elements.map((element) => element.position.desktop)).toEqual([
+    sourceSection.position.desktop,
+    child.position.desktop,
+  ])
+  expect(restored?.elements.map((element) => element.position.mobile)).toEqual([
+    sourceSection.position.mobile,
+    child.position.mobile,
+  ])
+
+  const duplicated = instantiateSectionTemplate(template, [sourceSection, child])
+  const duplicatedSection = duplicated?.elements.find((element) => element.kind === 'section')
+  const duplicatedChild = duplicated?.elements.find((element) => element.kind === 'text')
+  expect(duplicatedSection?.position.desktop.y).toBeGreaterThan(
+    sourceSection.position.desktop.y + sourceSection.size.desktop.height,
+  )
+  expect(
+    (duplicatedChild?.position.desktop.y ?? 0) -
+      (duplicatedSection?.position.desktop.y ?? 0),
+  ).toBe(60)
+})
+
 test('template insertion is one undoable editor history mutation', () => {
   const initial = getInitialEditorHistoryState()
   const sourceSection = section('new-section', 20, 100, 'mal')

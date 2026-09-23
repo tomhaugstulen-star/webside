@@ -22,6 +22,26 @@ function getNextInsertionY(elements: readonly EditorElement[]) {
   ) + 32
 }
 
+function getInsertionY(
+  section: EditorElement,
+  targetElements: readonly EditorElement[],
+) {
+  const { x, y } = section.position.desktop
+  const { width, height } = section.size.desktop
+  const spaceIsFree = targetElements.every((element) => {
+    const position = element.position.desktop
+    const size = element.size.desktop
+    return (
+      x + width <= position.x ||
+      position.x + size.width <= x ||
+      y + height <= position.y ||
+      position.y + size.height <= y
+    )
+  })
+
+  return spaceIsFree ? y : getNextInsertionY(targetElements)
+}
+
 function remapElementAsset(
   element: EditorElement,
   assetIds: ReadonlyMap<ImageAssetId, ImageAssetId>,
@@ -66,7 +86,7 @@ export function instantiateSectionTemplate(
     asset.assetId,
     createImageAssetId(),
   ]))
-  const insertY = getNextInsertionY(targetElements)
+  const insertY = getInsertionY(sourceSection, targetElements)
   const yOffset = insertY - sourceSection.position.desktop.y
 
   const elements = template.elements.map((source) => {
