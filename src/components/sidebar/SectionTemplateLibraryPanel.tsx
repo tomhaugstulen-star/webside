@@ -41,7 +41,7 @@ export function SectionTemplateLibraryPanel({
 
   return (
     <>
-      <button className="panel-back-button" type="button" onClick={onBack}>
+      <button className="button-library-back" type="button" onClick={onBack}>
         ← Elementer
       </button>
       <h2>Maler</h2>
