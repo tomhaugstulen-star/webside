@@ -35,23 +35,20 @@
   display: grid;
 }
 
-.colors-panel__fields .color-swatch-input {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
-  min-height: 62px;
-  padding: 0 16px;
+.colors-panel__field {
+  padding: 12px 16px;
 }
 
-.colors-panel__fields .color-swatch-input + .color-swatch-input {
+.colors-panel__field + .colors-panel__field {
   border-top: 1px solid var(--portal-border);
 }
 
-.colors-panel__fields .color-swatch-input__control {
-  justify-content: flex-end;
+.colors-panel__field .color-swatch-input {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
 }
 
-.colors-panel__fields .color-swatch-input__value {
-  min-width: 66px;
-  text-align: right;
+.colors-panel__field .color-swatch-input__control {
+  justify-content: flex-end;
 }
