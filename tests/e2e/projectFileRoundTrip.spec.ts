@@ -24,7 +24,7 @@ test('project file round-trip restores pages and imported image assets', async (
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Elementer', exact: true }).click()
-  const imageInput = page.locator('.image-import-control__input')
+  const imageInput = page.locator('.image-import-control:has(.element-card--image) input[type="file"]')
   await imageInput.setInputFiles({
     name: 'pixel.png',
     mimeType: 'image/png',
