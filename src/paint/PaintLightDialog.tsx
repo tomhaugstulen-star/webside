@@ -120,83 +120,109 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             <button type="button" onClick={onClose} disabled={busy} aria-label="Lukk bildeeditor">Lukk</button>
           </div>
         </header>
-        <div className="paint-dialog__tools" role="group" aria-label="Bildeverktøy">
-          {tools.map((item) => (
-            <button key={item.id} type="button" aria-pressed={tool === item.id} disabled={importPending}
-              onClick={() => setTool(item.id)}>{item.label}</button>
-          ))}
-          <label>Farge <input type="color" value={color} onChange={(event) => setColor(event.target.value)} /></label>
-          <label>Størrelse <input type="number" min="1" max="100" value={size}
-            onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
-        </div>
-        <div className="paint-dialog__tools" role="group" aria-label="Importer og slå sammen bilder">
-          <input ref={importInputRef} className="paint-dialog__file-input" type="file"
-            accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
-            onChange={(event) => {
-              const next = event.target.files?.[0]
-              event.target.value = ''
-              if (next) void importActions.importFile(next).then(() => {
-                paint.clearSelection()
-                setTool('select')
-                setMessage(null)
-              }).catch((error: unknown) => setMessage(
-                error instanceof Error ? error.message : 'Bildet kunne ikke importeres.',
-              ))
-            }} />
-          <button type="button" disabled={!paint.ready || importPending}
-            onClick={() => importInputRef.current?.click()}>Importer til lerret…</button>
-          {importPending && <>
-            <span>Flytt bildet på lerretet, og trykk Slå sammen.</span>
-            <button type="button" onClick={importActions.merge}>Slå sammen</button>
-            <button type="button" onClick={importActions.cancel}>Fjern import</button>
-          </>}
-        </div>
-        <div className="paint-dialog__tools" role="group" aria-label="Markering og historikk">
-          <button type="button" disabled={!paint.selection || importPending} onClick={paint.copy}>Kopier</button>
-          <button type="button" disabled={!paint.selection || importPending} onClick={paint.cut}>Klipp ut</button>
-          <button type="button" disabled={!paint.canPaste || importPending} onClick={paint.paste}>Lim inn</button>
-          <button type="button" disabled={!paint.selection || importPending} onClick={paint.crop}>Beskjær</button>
-          <button type="button" disabled={!paint.canUndo || importPending} onClick={() => void paint.undo()}>Angre</button>
-          <button type="button" disabled={!paint.canRedo || importPending} onClick={() => void paint.redo()}>Gjør om</button>
-        </div>
-        <div className="paint-dialog__canvas-scroll">
-          <div className="paint-dialog__canvas-wrap" style={{ width: paint.width || 1 }}>
-            <canvas ref={canvasRef} aria-label="Bildearbeidsflate"
-              onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
-              onPointerUp={paint.onPointerUp} onPointerCancel={paint.onPointerUp} />
-            <canvas ref={overlayRef} aria-hidden="true" />
-            <canvas ref={importOverlayRef} className="paint-dialog__import-overlay"
-              aria-label="Flytt importert bilde" style={{ pointerEvents: importPending ? 'auto' : 'none' }}
-              onPointerDown={importActions.onPointerDown} onPointerMove={importActions.onPointerMove}
-              onPointerUp={importActions.onPointerUp} onPointerCancel={importActions.onPointerUp} />
+
+        <div className="paint-dialog__workspace">
+          <aside className="paint-dialog__sidebar" aria-label="Bildeverktøy og innstillinger">
+            <div className="paint-dialog__panel-group" role="group" aria-label="Bildeverktøy">
+              <h3>Verktøy</h3>
+              <div className="paint-dialog__tool-grid">
+                {tools.map((item) => (
+                  <button key={item.id} type="button" aria-pressed={tool === item.id}
+                    disabled={importPending} onClick={() => setTool(item.id)}>{item.label}</button>
+                ))}
+              </div>
+              <label>Farge <input type="color" value={color}
+                onChange={(event) => setColor(event.target.value)} /></label>
+              <label>Størrelse <input type="number" min="1" max="100" value={size}
+                onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
+            </div>
+
+            <div className="paint-dialog__panel-group" role="group"
+              aria-label="Importer og slå sammen bilder">
+              <h3>Importer</h3>
+              <input ref={importInputRef} className="paint-dialog__file-input" type="file"
+                accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
+                onChange={(event) => {
+                  const next = event.target.files?.[0]
+                  event.target.value = ''
+                  if (next) void importActions.importFile(next).then(() => {
+                    paint.clearSelection()
+                    setTool('select')
+                    setMessage(null)
+                  }).catch((error: unknown) => setMessage(
+                    error instanceof Error ? error.message : 'Bildet kunne ikke importeres.',
+                  ))
+                }} />
+              <button type="button" disabled={!paint.ready || importPending}
+                onClick={() => importInputRef.current?.click()}>Importer til lerret…</button>
+              {importPending && <>
+                <span className="paint-dialog__hint">Flytt bildet på lerretet, og trykk Slå sammen.</span>
+                <button type="button" onClick={importActions.merge}>Slå sammen</button>
+                <button type="button" onClick={importActions.cancel}>Fjern import</button>
+              </>}
+            </div>
+
+            <div className="paint-dialog__panel-group" role="group" aria-label="Markering og historikk">
+              <h3>Markering og historikk</h3>
+              <div className="paint-dialog__action-grid">
+                <button type="button" disabled={!paint.selection || importPending} onClick={paint.copy}>Kopier</button>
+                <button type="button" disabled={!paint.selection || importPending} onClick={paint.cut}>Klipp ut</button>
+                <button type="button" disabled={!paint.canPaste || importPending} onClick={paint.paste}>Lim inn</button>
+                <button type="button" disabled={!paint.selection || importPending} onClick={paint.crop}>Beskjær</button>
+                <button type="button" disabled={!paint.canUndo || importPending}
+                  onClick={() => void paint.undo()}>Angre</button>
+                <button type="button" disabled={!paint.canRedo || importPending}
+                  onClick={() => void paint.redo()}>Gjør om</button>
+              </div>
+            </div>
+
+            <fieldset className="paint-dialog__resize">
+              <legend>Bildestørrelse</legend>
+              <p className="paint-dialog__meta">{file.name}<br />{paint.width} × {paint.height} px</p>
+              <label>Bredde <input type="number" min="1" max="16384" value={newWidth || ''}
+                onChange={(event) => setDimension('width', Number(event.target.value))} /></label>
+              <label>Høyde <input type="number" min="1" max="16384" value={newHeight || ''}
+                onChange={(event) => setDimension('height', Number(event.target.value))} /></label>
+              <label><input type="checkbox" checked={lockRatio}
+                onChange={(event) => setLockRatio(event.target.checked)} /> Lås proporsjoner</label>
+              <button type="button" onClick={applyResize}
+                disabled={!paint.ready || importPending}>Endre størrelse</button>
+              <button type="button" disabled={importPending} onClick={() => {
+                setNewWidth(1920); setNewHeight(1080); setLockRatio(false)
+              }}>Hero 16:9 · 1920 × 1080</button>
+            </fieldset>
+
+            <div className="paint-dialog__save">
+              <h3>Lagre</h3>
+              <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
+              <label>Format <select value={format} onChange={(event) =>
+                setFormat(event.target.value as SupportedImageMimeType)}>
+                <option value="image/png">PNG</option><option value="image/jpeg">JPEG</option>
+                <option value="image/webp">WebP</option>
+              </select></label>
+              <button type="button" disabled={!paint.ready || busy || importPending}
+                onClick={() => void save()}>Lagre som nytt bilde på siden</button>
+              <button type="button" disabled={!paint.ready || busy || importPending}
+                onClick={() => void exportFile()}>Eksporter til fil…</button>
+            </div>
+
+            {(message || paint.error) &&
+              <p className="paint-dialog__message" role="status">{message || paint.error}</p>}
+          </aside>
+
+          <div className="paint-dialog__canvas-scroll">
+            <div className="paint-dialog__canvas-wrap" style={{ width: paint.width || 1 }}>
+              <canvas ref={canvasRef} aria-label="Bildearbeidsflate"
+                onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
+                onPointerUp={paint.onPointerUp} onPointerCancel={paint.onPointerUp} />
+              <canvas ref={overlayRef} aria-hidden="true" />
+              <canvas ref={importOverlayRef} className="paint-dialog__import-overlay"
+                aria-label="Flytt importert bilde" style={{ pointerEvents: importPending ? 'auto' : 'none' }}
+                onPointerDown={importActions.onPointerDown} onPointerMove={importActions.onPointerMove}
+                onPointerUp={importActions.onPointerUp} onPointerCancel={importActions.onPointerUp} />
+            </div>
           </div>
         </div>
-        <div className="paint-dialog__bottom">
-          <fieldset className="paint-dialog__resize">
-            <legend>Bildestørrelse · original {file.name} · {paint.width} × {paint.height} px</legend>
-            <label>Bredde <input type="number" min="1" max="16384" value={newWidth || ''}
-              onChange={(event) => setDimension('width', Number(event.target.value))} /></label>
-            <label>Høyde <input type="number" min="1" max="16384" value={newHeight || ''}
-              onChange={(event) => setDimension('height', Number(event.target.value))} /></label>
-            <label><input type="checkbox" checked={lockRatio}
-              onChange={(event) => setLockRatio(event.target.checked)} /> Lås proporsjoner</label>
-            <button type="button" onClick={applyResize} disabled={!paint.ready || importPending}>Endre størrelse</button>
-            <button type="button" disabled={importPending} onClick={() => {
-              setNewWidth(1920); setNewHeight(1080); setLockRatio(false)
-            }}>Hero 16:9 · 1920 × 1080</button>
-          </fieldset>
-          <div className="paint-dialog__save">
-            <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
-            <label>Format <select value={format} onChange={(event) =>
-              setFormat(event.target.value as SupportedImageMimeType)}>
-              <option value="image/png">PNG</option><option value="image/jpeg">JPEG</option>
-              <option value="image/webp">WebP</option>
-            </select></label>
-            <button type="button" disabled={!paint.ready || busy || importPending} onClick={() => void save()}>Lagre som nytt bilde på siden</button>
-            <button type="button" disabled={!paint.ready || busy || importPending} onClick={() => void exportFile()}>Eksporter til fil…</button>
-          </div>
-        </div>
-        {(message || paint.error) && <p className="paint-dialog__message" role="status">{message || paint.error}</p>}
       </section>
     </div>
   )
