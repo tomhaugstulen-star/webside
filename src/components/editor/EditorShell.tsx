@@ -15,6 +15,7 @@ import { ConfirmElementDeletionDialog } from '../dialogs/ConfirmElementDeletionD
 import { RightPropertiesPanel } from '../properties/RightPropertiesPanel'
 import { LeftSidebar } from '../sidebar/LeftSidebar'
 import { TopToolbar } from '../toolbar/TopToolbar'
+import { PreviewShell } from '../preview/PreviewShell'
 import { useElementDeletionShortcut } from './useElementDeletionShortcut'
 import { useSelectedImageCropKeyboard } from './useSelectedImageCropKeyboard'
 import { getEditorHistoryShortcut } from './editorHistoryShortcut'
@@ -29,6 +30,7 @@ export function EditorShell() {
   const [activeTool, setActiveTool] = useState<EditorTool | null>(null)
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
   const {
     activePage,
@@ -111,12 +113,12 @@ export function EditorShell() {
   }
 
   useElementDeletionShortcut({
-    element: selectedElement,
+    element: previewOpen ? null : selectedElement,
     onRequestDeletion: requestElementDeletion,
   })
   useSelectedImageCropKeyboard({
     element: selectedElement,
-    disabled: deletionDialogOpen,
+    disabled: deletionDialogOpen || previewOpen,
     onCommitTransform: updateImageTransform,
   })
 
@@ -124,15 +126,20 @@ export function EditorShell() {
     const handleKeyDown = (event: KeyboardEvent) => {
       const historyShortcut = getEditorHistoryShortcut(event)
 
-      if (historyShortcut === 'undo' && canUndo) {
+      if (!previewOpen && historyShortcut === 'undo' && canUndo) {
         event.preventDefault()
         undo()
         return
       }
 
-      if (historyShortcut === 'redo' && canRedo) {
+      if (!previewOpen && historyShortcut === 'redo' && canRedo) {
         event.preventDefault()
         redo()
+        return
+      }
+
+      if (event.key === 'Escape' && previewOpen) {
+        setPreviewOpen(false)
         return
       }
 
@@ -144,7 +151,7 @@ export function EditorShell() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [canRedo, canUndo, deletionDialogOpen, redo, undo])
+  }, [canRedo, canUndo, deletionDialogOpen, previewOpen, redo, undo])
 
   const duplicateProject = useCallback(() => {
     void downloadDuplicateProject(state.project, getImageAsset)
@@ -157,6 +164,16 @@ export function EditorShell() {
         window.alert('Prosjektkopien kunne ikke opprettes.')
       })
   }, [getImageAsset, state.project])
+
+  if (previewOpen) {
+    return (
+      <PreviewShell
+        viewport={viewport}
+        onViewportChange={setViewport}
+        onClose={() => setPreviewOpen(false)}
+      />
+    )
+  }
 
   const visiblePropertiesElement =
     propertiesPanelOpen && selectedElement ? selectedElement : null
@@ -177,6 +194,11 @@ export function EditorShell() {
         onRedo={redo}
         persistenceStatus={persistenceStatus}
         onDuplicateProject={duplicateProject}
+        onPreview={() => {
+          setActiveTool(null)
+          setPropertiesPanelOpen(false)
+          setPreviewOpen(true)
+        }}
       />
       <div className="editor-shell__body">
         <LeftSidebar
