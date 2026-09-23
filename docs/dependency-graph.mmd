@@ -31,6 +31,7 @@ subgraph src["src"]
     src_model_editorFill_ts["editorFill.ts"]
     src_model_elementFrame_ts["elementFrame.ts"]
     src_model_textElementStyle_ts["textElementStyle.ts"]
+    src_model_heroAppearance_ts["heroAppearance.ts"]
     src_model_imagePresentation_ts["imagePresentation.ts"]
     src_model_navigation_ts["navigation.ts"]
     src_model_pageAppearance_ts["pageAppearance.ts"]
@@ -39,8 +40,10 @@ subgraph src["src"]
     src_model_elementCreation_ts["elementCreation.ts"]
     src_model_elementLayout_ts["elementLayout.ts"]
     src_model_headerElement_ts["headerElement.ts"]
+    src_model_projectImageAssets_ts["projectImageAssets.ts"]
     src_model_resolveResponsiveValue_ts["resolveResponsiveValue.ts"]
     src_model_navigationHref_ts["navigationHref.ts"]
+    src_model_heroElement_ts["heroElement.ts"]
     src_model_siteStructure_ts["siteStructure.ts"]
     src_model_projectColorEntries_ts["projectColorEntries.ts"]
     src_model_editorProjectValidation_ts["editorProjectValidation.ts"]
@@ -68,6 +71,7 @@ subgraph src["src"]
       src_components_canvas_EditorCanvasElementContent_tsx["EditorCanvasElementContent.tsx"]
       src_components_canvas_ButtonElementContent_tsx["ButtonElementContent.tsx"]
       src_components_canvas_HeaderElementContent_tsx["HeaderElementContent.tsx"]
+      src_components_canvas_HeroElementContent_tsx["HeroElementContent.tsx"]
       src_components_canvas_ImageElementContent_tsx["ImageElementContent.tsx"]
       src_components_canvas_useImageCropTransform_ts["useImageCropTransform.ts"]
       src_components_canvas_TextElementEditor_tsx["TextElementEditor.tsx"]
@@ -97,6 +101,8 @@ subgraph src["src"]
       src_components_properties_FramePropertiesSection_tsx["FramePropertiesSection.tsx"]
       src_components_properties_HeaderFontPropertiesSection_tsx["HeaderFontPropertiesSection.tsx"]
       src_components_properties_textFontFamilyLabels_ts["textFontFamilyLabels.ts"]
+      src_components_properties_HeroPropertiesSection_tsx["HeroPropertiesSection.tsx"]
+      src_components_properties_HeroImageProperties_tsx["HeroImageProperties.tsx"]
       src_components_properties_ImagePropertiesSection_tsx["ImagePropertiesSection.tsx"]
       src_components_properties_SectionAnchorPropertiesSection_tsx["SectionAnchorPropertiesSection.tsx"]
       src_components_properties_TextPropertiesSection_tsx["TextPropertiesSection.tsx"]
@@ -112,6 +118,7 @@ subgraph src["src"]
       src_components_sidebar_ColorsPanel_tsx["ColorsPanel.tsx"]
       src_components_sidebar_ElementsPanel_tsx["ElementsPanel.tsx"]
       src_components_sidebar_ButtonLibraryPanel_tsx["ButtonLibraryPanel.tsx"]
+      src_components_sidebar_HeroImportControl_tsx["HeroImportControl.tsx"]
       src_components_sidebar_ImageImportControl_tsx["ImageImportControl.tsx"]
       src_components_sidebar_HeaderCreationControl_tsx["HeaderCreationControl.tsx"]
       src_components_sidebar_ProjectNavigatorPanel_tsx["ProjectNavigatorPanel.tsx"]
@@ -132,6 +139,7 @@ subgraph src["src"]
     src_state_useEditorProject_ts["useEditorProject.ts"]
     src_state_editorProjectContext_ts["editorProjectContext.ts"]
     src_state_editorProjectAction_ts["editorProjectAction.ts"]
+    src_state_heroProjectAction_ts["heroProjectAction.ts"]
     src_state_navigationProjectAction_ts["navigationProjectAction.ts"]
     src_state_pageProjectAction_ts["pageProjectAction.ts"]
     src_state_useElementCreation_ts["useElementCreation.ts"]
@@ -145,6 +153,7 @@ subgraph src["src"]
     src_state_useButtonProperties_ts["useButtonProperties.ts"]
     src_state_useElementLink_ts["useElementLink.ts"]
     src_state_useHeaderAppearance_ts["useHeaderAppearance.ts"]
+    src_state_useHeroProperties_ts["useHeroProperties.ts"]
     src_state_useSectionAppearance_ts["useSectionAppearance.ts"]
     src_state_useTextAppearance_ts["useTextAppearance.ts"]
     src_state_useSectionAnchorId_ts["useSectionAnchorId.ts"]
@@ -158,6 +167,7 @@ subgraph src["src"]
     src_state_deleteElementFromActivePage_ts["deleteElementFromActivePage.ts"]
     src_state_reduceColorProjectAction_ts["reduceColorProjectAction.ts"]
     src_state_reduceHeaderAppearanceAction_ts["reduceHeaderAppearanceAction.ts"]
+    src_state_reduceHeroProjectAction_ts["reduceHeroProjectAction.ts"]
     src_state_reduceImageProjectAction_ts["reduceImageProjectAction.ts"]
     src_state_setImageAltText_ts["setImageAltText.ts"]
     src_state_setImageDesktopFrame_ts["setImageDesktopFrame.ts"]
@@ -214,6 +224,7 @@ src_model_editorProject_ts-->src_model_buttonAsset_ts
 src_model_editorProject_ts-->src_model_elementDimensions_ts
 src_model_editorProject_ts-->src_model_elementLink_ts
 src_model_editorProject_ts-->src_model_headerAppearance_ts
+src_model_editorProject_ts-->src_model_heroAppearance_ts
 src_model_editorProject_ts-->src_model_imageAsset_ts
 src_model_editorProject_ts-->src_model_imagePresentation_ts
 src_model_editorProject_ts-->src_model_navigation_ts
@@ -228,6 +239,9 @@ src_model_headerAppearance_ts-->src_model_textElementStyle_ts
 src_model_editorFill_ts-->src_model_editorColor_ts
 src_model_elementFrame_ts-->src_model_editorColor_ts
 src_model_textElementStyle_ts-->src_model_editorColor_ts
+src_model_heroAppearance_ts-->src_model_editorColor_ts
+src_model_heroAppearance_ts-->src_model_editorFill_ts
+src_model_heroAppearance_ts-->src_model_elementFrame_ts
 src_model_imagePresentation_ts-->src_model_elementDimensions_ts
 src_model_imagePresentation_ts-->src_model_imageAsset_ts
 src_model_pageAppearance_ts-->src_model_editorFill_ts
@@ -253,11 +267,16 @@ src_state_editorProjectAction_ts-->src_model_elementLink_ts
 src_state_editorProjectAction_ts-->src_model_imagePresentation_ts
 src_state_editorProjectAction_ts-->src_model_sectionAppearance_ts
 src_state_editorProjectAction_ts-->src_model_textElementStyle_ts
+src_state_editorProjectAction_ts-->src_state_heroProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_navigationProjectAction_ts
 src_state_editorProjectAction_ts-->src_state_pageProjectAction_ts
 src_model_elementLayout_ts-->src_model_editorProject_ts
 src_model_elementLayout_ts-->src_model_elementDimensions_ts
 src_model_elementLayout_ts-->src_model_imagePresentation_ts
+src_state_heroProjectAction_ts-->src_model_editorColor_ts
+src_state_heroProjectAction_ts-->src_model_editorFill_ts
+src_state_heroProjectAction_ts-->src_model_elementFrame_ts
+src_state_heroProjectAction_ts-->src_model_imageAsset_ts
 src_state_navigationProjectAction_ts-->src_model_navigation_ts
 src_state_useElementCreation_ts-->src_model_createStableId_ts
 src_state_useElementCreation_ts-->src_model_elementCreation_ts
@@ -268,10 +287,11 @@ src_state_isValidElementCreationRequest_ts-->src_model_elementCreation_ts
 src_state_isValidElementCreationRequest_ts-->src_model_headerElement_ts
 src_state_isValidElementCreationRequest_ts-->src_model_imageAsset_ts
 src_state_useElementDeletion_ts-->src_assets_images_useImageAssetStore_ts
-src_state_useElementDeletion_ts-->src_model_editorProject_ts
-src_state_useElementDeletion_ts-->src_model_imageAsset_ts
+src_state_useElementDeletion_ts-->src_model_projectImageAssets_ts
 src_state_useElementDeletion_ts-->src_state_useEditorProject_ts
 src_assets_images_useImageAssetStore_ts-->src_assets_images_imageAssetStoreContext_ts
+src_model_projectImageAssets_ts-->src_model_editorProject_ts
+src_model_projectImageAssets_ts-->src_model_imageAsset_ts
 src_state_useElementSelection_ts-->src_state_useEditorProject_ts
 src_state_useImageProperties_ts-->src_model_imagePresentation_ts
 src_state_useImageProperties_ts-->src_state_useEditorProject_ts
@@ -320,6 +340,7 @@ src_components_canvas_EditorCanvasElementContent_tsx-->src_model_editorProject_t
 src_components_canvas_EditorCanvasElementContent_tsx-->src_model_navigation_ts
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_ButtonElementContent_tsx
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_HeaderElementContent_tsx
+src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_HeroElementContent_tsx
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_ImageElementContent_tsx
 src_components_canvas_EditorCanvasElementContent_tsx-->src_components_canvas_TextElementEditor_tsx
 src_components_canvas_ButtonElementContent_tsx-->src_assets_buttons_buttonAssetCatalog_ts
@@ -335,6 +356,8 @@ src_components_canvas_HeaderElementContent_tsx-->src_model_navigation_ts
 src_components_canvas_HeaderElementContent_tsx-->src_model_navigationHref_ts
 src_components_canvas_HeaderElementContent_tsx-->src_state_useEditorProject_ts
 src_model_navigationHref_ts-->src_model_navigation_ts
+src_components_canvas_HeroElementContent_tsx-->src_assets_images_useImageAssetStore_ts
+src_components_canvas_HeroElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_ImageElementContent_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_canvas_ImageElementContent_tsx-->src_model_editorProject_ts
 src_components_canvas_ImageElementContent_tsx-->src_model_imagePresentation_ts
@@ -397,6 +420,7 @@ src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_D
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ElementLinkPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_FramePropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_HeaderFontPropertiesSection_tsx
+src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_HeroPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_ImagePropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_SectionAnchorPropertiesSection_tsx
 src_components_properties_RightPropertiesPanel_tsx-->src_components_properties_TextPropertiesSection_tsx
@@ -415,6 +439,7 @@ src_state_useElementLink_ts-->src_state_useEditorProject_ts
 src_components_properties_FramePropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_FramePropertiesSection_tsx-->src_model_elementFrame_ts
 src_components_properties_FramePropertiesSection_tsx-->src_state_useHeaderAppearance_ts
+src_components_properties_FramePropertiesSection_tsx-->src_state_useHeroProperties_ts
 src_components_properties_FramePropertiesSection_tsx-->src_state_useSectionAppearance_ts
 src_components_properties_FramePropertiesSection_tsx-->src_state_useTextAppearance_ts
 src_components_properties_FramePropertiesSection_tsx-->src_components_colors_ColorSwatchInput_tsx
@@ -423,6 +448,11 @@ src_state_useHeaderAppearance_ts-->src_model_editorFill_ts
 src_state_useHeaderAppearance_ts-->src_model_elementFrame_ts
 src_state_useHeaderAppearance_ts-->src_model_textElementStyle_ts
 src_state_useHeaderAppearance_ts-->src_state_useEditorProject_ts
+src_state_useHeroProperties_ts-->src_model_editorColor_ts
+src_state_useHeroProperties_ts-->src_model_editorFill_ts
+src_state_useHeroProperties_ts-->src_model_elementFrame_ts
+src_state_useHeroProperties_ts-->src_model_imageAsset_ts
+src_state_useHeroProperties_ts-->src_state_useEditorProject_ts
 src_state_useSectionAppearance_ts-->src_model_editorColor_ts
 src_state_useSectionAppearance_ts-->src_model_editorFill_ts
 src_state_useSectionAppearance_ts-->src_model_sectionAppearance_ts
@@ -437,6 +467,24 @@ src_components_properties_HeaderFontPropertiesSection_tsx-->src_model_textElemen
 src_components_properties_HeaderFontPropertiesSection_tsx-->src_state_useHeaderAppearance_ts
 src_components_properties_HeaderFontPropertiesSection_tsx-->src_components_properties_textFontFamilyLabels_ts
 src_components_properties_textFontFamilyLabels_ts-->src_model_textElementStyle_ts
+src_components_properties_HeroPropertiesSection_tsx-->src_model_editorProject_ts
+src_components_properties_HeroPropertiesSection_tsx-->src_model_heroElement_ts
+src_components_properties_HeroPropertiesSection_tsx-->src_state_useHeroProperties_ts
+src_components_properties_HeroPropertiesSection_tsx-->src_components_colors_BackgroundFillControl_tsx
+src_components_properties_HeroPropertiesSection_tsx-->src_components_colors_ColorSwatchInput_tsx
+src_components_properties_HeroPropertiesSection_tsx-->src_components_properties_HeroImageProperties_tsx
+src_components_colors_BackgroundFillControl_tsx-->src_model_editorFill_ts
+src_components_colors_BackgroundFillControl_tsx-->src_components_colors_ColorSwatchInput_tsx
+src_components_properties_HeroImageProperties_tsx-->src_assets_images_prepareImageFile_ts
+src_components_properties_HeroImageProperties_tsx-->src_assets_images_useImageAssetStore_ts
+src_components_properties_HeroImageProperties_tsx-->src_model_editorProject_ts
+src_components_properties_HeroImageProperties_tsx-->src_model_imageAsset_ts
+src_components_properties_HeroImageProperties_tsx-->src_model_projectImageAssets_ts
+src_components_properties_HeroImageProperties_tsx-->src_state_useEditorProject_ts
+src_components_properties_HeroImageProperties_tsx-->src_state_useHeroProperties_ts
+src_assets_images_prepareImageFile_ts-->src_model_imageAsset_ts
+src_assets_images_prepareImageFile_ts-->src_assets_images_imageFileSignature_ts
+src_assets_images_imageFileSignature_ts-->src_model_imageAsset_ts
 src_components_properties_ImagePropertiesSection_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_properties_ImagePropertiesSection_tsx-->src_model_editorProject_ts
 src_components_properties_ImagePropertiesSection_tsx-->src_model_imageAsset_ts
@@ -480,22 +528,23 @@ src_state_useProjectColors_ts-->src_state_useHeaderAppearance_ts
 src_state_useProjectColors_ts-->src_state_useSectionAppearance_ts
 src_state_useProjectColors_ts-->src_state_useTextAppearance_ts
 src_state_useProjectColors_ts-->src_state_useTextElementStyle_ts
-src_components_colors_BackgroundFillControl_tsx-->src_model_editorFill_ts
-src_components_colors_BackgroundFillControl_tsx-->src_components_colors_ColorSwatchInput_tsx
 src_components_sidebar_ElementsPanel_tsx-->src_model_elementCreation_ts
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ButtonLibraryPanel_tsx
+src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_HeroImportControl_tsx
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_ImageImportControl_tsx
 src_components_sidebar_ElementsPanel_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_ButtonLibraryPanel_tsx-->src_assets_buttons_buttonAssetCatalog_ts
 src_components_sidebar_ButtonLibraryPanel_tsx-->src_model_buttonAsset_ts
+src_components_sidebar_HeroImportControl_tsx-->src_assets_images_prepareImageFile_ts
+src_components_sidebar_HeroImportControl_tsx-->src_assets_images_useImageAssetStore_ts
+src_components_sidebar_HeroImportControl_tsx-->src_model_elementCreation_ts
+src_components_sidebar_HeroImportControl_tsx-->src_model_imageAsset_ts
+src_components_sidebar_HeroImportControl_tsx-->src_components_sidebar_SidebarIcon_tsx
 src_components_sidebar_ImageImportControl_tsx-->src_assets_images_prepareImageFile_ts
 src_components_sidebar_ImageImportControl_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_sidebar_ImageImportControl_tsx-->src_model_elementCreation_ts
 src_components_sidebar_ImageImportControl_tsx-->src_model_imageAsset_ts
 src_components_sidebar_ImageImportControl_tsx-->src_components_sidebar_SidebarIcon_tsx
-src_assets_images_prepareImageFile_ts-->src_model_imageAsset_ts
-src_assets_images_prepareImageFile_ts-->src_assets_images_imageFileSignature_ts
-src_assets_images_imageFileSignature_ts-->src_model_imageAsset_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_assets_images_prepareImageFile_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_sidebar_HeaderCreationControl_tsx-->src_model_elementCreation_ts
@@ -518,6 +567,7 @@ src_state_usePageActions_ts-->src_assets_images_useImageAssetStore_ts
 src_state_usePageActions_ts-->src_model_createStableId_ts
 src_state_usePageActions_ts-->src_model_editorProject_ts
 src_state_usePageActions_ts-->src_model_imageAsset_ts
+src_state_usePageActions_ts-->src_model_projectImageAssets_ts
 src_state_usePageActions_ts-->src_state_useEditorProject_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_assets_images_useImageAssetStore_ts
 src_components_sidebar_ProjectFileControls_tsx-->src_projectFiles_createProjectFile_ts
@@ -543,6 +593,8 @@ src_model_editorElementValidation_ts-->src_model_elementLayout_ts
 src_model_editorElementValidation_ts-->src_model_elementLink_ts
 src_model_editorElementValidation_ts-->src_model_headerAppearance_ts
 src_model_editorElementValidation_ts-->src_model_headerElement_ts
+src_model_editorElementValidation_ts-->src_model_heroAppearance_ts
+src_model_editorElementValidation_ts-->src_model_heroElement_ts
 src_model_editorElementValidation_ts-->src_model_imageAsset_ts
 src_model_editorElementValidation_ts-->src_model_imagePresentation_ts
 src_model_editorElementValidation_ts-->src_model_sectionAppearance_ts
@@ -593,6 +645,7 @@ src_state_editorProjectReducer_ts-->src_state_deleteElementFromActivePage_ts
 src_state_editorProjectReducer_ts-->src_state_editorProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_reduceColorProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_reduceHeaderAppearanceAction_ts
+src_state_editorProjectReducer_ts-->src_state_reduceHeroProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_reduceImageProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_reduceNavigationProjectAction_ts
 src_state_editorProjectReducer_ts-->src_state_reducePageProjectAction_ts
@@ -619,6 +672,8 @@ src_model_createEditorElement_ts-->src_model_elementDimensions_ts
 src_model_createEditorElement_ts-->src_model_elementLink_ts
 src_model_createEditorElement_ts-->src_model_findElementCreationPosition_ts
 src_model_createEditorElement_ts-->src_model_headerAppearance_ts
+src_model_createEditorElement_ts-->src_model_heroAppearance_ts
+src_model_createEditorElement_ts-->src_model_heroElement_ts
 src_model_createEditorElement_ts-->src_model_imagePresentation_ts
 src_model_createEditorElement_ts-->src_model_sectionAppearance_ts
 src_model_createEditorElement_ts-->src_model_siteStructure_ts
@@ -642,6 +697,14 @@ src_state_reduceHeaderAppearanceAction_ts-->src_model_elementFrame_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_model_headerAppearance_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_model_textElementStyle_ts
 src_state_reduceHeaderAppearanceAction_ts-->src_state_editorProjectAction_ts
+src_state_reduceHeroProjectAction_ts-->src_model_editorColor_ts
+src_state_reduceHeroProjectAction_ts-->src_model_editorFill_ts
+src_state_reduceHeroProjectAction_ts-->src_model_editorProject_ts
+src_state_reduceHeroProjectAction_ts-->src_model_elementFrame_ts
+src_state_reduceHeroProjectAction_ts-->src_model_heroAppearance_ts
+src_state_reduceHeroProjectAction_ts-->src_model_heroElement_ts
+src_state_reduceHeroProjectAction_ts-->src_model_imageAsset_ts
+src_state_reduceHeroProjectAction_ts-->src_state_heroProjectAction_ts
 src_state_reduceImageProjectAction_ts-->src_model_editorProject_ts
 src_state_reduceImageProjectAction_ts-->src_state_editorProjectAction_ts
 src_state_reduceImageProjectAction_ts-->src_state_setImageAltText_ts
