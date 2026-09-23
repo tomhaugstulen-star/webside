@@ -8,25 +8,16 @@ import {
   type NavigatorKindFilter,
   type NavigatorStatusFilter,
 } from '../navigation/editorNavigationItems'
-import type { ElementCreationRequest } from '../../model/elementCreation'
-import { ImageImportControl } from './ImageImportControl'
 import { PageManagementSection } from './PageManagementSection'
 import { ProjectFileControls } from './ProjectFileControls'
 import { WebsiteNavigationSection } from './WebsiteNavigationSection'
 
-type ImageCreationRequest = Extract<ElementCreationRequest, { kind: 'image' }>
-
-type ProjectNavigatorPanelProps = {
-  onCreateImage: (request: ImageCreationRequest) => boolean
-}
-
-export function ProjectNavigatorPanel({
-  onCreateImage,
-}: ProjectNavigatorPanelProps) {
+export function ProjectNavigatorPanel() {
   const { state, dispatch } = useEditorProject()
   const [kindFilter, setKindFilter] = useState<NavigatorKindFilter>('all')
   const [statusFilter, setStatusFilter] =
     useState<NavigatorStatusFilter>('all')
+  const [showElements, setShowElements] = useState(false)
 
   const selectPage = (pageId: string) => {
     dispatch({ type: 'set-active-page', pageId })
@@ -53,59 +44,19 @@ export function ProjectNavigatorPanel({
 
       <ProjectFileControls />
 
-      <section className="project-image-import">
-        <h3>Importer bilde</h3>
-        <ImageImportControl
-          label="Velg bilde fra maskinen"
-          onCreateImage={onCreateImage}
-        />
-      </section>
-
       <PageManagementSection />
-
-      <div className="project-navigator__filters">
-        <label>
-          <span>Elementtype</span>
-          <select
-            value={kindFilter}
-            onChange={(event) =>
-              setKindFilter(event.target.value as NavigatorKindFilter)
-            }
-          >
-            <option value="all">Alle</option>
-            <option value="section">Seksjon</option>
-            <option value="image">Bilde</option>
-            <option value="text">Tekst</option>
-            <option value="button">Knapp</option>
-            <option value="header">Header</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Status</span>
-          <select
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(event.target.value as NavigatorStatusFilter)
-            }
-          >
-            <option value="all">Alle</option>
-            <option value="visible">Synlige</option>
-            <option value="hidden">Skjulte</option>
-            <option value="locked">Låste</option>
-            <option value="unlocked">Ulåste</option>
-          </select>
-        </label>
-      </div>
+      <WebsiteNavigationSection />
 
       <nav className="project-navigator" aria-label="Prosjektnavigator">
         {state.project.pages.map((page) => {
           const activePage = page.id === state.activePageId
-          const matchingElements = page.elements
-            .map((element, elementIndex) => ({ element, elementIndex }))
-            .filter(({ element }) =>
-              matchesNavigatorFilters(element, kindFilter, statusFilter),
-            )
+          const matchingElements = activePage
+            ? page.elements
+                .map((element, elementIndex) => ({ element, elementIndex }))
+                .filter(({ element }) =>
+                  matchesNavigatorFilters(element, kindFilter, statusFilter),
+                )
+            : []
 
           return (
             <section className="project-navigator__page" key={page.id}>
@@ -121,7 +72,42 @@ export function ProjectNavigatorPanel({
                 <small>{page.slug}</small>
               </button>
 
-              {matchingElements.length > 0 ? (
+              {activePage && (
+                <div className="project-navigator__active-elements">
+                  <button
+                    type="button"
+                    className="project-navigator__toggle"
+                    aria-expanded={showElements}
+                    onClick={() => setShowElements(!showElements)}
+                  >
+                    {showElements ? 'Skjul' : 'Vis'} elementer ({page.elements.length})
+                  </button>
+                  {showElements && <>
+                    <div className="project-navigator__filters">
+                      <label><span>Elementtype</span>
+                        <select value={kindFilter} onChange={(event) =>
+                          setKindFilter(event.target.value as NavigatorKindFilter)}>
+                          <option value="all">Alle</option>
+                          <option value="section">Seksjon</option>
+                          <option value="image">Bilde</option>
+                          <option value="text">Tekst</option>
+                          <option value="button">Knapp</option>
+                          <option value="header">Header</option>
+                          <option value="hero">Hero</option>
+                        </select>
+                      </label>
+                      <label><span>Status</span>
+                        <select value={statusFilter} onChange={(event) =>
+                          setStatusFilter(event.target.value as NavigatorStatusFilter)}>
+                          <option value="all">Alle</option>
+                          <option value="visible">Synlige</option>
+                          <option value="hidden">Skjulte</option>
+                          <option value="locked">Låste</option>
+                          <option value="unlocked">Ulåste</option>
+                        </select>
+                      </label>
+                    </div>
+                    {matchingElements.length > 0 ? (
                 <ul className="project-navigator__elements">
                   {matchingElements.map(({ element, elementIndex }) => {
                     const selected =
@@ -159,17 +145,18 @@ export function ProjectNavigatorPanel({
                     )
                   })}
                 </ul>
-              ) : (
+                    ) : (
                 <p className="project-navigator__empty">
                   Ingen elementer matcher filteret
                 </p>
+                    )}
+                  </>}
+                </div>
               )}
             </section>
           )
         })}
       </nav>
-
-      <WebsiteNavigationSection />
     </>
   )
 }

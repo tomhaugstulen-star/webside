@@ -12,20 +12,19 @@ import {
 
 type NavigationItemEditorProps = {
   item: NavigationItem
-  index: number
-  total: number
   options: readonly NavigationTargetOption[]
+  allItems: readonly NavigationItem[]
 }
 
 export function NavigationItemEditor({
   item,
-  index,
-  total,
   options,
+  allItems,
 }: NavigationItemEditorProps) {
   const {
     setNavigationItemLabel,
     setNavigationItemTarget,
+    setNavigationItemParent,
     moveNavigationItem,
     deleteNavigationItem,
   } = useNavigationActions()
@@ -49,9 +48,11 @@ export function NavigationItemEditor({
   }
 
   const targetValue = navigationTargetValue(item.target)
+  const siblings = allItems.filter((candidate) => candidate.parentId === item.parentId)
+  const siblingIndex = siblings.findIndex((candidate) => candidate.id === item.id)
 
   return (
-    <li className="website-navigation__item">
+    <li className={`website-navigation__item${item.parentId ? ' website-navigation__item--child' : ''}`}>
       <form className="site-structure__form" onSubmit={saveLabel}>
         <label>
           <span>Menutekst</span>
@@ -87,17 +88,29 @@ export function NavigationItemEditor({
         </select>
       </label>
 
+      <label className="site-structure__select-field">
+        <span>Plassering</span>
+        <select value={item.parentId ?? ''} onChange={(event) =>
+          setNavigationItemParent(item.id, event.target.value || null)}>
+          <option value="">Hovedmeny</option>
+          {allItems.filter((candidate) => candidate.id !== item.id && !candidate.parentId &&
+            !allItems.some((child) => child.parentId === item.id)).map((candidate) => (
+              <option key={candidate.id} value={candidate.id}>Under {candidate.label} (rullegardin)</option>
+            ))}
+        </select>
+      </label>
+
       <div className="site-structure__button-row">
         <button
           type="button"
-          disabled={index <= 0}
+          disabled={siblingIndex <= 0}
           onClick={() => moveNavigationItem(item.id, 'up')}
         >
           Opp
         </button>
         <button
           type="button"
-          disabled={index >= total - 1}
+          disabled={siblingIndex >= siblings.length - 1}
           onClick={() => moveNavigationItem(item.id, 'down')}
         >
           Ned

@@ -8,6 +8,7 @@ import {
 } from '../../model/siteStructure'
 import { useEditorProject } from '../../state/useEditorProject'
 import { usePageActions } from '../../state/usePageActions'
+import { useNavigationActions } from '../../state/useNavigationActions'
 
 type ActivePageSettingsProps = {
   page: EditorPage
@@ -155,6 +156,7 @@ export function PageManagementSection() {
   const { state } = useEditorProject()
   const { addPage, setPageName, setPageSlug, movePage, deletePage } =
     usePageActions()
+  const { addNavigationItem } = useNavigationActions()
   const activePage = state.project.pages.find(
     (page) => page.id === state.activePageId,
   )
@@ -165,6 +167,9 @@ export function PageManagementSection() {
 
   const pageIndex = state.project.pages.findIndex(
     (page) => page.id === activePage.id,
+  )
+  const pageInMenu = state.project.navigation.items.some(
+    (item) => item.target.type === 'page' && item.target.pageId === activePage.id,
   )
 
   const createPage = () => {
@@ -186,16 +191,26 @@ export function PageManagementSection() {
         </button>
       </div>
 
-      <ActivePageSettings
-        key={activePage.id}
-        page={activePage}
-        pages={state.project.pages}
-        pageIndex={pageIndex}
-        onSetName={setPageName}
-        onSetSlug={setPageSlug}
-        onMove={movePage}
-        onDelete={deletePage}
-      />
+      <button className="page-management__add-menu" type="button"
+        disabled={pageInMenu}
+        onClick={() => addNavigationItem(activePage.name, {
+          type: 'page', pageId: activePage.id,
+        })}>
+        {pageInMenu ? 'Siden er i nettstedmenyen' : `Legg ${activePage.name} i nettstedmenyen`}
+      </button>
+
+      <details className="page-management__settings" key={activePage.id}>
+        <summary>Navn, adresse og siderekkefølge</summary>
+        <ActivePageSettings
+          page={activePage}
+          pages={state.project.pages}
+          pageIndex={pageIndex}
+          onSetName={setPageName}
+          onSetSlug={setPageSlug}
+          onMove={movePage}
+          onDelete={deletePage}
+        />
+      </details>
     </section>
   )
 }

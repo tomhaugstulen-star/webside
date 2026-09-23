@@ -59,7 +59,7 @@ export function SidebarPanel({
     case 'elements':
       return <ElementsPanel onCreateElement={onCreateElement} />
     case 'files':
-      return <ProjectNavigatorPanel onCreateImage={onCreateElement} />
+      return <ProjectNavigatorPanel />
     case 'settings':
       return <SettingsPanel />
   }

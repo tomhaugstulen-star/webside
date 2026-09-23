@@ -223,8 +223,8 @@
       "dependents": [
         "src/model/imageAsset.ts",
         "src/state/useElementCreation.ts",
-        "src/state/usePageActions.ts",
         "src/state/useNavigationActions.ts",
+        "src/state/usePageActions.ts",
         "src/model/createEditorProject.ts"
       ],
       "orphan": false,
@@ -816,6 +816,7 @@
         "src/model/editorProjectValidation.ts",
         "src/model/editorElementValidation.ts",
         "src/model/editorProjectMigration.ts",
+        "src/model/editorProjectMigrationV14.ts",
         "src/projectFiles/projectAssetReferences.ts",
         "src/projectFiles/projectFileFormat.ts",
         "src/components/sidebar/navigationTargetOptions.ts",
@@ -1346,8 +1347,8 @@
         "src/components/canvas/HeaderElementContent.tsx",
         "src/model/navigationHref.ts",
         "src/model/siteStructure.ts",
-        "src/components/sidebar/WebsiteNavigationSection.tsx",
         "src/state/useNavigationActions.ts",
+        "src/components/sidebar/WebsiteNavigationSection.tsx",
         "src/components/sidebar/NavigationItemEditor.tsx",
         "src/components/sidebar/navigationTargetOptions.ts",
         "src/state/deleteElementFromActivePage.ts",
@@ -1598,7 +1599,6 @@
         "src/components/sidebar/HeroImportControl.tsx",
         "src/components/sidebar/ImageImportControl.tsx",
         "src/components/sidebar/HeaderCreationControl.tsx",
-        "src/components/sidebar/ProjectNavigatorPanel.tsx",
         "src/state/addElementToActivePage.ts",
         "src/model/createEditorElement.ts"
       ],
@@ -1658,10 +1658,10 @@
         "src/state/useProjectColors.ts",
         "src/components/sidebar/ProjectNavigatorPanel.tsx",
         "src/components/sidebar/PageManagementSection.tsx",
+        "src/state/useNavigationActions.ts",
         "src/state/usePageActions.ts",
         "src/components/sidebar/ProjectFileControls.tsx",
-        "src/components/sidebar/WebsiteNavigationSection.tsx",
-        "src/state/useNavigationActions.ts"
+        "src/components/sidebar/WebsiteNavigationSection.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8376,8 +8376,7 @@
         }
       ],
       "dependents": [
-        "src/components/sidebar/ElementsPanel.tsx",
-        "src/components/sidebar/ProjectNavigatorPanel.tsx"
+        "src/components/sidebar/ElementsPanel.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8514,24 +8513,6 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../../model/elementCreation",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/elementCreation.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "../../state/useEditorProject",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -8557,23 +8538,6 @@
             "import"
           ],
           "resolved": "src/components/navigation/editorNavigationItems.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./ImageImportControl",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/components/sidebar/ImageImportControl.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8738,6 +8702,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../state/useNavigationActions",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useNavigationActions.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../state/usePageActions",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -8756,6 +8737,77 @@
       ],
       "dependents": [
         "src/components/sidebar/ProjectNavigatorPanel.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/state/useNavigationActions.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/createStableId",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/createStableId.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/PageManagementSection.tsx",
+        "src/components/sidebar/WebsiteNavigationSection.tsx",
+        "src/components/sidebar/NavigationItemEditor.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -9176,6 +9228,23 @@
             "import"
           ],
           "resolved": "src/model/editorProjectMigration.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./editorProjectMigrationV14",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProjectMigrationV14.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -9611,6 +9680,40 @@
       "valid": true
     },
     {
+      "source": "src/model/editorProjectMigrationV14.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/model/editorProjectValidation.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/projectFiles/projectAssetReferences.ts",
       "dependencies": [
         {
@@ -9946,76 +10049,6 @@
       ],
       "dependents": [
         "src/components/sidebar/ProjectNavigatorPanel.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/state/useNavigationActions.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../model/createStableId",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/model/createStableId.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/navigation",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/navigation.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./useEditorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/state/useEditorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/components/sidebar/WebsiteNavigationSection.tsx",
-        "src/components/sidebar/NavigationItemEditor.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -12689,10 +12722,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 163,
-    "totalDependenciesCruised": 548,
+    "totalCruised": 164,
+    "totalDependenciesCruised": 549,
     "optionsUsed": {
-      "baseDir": "C:\\Users\\tomha\\Desktop\\website",
+      "baseDir": "/workspace/scratch/ba15b09c2f09/webside-header-fix",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

@@ -93,6 +93,7 @@ function reduceEditorProjectState(
     case 'add-navigation-item':
     case 'set-navigation-item-label':
     case 'set-navigation-item-target':
+    case 'set-navigation-item-parent':
     case 'move-navigation-item':
     case 'delete-navigation-item':
       return reduceNavigationProjectAction(state, action)

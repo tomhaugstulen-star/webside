@@ -13,6 +13,7 @@ test('manages pages, section anchors and website navigation', async ({ page }) =
   await expect(activePage).toContainText('Side 2')
   await expect(activePage).toContainText('/side-2')
 
+  await pagesRegion.getByText('Navn, adresse og siderekkefølge').click()
   await pagesRegion.getByLabel('Navn').fill('Om oss')
   await pagesRegion.getByRole('button', { name: 'Lagre navn' }).click()
   await expect(activePage).toContainText('Om oss')
@@ -47,4 +48,17 @@ test('manages pages, section anchors and website navigation', async ({ page }) =
   const savedItem = navigationRegion.getByRole('listitem')
   await expect(savedItem.getByLabel('Menutekst')).toHaveValue('Kontakt')
   await expect(savedItem.getByLabel('Mål')).toHaveValue(/section:/)
+})
+
+test('keeps project panel compact and adds an active page to the menu', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
+  await expect(page.getByText('Importer bilde')).toHaveCount(0)
+  await page.getByRole('region', { name: 'Sider' }).getByRole('button', { name: '+ Ny side' }).click()
+  await page.getByRole('button', { name: 'Legg Side 2 i nettstedmenyen' }).click()
+  await expect(page.getByRole('region', { name: 'Nettstedmeny' })
+    .getByRole('listitem').getByLabel('Menutekst')).toHaveValue('Side 2')
+  await expect(page.getByText('Ingen elementer matcher filteret')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Vis elementer (0)' }).click()
+  await expect(page.getByText('Ingen elementer matcher filteret')).toHaveCount(1)
 })

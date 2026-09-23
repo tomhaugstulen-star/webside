@@ -23,12 +23,21 @@ export function WebsiteNavigationSection() {
     options[0]
   const [labelDraft, setLabelDraft] = useState('')
   const [targetValue, setTargetValue] = useState(initialTarget?.value ?? '')
+  const [parentId, setParentId] = useState('')
+  const selectedParentId = state.project.navigation.items.some(
+    (item) => item.id === parentId && !item.parentId,
+  ) ? parentId : ''
   const [feedback, setFeedback] = useState('')
   const selectedTarget =
     options.find((option) => option.value === targetValue) ??
     options.find((option) => option.value === activePageTargetValue) ??
     options[0]
   const selectedTargetValue = selectedTarget?.value ?? ''
+  const orderedItems = state.project.navigation.items
+    .filter((item) => !item.parentId)
+    .flatMap((item) => [item, ...state.project.navigation.items.filter(
+      (child) => child.parentId === item.id,
+    )])
 
   const addItem = (event: FormEvent) => {
     event.preventDefault()
@@ -44,8 +53,9 @@ export function WebsiteNavigationSection() {
       return
     }
 
-    addNavigationItem(normalized, selectedTarget.target)
+    addNavigationItem(normalized, selectedTarget.target, selectedParentId || undefined)
     setLabelDraft('')
+    setParentId('')
     setFeedback('Menypunktet er lagt til.')
   }
 
@@ -60,7 +70,7 @@ export function WebsiteNavigationSection() {
       </div>
 
       <p className="site-structure__hint">
-        Menypunktene lagres i prosjektet og vises i Header på sider som har Header.
+        Legg til sider og seksjoner i Header. Velg et overordnet menypunkt for rullegardin.
       </p>
 
       <form className="website-navigation__add-form" onSubmit={addItem}>
@@ -88,6 +98,16 @@ export function WebsiteNavigationSection() {
           </select>
         </label>
 
+        <label>
+          <span>Plassering</span>
+          <select value={selectedParentId} onChange={(event) => setParentId(event.target.value)}>
+            <option value="">Hovedmeny</option>
+            {state.project.navigation.items.filter((item) => !item.parentId).map((item) => (
+              <option key={item.id} value={item.id}>Under {item.label} (rullegardin)</option>
+            ))}
+          </select>
+        </label>
+
         <button type="submit">Legg til menypunkt</button>
       </form>
 
@@ -99,13 +119,12 @@ export function WebsiteNavigationSection() {
         <p className="website-navigation__empty">Ingen menypunkter ennå.</p>
       ) : (
         <ol className="website-navigation__list">
-          {state.project.navigation.items.map((item, index) => (
+          {orderedItems.map((item) => (
             <NavigationItemEditor
               key={item.id}
               item={item}
-              index={index}
-              total={state.project.navigation.items.length}
               options={options}
+              allItems={state.project.navigation.items}
             />
           ))}
         </ol>

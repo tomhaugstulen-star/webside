@@ -61,6 +61,9 @@ export function reduceNavigationProjectAction(
         state.project.navigation.items.some((item) => item.id === action.itemId) ||
         !isValidNavigationLabel(action.label) ||
         !isValidNavigationTarget(action.target) ||
+        (action.parentId !== undefined && !state.project.navigation.items.some(
+          (item) => item.id === action.parentId && !item.parentId,
+        )) ||
         !navigationTargetExists(state.project.pages, action.target)
       ) {
         return state
@@ -74,6 +77,7 @@ export function reduceNavigationProjectAction(
             id: action.itemId,
             label: action.label,
             target: copyNavigationTarget(action.target),
+            ...(action.parentId ? { parentId: action.parentId } : {}),
           },
         ],
         action.updatedAt,
@@ -137,12 +141,16 @@ export function reduceNavigationProjectAction(
       const index = state.project.navigation.items.findIndex(
         (item) => item.id === action.itemId,
       )
-      const targetIndex = action.direction === 'up' ? index - 1 : index + 1
+      const siblings = state.project.navigation.items
+        .map((item, itemIndex) => item.parentId ===
+          state.project.navigation.items[index]?.parentId ? itemIndex : -1)
+        .filter((itemIndex) => itemIndex >= 0)
+      const siblingIndex = siblings.indexOf(index)
+      const targetIndex = siblings[siblingIndex + (action.direction === 'up' ? -1 : 1)]
 
       if (
         index < 0 ||
-        targetIndex < 0 ||
-        targetIndex >= state.project.navigation.items.length
+        targetIndex === undefined
       ) {
         return state
       }
@@ -155,10 +163,34 @@ export function reduceNavigationProjectAction(
       return updateNavigation(state, items, action.updatedAt)
     }
 
-    case 'delete-navigation-item': {
-      const items = state.project.navigation.items.filter(
-        (item) => item.id !== action.itemId,
+    case 'set-navigation-item-parent': {
+      const item = state.project.navigation.items.find(
+        (candidate) => candidate.id === action.itemId,
       )
+      if (!item || item.parentId === (action.parentId ?? undefined) ||
+        (action.parentId !== null && !state.project.navigation.items.some(
+          (parent) => parent.id === action.parentId && parent.id !== action.itemId && !parent.parentId,
+        )) ||
+        (action.parentId !== null && state.project.navigation.items.some(
+          (child) => child.parentId === action.itemId,
+        ))) return state
+
+      return updateNavigation(state, state.project.navigation.items.map((candidate) => {
+        if (candidate.id !== action.itemId) return candidate
+        const { parentId: _previous, ...rest } = candidate
+        void _previous
+        return action.parentId ? { ...rest, parentId: action.parentId } : rest
+      }), action.updatedAt)
+    }
+
+    case 'delete-navigation-item': {
+      const items = state.project.navigation.items.flatMap((item) => {
+        if (item.id === action.itemId) return []
+        if (item.parentId !== action.itemId) return [item]
+        const { parentId: _previous, ...rest } = item
+        void _previous
+        return [rest]
+      })
 
       if (items.length === state.project.navigation.items.length) {
         return state
