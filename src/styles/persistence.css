@@ -1,0 +1,48 @@
+.top-toolbar__save-error {
+  color: #a43c32;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.persistence-gate {
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px;
+  text-align: center;
+  color: var(--portal-text);
+  background: var(--portal-workspace);
+}
+
+.persistence-gate h1,
+.persistence-gate p {
+  margin: 0;
+}
+
+.persistence-gate p {
+  max-width: 560px;
+  color: var(--portal-text-muted);
+  line-height: 1.55;
+}
+
+.persistence-gate button {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 18px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 10px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.persistence-gate button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+

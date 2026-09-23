@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { EditorPersistenceStatus } from '../../persistence/editorPersistenceContext'
 import type { ViewportMode } from '../../types/editor'
 
 type ToolbarPage = {
@@ -16,6 +17,7 @@ type TopToolbarProps = {
   canRedo: boolean
   onUndo: () => void
   onRedo: () => void
+  persistenceStatus: EditorPersistenceStatus
 }
 
 type IconName =
@@ -26,7 +28,6 @@ type IconName =
   | 'undo'
   | 'redo'
   | 'eye'
-  | 'save'
   | 'publish'
   | 'menu'
 
@@ -63,8 +64,6 @@ function Icon({ name }: { name: IconName }) {
       return <svg {...common}><path d="m15 7 5 5-5 5" /><path d="M19 12h-8a6 6 0 0 0-6 6" /></svg>
     case 'eye':
       return <svg {...common}><path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
-    case 'save':
-      return <svg {...common}><path d="M4 3h13l3 3v15H4Z" /><path d="M8 3v6h8V3M8 21v-7h8v7" /></svg>
     case 'publish':
       return <svg {...common}><path d="M12 16V3M7 8l5-5 5 5" /><path d="M5 14v6h14v-6" /></svg>
     case 'menu':
@@ -82,6 +81,7 @@ export function TopToolbar({
   canRedo,
   onUndo,
   onRedo,
+  persistenceStatus,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -183,7 +183,11 @@ export function TopToolbar({
 
       <div className="top-toolbar__actions">
         <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" disabled title="Kommer senere"><Icon name="eye" /><span>Forhåndsvisning</span></button>
-        <button className="toolbar-action" type="button" aria-label="Lagre" disabled title="Kommer senere"><Icon name="save" /><span>Lagre</span></button>
+        {persistenceStatus === 'error' && (
+          <span className="top-toolbar__save-error" role="alert">
+            Lagringsfeil
+          </span>
+        )}
         <button className="publish-button" type="button" aria-label="Publiser" disabled title="Kommer senere"><Icon name="publish" /><span>Publiser</span></button>
         <div className="main-menu-wrap" ref={menuRef}>
           <button

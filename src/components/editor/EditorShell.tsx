@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
+import { useEditorPersistence } from '../../persistence/useEditorPersistence'
 import { useElementCreation } from '../../state/useElementCreation'
 import { useElementDeletion } from '../../state/useElementDeletion'
 import { useElementSelection } from '../../state/useElementSelection'
@@ -36,6 +37,7 @@ export function EditorShell() {
     undo,
     redo,
   } = useEditorProject()
+  const { status: persistenceStatus } = useEditorPersistence()
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
@@ -158,6 +160,7 @@ export function EditorShell() {
         canRedo={canRedo}
         onUndo={undo}
         onRedo={redo}
+        persistenceStatus={persistenceStatus}
       />
       <div className="editor-shell__body">
         <LeftSidebar
