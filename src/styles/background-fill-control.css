@@ -1,0 +1,94 @@
+.background-fill-control {
+  display: grid;
+  gap: 12px;
+}
+
+.background-fill-control__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.background-fill-control__mode {
+  display: inline-flex;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.background-fill-control__mode button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-right: 1px solid var(--portal-border);
+  background: var(--portal-control-surface);
+  color: var(--portal-text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.background-fill-control__mode button:last-child {
+  border-right: 0;
+}
+
+.background-fill-control__mode button[aria-pressed='true'] {
+  background: var(--portal-control-selected);
+  color: var(--portal-accent);
+}
+
+.background-fill-control__mode button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.background-fill-control__preview {
+  height: 34px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+}
+
+.background-fill-control__gradient-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.background-fill-control__angle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.background-fill-control__angle-inputs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.background-fill-control__angle input[type='number'] {
+  width: 64px;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+  padding: 0 8px;
+  background: var(--portal-control-surface);
+  color: var(--portal-text);
+}
+
+.background-fill-control__angle input[type='range'] {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.background-fill-control button:focus-visible,
+.background-fill-control input:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
+}
