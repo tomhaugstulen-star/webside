@@ -81,6 +81,23 @@ Formatet er `.website-project` med versjonert JSON og innebygde base64-assets. I
 
 Dette er ikke fase 25-lagring, fase 27 Preview eller fase 30 nettstedseksport. Full fase 26 beholder senere ansvar for videre backup/import/migrering utover dette nødvendige round-trip-grunnlaget.
 
+## Vedlikeholdsgate #67 før fase 20 – lineære bakgrunnsgradienter
+
+Aktiv leveranse:
+
+- schema 13
+- typet `EditorFill` som source of truth
+- helfarge eller lineær gradient
+- nøyaktig to fargestopp
+- vinkel 0–360°
+- støtte på side, seksjon, Header og tekstboks
+- ramme- og tekstfarger forblir helfarge
+- schema 12 → 13 migrerer eksisterende bakgrunnsfarger uten visuelt avvik
+- schema 10/11 går fortsatt gjennom migreringskjeden til siste schema
+- gradientdata følger eksisterende `.website-project`-round-trip
+- #68, #69 og #71 er ikke del av leveransen
+- fase 20 starter ikke på denne branchen
+
 ## Fase 18 – arbeidsportalnavigasjon og navigator
 
 Fasen er fullført og merget i PR #58.
