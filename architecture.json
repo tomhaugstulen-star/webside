@@ -532,6 +532,23 @@
         },
         {
           "dynamic": false,
+          "module": "../preview/PreviewShell",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/preview/PreviewShell.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../properties/RightPropertiesPanel",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -980,6 +997,8 @@
         "src/components/canvas/snapElementResize.ts",
         "src/components/canvas/getCanvasContentHeight.ts",
         "src/components/dialogs/ConfirmElementDeletionDialog.tsx",
+        "src/components/preview/PreviewCanvas.tsx",
+        "src/components/preview/PreviewElement.tsx",
         "src/components/properties/RightPropertiesPanel.tsx",
         "src/components/properties/ButtonPropertiesSection.tsx",
         "src/components/properties/DeleteElementSection.tsx",
@@ -1246,6 +1265,7 @@
         "src/state/reduceHeroProjectAction.ts",
         "src/components/canvas/EditorCanvas.tsx",
         "src/components/canvas/getElementAppearanceCssStyle.ts",
+        "src/components/preview/PreviewCanvas.tsx",
         "src/state/useHeaderAppearance.ts",
         "src/state/useHeroProperties.ts",
         "src/state/useSectionAppearance.ts",
@@ -1513,6 +1533,8 @@
         "src/components/canvas/EditorCanvasElementContent.tsx",
         "src/components/canvas/HeaderElementContent.tsx",
         "src/model/navigationHref.ts",
+        "src/components/preview/PreviewCanvas.tsx",
+        "src/components/preview/PreviewElement.tsx",
         "src/state/useNavigationActions.ts",
         "src/components/sidebar/WebsiteNavigationSection.tsx",
         "src/components/sidebar/NavigationItemEditor.tsx",
@@ -3041,6 +3063,7 @@
         "src/state/useTextElementContent.ts",
         "src/components/canvas/HeaderElementContent.tsx",
         "src/state/useElementLocking.ts",
+        "src/components/preview/PreviewCanvas.tsx",
         "src/state/useButtonProperties.ts",
         "src/state/useElementLink.ts",
         "src/state/useHeaderAppearance.ts",
@@ -6617,6 +6640,9 @@
         "src/components/editor/EditorShell.tsx",
         "src/components/canvas/EditorCanvas.tsx",
         "src/components/canvas/EditorCanvasElement.tsx",
+        "src/components/preview/PreviewShell.tsx",
+        "src/components/preview/PreviewCanvas.tsx",
+        "src/components/preview/PreviewElement.tsx",
         "src/components/sidebar/LeftSidebar.tsx",
         "src/components/sidebar/SidebarPanels.tsx",
         "src/components/toolbar/TopToolbar.tsx"
@@ -7362,7 +7388,8 @@
         "src/components/canvas/EditorCanvasElement.tsx",
         "src/components/canvas/getAlignmentTargets.ts",
         "src/components/canvas/resizeSizeTargets.ts",
-        "src/components/canvas/getCanvasContentHeight.ts"
+        "src/components/canvas/getCanvasContentHeight.ts",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -7490,7 +7517,8 @@
         "src/components/canvas/EditorCanvasElement.tsx",
         "src/components/canvas/getAlignmentTargets.ts",
         "src/components/canvas/resizeSizeTargets.ts",
-        "src/components/canvas/getCanvasContentHeight.ts"
+        "src/components/canvas/getCanvasContentHeight.ts",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -7923,7 +7951,8 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvasElementContent.tsx"
+        "src/components/canvas/EditorCanvasElementContent.tsx",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8227,7 +8256,8 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvasElementContent.tsx"
+        "src/components/canvas/EditorCanvasElementContent.tsx",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8314,7 +8344,8 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvasElementContent.tsx"
+        "src/components/canvas/EditorCanvasElementContent.tsx",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8400,7 +8431,8 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvasElementContent.tsx"
+        "src/components/canvas/EditorCanvasElementContent.tsx",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8641,7 +8673,8 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvasElement.tsx"
+        "src/components/canvas/EditorCanvasElement.tsx",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -8677,7 +8710,8 @@
       ],
       "dependents": [
         "src/components/canvas/EditorCanvasElement.tsx",
-        "src/components/canvas/getElementAppearanceCssStyle.ts"
+        "src/components/canvas/getElementAppearanceCssStyle.ts",
+        "src/components/preview/PreviewElement.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -9654,7 +9688,8 @@
         }
       ],
       "dependents": [
-        "src/components/canvas/EditorCanvas.tsx"
+        "src/components/canvas/EditorCanvas.tsx",
+        "src/components/preview/PreviewCanvas.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -9690,6 +9725,404 @@
       ],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/preview/PreviewShell.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../types/editor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/types/editor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PreviewCanvas",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/preview/PreviewCanvas.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/preview/PreviewCanvas.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorFill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorFill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../state/useEditorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/state/useEditorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../types/editor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/types/editor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/getCanvasContentHeight",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/getCanvasContentHeight.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PreviewElement",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/preview/PreviewElement.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/preview/PreviewShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/preview/PreviewElement.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/navigation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/navigation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/resolveResponsiveElementLayout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/resolveResponsiveElementLayout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/resolveResponsiveValue",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/resolveResponsiveValue.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../types/editor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/types/editor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/ButtonElementContent",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/ButtonElementContent.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/getElementAppearanceCssStyle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/getElementAppearanceCssStyle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/getTextElementCssStyle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/getTextElementCssStyle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/HeaderElementContent",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/HeaderElementContent.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/HeroElementContent",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/HeroElementContent.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../canvas/ImageElementContent",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/canvas/ImageElementContent.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/preview/PreviewCanvas.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -14739,8 +15172,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 188,
-    "totalDependenciesCruised": 638,
+    "totalCruised": 191,
+    "totalDependenciesCruised": 659,
     "optionsUsed": {
       "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
