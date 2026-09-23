@@ -1,11 +1,15 @@
-import { createEditorColor, isEditorColor, type EditorColor } from './editorColor'
+import {
+  createDefaultSolidFill,
+  isEditorFill,
+  type EditorFill,
+} from './editorFill'
 
 export type PageAppearance = {
-  backgroundColor: EditorColor
+  backgroundFill: EditorFill
 }
 
 export const DEFAULT_PAGE_APPEARANCE: PageAppearance = {
-  backgroundColor: createEditorColor('#FFFFFF'),
+  backgroundFill: createDefaultSolidFill('#FFFFFF'),
 }
 
 export function isValidPageAppearance(value: unknown): value is PageAppearance {
@@ -16,6 +20,6 @@ export function isValidPageAppearance(value: unknown): value is PageAppearance {
   const appearance = value as Record<string, unknown>
   return (
     Object.keys(appearance).length === 1 &&
-    isEditorColor(appearance.backgroundColor)
+    isEditorFill(appearance.backgroundFill)
   )
 }
