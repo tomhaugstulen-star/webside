@@ -241,6 +241,20 @@ Låste hovedkrav:
 
 Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fra PR #52 kan brukes som referanse, men skal ikke merges direkte etter fase 18–24.
 
+## Fase 26 – sikkerhetskopi, prosjektformat, import og migrering
+
+Fasen er aktiv i sak #88 på `feature/phase-26-backup-project-format`.
+
+Låst hovedomfang:
+
+- videreføre eksisterende `.website-project`-format fra #66 uten parallell prosjektmodell
+- komplett lokal sikkerhetskopi med prosjektdata og refererte assets
+- bakoverkompatibel import av eksisterende gyldige v1-filer
+- typede og forståelige importfeil uten å endre aktivt prosjekt ved feil
+- aktivere `Dupliser prosjekt` som en uavhengig, importbar prosjektkopi med ny prosjekt-ID og nye timestamps
+- gjenbruke fase-25 autosave etter vellykket import
+- ingen sky, konto, lokalt prosjektbibliotek eller fase 27+ i denne leveransen
+
 ## Separat backlog
 
 Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
