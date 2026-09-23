@@ -14,6 +14,7 @@ import {
 } from '../../model/imageAsset'
 import {
   ImageAssetStoreContext,
+  type ImageAssetRegistration,
   type ImageAssetResource,
 } from './imageAssetStoreContext'
 
@@ -84,14 +85,61 @@ export function ImageAssetStoreProvider({ children }: PropsWithChildren) {
     setResources(nextResources)
   }, [])
 
+  const replaceImageAssets = useCallback(
+    (assets: readonly ImageAssetRegistration[]) => {
+      const nextResources = new Map<ImageAssetId, ImageAssetResource>()
+      const createdUrls: string[] = []
+
+      try {
+        for (const asset of assets) {
+          if (
+            !isImageAssetId(asset.assetId) ||
+            !isValidImageAssetMetadata(asset.metadata) ||
+            asset.file.name !== asset.metadata.fileName ||
+            asset.file.type !== asset.metadata.mimeType ||
+            asset.file.size !== asset.metadata.byteSize ||
+            nextResources.has(asset.assetId)
+          ) {
+            throw new Error('Invalid image asset replacement.')
+          }
+
+          const objectUrl = URL.createObjectURL(asset.file)
+          createdUrls.push(objectUrl)
+          nextResources.set(asset.assetId, {
+            file: asset.file,
+            objectUrl,
+            metadata: { ...asset.metadata },
+          })
+        }
+      } catch {
+        createdUrls.forEach((objectUrl) => URL.revokeObjectURL(objectUrl))
+        return false
+      }
+
+      const previousResources = resourcesRef.current
+      resourcesRef.current = nextResources
+      setResources(nextResources)
+      previousResources.forEach((resource) => {
+        URL.revokeObjectURL(resource.objectUrl)
+      })
+      return true
+    },
+    [],
+  )
+
   const getImageAsset = useCallback(
     (assetId: ImageAssetId) => resources.get(assetId) ?? null,
     [resources],
   )
 
   const value = useMemo(
-    () => ({ registerImageAsset, removeImageAsset, getImageAsset }),
-    [registerImageAsset, removeImageAsset, getImageAsset],
+    () => ({
+      registerImageAsset,
+      removeImageAsset,
+      replaceImageAssets,
+      getImageAsset,
+    }),
+    [registerImageAsset, removeImageAsset, replaceImageAssets, getImageAsset],
   )
 
   return (

@@ -23,7 +23,7 @@ EDITOR_PROJECT_SCHEMA_VERSION = 12
 12 Tekstboksramme og 1 px standardramme for nye innrammede elementer
 ```
 
-Det finnes ennå ingen prosjektimport-UI. Modellen har en deterministisk migreringskjede fra versjon 10 til gjeldende skjema, og framtidig import må validere den ferdig migrerte strukturen før `replace-project`.
+Prosjekt-panelet i #66 kan lagre og åpne `.website-project`. Schema 10/11 migreres deterministisk til schema 12. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
 
 Kontrollert migreringsretning:
 

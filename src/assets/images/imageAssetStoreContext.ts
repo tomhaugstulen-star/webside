@@ -10,6 +10,12 @@ export type ImageAssetResource = {
   metadata: ImageAssetMetadata
 }
 
+export type ImageAssetRegistration = {
+  assetId: ImageAssetId
+  file: File
+  metadata: ImageAssetMetadata
+}
+
 export type ImageAssetStoreContextValue = {
   registerImageAsset: (
     assetId: ImageAssetId,
@@ -17,6 +23,7 @@ export type ImageAssetStoreContextValue = {
     metadata: ImageAssetMetadata,
   ) => boolean
   removeImageAsset: (assetId: ImageAssetId) => void
+  replaceImageAssets: (assets: readonly ImageAssetRegistration[]) => boolean
   getImageAsset: (assetId: ImageAssetId) => ImageAssetResource | null
 }
 

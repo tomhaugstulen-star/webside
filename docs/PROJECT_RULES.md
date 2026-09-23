@@ -104,7 +104,7 @@ Transient state serialiseres ikke i `EditorProject`.
 - Automatisk lagring bygges i fase 25 og reagerer bare på reelle prosjektmutasjoner.
 - Et gyldig lagret prosjekt skal aldri overskrives av et standardprosjekt under oppstart.
 - Ugyldige eller ustøttede data skal ikke injiseres i reducer-state.
-- Backup, eksport, import og migrering bygges separat i fase 26.
+- #66 leverer manuell prosjektfil og nødvendig import/migrering før fase 20 etter uttrykkelig reprioritering. Øvrig backup/import/migrering følger fase 26; autolagring følger fase 25.
 
 ## Navigasjonsgrenser
 

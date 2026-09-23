@@ -19,10 +19,12 @@ type ImageCreationRequest = Extract<ElementCreationRequest, { kind: 'image' }>
 
 type ImageImportControlProps = {
   onCreateImage: (request: ImageCreationRequest) => boolean
+  label?: string
 }
 
 export function ImageImportControl({
   onCreateImage,
+  label = 'Bilde',
 }: ImageImportControlProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const mountedRef = useRef(true)
@@ -121,7 +123,7 @@ export function ImageImportControl({
         }}
       >
         <SidebarIcon name="image" />
-        <span>{busy ? 'Leser bilde…' : 'Bilde'}</span>
+        <span>{busy ? 'Leser bilde…' : label}</span>
       </button>
       {errorMessage && (
         <p id={errorId} className="image-import-control__error" role="alert">

@@ -8,13 +8,13 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
 - separat header-descender-fiks er merget i PR #59
-- aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
-- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch med regenererte arkitekturrapporter; brukeren har bekreftet full lokal kontroll og meldt manuell regresjon OK etter HEX/Escape-fiksen; PR/review, CI på endelig head og uttrykkelig mergegodkjenning gjenstår
-- repo-audit #64 er en egen oppryddingsgate før fase 20
-- neste produksjonsfase etter #63 og #64 er fase 20 – nettstedets Header og menynavigasjon
+- aktiv grunnlagsleveranse er #66 på `feature/project-import-before-phase-20`
+- #63/#64 er merget i PR #65; ny grunnlagsleveranse #66 flytter prosjektfil/import-round-trip frem før fase 20
+- neste produksjonsfase etter #66 er fase 20 – nettstedets Header og menynavigasjon
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
+- uttrykkelig beslutning 22.09.2026: nødvendig prosjektfil/import fra fase 26 leveres først som #66 før fase 20; øvrig fase-26 backup/import/migrering beholdes senere
 
 ## Låst roadmap
 
@@ -24,7 +24,7 @@ fase 19  Sider, seksjons-ID-er og navigasjonsmodell
 fase 20  Nettstedets Header og menynavigasjon
 fase 21  Hero
 fase 22  Header-redigering og nettstedstruktur
-fase 23  Responsive mobiloverstyringer
+fase 23  Responsiv mobiltilpasning og breakpoint-adferd
 fase 24  Angre og gjør om
 fase 25  Lokal prosjektlagring, autolagring og gjenoppretting
 fase 26  Sikkerhetskopi, prosjektformat, import og migrering
@@ -62,6 +62,25 @@ git status --short
 git diff --stat
 ```
 
+## Grunnlagsleveranse #66 før fase 20 – prosjektfil og import
+
+Brukeren har uttrykkelig prioritert muligheten til å fortsette tidligere arbeid før fase 20.
+
+Implementert på aktiv branch:
+
+- eksportere hele editorprosjektet til én lokal prosjektfil med prosjektdata og refererte bilder/logoer
+- åpne/importere samme prosjektfil i en senere editorøkt
+- validere og migrere prosjektdata før aktiv state erstattes
+- gjenopprette asset-store konsistent og avvise korrupte/ufullstendige prosjektfiler uten å ødelegge aktivt prosjekt
+- gjøre eksisterende bildeimport lettere å oppdage uten parallell assetmodell
+- være rent filbasert; ingen backend, konto, sky eller IndexedDB/autolagring
+
+Sluttkontroll på branchen: full `npm run verify` er grønn med 64 unit-tester og 12 E2E-tester. Nettlesertestene dekker ny editorøkt, flere sider, bilder/logoer, PC-/Telefon-visning, feilimport og rollback av objekt-URL-er. PR/review, CI på endelig head og uttrykkelig mergegodkjenning gjenstår.
+
+Formatet er `.website-project` med versjonert JSON og innebygde base64-assets. Import kontrollerer schema, layout, assetreferanser, unike assets, binært bildeformat, dimensjoner og metadata før state/assets erstattes. Feil ved klargjøring av objekt-URL-er rulles tilbake; lukking av panelet avbryter ventende import.
+
+Dette er ikke fase 25-lagring, fase 27 Preview eller fase 30 nettstedseksport. Full fase 26 beholder senere ansvar for videre backup/import/migrering utover dette nødvendige round-trip-grunnlaget.
+
 ## Fase 18 – arbeidsportalnavigasjon og navigator
 
 Fasen er fullført og merget i PR #58.
@@ -97,7 +116,7 @@ Levert:
 
 ### #63 – editor polish
 
-Implementert på aktiv branch:
+Levert i PR #65:
 
 - 1 px standardramme for nye innrammede elementer
 - Tekst får serialiserbar ramme med `Ingen` og 1–10 px
@@ -110,10 +129,7 @@ Implementert på aktiv branch:
 - brukeren har bekreftet full lokal `npm run verify` på `9548312` med 48 unit-tester og 6 E2E-tester; agentmiljøets nettleserkjøring var blokkert av Chromium-nedlasting
 - lokal Escape-håndtering i HEX-feltet bevarer Farger-panelet; brukeren har meldt manuell regresjon OK etter fiksen
 
-Gjenstår før #63 kan merges:
-
-- PR, diff/review/trådkontroll og CI på nøyaktig siste head
-- uttrykkelig brukergodkjenning før merge
+#63/#64 er avsluttet gjennom merge av PR #65 etter grønn Quality.
 
 ### #64 – repo-opprydding
 
@@ -125,7 +141,7 @@ Auditen før fase 20 fant:
 - BOM i `SidebarPanels.tsx`
 - behov for å sikre at genererte arkitekturrapporter følger siste modulendringer
 
-Ferdigstilt på aktiv branch: dedikerte resize-/target-tester og HEX-/pipette-tester, deaktivert planlagt UI med opprydding av døde callbacks, fjernet BOM og ubrukt `hero.png`, samt regenererte arkitekturrapporter. Knappbibliotekets SVG-er er beholdt. Ingen senere funksjonsfase er implementert.
+Levert i PR #65: dedikerte resize-/target-tester og HEX-/pipette-tester, deaktivert planlagt UI med opprydding av døde callbacks, fjernet BOM og ubrukt `hero.png`, samt regenererte arkitekturrapporter. Knappbibliotekets SVG-er er beholdt. Ingen senere funksjonsfase er implementert.
 
 ## Synlige UI-handlinger som skal bli funksjonelle
 
@@ -162,10 +178,12 @@ Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fr
 
 Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
 
+- #67 gradienter, #68 telefonpresets og #69 eksakte elementmål er kun planlagt. Separator/divider er bare notert.
+- nettstedet er responsivt; senere telefonmodeller er kun forhåndsvisningspresets, ikke separate enhetsdesign
 - #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer
 - #38 like mellomrom og fordelingsguider
-- #3 er den eldre planleggingsaken for viewport-spesifikke mobilkontroller og hører funksjonelt til fase 23
+- #3 er den eldre planleggingsaken for responsive mobilkontroller og hører funksjonelt til fase 23. Mobilvisning er samme responsive nettsted ved smalere viewport, ikke et separat device-spesifikt design.
 - #57 er dekket av implementasjonen i #63 og skal ikke ha en separat kodeleveranse; saken kan lukkes når #63 er merget
 
 ## Dokumentregel

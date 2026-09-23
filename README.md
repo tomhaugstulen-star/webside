@@ -26,12 +26,12 @@ Lokal webside-editor bygget med React, TypeScript og Vite. Programmet er laget f
 ## Leveransestatus
 
 - `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
-- aktiv vedlikeholdsleveranse før fase 20 er #63 på `feature/editor-polish-before-phase-20-v2`
-- kodearbeidet for #63/#64 er ferdigstilt på aktiv branch, inkludert testdekning og regenererte arkitekturrapporter; 48 unit-tester, lint, TypeScript, filgrenser, arkitekturkontroll og bygg er grønne
-- brukeren har bekreftet full lokal `npm run verify` på `9548312` med 48 unit-tester og 6 E2E-tester, samt meldt manuell regresjon OK etter HEX/Escape-fiksen; agentmiljøets E2E var blokkert av Chromium-nedlasting
-- leveransen klargjøres for PR/review; CI på endelig PR-head og uttrykkelig mergegodkjenning gjenstår
-- repo-audit #64 er implementert med assetopprydding, deaktivert planlagt UI og utvidet testdekning
-- neste produksjonsfase etter disse vedlikeholdsgatene er fase 20 – nettstedets Header og menynavigasjon
+- #63/#64 er merget i PR #65
+- aktiv grunnlagsleveranse er #66 på `feature/project-import-before-phase-20`
+- Prosjekt-panelet kan lagre og åpne én `.website-project`-fil med alle sider, elementer, bilder og logoer; filformatet er versjonert JSON med innebygde base64-assets
+- import valideres og schema 10/11 migreres til schema 12 før aktivt prosjekt og asset-store erstattes; ugyldige filer avvises uten å endre arbeidsøkten
+- bildeimport finnes både i Prosjekt-panelet og under Elementer → Bilde
+- neste produksjonsfase etter #66 er fase 20 – nettstedets Header og menynavigasjon
 - eksisterende synlige editorhandlinger som Lagre, Forhåndsvisning og Publiser er planlagte funksjoner; fase 30 skal kunne generere en komplett statisk nettsidemappe som kan lastes direkte opp til vanlig webhotell/domene
 - fase 25 leverer lokal prosjektlagring, automatisk lagring og gjenoppretting
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke brukes som aktiv leveranse
@@ -61,7 +61,7 @@ npm run architecture:diagram
 
 ## Viktig før fase 25
 
-Gjeldende `main` har ikke varig prosjektlagring eller automatisk lagring. Oppfriskning, lukking eller krasj kan derfor miste arbeidsøkten. Programmet skal ikke være eneste lagringssted for jobbkritisk innhold før fase 25 er ferdig kontrollert og merget.
+#66 gir manuell lagring til prosjektfil, men ingen automatisk lagring. Last ned en oppdatert prosjektfil før oppfriskning eller lukking; endringer etter siste nedlasting kan gå tapt. Toolbar-knappen «Lagre» forblir deaktivert frem til fase 25.
 
 ## Autoritativ dokumentasjon
 

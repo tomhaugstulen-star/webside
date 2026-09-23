@@ -1,3 +1,4 @@
+import { imageBytesMatchMimeType } from './imageFileSignature'
 import {
   MAX_IMAGE_DIMENSION_PX,
   MAX_IMAGE_FILE_BYTES,
@@ -76,6 +77,10 @@ export async function prepareImageFile(
   }
 
   try {
+    const signature = new Uint8Array(await file.slice(0, 12).arrayBuffer())
+    if (!imageBytesMatchMimeType(signature, mimeType)) {
+      return { ok: false, message: 'Bildets innhold stemmer ikke med filtypen.' }
+    }
     const dimensions = await readImageDimensions(file)
 
     if (dimensions.width <= 0 || dimensions.height <= 0) {
