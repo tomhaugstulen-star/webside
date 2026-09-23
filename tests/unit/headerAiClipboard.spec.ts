@@ -143,3 +143,31 @@ test('applies a valid AI Header proposal through one typed action', () => {
   expect(next.appearance.fontSize).toBe(28)
   expect(updated.project.updatedAt).toBe('2026-09-24T00:01:00.000Z')
 })
+
+
+test('accepts a valid proposal wrapped in a JSON code fence', () => {
+  const { header } = createHeaderState()
+  const proposal = {
+    format: 'website-editor-ai-v1',
+    type: 'header',
+    elementId: header.id,
+    viewport: 'desktop',
+    width: header.size.desktop.width,
+    height: header.size.desktop.height,
+    siteName: 'Kodeblokk navn',
+    subtitle: '',
+    appearance: header.appearance,
+  }
+
+  const parsed = parseHeaderAiProposal(
+    `\`\`\`json\n${JSON.stringify(proposal)}\n\`\`\``,
+    {
+      elementId: header.id,
+      viewport: 'desktop',
+      width: header.size.desktop.width,
+      height: header.size.desktop.height,
+    },
+  )
+
+  expect(parsed.siteName).toBe('Kodeblokk navn')
+})
