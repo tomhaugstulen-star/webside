@@ -86,15 +86,11 @@ export function resetElementMobileOverrides(
         return null
       }
 
-      const { mobile: _positionMobile, ...position } = element.position
-      const { mobile: _sizeMobile, ...size } = element.size
-      const { mobile: _visibilityMobile, ...visibility } = element.visibility
-
       return {
         ...element,
-        position,
-        size,
-        visibility,
+        position: { desktop: element.position.desktop },
+        size: { desktop: element.size.desktop },
+        visibility: { desktop: element.visibility.desktop },
       }
     },
   )
