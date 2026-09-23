@@ -139,6 +139,17 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'set-element-mobile-visibility'
+      elementId: string
+      visible: boolean
+      updatedAt: string
+    }
+  | {
+      type: 'reset-element-mobile-overrides'
+      elementId: string
+      updatedAt: string
+    }
+  | {
       type: 'set-text-element-content'
       elementId: string
       content: string
