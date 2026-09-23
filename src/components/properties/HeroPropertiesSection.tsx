@@ -1,13 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from 'react'
-import { prepareImageFile } from '../../assets/images/prepareImageFile'
-import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
+import { useId, useState, type FormEvent } from 'react'
 import type { HeroEditorElement } from '../../model/editorProject'
 import {
   isValidHeroCtaLabel,
@@ -18,16 +9,10 @@ import {
   MAX_HERO_TITLE_LENGTH,
   normalizeHeroText,
 } from '../../model/heroElement'
-import {
-  createImageAssetId,
-  supportedImageMimeTypes,
-  type ImageAssetId,
-} from '../../model/imageAsset'
-import { projectReferencesImageAsset } from '../../model/projectImageAssets'
-import { useEditorProject } from '../../state/useEditorProject'
 import { useHeroProperties } from '../../state/useHeroProperties'
 import { BackgroundFillControl } from '../colors/BackgroundFillControl'
 import { ColorSwatchInput } from '../colors/ColorSwatchInput'
+import { HeroImageProperties } from './HeroImageProperties'
 
 export function HeroPropertiesSection({
   element,
@@ -35,31 +20,16 @@ export function HeroPropertiesSection({
   element: HeroEditorElement
 }) {
   const idPrefix = useId()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const mountedRef = useRef(true)
   const [title, setTitle] = useState(element.title)
   const [subtitle, setSubtitle] = useState(element.subtitle)
   const [ctaLabel, setCtaLabel] = useState(element.ctaLabel)
-  const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const { state } = useEditorProject()
   const {
     updateHeroContent,
-    updateHeroImage,
     updateHeroBackgroundFill,
     updateHeroTextColor,
   } = useHeroProperties()
-  const { registerImageAsset, removeImageAsset, getImageAsset } =
-    useImageAssetStore()
-  const disabled = element.locked || busy
-  const resource = getImageAsset(element.imageAssetId)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-    }
-  }, [])
+  const disabled = element.locked
 
   const handleContentSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -81,58 +51,6 @@ export function HeroPropertiesSection({
     setCtaLabel(nextCtaLabel)
     updateHeroContent(element.id, nextTitle, nextSubtitle, nextCtaLabel)
     setMessage('Hero-innholdet er lagret.')
-  }
-
-  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.currentTarget.files?.[0] ?? null
-    event.currentTarget.value = ''
-    if (!file) return
-
-    setBusy(true)
-    setMessage(null)
-    let registeredAssetId: ImageAssetId | null = null
-
-    try {
-      const prepared = await prepareImageFile(file)
-      if (!mountedRef.current) return
-
-      if (!prepared.ok) {
-        setMessage(prepared.message)
-        return
-      }
-
-      const assetId = createImageAssetId()
-      if (
-        !registerImageAsset(assetId, prepared.value.file, prepared.value.metadata)
-      ) {
-        setMessage('Det nye Hero-bildet kunne ikke registreres.')
-        return
-      }
-
-      registeredAssetId = assetId
-      const previousAssetId = element.imageAssetId
-      const previousStillReferenced = projectReferencesImageAsset(
-        state.project,
-        previousAssetId,
-        element.id,
-      )
-
-      updateHeroImage(element.id, assetId, prepared.value.metadata)
-      registeredAssetId = null
-
-      if (!previousStillReferenced) {
-        removeImageAsset(previousAssetId)
-      }
-
-      setMessage('Hero-bildet er byttet.')
-    } catch {
-      if (registeredAssetId) removeImageAsset(registeredAssetId)
-      if (mountedRef.current) {
-        setMessage('Hero-bildet kunne ikke behandles. Prøv en annen fil.')
-      }
-    } finally {
-      if (mountedRef.current) setBusy(false)
-    }
   }
 
   const titleId = idPrefix + '-title'
@@ -213,34 +131,7 @@ export function HeroPropertiesSection({
         />
       </div>
 
-      <div className="hero-properties__image">
-        <input
-          ref={fileInputRef}
-          className="hero-properties__file-input"
-          type="file"
-          accept={supportedImageMimeTypes.join(',')}
-          disabled={disabled}
-          tabIndex={-1}
-          aria-hidden="true"
-          onChange={handleImageChange}
-        />
-        <button
-          className="hero-properties__secondary"
-          type="button"
-          disabled={disabled}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {busy ? 'Leser bilde…' : 'Bytt Hero-bilde'}
-        </button>
-        <p className="hero-properties__file-name">
-          {element.imageAssetMetadata.fileName}
-        </p>
-        {!resource && (
-          <p className="hero-properties__warning" role="alert">
-            Hero-bildet mangler i den aktive ressursbufferen.
-          </p>
-        )}
-      </div>
+      <HeroImageProperties element={element} disabled={disabled} />
 
       {message && (
         <p className="hero-properties__message" role="status">
@@ -248,7 +139,7 @@ export function HeroPropertiesSection({
         </p>
       )}
 
-      {element.locked && (
+      {disabled && (
         <p className="hero-properties__locked-note">
           Lås opp Hero-elementet for å redigere innhold og utseende.
         </p>
