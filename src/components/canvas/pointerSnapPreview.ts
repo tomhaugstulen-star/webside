@@ -82,6 +82,14 @@ export function getPointerSnapPreview({
     })
   }
 
+  if (element.kind === 'image' && element.mode === 'contain') {
+    return {
+      elementId: element.id,
+      layout,
+      guides: [],
+    }
+  }
+
   const result = snapElementResize({
     element,
     layout,
