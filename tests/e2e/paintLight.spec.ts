@@ -136,10 +136,12 @@ test('edits a copy of an image with history, crop and project save', async ({ pa
       }),
     })
   })
-  await dialog.getByRole('button', { name: 'Eksporter til fil…' }).click()
+  await dialog.getByRole('button', { name: 'Lagre', exact: true }).click()
+  await dialog.getByRole('menuitem', { name: 'Eksporter til fil…' }).click()
   await expect(dialog).toContainText('Bildefilen er lagret i valgt mappe.')
 
-  await dialog.getByRole('button', { name: 'Lagre som nytt bilde på siden' }).click()
+  await dialog.getByRole('button', { name: 'Lagre', exact: true }).click()
+  await dialog.getByRole('menuitem', { name: 'Lagre som nytt bilde på siden' }).click()
   await expect(images).toHaveCount(2)
   await expect(dialog).toBeHidden()
   await page.waitForTimeout(900)
