@@ -12,7 +12,7 @@ test('edits a copy of an image with history, crop and project save', async ({ pa
     return canvas.toDataURL('image/png').split(',')[1]
   })
   await page.getByRole('button', { name: 'Elementer', exact: true }).click()
-  await page.locator('.image-import-control input[type="file"]').setInputFiles({
+  await page.locator('.image-import-control:has(.element-card--image) input[type="file"]').setInputFiles({
     name: 'original.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64'),
   })
   const images = page.locator('.canvas-element--image')
