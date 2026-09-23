@@ -138,7 +138,19 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       <section className={`paint-dialog${fullscreen ? ' paint-dialog--fullscreen' : ''}`}
         role="dialog" aria-modal="true" aria-label="Rediger bilde">
         <header className="paint-dialog__header">
-          <div><h2>Rediger bilde</h2><p>Originalen beholdes. Endringene lagres som nytt bilde.</p></div>
+          <div className="paint-dialog__header-title"><h2>Rediger bilde</h2></div>
+          <div className="paint-dialog__history-actions" aria-label="Historikk">
+            <button type="button" className="paint-dialog__icon-button"
+              aria-label="Angre" title="Angre" disabled={!paint.canUndo || importPending}
+              onClick={() => void paint.undo()}>
+              <span aria-hidden="true">↶</span>
+            </button>
+            <button type="button" className="paint-dialog__icon-button"
+              aria-label="Gjør om" title="Gjør om" disabled={!paint.canRedo || importPending}
+              onClick={() => void paint.redo()}>
+              <span aria-hidden="true">↷</span>
+            </button>
+          </div>
           <div className="paint-dialog__header-actions">
             <input ref={importInputRef} className="paint-dialog__file-input" type="file"
               accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
@@ -159,18 +171,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <button type="button" onClick={importActions.merge}>Slå sammen</button>
               <button type="button" onClick={importActions.cancel}>Fjern import</button>
             </>}
-            <div className="paint-dialog__history-actions" aria-label="Historikk">
-              <button type="button" className="paint-dialog__icon-button"
-                aria-label="Angre" title="Angre" disabled={!paint.canUndo || importPending}
-                onClick={() => void paint.undo()}>
-                <span aria-hidden="true">↶</span>
-              </button>
-              <button type="button" className="paint-dialog__icon-button"
-                aria-label="Gjør om" title="Gjør om" disabled={!paint.canRedo || importPending}
-                onClick={() => void paint.redo()}>
-                <span aria-hidden="true">↷</span>
-              </button>
-            </div>
             <div className="paint-dialog__save-menu">
               <button type="button" aria-haspopup="menu" aria-expanded={saveMenuOpen}
                 disabled={!paint.ready || busy || importPending}
@@ -197,7 +197,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
 
         <div className="paint-dialog__workspace">
           <aside className="paint-dialog__sidebar" aria-label="Bildeverktøy og innstillinger">
-            <div className="paint-dialog__panel-group" role="group" aria-label="Bildeverktøy">
+            <div className="paint-dialog__panel-group" role="group" aria-label="Bildeverktøy og markering">
               <h3>Verktøy</h3>
               <div className="paint-dialog__tool-grid">
                 {tools.map((item) => (
@@ -209,11 +209,9 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 onChange={(event) => setColor(event.target.value)} /></label>
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
-            </div>
-
-            <div className="paint-dialog__panel-group" role="group" aria-label="Markering">
+              <div className="paint-dialog__panel-divider" />
               <h3>Markering</h3>
-              <div className="paint-dialog__action-grid">
+              <div className="paint-dialog__action-grid paint-dialog__action-grid--compact">
                 <button type="button" disabled={!paint.selection || importPending} onClick={paint.copy}>Kopier</button>
                 <button type="button" disabled={!paint.selection || importPending} onClick={paint.cut}>Klipp ut</button>
                 <button type="button" disabled={!paint.canPaste || importPending} onClick={paint.paste}>Lim inn</button>
