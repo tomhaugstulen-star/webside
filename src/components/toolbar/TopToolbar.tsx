@@ -19,6 +19,7 @@ type TopToolbarProps = {
   onRedo: () => void
   persistenceStatus: EditorPersistenceStatus
   onDuplicateProject: () => void
+  onPreview: () => void
 }
 
 type IconName =
@@ -84,6 +85,7 @@ export function TopToolbar({
   onRedo,
   persistenceStatus,
   onDuplicateProject,
+  onPreview,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -184,7 +186,7 @@ export function TopToolbar({
       </div>
 
       <div className="top-toolbar__actions">
-        <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" disabled title="Kommer senere"><Icon name="eye" /><span>Forhåndsvisning</span></button>
+        <button className="toolbar-action" type="button" aria-label="Forhåndsvisning" onClick={onPreview}><Icon name="eye" /><span>Forhåndsvisning</span></button>
         {persistenceStatus === 'error' && (
           <span className="top-toolbar__save-error" role="alert">
             Lagringsfeil
