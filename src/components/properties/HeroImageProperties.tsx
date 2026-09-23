@@ -12,8 +12,6 @@ import {
   supportedImageMimeTypes,
   type ImageAssetId,
 } from '../../model/imageAsset'
-import { projectReferencesImageAsset } from '../../model/projectImageAssets'
-import { useEditorProject } from '../../state/useEditorProject'
 import { useHeroProperties } from '../../state/useHeroProperties'
 
 export function HeroImageProperties({
@@ -27,7 +25,6 @@ export function HeroImageProperties({
   const mountedRef = useRef(true)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const { state } = useEditorProject()
   const { updateHeroImage } = useHeroProperties()
   const { registerImageAsset, removeImageAsset, getImageAsset } =
     useImageAssetStore()
@@ -67,19 +64,8 @@ export function HeroImageProperties({
       }
 
       registeredAssetId = assetId
-      const previousAssetId = element.imageAssetId
-      const previousStillReferenced = projectReferencesImageAsset(
-        state.project,
-        previousAssetId,
-        element.id,
-      )
-
       updateHeroImage(element.id, assetId, prepared.value.metadata)
       registeredAssetId = null
-
-      if (!previousStillReferenced) {
-        removeImageAsset(previousAssetId)
-      }
 
       setMessage('Hero-bildet er byttet.')
     } catch {
