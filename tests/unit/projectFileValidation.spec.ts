@@ -102,3 +102,39 @@ test('rejects invalid JSON, unsupported formats/schema and dangling assets befor
     expect(await readProjectFile(new File([content], 'broken.website-project'))).toBeNull()
   }
 })
+
+
+test('project file round-trip preserves explicit mobile layout and visibility', async () => {
+  const fixture = projectFileFixture()
+  const image = fixture.project.pages[0].elements[0]
+  image.position.mobile = { x: 12, y: 80 }
+  image.size.mobile = { width: 180, height: 120 }
+  image.visibility.mobile = false
+
+  const asset = fixture.assets[0]
+  const file = new File(
+    [base64ToBytes(asset.base64)!],
+    asset.metadata.fileName,
+    { type: asset.metadata.mimeType },
+  )
+  const blob = await createProjectFileBlob(
+    fixture.project,
+    () => ({ file, metadata: asset.metadata, objectUrl: 'blob:test' }),
+  )
+  expect(blob).not.toBeNull()
+
+  const imported = await readProjectFile(
+    new File([blob!], 'responsive.website-project', {
+      type: 'application/json',
+    }),
+  )
+  expect(imported?.project.pages[0].elements[0].position.mobile).toEqual({
+    x: 12,
+    y: 80,
+  })
+  expect(imported?.project.pages[0].elements[0].size.mobile).toEqual({
+    width: 180,
+    height: 120,
+  })
+  expect(imported?.project.pages[0].elements[0].visibility.mobile).toBe(false)
+})
