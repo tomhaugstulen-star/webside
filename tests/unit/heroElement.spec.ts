@@ -93,6 +93,25 @@ test('updates Hero content and CTA link through typed reducer actions', () => {
   })
 })
 
+test('allows Hero title and subtitle to be removed by saving empty values', () => {
+  const { state } = addHero()
+  const updated = editorProjectReducer(state, {
+    type: 'set-hero-content',
+    elementId: 'hero-1',
+    title: '',
+    subtitle: '',
+    ctaLabel: 'Les mer',
+    updatedAt: UPDATED_AT,
+  })
+
+  const hero = updated.project.pages[0].elements[0]
+  if (!hero || hero.kind !== 'hero') throw new Error('Expected Hero element.')
+
+  expect(hero.title).toBe('')
+  expect(hero.subtitle).toBe('')
+  expect(isValidEditorProject(updated.project)).toBe(true)
+})
+
 test('rejects Hero mutations while locked', () => {
   const { state } = addHero()
   const locked = editorProjectReducer(state, {
