@@ -17,7 +17,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 23 er fullført og merget i PR #82
 - fase 24 er fullført og merget i PR #84
 - fase 25 er fullført og merget i PR #87
-- fase 26 er aktiv i sak #88 på `feature/phase-26-backup-project-format`
+- fase 26 er fullført og merget i PR #89
+- fase 27 er aktiv i sak #90 på `feature/phase-27-local-preview`
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -243,7 +244,7 @@ Fasen implementeres på en ny branch fra den da gjeldende `main`. Gammel kode fr
 
 ## Fase 26 – sikkerhetskopi, prosjektformat, import og migrering
 
-Fasen er aktiv i sak #88 på `feature/phase-26-backup-project-format`.
+Fasen er fullført og merget i PR #89. Sak #88 er avsluttet.
 
 Låst hovedomfang:
 
@@ -254,6 +255,20 @@ Låst hovedomfang:
 - aktivere `Dupliser prosjekt` som en uavhengig, importbar prosjektkopi med ny prosjekt-ID og nye timestamps
 - gjenbruke fase-25 autosave etter vellykket import
 - ingen sky, konto, lokalt prosjektbibliotek eller fase 27+ i denne leveransen
+
+## Fase 27 – lokal forhåndsvisning
+
+Fasen er aktiv i sak #90 på `feature/phase-27-local-preview`.
+
+Låst hovedomfang:
+
+- aktivere eksisterende `Forhåndsvisning`-handling
+- ren lokal preview uten editorverktøy, selection, handles eller guides
+- gjenbruke eksisterende prosjekt-, asset- og rendererlogikk
+- lokal side- og seksjonsnavigasjon gjennom eksisterende Header-meny
+- PC-/Telefon-preview med samme responsive data og mobile overrides
+- preview-state er transient og skal ikke lagres i prosjektet eller påvirke undo/redo
+- ingen statisk eksport, SEO, domene eller publisering før fase 30
 
 ## Separat backlog
 
