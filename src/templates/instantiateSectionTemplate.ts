@@ -1,6 +1,6 @@
 import { createStableId } from '../model/createStableId'
 import type { EditorElement } from '../model/editorProject'
-import type { ImageAssetId } from '../model/imageAsset'
+import { createImageAssetId, type ImageAssetId } from '../model/imageAsset'
 import { createUniqueSectionAnchorId } from '../model/siteStructure'
 import type { ImageAssetRegistration } from '../assets/images/imageAssetStoreContext'
 import type { SectionTemplate } from './sectionTemplate'
@@ -64,7 +64,7 @@ export function instantiateSectionTemplate(
   ]))
   const assetIdMap = new Map(template.assets.map((asset) => [
     asset.assetId,
-    createStableId(),
+    createImageAssetId(),
   ]))
   const insertY = getNextInsertionY(targetElements)
   const yOffset = insertY - sourceSection.position.desktop.y
