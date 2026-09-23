@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useImageAssetStore } from '../assets/images/useImageAssetStore'
 import type {
   HeaderEditorElement,
   ResponsiveViewport,
@@ -10,6 +11,7 @@ import {
   parseHeaderAiProposal,
   type HeaderAiProposal,
 } from './headerAiClipboard'
+import { renderHeaderAiPreviewPng } from './headerAiImage'
 
 type Props = {
   element: HeaderEditorElement
@@ -19,6 +21,7 @@ type Props = {
 
 export function HeaderAiControls({ element, viewport, layout }: Props) {
   const { state, dispatch } = useEditorProject()
+  const { getImageAsset } = useImageAssetStore()
   const [proposal, setProposal] = useState<HeaderAiProposal | null>(null)
   const [message, setMessage] = useState<string | null>(null)
 
@@ -40,8 +43,26 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
         layout,
         project: state.project,
       })
-      await navigator.clipboard.writeText(clip)
-      setMessage('ChatGPT-utklipp kopiert.')
+      const logoUrl = getImageAsset(element.logoAssetId)?.objectUrl ?? undefined
+      const png = await renderHeaderAiPreviewPng(
+        element,
+        layout,
+        state.project.navigation.items.map((item) => item.label),
+        logoUrl,
+      )
+
+      if (typeof ClipboardItem === 'function' && navigator.clipboard.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': new Blob([clip], { type: 'text/plain' }),
+            'image/png': png,
+          }),
+        ])
+        setMessage('ChatGPT-utklipp og Header-bilde kopiert.')
+      } else {
+        await navigator.clipboard.writeText(clip)
+        setMessage('ChatGPT-utklipp kopiert. Nettleseren støtter ikke bilde på utklippstavlen.')
+      }
     } catch {
       setMessage('Kunne ikke kopiere til utklippstavlen.')
     }
