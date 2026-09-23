@@ -32,6 +32,7 @@ async function parseAsset(value: unknown): Promise<ImportedProjectAsset | null> 
     return null
   }
 
+  if (value.base64.length !== 4 * Math.ceil(value.metadata.byteSize / 3)) return null
   const bytes = base64ToBytes(value.base64)
   if (!bytes || bytes.byteLength !== value.metadata.byteSize) return null
 
@@ -66,6 +67,7 @@ export async function readProjectFile(
 
   if (
     !isRecord(parsed) ||
+    Object.keys(parsed).length !== 4 ||
     parsed.format !== PROJECT_FILE_FORMAT ||
     parsed.formatVersion !== PROJECT_FILE_FORMAT_VERSION ||
     !Array.isArray(parsed.assets)

@@ -3,7 +3,9 @@ import type {
   EditorElement,
   ResponsiveValue,
 } from './editorProject'
-import { isValidElementLayout } from './elementLayout'
+import { isValidElementLayout, isValidElementDesktopLayout } from './elementLayout'
+import { HEADER_SERIALIZED_WIDTH } from './elementDimensions'
+import { isValidHeaderSiteName, isValidHeaderSubtitle } from './headerElement'
 import { isValidElementLink } from './elementLink'
 import { isValidHeaderAppearance } from './headerAppearance'
 import {
@@ -83,15 +85,18 @@ function hasValidLayouts(element: Record<string, unknown>, kind: EditorElement['
     position: positions.desktop,
     size: sizes.desktop,
   })
-  const mobileValid =
-    positions.mobile === undefined && sizes.mobile === undefined
-      ? true
-      : positions.mobile !== undefined &&
-        sizes.mobile !== undefined &&
-        isValidElementLayout(kind, {
-          position: positions.mobile,
-          size: sizes.mobile,
-        })
+  const mobileValid = isValidElementLayout(kind, {
+    position: positions.mobile ?? positions.desktop,
+    size: sizes.mobile ?? sizes.desktop,
+  })
+  if (kind === 'header') {
+    return desktopValid && mobileValid && element.locked === false &&
+      [positions.desktop, positions.mobile ?? positions.desktop].every(
+        ({ x, y }) => x === 0 && y === 0,
+      ) && [sizes.desktop, sizes.mobile ?? sizes.desktop].every(
+        ({ width }) => width === HEADER_SERIALIZED_WIDTH,
+      )
+  }
 
   return desktopValid && mobileValid
 }
@@ -100,10 +105,21 @@ function isExactImageTransform(value: unknown): value is ImageTransform {
   const normalized = normalizeImageTransform(value)
   if (!normalized || !isRecord(value)) return false
   return (
+    hasExactKeys(value, ['zoom', 'offsetX', 'offsetY']) &&
     value.zoom === normalized.zoom &&
     value.offsetX === normalized.offsetX &&
     value.offsetY === normalized.offsetY
   )
+}
+
+function hasValidImageCropLayouts(element: EditorElement) {
+  return ['desktop', 'mobile'].every((viewport) => {
+    const mobile = viewport === 'mobile'
+    return isValidElementDesktopLayout(element, {
+      position: (mobile && element.position.mobile) || element.position.desktop,
+      size: (mobile && element.size.mobile) || element.size.desktop,
+    })
+  })
 }
 
 function hasValidCommonFields(
@@ -143,7 +159,8 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
         isValidImageAssetMetadata(value.assetMetadata) &&
         typeof value.altText === 'string' &&
         isImageMode(value.mode) &&
-        isExactImageTransform(value.transform)
+        isExactImageTransform(value.transform) &&
+        hasValidImageCropLayouts(value as unknown as EditorElement)
       )
     case 'text':
       return (
@@ -179,7 +196,9 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
         isImageAssetId(value.logoAssetId) &&
         isValidImageAssetMetadata(value.logoAssetMetadata) &&
         typeof value.siteName === 'string' &&
+        isValidHeaderSiteName(value.siteName) &&
         typeof value.subtitle === 'string' &&
+        isValidHeaderSubtitle(value.subtitle) &&
         isValidHeaderAppearance(value.appearance)
       )
     default:

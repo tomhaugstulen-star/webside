@@ -1,4 +1,5 @@
 import type { ImageAssetResource } from '../assets/images/imageAssetStoreContext'
+import { isValidEditorProject } from '../model/editorProjectValidation'
 import type { EditorProject } from '../model/editorProject'
 import type { ImageAssetId } from '../model/imageAsset'
 import { arrayBufferToBase64 } from './projectFileBase64'
@@ -19,6 +20,7 @@ export async function createProjectFileBlob(
   project: EditorProject,
   getImageAsset: GetImageAsset,
 ): Promise<Blob | null> {
+  if (!isValidEditorProject(project)) return null
   const references = getProjectAssetReferences(project)
   if (!references) return null
 

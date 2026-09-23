@@ -13,9 +13,10 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary)
 }
 
-export function base64ToBytes(value: string): Uint8Array | null {
+export function base64ToBytes(value: string): Uint8Array<ArrayBuffer> | null {
   try {
     const binary = atob(value)
+    if (btoa(binary) !== value) return null
     const bytes = new Uint8Array(binary.length)
 
     for (let index = 0; index < binary.length; index += 1) {

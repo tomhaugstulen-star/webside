@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import { createProjectFileBlob } from '../../projectFiles/createProjectFile'
 import {
@@ -11,6 +11,12 @@ import { useEditorProject } from '../../state/useEditorProject'
 type BusyMode = 'export' | 'import' | null
 
 export function ProjectFileControls() {
+  const mountedRef = useRef(true)
+  const operationRef = useRef(false)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<BusyMode>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -18,12 +24,15 @@ export function ProjectFileControls() {
   const { getImageAsset, replaceImageAssets } = useImageAssetStore()
 
   const exportProject = async () => {
+    if (operationRef.current) return
+    operationRef.current = true
     setBusy('export')
     setMessage(null)
 
     try {
       const blob = await createProjectFileBlob(state.project, getImageAsset)
 
+      if (!mountedRef.current) return
       if (!blob) {
         setMessage('Prosjektet kunne ikke eksporteres. Kontroller bildene.')
         return
@@ -41,7 +50,8 @@ export function ProjectFileControls() {
     } catch {
       setMessage('Prosjektet kunne ikke eksporteres.')
     } finally {
-      setBusy(null)
+      operationRef.current = false
+      if (mountedRef.current) setBusy(null)
     }
   }
 
@@ -49,7 +59,8 @@ export function ProjectFileControls() {
     const file = event.currentTarget.files?.[0] ?? null
     event.currentTarget.value = ''
 
-    if (!file) return
+    if (!file || operationRef.current) return
+    operationRef.current = true
 
     setBusy('import')
     setMessage(null)
@@ -57,6 +68,7 @@ export function ProjectFileControls() {
     try {
       const imported = await readProjectFile(file)
 
+      if (!mountedRef.current) return
       if (!imported) {
         setMessage('Prosjektfilen er ugyldig eller skadet.')
         return
@@ -72,7 +84,8 @@ export function ProjectFileControls() {
     } catch {
       setMessage('Prosjektfilen kunne ikke åpnes.')
     } finally {
-      setBusy(null)
+      operationRef.current = false
+      if (mountedRef.current) setBusy(null)
     }
   }
 
@@ -103,11 +116,12 @@ export function ProjectFileControls() {
         className="project-file-controls__input"
         type="file"
         accept={PROJECT_FILE_EXTENSION}
+        disabled={busy !== null}
         tabIndex={-1}
         aria-hidden="true"
         onChange={(event) => void importProject(event)}
       />
-      {message && <p className="project-file-controls__message">{message}</p>}
+      {message && <p role="status" className="project-file-controls__message">{message}</p>}
     </section>
   )
 }

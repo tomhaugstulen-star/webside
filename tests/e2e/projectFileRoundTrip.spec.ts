@@ -11,6 +11,13 @@ async function openProject(page: Page) {
 
 test('project file round-trip restores pages and imported image assets', async ({ page }) => {
   await page.goto('/')
+  await page.getByRole('button', { name: 'Logo og header', exact: true }).click()
+  await page.getByLabel('Navn på nettsted eller firma').fill('Round-trip logo')
+  await page.locator('.header-creation-control__file-input').setInputFiles({
+    name: 'logo.png', mimeType: 'image/png', buffer: onePixelPng,
+  })
+  await expect(page.getByText('logo.png', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Opprett header', exact: true }).click()
   await openProject(page)
 
   await page.getByRole('button', { name: '+ Ny side', exact: true }).click()
@@ -42,6 +49,9 @@ test('project file round-trip restores pages and imported image assets', async (
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
   await expect(page.locator('.project-navigator__element').filter({ hasText: 'Bilde' })).toHaveCount(1)
 
+  const restoredLogo = page.locator('.header-element__logo')
+  await expect(restoredLogo).toBeVisible()
+  await expect.poll(() => restoredLogo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBe(1)
   await page.locator('.project-navigator__page-button').filter({ hasText: 'Side 2' }).click()
   const restoredImage = page.locator('.image-element__image')
   await expect(restoredImage).toBeVisible()
