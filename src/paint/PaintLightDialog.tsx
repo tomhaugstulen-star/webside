@@ -177,6 +177,12 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 </div>
               )}
             </div>
+            <div className="paint-dialog__selection-actions" aria-label="Markering">
+              <button type="button" disabled={!paint.selection || importPending} onClick={paint.copy}>Kopier</button>
+              <button type="button" disabled={!paint.selection || importPending} onClick={paint.cut}>Klipp ut</button>
+              <button type="button" disabled={!paint.canPaste || importPending} onClick={paint.paste}>Lim inn</button>
+              <button type="button" disabled={!paint.selection || importPending} onClick={paint.crop}>Beskjær</button>
+            </div>
           </div>
           <div className="paint-dialog__history-actions" aria-label="Historikk">
             <button type="button" className="paint-dialog__icon-button"
@@ -212,14 +218,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 onChange={(event) => setColor(event.target.value)} /></label>
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
-              <div className="paint-dialog__panel-divider" />
-              <h3>Markering</h3>
-              <div className="paint-dialog__action-grid paint-dialog__action-grid--compact">
-                <button type="button" disabled={!paint.selection || importPending} onClick={paint.copy}>Kopier</button>
-                <button type="button" disabled={!paint.selection || importPending} onClick={paint.cut}>Klipp ut</button>
-                <button type="button" disabled={!paint.canPaste || importPending} onClick={paint.paste}>Lim inn</button>
-                <button type="button" disabled={!paint.selection || importPending} onClick={paint.crop}>Beskjær</button>
-              </div>
             </div>
 
             <fieldset className="paint-dialog__resize">
