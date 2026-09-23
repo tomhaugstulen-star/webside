@@ -60,7 +60,7 @@ export function WebsiteNavigationSection() {
       </div>
 
       <p className="site-structure__hint">
-        Menypunktene lagres i prosjektet nå. Selve Header-menyen bygges i neste fase.
+        Menypunktene lagres i prosjektet og vises i Header på sider som har Header.
       </p>
 
       <form className="website-navigation__add-form" onSubmit={addItem}>
