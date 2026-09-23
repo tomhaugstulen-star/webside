@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useImageAssetStore } from '../assets/images/useImageAssetStore'
 import type {
   HeaderEditorElement,
@@ -119,7 +120,7 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
         Lim inn AI-forslag
       </button>
       {message && <span className="canvas-object-toolbar__status" role="status">{message}</span>}
-      {proposal && (
+      {proposal && createPortal(
         <div className="ai-preview-backdrop">
           <section className="ai-preview-dialog" role="dialog" aria-modal="true"
             aria-label="AI-forslag til Header">
@@ -148,7 +149,8 @@ export function HeaderAiControls({ element, viewport, layout }: Props) {
               <button type="button" onClick={applyProposal}>Bruk forslag</button>
             </div>
           </section>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )
