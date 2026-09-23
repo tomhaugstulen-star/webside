@@ -8,6 +8,7 @@ import {
 import { useImageAssetStore } from '../assets/images/useImageAssetStore'
 import { createStableId } from '../model/createStableId'
 import { isValidEditorProject } from '../model/editorProjectValidation'
+import type { ImageAssetId } from '../model/imageAsset'
 import { useEditorProject } from '../state/useEditorProject'
 import { captureSectionTemplate } from './captureSectionTemplate'
 import { instantiateSectionTemplate } from './instantiateSectionTemplate'
@@ -114,7 +115,7 @@ export function SectionTemplateLibraryProvider({
 
       if (!isValidEditorProject(candidateProject)) return 'invalid-template'
 
-      const registeredIds: string[] = []
+      const registeredIds: ImageAssetId[] = []
       for (const asset of insertion.assets) {
         if (
           !registerImageAsset(asset.assetId, asset.file, asset.metadata)
