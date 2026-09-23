@@ -80,8 +80,6 @@ export function resizeContainedImageLayout(
 ): ElementLayout {
   const ratio = getAspectRatio(metadata)
   const minimum = getMinimumAspectSize(metadata)
-  const centerX = initialLayout.position.x + initialLayout.size.width / 2
-  const centerY = initialLayout.position.y + initialLayout.size.height / 2
   const right = initialLayout.position.x + initialLayout.size.width
   const bottom = initialLayout.position.y + initialLayout.size.height
 
@@ -100,15 +98,15 @@ export function resizeContainedImageLayout(
   }
 
   let maximumWidth =
-    handle.includes('east') && !handle.includes('west')
-      ? canvasWidth - initialLayout.position.x
-      : handle.includes('west')
-        ? right
-        : 2 * Math.min(centerX, canvasWidth - centerX)
+    handle.includes('west')
+      ? right
+      : canvasWidth - initialLayout.position.x
 
-  if (handle === 'north') {
-    maximumWidth = Math.min(maximumWidth, bottom * ratio)
-  } else if (handle.includes('north')) {
+  if (!handle.includes('east') && !handle.includes('west')) {
+    maximumWidth = canvasWidth - initialLayout.position.x
+  }
+
+  if (handle.includes('north')) {
     maximumWidth = Math.min(maximumWidth, bottom * ratio)
   }
 
@@ -120,14 +118,10 @@ export function resizeContainedImageLayout(
 
   if (handle.includes('west')) {
     x = right - width
-  } else if (!handle.includes('east')) {
-    x = centerX - width / 2
   }
 
   if (handle.includes('north')) {
     y = bottom - height
-  } else if (!handle.includes('south')) {
-    y = centerY - height / 2
   }
 
   return {
