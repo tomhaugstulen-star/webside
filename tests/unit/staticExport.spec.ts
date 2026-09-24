@@ -8,6 +8,7 @@ import { normalizePublicUrl } from '../../src/model/siteSettings'
 import { createImageAssetId } from '../../src/model/imageAsset'
 import { pageFilePath, relativePageHref } from '../../src/export/sitePaths'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
+import { PUBLIC_DESKTOP_WIDTH } from '../../src/export/siteDimensions'
 
 const decode = new TextDecoder()
 
@@ -80,4 +81,18 @@ test('public markup escapes content and resolves menu and section links', () => 
   expect(html).toContain('Om &amp; oss')
   expect(html).toContain('&lt;script&gt;farlig&lt;/script&gt;')
   expect(html).not.toContain('<script>')
+})
+
+test('export keeps elements placed in the editor’s expanded desktop canvas', () => {
+  const project = createBlankProject('Bredt lerret')
+  const section = createEditorElement({ id: 'section-1', request: { kind: 'section' }, existingElements: [] })
+  if (section.kind !== 'section') throw Error('Fixture')
+  project.pages[0].elements.push({ ...section,
+    position: { desktop: { x: 594, y: 180 } },
+    size: { desktop: { width: 537, height: 478 } },
+  })
+  const html = renderPublicElements(project, '/', () => 'unused', () => ({ href: 'unused', color: '#fff' }))
+  expect(html).toContain('--d-x:594px')
+  expect(html).toContain('--d-w:537px')
+  expect(594 + 537).toBeLessThanOrEqual(PUBLIC_DESKTOP_WIDTH)
 })
