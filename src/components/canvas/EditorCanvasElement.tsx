@@ -6,7 +6,7 @@ import {
   type PointerEvent,
   type RefObject,
 } from 'react'
-import { useHeaderAiContextMenu } from '../../ai/useHeaderAiContextMenu'
+import { useElementAiContextMenu } from '../../ai/useElementAiContextMenu'
 import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import type { NavigationTarget } from '../../model/navigation'
@@ -101,8 +101,8 @@ export function EditorCanvasElement({
     onPreviewLayoutChange,
   })
 
-  const { handleContextMenu, controls: aiControls } = useHeaderAiContextMenu(
-    element, viewport, layout, onSelect,
+  const { handleContextMenu, panel: aiPanel } = useElementAiContextMenu(
+    element, layout, onSelect,
   )
 
   if (!visible) {
@@ -234,7 +234,7 @@ export function EditorCanvasElement({
             />
           ))}
       </div>
-      {aiControls}
+      {aiPanel}
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
           element={element}
