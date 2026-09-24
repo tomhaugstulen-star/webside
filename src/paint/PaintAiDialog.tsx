@@ -11,12 +11,14 @@ type Props = {
 export function PaintAiDialog({ canvasRef, disabled, onClose }: Props) {
   const [comment, setComment] = useState('')
   const [previewUrl, setPreviewUrl] = useState('')
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     setPreviewUrl(canvas.toDataURL('image/png'))
+    setDimensions({ width: canvas.width, height: canvas.height })
   }, [canvasRef])
 
   const copySnapshot = async () => {
@@ -36,8 +38,6 @@ export function PaintAiDialog({ canvasRef, disabled, onClose }: Props) {
     }
   }
 
-  const canvas = canvasRef.current
-
   return createPortal(
     <div className="paint-ai-backdrop">
       <section
@@ -50,7 +50,9 @@ export function PaintAiDialog({ canvasRef, disabled, onClose }: Props) {
           <div>
             <h2>AI</h2>
             <p>
-              {canvas ? `${canvas.width} × ${canvas.height} px` : 'Bilde'}
+              {dimensions.width > 0
+                ? `${dimensions.width} × ${dimensions.height} px`
+                : 'Bilde'}
             </p>
           </div>
           <button type="button" onClick={onClose} aria-label="Lukk AI">
