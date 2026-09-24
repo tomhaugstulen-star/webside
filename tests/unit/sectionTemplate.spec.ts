@@ -58,6 +58,7 @@ function page(elements: EditorElement[]): EditorPage {
     id: 'page-1',
     name: 'Forside',
     slug: '/',
+    seo: { title: 'Forside', description: '' },
     appearance: createBlankProject().pages[0].appearance,
     elements,
   }

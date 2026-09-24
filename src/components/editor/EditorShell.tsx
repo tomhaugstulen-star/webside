@@ -21,13 +21,12 @@ import { usePaintLight } from '../../paint/usePaintLight'
 import { useElementDeletionShortcut } from './useElementDeletionShortcut'
 import { useSelectedImageCropKeyboard } from './useSelectedImageCropKeyboard'
 import { getEditorHistoryShortcut } from './editorHistoryShortcut'
-
+import { useStaticSiteExport } from '../../export/useStaticSiteExport'
 type DeletionRequest = {
   elementId: string
   kind: ElementKind
   returnFocus: HTMLElement | null
 }
-
 export function EditorShell() {
   const [activeTool, setActiveTool] = useState<EditorTool | null>(null)
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
@@ -46,6 +45,7 @@ export function EditorShell() {
   } = useEditorProject()
   const { status: persistenceStatus } = useEditorPersistence()
   const { getImageAsset } = useImageAssetStore()
+  const { exporting, exportMessage, setExportMessage, exportSite } = useStaticSiteExport(state.project)
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
   const { selectedElement } = useElementSelection()
@@ -60,24 +60,19 @@ export function EditorShell() {
   const deletionContents = deletionTarget?.kind === 'section'
     ? getSectionContents(deletionTarget, activePage.elements)
     : []
-
   const toggleToolPanel = (tool: EditorTool) => {
     setActiveTool((currentTool) => (currentTool === tool ? null : tool))
   }
-
   const closeToolPanel = () => {
     setActiveTool(null)
   }
-
   const changeActivePage = (pageId: string) => {
     dispatch({ type: 'set-active-page', pageId })
     closeToolPanel()
     setPropertiesPanelOpen(false)
   }
-
   const createElementAndClosePanel = (request: ElementCreationRequest) => {
     const created = createElement(request)
-
     if (created) {
       closeToolPanel()
     }
@@ -212,7 +207,11 @@ export function EditorShell() {
           setPropertiesPanelOpen(false)
           paint.open()
         }}
+        onExport={() => void exportSite()}
+        exporting={exporting}
+        onProjectSettings={() => setActiveTool('settings')}
       />
+      {exportMessage && <div className="site-export-message" role="status"><span>{exportMessage}</span><button type="button" aria-label="Lukk eksportmelding" onClick={() => setExportMessage(null)}>×</button></div>}
       <div className="editor-shell__body">
         <LeftSidebar
           activeTool={activeTool}

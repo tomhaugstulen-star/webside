@@ -15,6 +15,8 @@ import {
   type EditorProjectV13,
 } from './editorProjectMigration'
 import { migrateEditorProjectV14, type EditorProjectV14 } from './editorProjectMigrationV14'
+import { migrateEditorProjectV15, type EditorProjectV15 } from './editorProjectMigrationV15'
+import { isValidPageSeo, isValidSiteSettings } from './siteSettings'
 import { isValidPageAppearance } from './pageAppearance'
 import {
   isValidPageName,
@@ -43,13 +45,14 @@ export function isValidEditorProject(value: unknown): value is EditorProject {
   if (
     !isRecord(value) ||
     !hasExactKeys(value, [
-      'schemaVersion', 'id', 'name', 'pages',
+      'schemaVersion', 'id', 'name', 'siteSettings', 'pages',
       'navigation', 'createdAt', 'updatedAt',
     ]) ||
     value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION ||
     !isReference(value.id) ||
     typeof value.name !== 'string' ||
     value.name.trim().length === 0 ||
+    !isValidSiteSettings(value.siteSettings) ||
     !Array.isArray(value.pages) ||
     value.pages.length === 0 ||
     !isTimestamp(value.createdAt) ||
@@ -62,10 +65,11 @@ export function isValidEditorProject(value: unknown): value is EditorProject {
   for (const page of value.pages) {
     if (
       !isRecord(page) ||
-      !hasExactKeys(page, ['id', 'name', 'slug', 'appearance', 'elements']) ||
+      !hasExactKeys(page, ['id', 'name', 'slug', 'seo', 'appearance', 'elements']) ||
       !isReference(page.id) ||
       !isValidPageName(page.name) ||
       !isValidPageSlug(page.slug) ||
+      !isValidPageSeo(page.seo) ||
       !isValidPageAppearance(page.appearance) ||
       !Array.isArray(page.elements) ||
       !page.elements.every(isValidEditorElement)
@@ -108,6 +112,8 @@ export function parseImportedEditorProject(value: unknown): EditorProject | null
       migrated = migrateEditorProjectV13(value as unknown as EditorProjectV13)
     } else if (value.schemaVersion === 14) {
       migrated = migrateEditorProjectV14(value as unknown as EditorProjectV14)
+    } else if (value.schemaVersion === 15) {
+      migrated = migrateEditorProjectV15(value as unknown as EditorProjectV15)
     } else if (value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION) {
       return null
     }

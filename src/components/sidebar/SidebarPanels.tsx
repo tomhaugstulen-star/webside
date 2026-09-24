@@ -4,6 +4,7 @@ import { ColorsPanel } from './ColorsPanel'
 import { ElementsPanel } from './ElementsPanel'
 import { HeaderCreationControl } from './HeaderCreationControl'
 import { ProjectNavigatorPanel } from './ProjectNavigatorPanel'
+import { SiteSettingsPanel } from './SiteSettingsPanel'
 
 type ElementsPanelProps = {
   onCreateElement: (request: ElementCreationRequest) => boolean
@@ -26,25 +27,7 @@ function LogoHeaderPanel({ onCreateElement }: ElementsPanelProps) {
 }
 
 function SettingsPanel() {
-  return (
-    <>
-      <h2>Innstillinger</h2>
-      <div className="setting-group">
-        <button className="setting-row" type="button" disabled title="Kommer senere">
-          <span>Prosjektnavn</span>
-          <span>›</span>
-        </button>
-        <button className="setting-row" type="button" disabled title="Kommer senere">
-          <span>Domene</span>
-          <span>›</span>
-        </button>
-        <button className="setting-row" type="button" disabled title="Kommer senere">
-          <span>SEO</span>
-          <span>›</span>
-        </button>
-      </div>
-    </>
-  )
+  return <SiteSettingsPanel />
 }
 
 export function SidebarPanel({

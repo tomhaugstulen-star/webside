@@ -1,6 +1,7 @@
 import { createInitialEditorProjectState } from '../model/createEditorProject'
 import type { EditorProjectState } from '../model/editorProject'
 import { isValidProjectSiteStructure } from '../model/siteStructure'
+import { reduceSiteMetadata } from './reduceSiteMetadata'
 import { addElementToActivePage } from './addElementToActivePage'
 import { deleteElementFromActivePage } from './deleteElementFromActivePage'
 import { insertElementsToActivePage } from './insertElementsToActivePage'
@@ -22,18 +23,15 @@ import { setSectionAnchorId } from './setSectionAnchorId'
 import { setTextElementContent } from './setTextElementContent'
 import { setTextElementStyle } from './setTextElementStyle'
 import { toggleElementLock } from './toggleElementLock'
-
 export function getInitialEditorProjectState() {
   return createInitialEditorProjectState()
 }
-
 function activePageContainsElement(state: EditorProjectState, elementId: string) {
   const activePage = state.project.pages.find(
     (page) => page.id === state.activePageId,
   )
   return activePage?.elements.some((element) => element.id === elementId) ?? false
 }
-
 function selectedElementExists(state: EditorProjectState) {
   return (
     state.selectedElementId === null ||
@@ -51,6 +49,8 @@ function reduceEditorProjectState(
   action: EditorProjectAction,
 ): EditorProjectState {
   switch (action.type) {
+    case 'set-site-metadata':
+      return reduceSiteMetadata(state, action)
     case 'replace-project': {
       const activePageId = action.project.pages[0]?.id
       if (!activePageId) {

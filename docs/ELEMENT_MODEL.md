@@ -5,7 +5,7 @@ Dette dokumentet beskriver den autoritative serialiserbare modellen.
 ## Skjemaversjon
 
 ```ts
-EDITOR_PROJECT_SCHEMA_VERSION = 15
+EDITOR_PROJECT_SCHEMA_VERSION = 16
 ```
 
 ```text
@@ -24,9 +24,10 @@ EDITOR_PROJECT_SCHEMA_VERSION = 15
 13 Typet bakgrunnsfyll: helfarge eller lineær gradient
 14 Hero med bilde, innhold, CTA-lenke og utseende
 15 Valgfrie menypunkt-underpunkter for rullegardin i Header
+16 Nettstedinnstillinger og SEO per side for statisk eksport
 ```
 
-Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12/13/14 migreres deterministisk til schema 15. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
+Prosjekt-panelet kan lagre og åpne `.website-project`. Schema 10/11/12/13/14/15 migreres deterministisk til schema 16. Hele prosjektstrukturen og alle refererte bilder/logoer valideres før `replace-project` og samlet asset-gjenoppretting.
 
 Kontrollert migreringsretning:
 
@@ -37,6 +38,7 @@ Kontrollert migreringsretning:
 - versjon 12 til 13 erstatter bakgrunnens `backgroundColor` med typet `backgroundFill` uten visuelt avvik
 - versjon 13 til 14 er identitetsbevarende for eksisterende prosjektdata og åpner for Hero-varianten
 - versjon 14 til 15 er identitetsbevarende for eksisterende menypunkter; `parentId` er valgfri
+- versjon 15 til 16 legger til nettstedsspråk, valgfri offentlig URL og SEO-tittel/beskrivelse per side
 - Header med lagret `x` eller `y` ulik 0 må normaliseres eller avvises
 - Header med `locked: true` må normaliseres eller avvises
 - eldre ukjente versjoner må ikke lastes delvis
@@ -45,9 +47,10 @@ Kontrollert migreringsretning:
 
 ```ts
 type EditorProject = {
-  schemaVersion: 15
+  schemaVersion: 16
   id: string
   name: string
+  siteSettings: SiteSettings
   pages: EditorPage[]
   navigation: WebsiteNavigation
   createdAt: string
@@ -58,6 +61,7 @@ type EditorPage = {
   id: string
   name: string
   slug: string
+  seo: PageSeo
   appearance: PageAppearance
   elements: EditorElement[]
 }

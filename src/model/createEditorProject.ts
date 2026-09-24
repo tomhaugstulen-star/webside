@@ -6,6 +6,7 @@ import {
 } from './editorProject'
 import { createStableId } from './createStableId'
 import { DEFAULT_PAGE_APPEARANCE } from './pageAppearance'
+import { DEFAULT_SITE_SETTINGS } from './siteSettings'
 
 export {
   migrateEditorProjectV10,
@@ -23,6 +24,7 @@ export function createEditorPage(
     id,
     name,
     slug,
+    seo: { title: name, description: '' },
     appearance: { ...DEFAULT_PAGE_APPEARANCE },
     elements: [],
   }
@@ -40,6 +42,7 @@ export function createBlankProject(name = 'Nytt prosjekt'): EditorProject {
     schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
     id: createStableId(),
     name,
+    siteSettings: { ...DEFAULT_SITE_SETTINGS },
     pages: [firstPage],
     navigation: { items: [] },
     createdAt,

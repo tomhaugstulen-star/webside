@@ -21,6 +21,9 @@ type TopToolbarProps = {
   onDuplicateProject: () => void
   onPreview: () => void
   onEditImage: () => void
+  onExport: () => void
+  exporting: boolean
+  onProjectSettings: () => void
 }
 
 type IconName =
@@ -91,6 +94,9 @@ export function TopToolbar({
   onDuplicateProject,
   onPreview,
   onEditImage,
+  onExport,
+  exporting,
+  onProjectSettings,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -200,7 +206,7 @@ export function TopToolbar({
             Lagringsfeil
           </span>
         )}
-        <button className="publish-button" type="button" aria-label="Publiser" disabled title="Kommer senere"><Icon name="publish" /><span>Publiser</span></button>
+        <button className="publish-button" type="button" aria-label="Eksporter nettsted" disabled={exporting} onClick={onExport}><Icon name="publish" /><span>{exporting ? 'Eksporterer…' : 'Eksporter nettsted'}</span></button>
         <div className="main-menu-wrap" ref={menuRef}>
           <button
             className="main-menu-button"
@@ -213,7 +219,7 @@ export function TopToolbar({
           </button>
           {menuOpen && (
             <div className="main-menu-popover">
-              <button type="button" disabled title="Kommer senere">Prosjektinnstillinger</button>
+              <button type="button" onClick={() => { setMenuOpen(false); onProjectSettings() }}>Prosjektinnstillinger</button>
               <button
                 type="button"
                 onClick={() => {
