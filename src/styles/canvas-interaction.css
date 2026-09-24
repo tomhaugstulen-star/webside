@@ -118,3 +118,24 @@
   outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
+
+
+.canvas-element__size-indicator {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 96px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  color: #ffffff;
+  background: rgba(36, 30, 27, 0.88);
+  box-shadow: 0 3px 10px rgba(36, 30, 27, 0.18);
+  pointer-events: none;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
