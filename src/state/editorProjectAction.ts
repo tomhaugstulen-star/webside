@@ -122,6 +122,12 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'set-element-display-name'
+      elementId: string
+      displayName: string
+      updatedAt: string
+    }
+  | {
       type: 'set-section-anchor-id'
       elementId: string
       anchorId: string
