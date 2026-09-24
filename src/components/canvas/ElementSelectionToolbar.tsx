@@ -1,12 +1,10 @@
 import type { CSSProperties, PointerEvent } from 'react'
-import { HeaderAiControls } from '../../ai/HeaderAiControls'
 import type { ElementLayout } from '../../model/elementLayout'
-import type { EditorElement, ResponsiveViewport } from '../../model/editorProject'
+import type { EditorElement } from '../../model/editorProject'
 import { useElementLocking } from '../../state/useElementLocking'
 
 type ElementSelectionToolbarProps = {
   element: EditorElement
-  viewport: ResponsiveViewport
   lockable: boolean
   locked: boolean
   layout: ElementLayout
@@ -39,7 +37,6 @@ function LockIcon({ locked }: { locked: boolean }) {
 
 export function ElementSelectionToolbar({
   element,
-  viewport,
   lockable,
   locked,
   layout,
@@ -47,9 +44,7 @@ export function ElementSelectionToolbar({
 }: ElementSelectionToolbarProps) {
   const { toggleElementLocked } = useElementLocking()
   const style: CSSProperties = {
-    left: element.kind === 'header'
-      ? layout.position.x
-      : layout.position.x + layout.size.width,
+    left: layout.position.x + layout.size.width,
     top: layout.position.y,
   }
 
@@ -59,7 +54,7 @@ export function ElementSelectionToolbar({
 
   return (
     <div
-      className={`canvas-object-toolbar${element.kind === 'header' ? ' canvas-object-toolbar--header' : ''}`}
+      className="canvas-object-toolbar"
       style={style}
       role="toolbar"
       aria-label="Objektverktøy"
@@ -72,9 +67,6 @@ export function ElementSelectionToolbar({
       >
         Egenskaper
       </button>
-      {element.kind === 'header' && (
-        <HeaderAiControls element={element} viewport={viewport} layout={layout} />
-      )}
       {lockable && (
         <button
           className={`canvas-object-toolbar__button ${locked ? 'canvas-object-toolbar__button--active' : ''}`}
