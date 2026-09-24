@@ -123,9 +123,7 @@ function reduceEditorProjectState(
       )
 
     case 'set-element-display-name':
-      return setElementDisplayName(
-        state, action.elementId, action.displayName, action.updatedAt,
-      )
+      return setElementDisplayName(state, action.elementId, action.displayName, action.updatedAt)
 
     case 'set-section-anchor-id':
       return setSectionAnchorId(
