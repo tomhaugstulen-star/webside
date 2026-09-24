@@ -35,7 +35,6 @@
 @import './styles/paint-light.css';
 @import './styles/paint-light-workspace.css';
 @import './styles/paint-ai.css';
-@import './styles/ai-clipboard.css';
 
 #root {
   min-height: 100vh;
