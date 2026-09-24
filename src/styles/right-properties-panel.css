@@ -156,3 +156,49 @@
     transition: none;
   }
 }
+
+
+.element-name-properties {
+  margin-bottom: 24px;
+}
+
+.element-name-properties form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.element-name-properties input,
+.element-name-properties button {
+  min-height: 38px;
+  box-sizing: border-box;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 8px;
+  background: var(--portal-control-surface);
+  color: var(--portal-text);
+}
+
+.element-name-properties input {
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.element-name-properties button {
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.element-name-properties p {
+  margin: 8px 0 0;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.element-name-properties input:focus-visible,
+.element-name-properties button:focus-visible {
+  outline: 3px solid var(--portal-focus-ring);
+  outline-offset: 2px;
+}
