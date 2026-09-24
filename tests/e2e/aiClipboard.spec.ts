@@ -47,8 +47,8 @@ test('copies Header context and applies a validated AI proposal only after appro
   await createHeader(page)
 
   const header = page.locator('.canvas-element--header')
-  await header.click()
-  await page.getByRole('button', { name: 'Kopier til ChatGPT' }).click()
+  await header.click({ button: 'right' })
+  await page.getByRole('menuitem', { name: 'Kopier til ChatGPT' }).click()
 
   const clip = await page.evaluate(() =>
     (window as typeof window & { __aiClipboardText?: string }).__aiClipboardText ?? '',
@@ -87,7 +87,8 @@ test('copies Header context and applies a validated AI proposal only after appro
   })
 
   await setClipboardText(page, proposal)
-  await page.getByRole('button', { name: 'Lim inn AI-forslag' }).click()
+  await header.click({ button: 'right' })
+  await page.getByRole('menuitem', { name: 'Lim inn AI-forslag' }).click()
   const preview = page.getByRole('dialog', { name: 'AI-forslag til Header' })
   await expect(preview).toBeVisible()
   await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
@@ -97,7 +98,8 @@ test('copies Header context and applies a validated AI proposal only after appro
   await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
 
   await setClipboardText(page, proposal)
-  await page.getByRole('button', { name: 'Lim inn AI-forslag' }).click()
+  await header.click({ button: 'right' })
+  await page.getByRole('menuitem', { name: 'Lim inn AI-forslag' }).click()
   await preview.getByRole('button', { name: 'Bruk forslag' }).click()
 
   await expect(header.locator('.header-element__site-name')).toHaveText('AI navn')
@@ -113,14 +115,14 @@ test('rejects an invalid AI proposal without changing the Header', async ({ page
   await createHeader(page)
 
   const header = page.locator('.canvas-element--header')
-  await header.click()
   await setClipboardText(page, JSON.stringify({
     format: 'website-editor-ai-v1',
     type: 'header',
     html: '<header>ikke tillatt</header>',
   }))
 
-  await page.getByRole('button', { name: 'Lim inn AI-forslag' }).click()
+  await header.click({ button: 'right' })
+  await page.getByRole('menuitem', { name: 'Lim inn AI-forslag' }).click()
   await expect(page.getByText('AI-forslaget har ukjent eller manglende struktur.')).toBeVisible()
   await expect(page.getByRole('dialog', { name: 'AI-forslag til Header' })).toHaveCount(0)
   await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
