@@ -16,8 +16,8 @@ export function PaintChatGptPanel({ canvasRef, disabled }: Props) {
 
     setMessage(null)
     try {
-      await copyPaintSnapshot(canvas)
-      setMessage('Snapshot kopiert. Lim det inn i ChatGPT.')
+      await copyPaintSnapshot(canvas, comment)
+      setMessage(comment.trim() ? 'Snapshot og kommentar kopiert.' : 'Snapshot kopiert.')
     } catch (error) {
       setMessage(
         error instanceof Error
