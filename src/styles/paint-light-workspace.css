@@ -109,3 +109,27 @@
     justify-self: center;
   }
 }
+
+
+.paint-dialog__chatgpt-comment {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.paint-dialog__chatgpt-comment textarea {
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  padding: 8px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  font: inherit;
+  line-height: 1.4;
+}
+
+.paint-dialog__chatgpt-comment textarea:focus {
+  outline: 3px solid var(--portal-focus-ring);
+  border-color: var(--portal-accent);
+}
