@@ -7,7 +7,6 @@ import {
   isValidHeaderSubtitle,
   normalizeHeaderText,
 } from '../model/headerElement'
-import { isValidHeaderAppearance } from '../model/headerAppearance'
 import {
   isImageAssetId,
   isValidImageAssetMetadata,
@@ -105,39 +104,6 @@ export function reduceHeaderProjectAction(
               },
       )
 
-    case 'apply-header-ai-proposal': {
-      const siteName = normalizeHeaderText(action.siteName)
-      const subtitle = normalizeHeaderText(action.subtitle)
-
-      if (
-        !isValidHeaderSiteName(siteName) ||
-        !isValidHeaderSubtitle(subtitle) ||
-        !isValidHeaderAppearance(action.appearance)
-      ) {
-        return state
-      }
-
-      return updateActiveHeader(
-        state,
-        action.elementId,
-        action.updatedAt,
-        (element) => {
-          const unchanged =
-            siteName === element.siteName &&
-            subtitle === element.subtitle &&
-            JSON.stringify(action.appearance) === JSON.stringify(element.appearance)
-
-          return unchanged
-            ? null
-            : {
-                ...element,
-                siteName,
-                subtitle,
-                appearance: action.appearance,
-              }
-        },
-      )
-    }
   }
 
   const unhandledAction: never = action
