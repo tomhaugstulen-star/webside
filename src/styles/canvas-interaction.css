@@ -37,9 +37,6 @@
   transform: translate(-100%, calc(-100% - 8px));
 }
 
-.canvas-object-toolbar--header {
-  transform: translate(0, calc(-100% - 8px));
-}
 
 .canvas-object-toolbar__button {
   width: 36px;
