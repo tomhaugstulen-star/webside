@@ -112,7 +112,14 @@ export function BackgroundFillControl({
             value={fill.stops[0]}
             disabled={disabled}
             onChange={(color) =>
-              onChange({ ...fill, stops: [color as typeof fill.stops[0], fill.stops[1]] })
+              onChange({
+                ...fill,
+                stops: [
+                  color as typeof fill.stops[0],
+                  fill.stops[1],
+                  fill.stops[2] ?? fill.stops[1],
+                ],
+              })
             }
           />
           <ColorSwatchInput
@@ -121,7 +128,30 @@ export function BackgroundFillControl({
             value={fill.stops[1]}
             disabled={disabled}
             onChange={(color) =>
-              onChange({ ...fill, stops: [fill.stops[0], color as typeof fill.stops[1]] })
+              onChange({
+                ...fill,
+                stops: [
+                  fill.stops[0],
+                  color as typeof fill.stops[1],
+                  fill.stops[2] ?? fill.stops[1],
+                ],
+              })
+            }
+          />
+          <ColorSwatchInput
+            id={`${id}-stop-3`}
+            label={`${label} farge 3`}
+            value={fill.stops[2] ?? fill.stops[1]}
+            disabled={disabled}
+            onChange={(color) =>
+              onChange({
+                ...fill,
+                stops: [
+                  fill.stops[0],
+                  fill.stops[1],
+                  color as typeof fill.stops[1],
+                ],
+              })
             }
           />
           <div className="background-fill-control__angle">
