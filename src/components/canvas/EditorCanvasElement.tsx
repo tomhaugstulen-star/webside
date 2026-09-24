@@ -101,6 +101,10 @@ export function EditorCanvasElement({
     onPreviewLayoutChange,
   })
 
+  const { handleContextMenu, controls: aiControls } = useHeaderAiContextMenu(
+    element, viewport, layout, onSelect,
+  )
+
   if (!visible) {
     return null
   }
@@ -127,9 +131,6 @@ export function EditorCanvasElement({
   const lockedClass = element.locked ? ' canvas-element--locked' : ''
   const editingClass = isTextEditing ? ' canvas-element--editing' : ''
   const accessibleLabel = getAccessibleElementLabel(element)
-  const { handleContextMenu, controls: aiControls } = useHeaderAiContextMenu(
-    element, viewport, layout, onSelect,
-  )
 
   const handleElementPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (!isHeader) {
