@@ -231,9 +231,6 @@
         "src/paint/PaintImagePicker.tsx",
         "src/paint/PaintLightDialog.tsx",
         "src/paint/paintCanvasFiles.ts",
-        "src/projectFiles/downloadDuplicateProject.ts",
-        "src/projectFiles/createProjectFile.ts",
-        "src/projectFiles/projectFileFormat.ts",
         "src/state/headerProjectAction.ts",
         "src/state/heroProjectAction.ts",
         "src/state/isValidElementCreationRequest.ts",
@@ -251,7 +248,10 @@
         "src/components/sidebar/HeaderCreationControl.tsx",
         "src/state/usePageActions.ts",
         "src/model/projectImageAssets.ts",
+        "src/projectFiles/createProjectFile.ts",
+        "src/projectFiles/projectFileFormat.ts",
         "src/projectFiles/readProjectFile.ts",
+        "src/projectFiles/downloadDuplicateProject.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
         "src/persistence/localProjectStorage.ts",
         "src/persistence/indexedDbLocalProjectStorage.ts",
@@ -275,11 +275,11 @@
       "dependencies": [],
       "dependents": [
         "src/model/imageAsset.ts",
-        "src/projectFiles/createDuplicateProject.ts",
         "src/model/createEditorProject.ts",
         "src/state/useElementCreation.ts",
         "src/state/useNavigationActions.ts",
         "src/state/usePageActions.ts",
+        "src/projectFiles/createDuplicateProject.ts",
         "src/templates/SectionTemplateLibraryProvider.tsx",
         "src/templates/instantiateSectionTemplate.ts"
       ],
@@ -321,8 +321,8 @@
         "src/export/createStaticSite.ts",
         "src/paint/usePaintLight.tsx",
         "src/paint/PaintImagePicker.tsx",
-        "src/projectFiles/downloadDuplicateProject.ts",
         "src/projectFiles/createProjectFile.ts",
+        "src/projectFiles/downloadDuplicateProject.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
         "src/templates/captureSectionTemplate.ts",
         "src/templates/instantiateSectionTemplate.ts"
@@ -340,23 +340,6 @@
     {
       "source": "src/components/editor/EditorShell.tsx",
       "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../assets/images/useImageAssetStore",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/assets/images/useImageAssetStore.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "dynamic": false,
           "module": "../../export/useStaticSiteExport",
@@ -454,23 +437,6 @@
             "import"
           ],
           "resolved": "src/persistence/useEditorPersistence.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../projectFiles/downloadDuplicateProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/downloadDuplicateProject.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -702,6 +668,23 @@
         },
         {
           "dynamic": false,
+          "module": "./useDuplicateProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/editor/useDuplicateProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./useElementDeletionShortcut",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -737,55 +720,6 @@
       ],
       "dependents": [
         "src/App.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/assets/images/useImageAssetStore.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./imageAssetStoreContext",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/assets/images/imageAssetStoreContext.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/components/editor/EditorShell.tsx",
-        "src/export/useStaticSiteExport.ts",
-        "src/paint/usePaintLight.tsx",
-        "src/components/canvas/HeaderElementContent.tsx",
-        "src/components/canvas/HeroElementContent.tsx",
-        "src/components/canvas/ImageElementContent.tsx",
-        "src/components/properties/HeaderLogoProperties.tsx",
-        "src/components/properties/HeroImageProperties.tsx",
-        "src/components/properties/ImagePropertiesSection.tsx",
-        "src/components/sidebar/HeroImportControl.tsx",
-        "src/components/sidebar/ImageImportControl.tsx",
-        "src/components/sidebar/HeaderCreationControl.tsx",
-        "src/state/usePageActions.ts",
-        "src/components/sidebar/ProjectFileControls.tsx",
-        "src/persistence/EditorPersistenceProvider.tsx",
-        "src/templates/SectionTemplateLibraryProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -872,6 +806,55 @@
       ],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/assets/images/useImageAssetStore.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/export/useStaticSiteExport.ts",
+        "src/paint/usePaintLight.tsx",
+        "src/components/canvas/HeaderElementContent.tsx",
+        "src/components/canvas/HeroElementContent.tsx",
+        "src/components/canvas/ImageElementContent.tsx",
+        "src/components/properties/HeaderLogoProperties.tsx",
+        "src/components/properties/HeroImageProperties.tsx",
+        "src/components/properties/ImagePropertiesSection.tsx",
+        "src/components/sidebar/HeroImportControl.tsx",
+        "src/components/sidebar/ImageImportControl.tsx",
+        "src/components/sidebar/HeaderCreationControl.tsx",
+        "src/state/usePageActions.ts",
+        "src/components/sidebar/ProjectFileControls.tsx",
+        "src/components/editor/useDuplicateProject.ts",
+        "src/persistence/EditorPersistenceProvider.tsx",
+        "src/templates/SectionTemplateLibraryProvider.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -1139,10 +1122,6 @@
         "src/model/elementCreation.ts",
         "src/model/sectionContents.ts",
         "src/paint/usePaintLight.tsx",
-        "src/projectFiles/downloadDuplicateProject.ts",
-        "src/projectFiles/createDuplicateProject.ts",
-        "src/projectFiles/createProjectFile.ts",
-        "src/projectFiles/projectFileFormat.ts",
         "src/state/editorProjectContext.ts",
         "src/state/editorHistoryReducer.ts",
         "src/state/editorProjectAction.ts",
@@ -1221,7 +1200,12 @@
         "src/components/sidebar/PageManagementSection.tsx",
         "src/state/usePageActions.ts",
         "src/model/projectImageAssets.ts",
+        "src/projectFiles/createProjectFile.ts",
+        "src/projectFiles/projectFileFormat.ts",
         "src/components/sidebar/navigationTargetOptions.ts",
+        "src/components/editor/useDuplicateProject.ts",
+        "src/projectFiles/downloadDuplicateProject.ts",
+        "src/projectFiles/createDuplicateProject.ts",
         "src/components/editor/useElementDeletionShortcut.ts",
         "src/components/editor/useSelectedImageCropKeyboard.ts",
         "src/persistence/EditorPersistenceProvider.tsx",
@@ -1954,8 +1938,8 @@
       "dependencies": [],
       "dependents": [
         "src/export/useStaticSiteExport.ts",
-        "src/projectFiles/downloadDuplicateProject.ts",
-        "src/components/sidebar/ProjectFileControls.tsx"
+        "src/components/sidebar/ProjectFileControls.tsx",
+        "src/projectFiles/downloadDuplicateProject.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -2559,8 +2543,8 @@
       ],
       "dependents": [
         "src/export/createStaticSite.ts",
-        "src/projectFiles/createProjectFile.ts",
         "src/state/insertElementsToActivePage.ts",
+        "src/projectFiles/createProjectFile.ts",
         "src/projectFiles/readProjectFile.ts",
         "src/persistence/createLocalProjectSnapshot.ts",
         "src/persistence/indexedDbLocalProjectStorage.ts",
@@ -4683,410 +4667,6 @@
         "src/persistence/useEditorPersistence.ts",
         "src/components/toolbar/TopToolbar.tsx",
         "src/persistence/EditorPersistenceProvider.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/projectFiles/downloadDuplicateProject.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../assets/images/imageAssetStoreContext",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/assets/images/imageAssetStoreContext.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/editorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/editorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/imageAsset",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/imageAsset.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./createDuplicateProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/createDuplicateProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./createProjectFile",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/createProjectFile.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./downloadProjectBlob",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/downloadProjectBlob.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./projectFileFormat",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/projectFileFormat.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/components/editor/EditorShell.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/projectFiles/createDuplicateProject.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../model/createStableId",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/model/createStableId.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/editorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/editorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/projectFiles/downloadDuplicateProject.ts"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/projectFiles/createProjectFile.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../assets/images/imageAssetStoreContext",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/assets/images/imageAssetStoreContext.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/editorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/editorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/editorProjectValidation",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/model/editorProjectValidation.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/imageAsset",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/imageAsset.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./projectAssetReferences",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/projectAssetReferences.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./projectFileBase64",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/projectFileBase64.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./projectFileFormat",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/projectFiles/projectFileFormat.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/projectFiles/downloadDuplicateProject.ts",
-        "src/components/sidebar/ProjectFileControls.tsx"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/projectFiles/projectFileBase64.ts",
-      "dependencies": [],
-      "dependents": [
-        "src/projectFiles/createProjectFile.ts",
-        "src/projectFiles/readProjectFile.ts"
-      ],
-      "orphan": false,
-      "reachable": [
-        {
-          "value": true,
-          "asDefinedInRule": "no-unreachable-from-main",
-          "matchedFrom": "src/main.tsx"
-        }
-      ],
-      "valid": true
-    },
-    {
-      "source": "src/projectFiles/projectFileFormat.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../model/editorProject",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/editorProject.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../model/imageAsset",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "src/model/imageAsset.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/projectFiles/downloadDuplicateProject.ts",
-        "src/projectFiles/createProjectFile.ts",
-        "src/components/sidebar/ProjectFileControls.tsx",
-        "src/projectFiles/readProjectFile.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -16146,6 +15726,219 @@
       "valid": true
     },
     {
+      "source": "src/projectFiles/createProjectFile.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProjectValidation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/editorProjectValidation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./projectAssetReferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectAssetReferences.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./projectFileBase64",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectFileBase64.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./projectFileFormat",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectFileFormat.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/ProjectFileControls.tsx",
+        "src/projectFiles/downloadDuplicateProject.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/projectFiles/projectFileBase64.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/projectFiles/createProjectFile.ts",
+        "src/projectFiles/readProjectFile.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/projectFiles/projectFileFormat.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/sidebar/ProjectFileControls.tsx",
+        "src/projectFiles/createProjectFile.ts",
+        "src/projectFiles/readProjectFile.ts",
+        "src/projectFiles/downloadDuplicateProject.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/projectFiles/projectFileErrorMessage.ts",
       "dependencies": [
         {
@@ -16651,6 +16444,266 @@
       "dependencies": [],
       "dependents": [
         "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/components/editor/useDuplicateProject.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../assets/images/useImageAssetStore",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/images/useImageAssetStore.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../projectFiles/downloadDuplicateProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/downloadDuplicateProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/EditorShell.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/projectFiles/downloadDuplicateProject.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/images/imageAssetStoreContext",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/assets/images/imageAssetStoreContext.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/imageAsset",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/imageAsset.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./createDuplicateProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/createDuplicateProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./createProjectFile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/createProjectFile.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./downloadProjectBlob",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/downloadProjectBlob.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./projectFileFormat",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/projectFiles/projectFileFormat.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/editor/useDuplicateProject.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/projectFiles/createDuplicateProject.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../model/createStableId",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/model/createStableId.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/projectFiles/downloadDuplicateProject.ts"
       ],
       "orphan": false,
       "reachable": [
@@ -17858,8 +17911,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 224,
-    "totalDependenciesCruised": 777,
+    "totalCruised": 225,
+    "totalDependenciesCruised": 779,
     "optionsUsed": {
       "baseDir": "/workspace/scratch/20603487deda/webside",
       "combinedDependencies": false,

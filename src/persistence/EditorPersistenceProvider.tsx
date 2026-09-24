@@ -187,9 +187,29 @@ export function EditorPersistenceProvider({
     }
   }
 
+  const startNewProject = useCallback(() => {
+    if (resetting || !window.confirm(
+      'Starte et nytt tomt prosjekt? Det nåværende lokale prosjektet blir erstattet. Last ned en prosjektfil først hvis du vil beholde det.',
+    )) return false
+
+    if (saveTimerRef.current !== null) {
+      window.clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = null
+    }
+    if (!replaceImageAssets([])) {
+      setStatus('error')
+      return false
+    }
+    const project = createBlankProject()
+    latestProjectRef.current = project
+    dispatch({ type: 'replace-project', project })
+    void saveProject(project)
+    return true
+  }, [dispatch, replaceImageAssets, resetting, saveProject])
+
   const value = useMemo(
-    () => ({ status, saveNow }),
-    [saveNow, status],
+    () => ({ status, saveNow, startNewProject }),
+    [saveNow, startNewProject, status],
   )
 
   if (status === 'loading') {

@@ -24,6 +24,7 @@ type TopToolbarProps = {
   onExport: () => void
   exporting: boolean
   onProjectSettings: () => void
+  onNewProject: () => void
 }
 
 type IconName =
@@ -97,6 +98,7 @@ export function TopToolbar({
   onExport,
   exporting,
   onProjectSettings,
+  onNewProject,
 }: TopToolbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -219,6 +221,7 @@ export function TopToolbar({
           </button>
           {menuOpen && (
             <div className="main-menu-popover">
+              <button type="button" onClick={() => { setMenuOpen(false); onNewProject() }}>Nytt prosjekt</button>
               <button type="button" onClick={() => { setMenuOpen(false); onProjectSettings() }}>Prosjektinnstillinger</button>
               <button
                 type="button"

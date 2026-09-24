@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useImageAssetStore } from '../../assets/images/useImageAssetStore'
 import type { ElementCreationRequest } from '../../model/elementCreation'
 import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { getSectionContents } from '../../model/sectionContents'
 import { useEditorPersistence } from '../../persistence/useEditorPersistence'
-import { downloadDuplicateProject } from '../../projectFiles/downloadDuplicateProject'
 import { useElementCreation } from '../../state/useElementCreation'
 import { useElementDeletion } from '../../state/useElementDeletion'
 import { useElementSelection } from '../../state/useElementSelection'
@@ -22,6 +20,7 @@ import { useElementDeletionShortcut } from './useElementDeletionShortcut'
 import { useSelectedImageCropKeyboard } from './useSelectedImageCropKeyboard'
 import { getEditorHistoryShortcut } from './editorHistoryShortcut'
 import { useStaticSiteExport } from '../../export/useStaticSiteExport'
+import { useDuplicateProject } from './useDuplicateProject'
 type DeletionRequest = {
   elementId: string
   kind: ElementKind
@@ -43,8 +42,8 @@ export function EditorShell() {
     undo,
     redo,
   } = useEditorProject()
-  const { status: persistenceStatus } = useEditorPersistence()
-  const { getImageAsset } = useImageAssetStore()
+  const { status: persistenceStatus, startNewProject } = useEditorPersistence()
+  const duplicateProject = useDuplicateProject(state.project)
   const { exporting, exportMessage, setExportMessage, exportSite } = useStaticSiteExport(state.project)
   const { createElement } = useElementCreation()
   const { deleteElement } = useElementDeletion()
@@ -156,18 +155,6 @@ export function EditorShell() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [canRedo, canUndo, deletionDialogOpen, paint.active, previewOpen, redo, undo])
 
-  const duplicateProject = useCallback(() => {
-    void downloadDuplicateProject(state.project, getImageAsset)
-      .then((created) => {
-        if (!created) {
-          window.alert('Prosjektkopien kunne ikke opprettes. Kontroller bildene.')
-        }
-      })
-      .catch(() => {
-        window.alert('Prosjektkopien kunne ikke opprettes.')
-      })
-  }, [getImageAsset, state.project])
-
   if (previewOpen) {
     return (
       <PreviewShell
@@ -210,6 +197,13 @@ export function EditorShell() {
         onExport={() => void exportSite()}
         exporting={exporting}
         onProjectSettings={() => setActiveTool('settings')}
+        onNewProject={() => {
+          if (!startNewProject()) return
+          setActiveTool(null)
+          setPropertiesPanelOpen(false)
+          setViewport('desktop')
+          setExportMessage(null)
+        }}
       />
       {exportMessage && <div className="site-export-message" role="status"><span>{exportMessage}</span><button type="button" aria-label="Lukk eksportmelding" onClick={() => setExportMessage(null)}>×</button></div>}
       <div className="editor-shell__body">
