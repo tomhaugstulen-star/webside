@@ -6,7 +6,6 @@ import {
   type PointerEvent,
   type RefObject,
 } from 'react'
-import { useElementAiContextMenu } from '../../ai/useElementAiContextMenu'
 import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import type { NavigationTarget } from '../../model/navigation'
@@ -101,9 +100,6 @@ export function EditorCanvasElement({
     onPreviewLayoutChange,
   })
 
-  const { handleContextMenu, panel: aiPanel } = useElementAiContextMenu(
-    element, layout, onSelect,
-  )
 
   if (!visible) {
     return null
@@ -203,7 +199,6 @@ export function EditorCanvasElement({
           isTextEditing ? undefined : handleLostPointerCapture
         }
         onDoubleClick={isTextEditing ? undefined : handleDoubleClick}
-        onContextMenu={isTextEditing ? undefined : handleContextMenu}
         onKeyDown={isTextEditing ? undefined : handleKeyDown}
       >
         <EditorCanvasElementContent
@@ -234,7 +229,6 @@ export function EditorCanvasElement({
             />
           ))}
       </div>
-      {aiPanel}
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
           element={element}
