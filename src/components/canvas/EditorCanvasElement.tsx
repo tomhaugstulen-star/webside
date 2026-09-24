@@ -231,7 +231,6 @@ export function EditorCanvasElement({
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
           element={element}
-          viewport={viewport}
           lockable={!isHeader}
           locked={element.locked}
           layout={layout}
