@@ -21,6 +21,7 @@ type EditorCanvasProps = {
   onWorkspacePointerDown: () => void
   onOpenProperties: () => void
   onCloseProperties: () => void
+  onCanvasWidthChange: (width: number) => void
 }
 
 type CanvasPreviewState = {
@@ -54,6 +55,7 @@ export function EditorCanvas({
   onWorkspacePointerDown,
   onOpenProperties,
   onCloseProperties,
+  onCanvasWidthChange,
 }: EditorCanvasProps) {
   const { activePage, dispatch } = useEditorProject()
   const { selectedElementId, selectElement, clearSelection } =
@@ -95,13 +97,17 @@ export function EditorCanvas({
       return
     }
 
-    const updateCanvasWidth = () => setCanvasWidth(canvas.clientWidth)
+    const updateCanvasWidth = () => {
+      const width = canvas.clientWidth
+      setCanvasWidth(width)
+      onCanvasWidthChange(width)
+    }
     const observer = new ResizeObserver(updateCanvasWidth)
     updateCanvasWidth()
     observer.observe(canvas)
 
     return () => observer.disconnect()
-  }, [viewport])
+  }, [onCanvasWidthChange, viewport])
 
   const handlePreviewLayoutChange = (
     preview: ElementLayoutPreview | null,
