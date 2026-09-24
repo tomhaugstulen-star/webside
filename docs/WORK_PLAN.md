@@ -6,7 +6,7 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 ## Nåstatus
 
-- `main` er fullført gjennom fase 28A; Paint-light er merget i PR #94
+- `main` er fullført gjennom fase 29; Paint-light/fase 28A er merget i PR #94 og fase 29 er merget i PR #96
 - separat header-descender-fiks er merget i PR #59
 - #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
 - #67 er fullført og merget i PR #72: typet helfarge/lineær gradient og schema 13
@@ -20,7 +20,8 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 26 er fullført og merget i PR #89
 - fase 27 er fullført og merget i PR #91
 - fase 28 er fullført og merget i PR #93; sak #92 er lukket
-- fase 29 er aktiv i PR #96 og er låst til en enkel ChatGPT-snapshotflyt inne i `Rediger bilde`; AI i selve side-editoren er fjernet
+- fase 29 er fullført og merget i PR #96; sak #95 er lukket
+- neste planlagte fase er fase 30; den er ikke startet
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -45,7 +46,7 @@ fase 29  ChatGPT-snapshot fra Rediger bilde
 fase 30  Prosjektinnstillinger, SEO, statisk eksport og publisering
 ```
 
-Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell, énveis ChatGPT-flyt i `Rediger bilde`: brukeren åpner AI-dialogen, skriver en kommentar og kopierer ett PNG-snapshot der hele bildearbeidsflaten beholdes i original oppløsning og instruksjonen rendres inn under bildet. AI skal ikke ligge på Header, Hero, Seksjon, Tekst eller andre sideelementer, og det finnes ingen retur/importflyt fra ChatGPT til prosjektstate. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen.
+Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er fullført som en manuell, énveis ChatGPT-flyt i `Rediger bilde`: brukeren åpner AI-dialogen, skriver en kommentar og kopierer ett PNG-snapshot der hele bildearbeidsflaten beholdes i original oppløsning og instruksjonen rendres inn under bildet. AI ligger ikke på Header, Hero, Seksjon, Tekst eller andre sideelementer, og det finnes ingen retur/importflyt fra ChatGPT til prosjektstate. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen.
 
 Rekkefølgen endres bare etter en ny, uttrykkelig beslutning fra brukeren. Endringen dokumenteres her før kodearbeidet starter.
 
@@ -289,16 +290,31 @@ Låst hovedomfang:
 
 ## Fase 28A – lokal bilderedigering
 
-Paint-light i sak #71 leveres før fase 29. Brukeren valgte denne rekkefølgen
-23.09.2026 for å kunne redigere bilder direkte i Website-editoren.
-Inngangen plasseres i toppverktøylinjen. Redigeringen bruker eksisterende
+Fasen er fullført og merget i PR #94. Sak #71 er lukket.
+
+Paint-light gir lokal bilderedigering direkte i Website-editoren, bruker eksisterende
 bildeasset-modell og endrer ikke originalbildet.
+
+## Fase 29 – ChatGPT-snapshot fra Rediger bilde
+
+Fasen er fullført og merget i PR #96. Sak #95 er lukket.
+
+Låst leveranse:
+
+- AI-knapp i `Rediger bilde`
+- stor responsiv AI-dialog med preview og kommentarfelt
+- ett PNG-snapshot med hele lerretet i original oppløsning
+- kommentaren rendres inn under bildet i samme PNG
+- én vanlig `Ctrl+V` i ChatGPT gir både bilde og instruksjon
+- ingen AI på Header, Hero, Seksjon, Tekst eller andre sideelementer
+- ingen retur/importflyt fra ChatGPT til prosjektstate
+- ingen OpenAI API, AI-backend eller API-nøkler
 
 ## Separat backlog
 
-Disse sakene blandes ikke inn i aktiv fase uten uttrykkelig beslutning:
+Disse sakene blandes ikke inn i andre faser uten uttrykkelig beslutning:
 
-- #68 telefonpresets og #69 eksakte elementmål er separat planlagt. Paint-light #71 er aktiv fase 28A. Separator/divider er bare notert.
+- #68 telefonpresets og #69 eksakte elementmål er separat planlagt. Separator/divider er bare notert.
 - nettstedet er responsivt; senere telefonmodeller er kun forhåndsvisningspresets, ikke separate enhetsdesign
 - #36 editor-only elementgrense når designramme er `Ingen`
 - #37 elementnotat og høyrepanelendringer
