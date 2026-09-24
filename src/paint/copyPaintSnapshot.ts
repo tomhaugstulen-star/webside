@@ -1,4 +1,7 @@
-export async function copyPaintSnapshot(canvas: HTMLCanvasElement) {
+export async function copyPaintSnapshot(
+  canvas: HTMLCanvasElement,
+  comment: string,
+) {
   if (typeof ClipboardItem !== 'function' || !navigator.clipboard.write) {
     throw new Error('Nettleseren støtter ikke kopiering av bilde til utklippstavlen.')
   }
@@ -9,8 +12,16 @@ export async function copyPaintSnapshot(canvas: HTMLCanvasElement) {
       else reject(new Error('Kunne ikke lage snapshot av bildet.'))
     }, 'image/png')
   })
+  const clipboardData: Record<string, Blob> = { 'image/png': blob }
+  const trimmedComment = comment.trim()
+
+  if (trimmedComment) {
+    clipboardData['text/plain'] = new Blob([trimmedComment], {
+      type: 'text/plain',
+    })
+  }
 
   await navigator.clipboard.write([
-    new ClipboardItem({ 'image/png': blob }),
+    new ClipboardItem(clipboardData),
   ])
 }
