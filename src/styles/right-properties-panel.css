@@ -162,7 +162,7 @@
   margin-bottom: 24px;
 }
 
-.element-name-properties form {
+.element-name-properties__controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
