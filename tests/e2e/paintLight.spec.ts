@@ -171,12 +171,15 @@ test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
           const item = items[0]
           const state = window as typeof window & {
             __paintClipboardTypes?: string[]
-            __paintClipboardText?: string
+            __paintClipboardSize?: [number, number]
           }
           state.__paintClipboardTypes = items.flatMap((entry) => entry.types)
-          state.__paintClipboardText = item?.data['text/plain']
-            ? await item.data['text/plain'].text()
-            : ''
+          const png = item?.data['image/png']
+          if (png) {
+            const bitmap = await createImageBitmap(png)
+            state.__paintClipboardSize = [bitmap.width, bitmap.height]
+            bitmap.close()
+          }
         },
       },
     })
@@ -197,16 +200,23 @@ test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
   await page.getByRole('button', { name: 'Rediger bilde' }).click()
 
   const dialog = page.getByRole('dialog', { name: 'Rediger bilde' })
-  await dialog.getByLabel('Kommentar').fill('Slå sammen bildene naturlig.')
-  await dialog.getByRole('button', { name: 'Kopier snapshot' }).click()
+  await dialog.getByRole('button', { name: 'AI', exact: true }).click()
 
-  await expect(dialog).toContainText('Snapshot kopiert.')
+  const aiDialog = page.getByRole('dialog', { name: 'AI for bilde' })
+  await expect(aiDialog).toContainText('160 × 120 px')
+  await expect(aiDialog.getByAltText('Snapshot av bildearbeidsflate')).toBeVisible()
+  await aiDialog.getByLabel('Kommentar').fill('Slå sammen bildene naturlig.')
+  await aiDialog.getByRole('button', { name: 'Kopier til ChatGPT' }).click()
+
+  await expect(aiDialog).toContainText('Snapshot med kommentar kopiert.')
   await expect.poll(() => page.evaluate(() =>
     (window as typeof window & { __paintClipboardTypes?: string[] })
       .__paintClipboardTypes ?? [],
-  )).toEqual(expect.arrayContaining(['image/png', 'text/plain']))
-  await expect.poll(() => page.evaluate(() =>
-    (window as typeof window & { __paintClipboardText?: string })
-      .__paintClipboardText ?? '',
-  )).toBe('Slå sammen bildene naturlig.')
+  )).toEqual(['image/png'])
+  const copiedSize = await page.evaluate(() =>
+    (window as typeof window & { __paintClipboardSize?: [number, number] })
+      .__paintClipboardSize ?? [0, 0],
+  )
+  expect(copiedSize[0]).toBe(160)
+  expect(copiedSize[1]).toBeGreaterThan(120)
 })
