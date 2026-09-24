@@ -213,6 +213,11 @@ export function EditorCanvasElement({
           onFinishTextEditing={finishTextEditing}
           onNavigate={onNavigate}
         />
+        {element.kind === 'section' && transformMode === 'resize' && (
+          <span className="canvas-element__size-indicator" aria-live="polite">
+            {Math.round(layout.size.width)} × {Math.round(layout.size.height)} px
+          </span>
+        )}
         {selected && !element.locked && !isTextEditing &&
           (element.kind === 'image' ? (
             <ImageResizeHandles onPointerDown={handleResizePointerDown} />
