@@ -22,7 +22,7 @@ export function setElementDisplayName(
         ...item,
         elements: item.elements.map((candidate) => candidate.id === element.id ? {
           ...candidate,
-          ...(normalized ? { displayName: normalized } : {}),
+          displayName: normalized,
         } : candidate),
       } : item),
     },
