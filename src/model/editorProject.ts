@@ -34,6 +34,7 @@ type BaseEditorElement = {
   size: ResponsiveValue<ElementSize>
   visibility: ResponsiveValue<boolean>
   locked: boolean
+  displayName?: string
 }
 
 export type SectionEditorElement = BaseEditorElement & {
