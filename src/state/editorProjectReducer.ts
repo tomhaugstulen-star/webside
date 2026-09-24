@@ -211,7 +211,6 @@ function reduceEditorProjectState(
 
     case 'set-header-content':
     case 'set-header-logo':
-    case 'apply-header-ai-proposal':
       return reduceHeaderProjectAction(state, action)
     case 'set-header-background-fill':
     case 'set-header-text-color':
