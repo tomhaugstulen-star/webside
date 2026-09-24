@@ -8,7 +8,7 @@ import {
 
 test('accepts a current blank project', () => {
   const project = createBlankProject('Test')
-  expect(project.schemaVersion).toBe(15)
+  expect(project.schemaVersion).toBe(16)
   expect(isValidEditorProject(project)).toBe(true)
   expect(parseImportedEditorProject(project)).toEqual(project)
 })
@@ -19,7 +19,7 @@ test('migrates a schema 14 project and rejects orphan menu children', () => {
   const old = { ...project, schemaVersion: 14, navigation: { items: [
     { id: 'nav-1', label: 'Forside', target },
   ] } }
-  expect(parseImportedEditorProject(old)?.schemaVersion).toBe(15)
+  expect(parseImportedEditorProject(old)?.schemaVersion).toBe(16)
   expect(isValidEditorProject({ ...project, navigation: { items: [
     { id: 'orphan', label: 'Feil', target, parentId: 'missing' },
   ] } })).toBe(false)
@@ -54,7 +54,7 @@ test('migrates schema 12 solid backgrounds to current fills', () => {
   }
 
   const migrated = parseImportedEditorProject(legacy)
-  expect(migrated?.schemaVersion).toBe(15)
+  expect(migrated?.schemaVersion).toBe(16)
   expect(migrated?.pages[0].appearance.backgroundFill).toEqual({
     type: 'solid',
     color: '#FFFFFF',

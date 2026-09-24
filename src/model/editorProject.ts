@@ -10,10 +10,11 @@ import type { PageAppearance } from './pageAppearance'
 import type { SectionAppearance } from './sectionAppearance'
 import type { TextAppearance } from './textAppearance'
 import type { TextElementStyle } from './textElementStyle'
+import type { PageSeo, SiteSettings } from './siteSettings'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 15 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 16 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -97,6 +98,7 @@ export type EditorPage = {
   id: string
   name: string
   slug: string
+  seo: PageSeo
   appearance: PageAppearance
   elements: EditorElement[]
 }
@@ -105,6 +107,7 @@ export type EditorProject = {
   schemaVersion: typeof EDITOR_PROJECT_SCHEMA_VERSION
   id: string
   name: string
+  siteSettings: SiteSettings
   pages: EditorPage[]
   navigation: WebsiteNavigation
   createdAt: string

@@ -346,3 +346,13 @@ Låste krav:
 - editorens egne kildefiler, prosjektstate og utviklingsverktøy skal ikke følge med i den offentlige nettsidepakken
 
 Den konkrete URL-/mappestrukturen, asset-cache-regler og eventuell direkte hostingintegrasjon låses når fase 30 starter.
+
+### Teknisk beslutning fase 30 (24.09.2026)
+
+- Eksporteres som én ZIP med `index.html` for `/` og `<slug>/index.html` for øvrige sider. Slugene er allerede entydige i prosjektmodellen. Alle interne side-, seksjons-, CSS-, script- og assetlenker er relative til sidens plassering, slik at samme pakke kan lastes opp i dokumentrot eller en undermappe.
+- SEO lagres per side (tittel og beskrivelse); nettstedets språk og valgfri offentlig basis-URL lagres på prosjektet. Schema migreres fra 15 til 16. Basis-URL brukes bare til kanonisk URL og sitemap når den er oppgitt; den påvirker ikke intern navigasjon.
+- HTML rendres direkte fra validert prosjektdata, med escaping av tekst/attributter og de eksisterende layout-/bildetransformene som kilde. Kun offentlig CSS og et minimalt script for mobilmeny/undermeny følger med. Ingen prosjektstate, editor, React, Vite eller API.
+- Refererte bilde-/logoassets valideres mot metadata og eksporteres én gang under `assets/` med deterministiske filnavn; innebygde knapp-SVG-er følger med. Samme filnavn og innhold gir stabile cache-URL-er ved gjentatt eksport.
+- ZIP opprettes lokalt i nettleseren og lastes ned for manuell opplasting. «Publiser» betyr derfor «Eksporter nettsted» i denne fasen. Direkte tilgang til hosting, autentisering og opplasting utsettes.
+- «Nytt prosjekt» i hovedmenyen erstatter det aktive lokale prosjektet etter bekreftelse, lager ny prosjekt-ID, tømmer sider/elementer/navigasjon, frigjør gamle bildeassets og nullstiller angre-/gjør om-historikken. Det nye prosjektet lagres gjennom den eksisterende autolagringen; malbiblioteket er fortsatt et separat bibliotek for gjenbruk.
+- Prosjekt uten forside eller med manglende/inkonsistente assets gir tydelig eksportfeil; ingen delvis pakke lastes ned. Eksportens HTML, stier, lenker, metadata, ZIP-innhold og bilder verifiseres i automatiske tester samt lokal PC-/telefonvisning.

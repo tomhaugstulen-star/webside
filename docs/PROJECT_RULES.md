@@ -63,7 +63,7 @@ hard grense: 300+ linjer, alltid blokkert
 
 ## Autoritativ prosjektmodell
 
-- Gjeldende prosjektskjema er 15.
+- Gjeldende prosjektskjema er 16.
 - `EditorProject` eier alle varige serialiserbare prosjektdata.
 - Bakgrunnsfyll lagres som typet `EditorFill`: helfarge eller lineær gradient med nøyaktig to fargestopp og vinkel 0–360°. Rå CSS-gradientstrenger er ikke prosjektdata.
 - Varige prosjektendringer går gjennom typede reducerhandlinger.
@@ -83,6 +83,7 @@ Varig:
 
 - prosjekt, sider og elementer
 - nettstednavigasjon og offentlige seksjons-ID-er
+- nettstedsspråk, offentlig basis-URL og SEO-tittel/beskrivelse per side
 - posisjon, størrelse, synlighet og låsestatus
 - utseende, typede bakgrunnsfyll, tekst, lenker og asset-ID-er
 - bilde- og logometadata

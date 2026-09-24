@@ -12,6 +12,7 @@ import {
 } from './editorProject'
 import type { HeaderAppearance } from './headerAppearance'
 import { createUniqueSectionAnchorId } from './siteStructure'
+import { DEFAULT_SITE_SETTINGS } from './siteSettings'
 
 type PageAppearanceV12 = {
   backgroundColor: EditorColor
@@ -52,18 +53,19 @@ type EditorElementV12 =
       SectionEditorElement | TextEditorElement | HeaderEditorElement
     >
 
-type EditorPageV12 = Omit<EditorPage, 'appearance' | 'elements'> & {
+type EditorPageV12 = Omit<EditorPage, 'appearance' | 'elements' | 'seo'> & {
   appearance: PageAppearanceV12
   elements: EditorElementV12[]
 }
 
-export type EditorProjectV12 = Omit<EditorProject, 'schemaVersion' | 'pages'> & {
+export type EditorProjectV12 = Omit<EditorProject, 'schemaVersion' | 'pages' | 'siteSettings'> & {
   schemaVersion: 12
   pages: EditorPageV12[]
 }
 
-export type EditorProjectV13 = Omit<EditorProject, 'schemaVersion'> & {
+export type EditorProjectV13 = Omit<EditorProject, 'schemaVersion' | 'siteSettings' | 'pages'> & {
   schemaVersion: 13
+  pages: Array<Omit<EditorPage, 'seo'>>
 }
 
 type TextAppearanceV11 = Pick<TextAppearanceV12, 'backgroundColor'>
@@ -196,6 +198,7 @@ function migrateElementV12(element: EditorElementV12): EditorElement {
 function migratePageV12ToCurrent(page: EditorPageV12): EditorPage {
   return {
     ...page,
+    seo: { title: page.name, description: '' },
     appearance: {
       backgroundFill: createSolidFill(page.appearance.backgroundColor),
     },
@@ -205,26 +208,26 @@ function migratePageV12ToCurrent(page: EditorPageV12): EditorPage {
 
 export function migrateEditorProjectV13(project: EditorProjectV13): EditorProject {
   assertNoHeroElements(project.pages)
-
   return {
     ...project,
     schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
+    siteSettings: { ...DEFAULT_SITE_SETTINGS },
+    pages: project.pages.map((page) => ({ ...page, seo: { title: page.name, description: '' } })),
   }
 }
 
 export function migrateEditorProjectV12(project: EditorProjectV12): EditorProject {
   assertNoHeroElements(project.pages)
-
   return {
     ...project,
     schemaVersion: EDITOR_PROJECT_SCHEMA_VERSION,
+    siteSettings: { ...DEFAULT_SITE_SETTINGS },
     pages: project.pages.map(migratePageV12ToCurrent),
   }
 }
 
 export function migrateEditorProjectV11(project: EditorProjectV11): EditorProject {
   assertNoHeroElements(project.pages)
-
   const v12: EditorProjectV12 = {
     ...project,
     schemaVersion: 12,

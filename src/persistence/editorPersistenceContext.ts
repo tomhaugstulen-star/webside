@@ -10,6 +10,7 @@ export type EditorPersistenceStatus =
 export type EditorPersistenceContextValue = {
   status: EditorPersistenceStatus
   saveNow: () => void
+  startNewProject: () => boolean
 }
 
 export const EditorPersistenceContext =

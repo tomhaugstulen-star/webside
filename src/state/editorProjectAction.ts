@@ -17,6 +17,7 @@ import type { HeaderProjectAction } from './headerProjectAction'
 import type { HeroProjectAction } from './heroProjectAction'
 import type { NavigationProjectAction } from './navigationProjectAction'
 import type { PageProjectAction } from './pageProjectAction'
+import type { PageSeo, SiteSettings } from '../model/siteSettings'
 
 export type ColorProjectAction =
   | {
@@ -224,3 +225,5 @@ export type EditorProjectAction =
   | HeroProjectAction
   | PageProjectAction
   | NavigationProjectAction
+  | { type: 'set-site-metadata'; name: string; settings: SiteSettings;
+      pageId: string; seo: PageSeo; updatedAt: string }
