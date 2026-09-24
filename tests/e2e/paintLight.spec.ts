@@ -154,8 +154,10 @@ test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
   await page.addInitScript(() => {
     class TestClipboardItem {
       types: string[]
+      data: Record<string, Blob>
       constructor(data: Record<string, Blob>) {
         this.types = Object.keys(data)
+        this.data = data
       }
     }
     Object.defineProperty(window, 'ClipboardItem', {
@@ -165,9 +167,16 @@ test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: {
-        write: async (items: Array<{ types: string[] }>) => {
-          ;(window as typeof window & { __paintClipboardTypes?: string[] })
-            .__paintClipboardTypes = items.flatMap((item) => item.types)
+        write: async (items: Array<{ types: string[]; data: Record<string, Blob> }>) => {
+          const item = items[0]
+          const state = window as typeof window & {
+            __paintClipboardTypes?: string[]
+            __paintClipboardText?: string
+          }
+          state.__paintClipboardTypes = items.flatMap((entry) => entry.types)
+          state.__paintClipboardText = item?.data['text/plain']
+            ? await item.data['text/plain'].text()
+            : ''
         },
       },
     })
@@ -195,5 +204,9 @@ test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
   await expect.poll(() => page.evaluate(() =>
     (window as typeof window & { __paintClipboardTypes?: string[] })
       .__paintClipboardTypes ?? [],
-  )).toContain('image/png')
+  )).toEqual(expect.arrayContaining(['image/png', 'text/plain']))
+  await expect.poll(() => page.evaluate(() =>
+    (window as typeof window & { __paintClipboardText?: string })
+      .__paintClipboardText ?? '',
+  )).toBe('Slå sammen bildene naturlig.')
 })
