@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
-import { PaintChatGptPanel } from './PaintChatGptPanel'
+import { PaintAiDialog } from './PaintAiDialog'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
@@ -33,6 +33,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [lockRatio, setLockRatio] = useState(true)
   const [busy, setBusy] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
+  const [aiOpen, setAiOpen] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
@@ -59,14 +60,15 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     const onEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !busy) {
         event.stopImmediatePropagation()
-        if (importPending) importActions.cancel()
+        if (aiOpen) setAiOpen(false)
+        else if (importPending) importActions.cancel()
         else if (fullscreen) setFullscreen(false)
         else onClose()
       }
     }
     window.addEventListener('keydown', onEscape, true)
     return () => window.removeEventListener('keydown', onEscape, true)
-  }, [busy, fullscreen, importPending, importActions, onClose])
+  }, [aiOpen, busy, fullscreen, importPending, importActions, onClose])
 
   const fileName = () => {
     const base = name.trim().replace(/\.(png|jpe?g|webp)$/i, '')
@@ -176,6 +178,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
           onCut={paint.cut}
           onPaste={paint.paste}
           onCrop={paint.crop}
+          onOpenAi={() => setAiOpen(true)}
           onToggleFullscreen={() => setFullscreen(!fullscreen)}
           onClose={onClose}
         />
@@ -241,10 +244,13 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
           </div>
         </div>
 
-        <PaintChatGptPanel
-          canvasRef={canvasRef}
-          disabled={!paint.ready || importPending}
-        />
+        {aiOpen && (
+          <PaintAiDialog
+            canvasRef={canvasRef}
+            disabled={!paint.ready || importPending}
+            onClose={() => setAiOpen(false)}
+          />
+        )}
       </section>
     </div>
   )
