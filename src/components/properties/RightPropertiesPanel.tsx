@@ -2,6 +2,7 @@ import type { EditorElement, ElementKind } from '../../model/editorProject'
 import { ButtonPropertiesSection } from './ButtonPropertiesSection'
 import { DeleteElementSection } from './DeleteElementSection'
 import { ElementLinkPropertiesSection } from './ElementLinkPropertiesSection'
+import { ElementNamePropertiesSection } from './ElementNamePropertiesSection'
 import { FramePropertiesSection } from './FramePropertiesSection'
 import { HeaderFontPropertiesSection } from './HeaderFontPropertiesSection'
 import { HeaderPropertiesSection } from './HeaderPropertiesSection'
@@ -107,6 +108,8 @@ export function RightPropertiesPanel({
               (element.kind === 'hero' && element.ctaLabel)) && (
               <ElementLinkPropertiesSection element={element} />
             )}
+
+            <ElementNamePropertiesSection element={element} />
 
             <MobilePropertiesSection element={element} />
 
