@@ -23,6 +23,7 @@ type Props = {
   onCut: () => void
   onPaste: () => void
   onCrop: () => void
+  onOpenAi: () => void
   onToggleFullscreen: () => void
   onClose: () => void
 }
@@ -31,12 +32,14 @@ export function PaintLightToolbar({
   importInputRef, ready, importPending, busy, fullscreen, saveMenuOpen,
   canUndo, canRedo, hasSelection, canPaste, onImportFile, onMergeImport,
   onCancelImport, onToggleSaveMenu, onSave, onExport, onUndo, onRedo,
-  onCopy, onCut, onPaste, onCrop, onToggleFullscreen, onClose,
+  onCopy, onCut, onPaste, onCrop, onOpenAi, onToggleFullscreen, onClose,
 }: Props) {
   return (
     <header className="paint-dialog__header">
       <div className="paint-dialog__header-left">
         <div className="paint-dialog__header-title"><h2>Rediger bilde</h2></div>
+        <button type="button" className="paint-dialog__ai-button"
+          disabled={!ready || importPending} onClick={onOpenAi}>AI</button>
         <input ref={importInputRef} className="paint-dialog__file-input" type="file"
           accept="image/png,image/jpeg,image/webp" aria-label="Velg bilde til lerret"
           onChange={(event) => {
