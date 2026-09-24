@@ -17,10 +17,16 @@ async function createHeader(page: Page) {
   await page.getByRole('button', { name: 'Opprett header', exact: true }).click()
 }
 
-async function setClipboardText(page: Page, value: string) {
-  await page.evaluate((text) => {
-    ;(window as typeof window & { __aiClipboardText?: string }).__aiClipboardText = text
-  }, value)
+async function createHero(page: Page) {
+  await page.getByRole('button', { name: 'Elementer', exact: true }).click()
+  const heroControl = page.locator('.image-import-control').filter({
+    has: page.getByRole('button', { name: 'Hero', exact: true }),
+  })
+  await heroControl.locator('input[type="file"]').setInputFiles({
+    name: 'hero.png',
+    mimeType: 'image/png',
+    buffer: onePixelPng,
+  })
 }
 
 test.beforeEach(async ({ page }) => {
@@ -35,95 +41,49 @@ test.beforeEach(async ({ page }) => {
         writeText: async (text: string) => {
           ;(window as typeof window & { __aiClipboardText?: string }).__aiClipboardText = text
         },
-        readText: async () =>
-          (window as typeof window & { __aiClipboardText?: string }).__aiClipboardText ?? '',
       },
     })
   })
 })
 
-test('copies Header context and applies a validated AI proposal only after approval', async ({ page }) => {
+test('copies a Header with dimensions and the user instruction', async ({ page }) => {
   await page.goto('/')
   await createHeader(page)
 
-  const header = page.locator('.canvas-element--header')
-  await header.click({ button: 'right' })
-  await page.getByRole('menuitem', { name: 'Kopier til ChatGPT' }).click()
+  await page.locator('.canvas-element--header').click({ button: 'right' })
+  const panel = page.getByRole('dialog', { name: 'Send element til ChatGPT' })
+  await expect(panel).toContainText('Header')
+  await expect(panel).toContainText('Opprinnelig navn')
+  await expect(panel).toContainText('88 px')
+
+  await panel.getByLabel('Kommentar').fill('Gjør headeren roligere og mer premium.')
+  await panel.getByRole('button', { name: 'Kopier til ChatGPT' }).click()
 
   const clip = await page.evaluate(() =>
     (window as typeof window & { __aiClipboardText?: string }).__aiClipboardText ?? '',
   )
   expect(clip).toContain('WEBSITE_EDITOR_CLIP v1')
-  expect(clip).toContain('"lockedFrame": true')
-  expect(clip).toContain('"format": "website-editor-ai-v1"')
-
-  const targetText = clip.split('Target:\n')[1]?.split('\n\nCurrentDesign:')[0]
-  const designText = clip.split('CurrentDesign:\n')[1]?.split('\n\nInstruks til ChatGPT:')[0]
-  if (!targetText || !designText) throw new Error('AI clip is missing structured data.')
-
-  const target = JSON.parse(targetText) as {
-    elementId: string
-    viewport: 'desktop' | 'mobile'
-    width: number
-    height: number
-  }
-  const current = JSON.parse(designText) as {
-    appearance: Record<string, unknown>
-  }
-  const proposal = JSON.stringify({
-    format: 'website-editor-ai-v1',
-    type: 'header',
-    elementId: target.elementId,
-    viewport: target.viewport,
-    width: target.width,
-    height: target.height,
-    siteName: 'AI navn',
-    subtitle: 'AI undertittel',
-    appearance: {
-      ...current.appearance,
-      textColor: '#112233',
-      fontSize: 28,
-    },
-  })
-
-  await setClipboardText(page, proposal)
-  await header.click({ button: 'right' })
-  await page.getByRole('menuitem', { name: 'Lim inn AI-forslag' }).click()
-  const preview = page.getByRole('dialog', { name: 'AI-forslag til Header' })
-  await expect(preview).toBeVisible()
-  await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
-
-  await preview.getByRole('button', { name: 'Avbryt' }).click()
-  await expect(preview).toBeHidden()
-  await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
-
-  await setClipboardText(page, proposal)
-  await header.click({ button: 'right' })
-  await page.getByRole('menuitem', { name: 'Lim inn AI-forslag' }).click()
-  await preview.getByRole('button', { name: 'Bruk forslag' }).click()
-
-  await expect(header.locator('.header-element__site-name')).toHaveText('AI navn')
-  await expect(header.locator('.header-element__subtitle')).toHaveText('AI undertittel')
-
-  await page.getByRole('button', { name: 'Angre', exact: true }).click()
-  await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
-  await expect(header.locator('.header-element__subtitle')).toHaveText('Opprinnelig undertittel')
+  expect(clip).toContain('Type: Header')
+  expect(clip).toContain('Element: Opprinnelig navn')
+  expect(clip).toMatch(/Width: \d+ px/)
+  expect(clip).toContain('Height: 88 px')
+  expect(clip).toContain('Gjør headeren roligere og mer premium.')
 })
 
-test('rejects an invalid AI proposal without changing the Header', async ({ page }) => {
+test('opens the same ChatGPT panel for a non-Header element', async ({ page }) => {
   await page.goto('/')
-  await createHeader(page)
+  await createHero(page)
 
-  const header = page.locator('.canvas-element--header')
-  await setClipboardText(page, JSON.stringify({
-    format: 'website-editor-ai-v1',
-    type: 'header',
-    html: '<header>ikke tillatt</header>',
-  }))
+  await page.locator('.canvas-element--hero').click({ button: 'right' })
+  const panel = page.getByRole('dialog', { name: 'Send element til ChatGPT' })
+  await expect(panel).toContainText('Hero')
 
-  await header.click({ button: 'right' })
-  await page.getByRole('menuitem', { name: 'Lim inn AI-forslag' }).click()
-  await expect(page.getByText('AI-forslaget har ukjent eller manglende struktur.')).toBeVisible()
-  await expect(page.getByRole('dialog', { name: 'AI-forslag til Header' })).toHaveCount(0)
-  await expect(header.locator('.header-element__site-name')).toHaveText('Opprinnelig navn')
+  await panel.getByLabel('Kommentar').fill('Lag et nytt bilde til denne flaten.')
+  await panel.getByRole('button', { name: 'Kopier til ChatGPT' }).click()
+
+  const clip = await page.evaluate(() =>
+    (window as typeof window & { __aiClipboardText?: string }).__aiClipboardText ?? '',
+  )
+  expect(clip).toContain('Type: Hero')
+  expect(clip).toContain('Lag et nytt bilde til denne flaten.')
 })
