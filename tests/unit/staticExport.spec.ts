@@ -9,6 +9,7 @@ import { createImageAssetId } from '../../src/model/imageAsset'
 import { pageFilePath, relativePageHref } from '../../src/export/sitePaths'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
 import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
+import { PUBLIC_DESKTOP_WIDTH } from '../../src/export/siteDimensions'
 
 const decode = new TextDecoder()
 
@@ -111,4 +112,18 @@ test('ordinary button opens navigation on every page without a Header', () => {
   expect(html).toContain('href=".././"')
   expect(html).toContain(`href="#${section.anchorId}"`)
   expect(html).not.toContain('site-header')
+})
+
+test('export keeps elements placed in the editor’s expanded desktop canvas', () => {
+  const project = createBlankProject('Bredt lerret')
+  const section = createEditorElement({ id: 'section-1', request: { kind: 'section' }, existingElements: [] })
+  if (section.kind !== 'section') throw Error('Fixture')
+  project.pages[0].elements.push({ ...section,
+    position: { desktop: { x: 594, y: 180 } },
+    size: { desktop: { width: 537, height: 478 } },
+  })
+  const html = renderPublicElements(project, '/', () => 'unused', () => ({ href: 'unused', color: '#fff' }))
+  expect(html).toContain('--d-x:594px')
+  expect(html).toContain('--d-w:537px')
+  expect(594 + 537).toBeLessThanOrEqual(PUBLIC_DESKTOP_WIDTH)
 })

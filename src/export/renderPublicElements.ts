@@ -7,6 +7,7 @@ import { getTextFontFamilyCssValue } from '../components/canvas/getTextElementCs
 import type { ElementLink } from '../model/elementLink'
 import { resolveNavigationTargetHref } from '../model/navigationHref'
 import { escapeHtml, relativePageHref } from './sitePaths'
+import { PUBLIC_DESKTOP_WIDTH, PUBLIC_MOBILE_WIDTH } from './siteDimensions'
 
 const property = (key: string, value: string | number) => `${key}:${value};`
 const pixels = (n: number) => `${n}px`
@@ -15,8 +16,8 @@ const frameCss = (element: Extract<EditorElement, { appearance: unknown }>) =>
   `border:${element.appearance.frame.width}px solid ${element.appearance.frame.color};`
 
 function layoutCss(element: EditorElement) {
-  const desktop = resolveResponsiveElementLayout(element, 'desktop', 1080)
-  const mobile = resolveResponsiveElementLayout(element, 'mobile', 390)
+  const desktop = resolveResponsiveElementLayout(element, 'desktop', PUBLIC_DESKTOP_WIDTH)
+  const mobile = resolveResponsiveElementLayout(element, 'mobile', PUBLIC_MOBILE_WIDTH)
   const vars = (prefix: string, layout: typeof desktop) =>
     property(`--${prefix}-x`, pixels(layout.position.x)) +
     property(`--${prefix}-y`, pixels(layout.position.y)) +
@@ -38,7 +39,7 @@ function imageMarkup(element: Extract<EditorElement, { kind: 'image' }>, asset: 
     return `--${prefix}-ix:${image.left}px;--${prefix}-iy:${image.top}px;` +
       `--${prefix}-iw:${image.width}px;--${prefix}-ih:${image.height}px;`
   }
-  return `<div class="site-image" style="${layout('desktop', 1080)}${layout('mobile', 390)}">` +
+  return `<div class="site-image" style="${layout('desktop', PUBLIC_DESKTOP_WIDTH)}${layout('mobile', PUBLIC_MOBILE_WIDTH)}">` +
     `<img src="${escapeHtml(asset)}" alt="${escapeHtml(element.altText)}" loading="lazy"></div>`
 }
 

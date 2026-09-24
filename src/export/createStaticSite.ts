@@ -16,6 +16,7 @@ import javascript from './publicSite.js?raw'
 import { createZip, type ZipEntry } from './createZip'
 import { renderPublicElements } from './renderPublicElements'
 import { escapeHtml, pageFilePath, relativeRoot } from './sitePaths'
+import { PUBLIC_DESKTOP_WIDTH, PUBLIC_MOBILE_WIDTH } from './siteDimensions'
 
 const encoder = new TextEncoder()
 const buttonAssets = [
@@ -49,12 +50,12 @@ function renderPage(project: EditorProject, slug: string, assets: Map<string, st
   const elements = renderPublicElements(project, slug, assetHref, buttonHref)
   const desktopHeight = page.elements.reduce((height, element) => {
     if (!element.visibility.desktop) return height
-    const layout = resolveResponsiveElementLayout(element, 'desktop', 1080)
+    const layout = resolveResponsiveElementLayout(element, 'desktop', PUBLIC_DESKTOP_WIDTH)
     return Math.max(height, layout.position.y + layout.size.height + 48)
   }, 620)
   const mobileHeight = page.elements.reduce((height, element) => {
     if (!resolveResponsiveValue(element.visibility, 'mobile')) return height
-    const layout = resolveResponsiveElementLayout(element, 'mobile', 390)
+    const layout = resolveResponsiveElementLayout(element, 'mobile', PUBLIC_MOBILE_WIDTH)
     return Math.max(height, layout.position.y + layout.size.height + 48)
   }, 620)
   const background = editorFillToCssBackground(page.appearance.backgroundFill)

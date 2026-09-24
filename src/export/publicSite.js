@@ -1,12 +1,16 @@
 const page = document.querySelector('.site-page')
-function fitNarrowScreen() {
+function fitPageToViewport() {
   if (!page) return
-  const narrow = window.innerWidth < 390
-  page.style.width = narrow ? '390px' : ''
-  page.style.zoom = narrow ? String(window.innerWidth / 390) : ''
+  const viewport = document.documentElement.clientWidth || window.innerWidth
+  const mobile = viewport < 768
+  const baseWidth = mobile ? 390 : 1320
+  const scale = Math.min(1, viewport / baseWidth)
+  page.style.width = scale < 1 ? `${baseWidth}px` : ''
+  page.style.maxWidth = scale < 1 ? 'none' : ''
+  page.style.zoom = scale < 1 ? String(scale) : ''
 }
-fitNarrowScreen()
-window.addEventListener('resize', fitNarrowScreen)
+fitPageToViewport()
+window.addEventListener('resize', fitPageToViewport)
 
 document.addEventListener('click', (event) => {
   const toggle = event.target.closest('.site-menu-toggle,.site-submenu-toggle,.site-button-menu-toggle')
