@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type MouseEvent,
 } from 'react'
 import type { EditorElement } from '../../model/editorProject'
 import type { NavigationTarget } from '../../model/navigation'
@@ -65,6 +66,7 @@ export function EditorCanvas({
   const [textEditingState, setTextEditingState] =
     useState<TextEditingState | null>(null)
   const [canvasWidth, setCanvasWidth] = useState(0)
+  const [aiMenu, setAiMenu] = useState<{ elementId: string; x: number; y: number } | null>(null)
   const pendingNavigationRef = useRef<NavigationTarget | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -89,6 +91,14 @@ export function EditorCanvas({
   }
   const renderElements = orderElementsForRendering(activePage.elements)
   const alignmentGuides = layoutPreview?.guides ?? []
+  const aiHeader = aiMenu
+    ? activePage.elements.find(
+        (element) => element.id === aiMenu.elementId && element.kind === 'header',
+      ) ?? null
+    : activePage.elements.find((element) => element.kind === 'header') ?? null
+  const aiHeaderLayout = aiHeader?.kind === 'header'
+    ? resolveResponsiveElementLayout(aiHeader, viewport, canvasWidth)
+    : null
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current
@@ -108,6 +118,19 @@ export function EditorCanvas({
 
     return () => observer.disconnect()
   }, [onCanvasWidthChange, viewport])
+
+  const handleAiContextMenu = (event: MouseEvent<HTMLDivElement>) => {
+    const target = (event.target as HTMLElement).closest<HTMLElement>('[data-element-id]')
+    const elementId = target?.dataset.elementId
+    const element = activePage.elements.find((candidate) => candidate.id === elementId)
+
+    if (!element || element.kind !== 'header') return
+
+    event.preventDefault()
+    event.stopPropagation()
+    selectElement(element.id)
+    setAiMenu({ elementId: element.id, x: event.clientX, y: event.clientY })
+  }
 
   const handlePreviewLayoutChange = (
     preview: ElementLayoutPreview | null,
@@ -206,6 +229,7 @@ export function EditorCanvas({
             className={`canvas-page canvas-page--${viewport}`}
             style={pageStyle}
             aria-label={`Nettside: ${activePage.name}`}
+            onContextMenu={handleAiContextMenu}
           >
             {renderElements.map((element) => (
               <EditorCanvasElement
@@ -228,6 +252,19 @@ export function EditorCanvas({
               />
             ))}
             <AlignmentGuideOverlay guides={alignmentGuides} />
+            {aiHeader?.kind === 'header' && aiHeaderLayout && (
+              <HeaderAiControls
+                element={aiHeader}
+                viewport={viewport}
+                layout={aiHeaderLayout}
+                menuPosition={
+                  aiMenu?.elementId === aiHeader.id
+                    ? { x: aiMenu.x, y: aiMenu.y }
+                    : null
+                }
+                onCloseMenu={() => setAiMenu(null)}
+              />
+            )}
           </div>
         </div>
       </div>
