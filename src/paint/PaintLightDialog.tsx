@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
+import { PaintChatGptPanel } from './PaintChatGptPanel'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
@@ -210,6 +211,11 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 setNewWidth(1920); setNewHeight(1080); setLockRatio(false)
               }}>Hero 16:9 · 1920 × 1080</button>
             </fieldset>
+
+            <PaintChatGptPanel
+              canvasRef={canvasRef}
+              disabled={!paint.ready || importPending}
+            />
 
             <div className="paint-dialog__save">
               <h3>Fil</h3>
