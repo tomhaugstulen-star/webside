@@ -212,7 +212,6 @@ function reduceEditorProjectState(
     case 'set-header-content':
     case 'set-header-logo':
       return reduceHeaderProjectAction(state, action)
-
     case 'set-header-background-fill':
     case 'set-header-text-color':
     case 'set-header-font-family':

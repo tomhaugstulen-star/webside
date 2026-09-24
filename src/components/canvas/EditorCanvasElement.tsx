@@ -100,6 +100,7 @@ export function EditorCanvasElement({
     onPreviewLayoutChange,
   })
 
+
   if (!visible) {
     return null
   }
@@ -230,7 +231,7 @@ export function EditorCanvasElement({
       </div>
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
-          elementId={element.id}
+          element={element}
           lockable={!isHeader}
           locked={element.locked}
           layout={layout}

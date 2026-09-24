@@ -154,8 +154,11 @@ subgraph src["src"]
     src_paint_usePaintLight_tsx["usePaintLight.tsx"]
     src_paint_PaintImagePicker_tsx["PaintImagePicker.tsx"]
     src_paint_PaintLightDialog_tsx["PaintLightDialog.tsx"]
+    src_paint_PaintAiDialog_tsx["PaintAiDialog.tsx"]
+    src_paint_copyPaintSnapshot_ts["copyPaintSnapshot.ts"]
     src_paint_paintCanvasFiles_ts["paintCanvasFiles.ts"]
     src_paint_paintGeometry_ts["paintGeometry.ts"]
+    src_paint_PaintLightToolbar_tsx["PaintLightToolbar.tsx"]
     src_paint_usePaintCanvas_ts["usePaintCanvas.ts"]
     src_paint_paintDrawing_ts["paintDrawing.ts"]
     src_paint_usePaintImport_ts["usePaintImport.ts"]
@@ -333,10 +336,13 @@ src_assets_images_imageFileSignature_ts-->src_model_imageAsset_ts
 src_paint_PaintImagePicker_tsx-->src_assets_images_imageAssetStoreContext_ts
 src_paint_PaintImagePicker_tsx-->src_model_imageAsset_ts
 src_paint_PaintLightDialog_tsx-->src_model_imageAsset_ts
+src_paint_PaintLightDialog_tsx-->src_paint_PaintAiDialog_tsx
 src_paint_PaintLightDialog_tsx-->src_paint_paintCanvasFiles_ts
 src_paint_PaintLightDialog_tsx-->src_paint_paintGeometry_ts
+src_paint_PaintLightDialog_tsx-->src_paint_PaintLightToolbar_tsx
 src_paint_PaintLightDialog_tsx-->src_paint_usePaintCanvas_ts
 src_paint_PaintLightDialog_tsx-->src_paint_usePaintImport_ts
+src_paint_PaintAiDialog_tsx-->src_paint_copyPaintSnapshot_ts
 src_paint_paintCanvasFiles_ts-->src_model_imageAsset_ts
 src_paint_usePaintCanvas_ts-->src_paint_paintDrawing_ts
 src_paint_usePaintCanvas_ts-->src_paint_paintGeometry_ts
@@ -644,6 +650,7 @@ src_components_canvas_ImageElementContent_tsx-->src_components_canvas_useImageCr
 src_components_canvas_useImageCropTransform_ts-->src_model_editorProject_ts
 src_components_canvas_useImageCropTransform_ts-->src_model_imagePresentation_ts
 src_components_canvas_useImageCropTransform_ts-->src_state_useImageProperties_ts
+src_components_canvas_ElementSelectionToolbar_tsx-->src_model_editorProject_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_model_elementLayout_ts
 src_components_canvas_ElementSelectionToolbar_tsx-->src_state_useElementLocking_ts
 src_state_useElementLocking_ts-->src_state_useEditorProject_ts

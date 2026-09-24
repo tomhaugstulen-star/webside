@@ -2,17 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
+import { PaintAiDialog } from './PaintAiDialog'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
-
 type Props = {
   file: File
   dimensions: { width: number; height: number }
   onClose: () => void
   onSave: (file: File) => Promise<void>
 }
-
 const tools: Array<{ id: PaintTool; label: string }> = [
   { id: 'select', label: 'Marker / flytt' },
   { id: 'brush', label: 'Pensel' },
@@ -20,7 +19,6 @@ const tools: Array<{ id: PaintTool; label: string }> = [
   { id: 'line', label: 'Strek' },
   { id: 'rectangle', label: 'Rektangel' },
 ]
-
 export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [tool, setTool] = useState<PaintTool>('select')
   const [color, setColor] = useState('#17202c')
@@ -32,6 +30,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [lockRatio, setLockRatio] = useState(true)
   const [busy, setBusy] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
+  const [aiOpen, setAiOpen] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
@@ -40,7 +39,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     usePaintImport(canvasRef, paint.width, paint.height, paint.commit)
   const importInputRef = useRef<HTMLInputElement>(null)
   const canvasViewportRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
     const viewport = canvasViewportRef.current
     if (!viewport) return
@@ -53,20 +51,19 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     observer.observe(viewport)
     return () => observer.disconnect()
   }, [])
-
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !busy) {
         event.stopImmediatePropagation()
-        if (importPending) importActions.cancel()
+        if (aiOpen) setAiOpen(false)
+        else if (importPending) importActions.cancel()
         else if (fullscreen) setFullscreen(false)
         else onClose()
       }
     }
     window.addEventListener('keydown', onEscape, true)
     return () => window.removeEventListener('keydown', onEscape, true)
-  }, [busy, fullscreen, importPending, importActions, onClose])
-
+  }, [aiOpen, busy, fullscreen, importPending, importActions, onClose])
   const fileName = () => {
     const base = name.trim().replace(/\.(png|jpe?g|webp)$/i, '')
     if (!base) throw new Error('Skriv et filnavn.')
@@ -121,7 +118,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     : 1
   const displayWidth = Math.max(1, Math.round((paint.width || 1) * fitScale))
   const displayHeight = Math.max(1, Math.round((paint.height || 1) * fitScale))
-
   const applyResize = () => {
     if (!validDimensions(newWidth, newHeight)) {
       setMessage('Bruk hele piksler, maks 16 384 per side og 40 megapiksler.')
@@ -133,7 +129,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     paint.resize(newWidth, newHeight)
     setMessage(null)
   }
-
   return (
     <div className="paint-backdrop">
       <section className={`paint-dialog${fullscreen ? ' paint-dialog--fullscreen' : ''}`}
@@ -175,10 +170,10 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
           onCut={paint.cut}
           onPaste={paint.paste}
           onCrop={paint.crop}
+          onOpenAi={() => setAiOpen(true)}
           onToggleFullscreen={() => setFullscreen(!fullscreen)}
           onClose={onClose}
         />
-
         <div className="paint-dialog__workspace">
           <aside className="paint-dialog__sidebar" aria-label="Bildeverktøy og innstillinger">
             <div className="paint-dialog__panel-group" role="group" aria-label="Bildeverktøy og markering">
@@ -194,7 +189,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
             </div>
-
             <fieldset className="paint-dialog__resize">
               <legend>Bildestørrelse</legend>
               <p className="paint-dialog__meta">{file.name}<br />{paint.width} × {paint.height} px</p>
@@ -210,7 +204,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 setNewWidth(1920); setNewHeight(1080); setLockRatio(false)
               }}>Hero 16:9 · 1920 × 1080</button>
             </fieldset>
-
             <div className="paint-dialog__save">
               <h3>Fil</h3>
               <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
@@ -220,11 +213,9 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 <option value="image/webp">WebP</option>
               </select></label>
             </div>
-
             {(message || paint.error) &&
               <p className="paint-dialog__message" role="status">{message || paint.error}</p>}
           </aside>
-
           <div ref={canvasViewportRef} className="paint-dialog__canvas-scroll">
             <div className="paint-dialog__canvas-wrap"
               style={{ width: displayWidth, height: displayHeight }}>
@@ -239,6 +230,13 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             </div>
           </div>
         </div>
+        {aiOpen && (
+          <PaintAiDialog
+            canvasRef={canvasRef}
+            disabled={!paint.ready || importPending}
+            onClose={() => setAiOpen(false)}
+          />
+        )}
       </section>
     </div>
   )

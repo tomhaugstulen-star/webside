@@ -103,6 +103,7 @@ export function reduceHeaderProjectAction(
                 logoAssetMetadata: { ...action.logoAssetMetadata },
               },
       )
+
   }
 
   const unhandledAction: never = action

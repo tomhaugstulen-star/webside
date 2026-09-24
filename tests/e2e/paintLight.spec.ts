@@ -148,3 +148,75 @@ test('edits a copy of an image with history, crop and project save', async ({ pa
   await page.reload()
   await expect(images).toHaveCount(2)
 })
+
+
+test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
+  await page.addInitScript(() => {
+    class TestClipboardItem {
+      types: string[]
+      data: Record<string, Blob>
+      constructor(data: Record<string, Blob>) {
+        this.types = Object.keys(data)
+        this.data = data
+      }
+    }
+    Object.defineProperty(window, 'ClipboardItem', {
+      configurable: true,
+      value: TestClipboardItem,
+    })
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        write: async (items: Array<{ types: string[]; data: Record<string, Blob> }>) => {
+          const item = items[0]
+          const state = window as typeof window & {
+            __paintClipboardTypes?: string[]
+            __paintClipboardSize?: [number, number]
+          }
+          state.__paintClipboardTypes = items.flatMap((entry) => entry.types)
+          const png = item?.data['image/png']
+          if (png) {
+            const bitmap = await createImageBitmap(png)
+            state.__paintClipboardSize = [bitmap.width, bitmap.height]
+            bitmap.close()
+          }
+        },
+      },
+    })
+  })
+
+  await page.goto('/')
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 160
+    canvas.height = 120
+    canvas.getContext('2d')!.fillRect(0, 0, 160, 120)
+    return canvas.toDataURL('image/png').split(',')[1]
+  })
+  await page.getByRole('button', { name: 'Elementer', exact: true }).click()
+  await page.locator('.image-import-control:has(.element-card--image) input[type="file"]').setInputFiles({
+    name: 'snapshot.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64'),
+  })
+  await page.getByRole('button', { name: 'Rediger bilde' }).click()
+
+  const dialog = page.getByRole('dialog', { name: 'Rediger bilde' })
+  await dialog.getByRole('button', { name: 'AI', exact: true }).click()
+
+  const aiDialog = page.getByRole('dialog', { name: 'AI for bilde' })
+  await expect(aiDialog).toContainText('160 × 120 px')
+  await expect(aiDialog.getByAltText('Snapshot av bildearbeidsflate')).toBeVisible()
+  await aiDialog.getByLabel('Kommentar').fill('Slå sammen bildene naturlig.')
+  await aiDialog.getByRole('button', { name: 'Kopier til ChatGPT' }).click()
+
+  await expect(aiDialog).toContainText('Snapshot med kommentar kopiert.')
+  await expect.poll(() => page.evaluate(() =>
+    (window as typeof window & { __paintClipboardTypes?: string[] })
+      .__paintClipboardTypes ?? [],
+  )).toEqual(['image/png'])
+  const copiedSize = await page.evaluate(() =>
+    (window as typeof window & { __paintClipboardSize?: [number, number] })
+      .__paintClipboardSize ?? [0, 0],
+  )
+  expect(copiedSize[0]).toBe(160)
+  expect(copiedSize[1]).toBeGreaterThan(120)
+})

@@ -3,12 +3,14 @@ import { PreviewCanvas } from './PreviewCanvas'
 
 type PreviewShellProps = {
   viewport: ViewportMode
+  desktopCanvasWidth: number
   onViewportChange: (viewport: ViewportMode) => void
   onClose: () => void
 }
 
 export function PreviewShell({
   viewport,
+  desktopCanvasWidth,
   onViewportChange,
   onClose,
 }: PreviewShellProps) {
@@ -42,7 +44,7 @@ export function PreviewShell({
           </button>
         </div>
       </header>
-      <PreviewCanvas viewport={viewport} />
+      <PreviewCanvas viewport={viewport} desktopCanvasWidth={desktopCanvasWidth} />
     </div>
   )
 }

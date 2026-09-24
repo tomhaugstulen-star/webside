@@ -34,6 +34,7 @@
 @import './styles/section-templates.css';
 @import './styles/paint-light.css';
 @import './styles/paint-light-workspace.css';
+@import './styles/paint-ai.css';
 
 #root {
   min-height: 100vh;

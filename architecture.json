@@ -1059,6 +1059,7 @@
         "src/components/canvas/HeroElementContent.tsx",
         "src/components/canvas/ImageElementContent.tsx",
         "src/components/canvas/useImageCropTransform.ts",
+        "src/components/canvas/ElementSelectionToolbar.tsx",
         "src/components/canvas/getElementAppearanceCssStyle.ts",
         "src/components/canvas/useElementPointerTransform.ts",
         "src/components/canvas/elementPointerTransform.ts",
@@ -2236,6 +2237,23 @@
         },
         {
           "dynamic": false,
+          "module": "./PaintAiDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/paint/PaintAiDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./paintCanvasFiles",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -2261,6 +2279,23 @@
             "import"
           ],
           "resolved": "src/paint/paintGeometry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PaintLightToolbar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/paint/PaintLightToolbar.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2317,6 +2352,56 @@
       "valid": true
     },
     {
+      "source": "src/paint/PaintAiDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./copyPaintSnapshot",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/paint/copyPaintSnapshot.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/paint/PaintLightDialog.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/paint/copyPaintSnapshot.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/paint/PaintAiDialog.tsx"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
       "source": "src/paint/paintCanvasFiles.ts",
       "dependencies": [
         {
@@ -2359,6 +2444,22 @@
         "src/paint/usePaintCanvas.ts",
         "src/paint/paintDrawing.ts",
         "src/paint/usePaintImport.ts"
+      ],
+      "orphan": false,
+      "reachable": [
+        {
+          "value": true,
+          "asDefinedInRule": "no-unreachable-from-main",
+          "matchedFrom": "src/main.tsx"
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "src/paint/PaintLightToolbar.tsx",
+      "dependencies": [],
+      "dependents": [
+        "src/paint/PaintLightDialog.tsx"
       ],
       "orphan": false,
       "reachable": [
@@ -9353,6 +9454,24 @@
     {
       "source": "src/components/canvas/ElementSelectionToolbar.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../model/editorProject",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "src/model/editorProject.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../../model/elementLayout",
@@ -16684,10 +16803,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 210,
-    "totalDependenciesCruised": 725,
+    "totalCruised": 213,
+    "totalDependenciesCruised": 729,
     "optionsUsed": {
-      "baseDir": "/workspace/scratch/0b3a5f2e790c/webside",
+      "baseDir": "C:\\Users\\tomha\\Desktop\\website",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

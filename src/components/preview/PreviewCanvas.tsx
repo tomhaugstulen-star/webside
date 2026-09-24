@@ -20,7 +20,13 @@ function orderElements(elements: EditorElement[]) {
   ]
 }
 
-export function PreviewCanvas({ viewport }: { viewport: ViewportMode }) {
+export function PreviewCanvas({
+  viewport,
+  desktopCanvasWidth,
+}: {
+  viewport: ViewportMode
+  desktopCanvasWidth: number
+}) {
   const { state } = useEditorProject()
   const [pageId, setPageId] = useState(state.activePageId)
   const [canvasWidth, setCanvasWidth] = useState(0)
@@ -38,6 +44,9 @@ export function PreviewCanvas({ viewport }: { viewport: ViewportMode }) {
   )
   const pageStyle: CSSProperties = {
     background: editorFillToCssBackground(page.appearance.backgroundFill),
+    ...(viewport === 'desktop' && desktopCanvasWidth > 0
+      ? { width: desktopCanvasWidth }
+      : {}),
     ...(contentHeight > 0 ? { height: contentHeight } : {}),
   }
 

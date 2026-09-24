@@ -6,7 +6,7 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 
 ## Nåstatus
 
-- `main` er fullført gjennom fase 19 – sider, seksjons-ID-er og navigasjonsmodell (PR #62)
+- `main` er fullført gjennom fase 28A; Paint-light er merget i PR #94
 - separat header-descender-fiks er merget i PR #59
 - #66 er merget i PR #70 og prosjektfil/import-round-trip er tilgjengelig før fase 20
 - #67 er fullført og merget i PR #72: typet helfarge/lineær gradient og schema 13
@@ -20,7 +20,7 @@ Programmet er et lokalt énbrukerverktøy. Stabilitet, enkelhet og forutsigbar d
 - fase 26 er fullført og merget i PR #89
 - fase 27 er fullført og merget i PR #91
 - fase 28 er fullført og merget i PR #93; sak #92 er lukket
-- Paint-light (#71) leveres som egen fase 28A før fase 29, etter uttrykkelig beslutning 23.09.2026
+- fase 29 er aktiv i PR #96 og er låst til en enkel ChatGPT-snapshotflyt inne i `Rediger bilde`; AI i selve side-editoren er fjernet
 - synlige topp-/menyhandlinger som ennå ikke virker skal beholdes som planlagte produktfunksjoner og aktiveres i riktig fase
 - den tidligere fase-25-PR-en #52 er parkert og skal ikke videreutvikles eller merges
 - ny faseimplementering starter alltid fra oppdatert `main` på en egen branch
@@ -41,11 +41,11 @@ fase 26  Sikkerhetskopi, prosjektformat, import og migrering
 fase 27  Lokal forhåndsvisning
 fase 28  Malbibliotek og gjenbrukbare seksjoner
 fase 28A Lokal bilderedigering (Paint-light)
-fase 29  ChatGPT clipboard-arbeidsflyt
+fase 29  ChatGPT-snapshot fra Rediger bilde
 fase 30  Prosjektinnstillinger, SEO, statisk eksport og publisering
 ```
 
-Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell ChatGPT-workflow der valgte editorområder sendes via kontrollert utklipp med eksakte mål og prosjektkontekst, og resultatet valideres og forhåndsvises før godkjenning. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen, verken nå eller som planlagt senere oppgradering. Dokumentet er en produktreferanse, ikke en egen status- eller roadmap-sannhetskilde. Endelig fase-29-omfang låses i egen GitHub-sak når fasen starter.
+Konseptreferanse for fase 29: `docs/AI_CHATGPT_CLIPBOARD_WORKFLOW.md`. Fase 29 er låst til en manuell, énveis ChatGPT-flyt i `Rediger bilde`: brukeren åpner AI-dialogen, skriver en kommentar og kopierer ett PNG-snapshot der hele bildearbeidsflaten beholdes i original oppløsning og instruksjonen rendres inn under bildet. AI skal ikke ligge på Header, Hero, Seksjon, Tekst eller andre sideelementer, og det finnes ingen retur/importflyt fra ChatGPT til prosjektstate. Direkte OpenAI API-integrasjon, AI-backend og API-nøkler er ikke del av prosjektplanen.
 
 Rekkefølgen endres bare etter en ny, uttrykkelig beslutning fra brukeren. Endringen dokumenteres her før kodearbeidet starter.
 

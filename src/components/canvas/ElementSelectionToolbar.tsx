@@ -1,9 +1,10 @@
 import type { CSSProperties, PointerEvent } from 'react'
 import type { ElementLayout } from '../../model/elementLayout'
+import type { EditorElement } from '../../model/editorProject'
 import { useElementLocking } from '../../state/useElementLocking'
 
 type ElementSelectionToolbarProps = {
-  elementId: string
+  element: EditorElement
   lockable: boolean
   locked: boolean
   layout: ElementLayout
@@ -35,7 +36,7 @@ function LockIcon({ locked }: { locked: boolean }) {
 }
 
 export function ElementSelectionToolbar({
-  elementId,
+  element,
   lockable,
   locked,
   layout,
@@ -73,7 +74,7 @@ export function ElementSelectionToolbar({
           aria-label={locked ? 'Lås opp element' : 'Lås element'}
           aria-pressed={locked}
           title={locked ? 'Lås opp' : 'Lås'}
-          onClick={() => toggleElementLocked(elementId)}
+          onClick={() => toggleElementLocked(element.id)}
         >
           <LockIcon locked={locked} />
         </button>

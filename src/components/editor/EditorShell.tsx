@@ -33,6 +33,7 @@ export function EditorShell() {
   const [viewport, setViewport] = useState<ViewportMode>('desktop')
   const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewDesktopWidth, setPreviewDesktopWidth] = useState(0)
   const [deletionRequest, setDeletionRequest] = useState<DeletionRequest | null>(null)
   const {
     activePage,
@@ -176,6 +177,7 @@ export function EditorShell() {
     return (
       <PreviewShell
         viewport={viewport}
+        desktopCanvasWidth={previewDesktopWidth}
         onViewportChange={setViewport}
         onClose={() => setPreviewOpen(false)}
       />
@@ -222,6 +224,7 @@ export function EditorShell() {
           onWorkspacePointerDown={closeToolPanel}
           onOpenProperties={() => setPropertiesPanelOpen(true)}
           onCloseProperties={() => setPropertiesPanelOpen(false)}
+          onCanvasWidthChange={setPreviewDesktopWidth}
         />
         <RightPropertiesPanel
           element={visiblePropertiesElement}
