@@ -100,7 +100,7 @@ export function EditorCanvas({
     const updateCanvasWidth = () => {
       const width = canvas.clientWidth
       setCanvasWidth(width)
-      onCanvasWidthChange(width)
+      if (viewport === 'desktop') onCanvasWidthChange(width)
     }
     const observer = new ResizeObserver(updateCanvasWidth)
     updateCanvasWidth()
