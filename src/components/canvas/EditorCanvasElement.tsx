@@ -6,6 +6,7 @@ import {
   type PointerEvent,
   type RefObject,
 } from 'react'
+import { useHeaderAiContextMenu } from '../../ai/useHeaderAiContextMenu'
 import type { ElementLayout } from '../../model/elementLayout'
 import type { EditorElement } from '../../model/editorProject'
 import type { NavigationTarget } from '../../model/navigation'
@@ -126,6 +127,9 @@ export function EditorCanvasElement({
   const lockedClass = element.locked ? ' canvas-element--locked' : ''
   const editingClass = isTextEditing ? ' canvas-element--editing' : ''
   const accessibleLabel = getAccessibleElementLabel(element)
+  const { handleContextMenu, controls: aiControls } = useHeaderAiContextMenu(
+    element, viewport, layout, onSelect,
+  )
 
   const handleElementPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (!isHeader) {
@@ -198,6 +202,7 @@ export function EditorCanvasElement({
           isTextEditing ? undefined : handleLostPointerCapture
         }
         onDoubleClick={isTextEditing ? undefined : handleDoubleClick}
+        onContextMenu={isTextEditing ? undefined : handleContextMenu}
         onKeyDown={isTextEditing ? undefined : handleKeyDown}
       >
         <EditorCanvasElementContent
@@ -228,6 +233,7 @@ export function EditorCanvasElement({
             />
           ))}
       </div>
+      {aiControls}
       {selected && transformMode === null && !isTextEditing && (
         <ElementSelectionToolbar
           element={element}
