@@ -18,6 +18,7 @@ import { setButtonAsset } from './setButtonAsset'
 import { setButtonDropdown } from './setButtonDropdown'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
+import { setElementDisplayName } from './setElementDisplayName'
 import { setElementViewportLayout } from './setElementViewportLayout'
 import { setElementLink } from './setElementLink'
 import { setSectionAnchorId } from './setSectionAnchorId'
@@ -119,6 +120,11 @@ function reduceEditorProjectState(
     case 'delete-element-from-active-page':
       return deleteElementFromActivePage(
         state, action.elementId, action.updatedAt,
+      )
+
+    case 'set-element-display-name':
+      return setElementDisplayName(
+        state, action.elementId, action.displayName, action.updatedAt,
       )
 
     case 'set-section-anchor-id':
