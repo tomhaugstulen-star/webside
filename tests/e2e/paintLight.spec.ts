@@ -148,3 +148,52 @@ test('edits a copy of an image with history, crop and project save', async ({ pa
   await page.reload()
   await expect(images).toHaveCount(2)
 })
+
+
+test('copies the entire paint canvas as a PNG snapshot', async ({ page }) => {
+  await page.addInitScript(() => {
+    class TestClipboardItem {
+      types: string[]
+      constructor(data: Record<string, Blob>) {
+        this.types = Object.keys(data)
+      }
+    }
+    Object.defineProperty(window, 'ClipboardItem', {
+      configurable: true,
+      value: TestClipboardItem,
+    })
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        write: async (items: Array<{ types: string[] }>) => {
+          ;(window as typeof window & { __paintClipboardTypes?: string[] })
+            .__paintClipboardTypes = items.flatMap((item) => item.types)
+        },
+      },
+    })
+  })
+
+  await page.goto('/')
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 160
+    canvas.height = 120
+    canvas.getContext('2d')!.fillRect(0, 0, 160, 120)
+    return canvas.toDataURL('image/png').split(',')[1]
+  })
+  await page.getByRole('button', { name: 'Elementer', exact: true }).click()
+  await page.locator('.image-import-control:has(.element-card--image) input[type="file"]').setInputFiles({
+    name: 'snapshot.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64'),
+  })
+  await page.getByRole('button', { name: 'Rediger bilde' }).click()
+
+  const dialog = page.getByRole('dialog', { name: 'Rediger bilde' })
+  await dialog.getByLabel('Kommentar').fill('Slå sammen bildene naturlig.')
+  await dialog.getByRole('button', { name: 'Kopier snapshot' }).click()
+
+  await expect(dialog).toContainText('Snapshot kopiert.')
+  await expect.poll(() => page.evaluate(() =>
+    (window as typeof window & { __paintClipboardTypes?: string[] })
+      .__paintClipboardTypes ?? [],
+  )).toContain('image/png')
+})
