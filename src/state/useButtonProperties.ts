@@ -29,5 +29,9 @@ export function useButtonProperties() {
     [dispatch],
   )
 
-  return { updateButtonLabel, updateButtonAsset }
+  const updateButtonDropdown = useCallback((elementId: string, dropdown: boolean) => {
+    dispatch({ type: 'set-button-dropdown', elementId, dropdown, updatedAt: new Date().toISOString() })
+  }, [dispatch])
+
+  return { updateButtonLabel, updateButtonAsset, updateButtonDropdown }
 }

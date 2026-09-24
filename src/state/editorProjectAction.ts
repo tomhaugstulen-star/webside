@@ -187,6 +187,12 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'set-button-dropdown'
+      elementId: string
+      dropdown: boolean
+      updatedAt: string
+    }
+  | {
       type: 'set-image-alt-text'
       elementId: string
       altText: string

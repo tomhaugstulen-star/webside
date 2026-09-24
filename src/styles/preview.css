@@ -107,6 +107,15 @@
   display: block;
 }
 
+.preview-element--dropdown { overflow: visible; z-index: 5; }
+.preview-button-menu { position: relative; width: 100%; height: 100%; }
+.preview-button-menu__trigger { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.preview-button-menu__list { position: absolute; top: 100%; left: 0; z-index: 6; min-width: max(100%, 170px); max-width: min(300px, 90vw); max-height: 65vh; overflow-y: auto; padding: 6px; border: 1px solid #bbb; border-radius: 9px; background: #fff; color: #222; box-shadow: 0 8px 24px #0003; }
+.preview-button-menu__list button { display: block; width: 100%; padding: 9px 12px; border: 0; border-radius: 6px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.preview-button-menu__list button:hover, .preview-button-menu__list button:focus-visible { background: #eee; }
+.preview-button-menu__list .preview-button-menu__child { padding-left: 25px; }
+.preview-button-menu__list span { display: block; padding: 9px 12px; }
+
 .preview-element .image-element__content--crop {
   cursor: default;
   touch-action: auto;

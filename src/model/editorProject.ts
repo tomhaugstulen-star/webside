@@ -64,6 +64,7 @@ export type ButtonEditorElement = BaseEditorElement & {
   assetId: ButtonAssetId
   label: string
   link: ElementLink
+  dropdown?: boolean
 }
 
 export type HeaderEditorElement = BaseEditorElement & {

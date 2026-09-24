@@ -187,12 +187,15 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
         hasExactKeys(value, [
           'id', 'position', 'size', 'visibility', 'locked',
           'kind', 'assetId', 'label', 'link',
+          ...(value.dropdown === undefined ? [] : ['dropdown']),
         ]) &&
         hasValidCommonFields(value, 'button') &&
         isKnownButtonAssetId(value.assetId) &&
         typeof value.label === 'string' &&
         normalizeButtonLabel(value.label) === value.label &&
-        isValidElementLink(value.link)
+        isValidElementLink(value.link) &&
+        (value.dropdown === undefined || typeof value.dropdown === 'boolean') &&
+        (value.dropdown !== true || value.link.type === 'none')
       )
     case 'header':
       return (

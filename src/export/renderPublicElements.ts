@@ -85,7 +85,15 @@ export function renderPublicElements(project: EditorProject, pageSlug: string,
       case 'image': content = imageMarkup(element, assetHref(element.assetId)); break
       case 'button': {
         const button = buttonHref(element.assetId)
-        content = linkContent(`<span class="site-button-content" style="color:${button.color}"><img src="${escapeHtml(button.href)}" alt=""><span>${escapeHtml(element.label)}</span></span>`, element.link)
+        const face = `<span class="site-button-content" style="color:${button.color}"><img src="${escapeHtml(button.href)}" alt=""><span>${escapeHtml(element.label)}</span></span>`
+        if (element.dropdown) {
+          const options = project.navigation.items.map((item) => {
+            const target = resolveNavigationTargetHref(project.pages, item.target)
+            return target ? `<a${item.parentId ? ' class="site-button-menu-child"' : ''} href="${escapeHtml(relativePageHref(pageSlug, target))}">${escapeHtml(item.label)}</a>` : ''
+          }).join('')
+          content = `<button type="button" class="site-button-menu-toggle" aria-expanded="false" aria-controls="menu-${escapeHtml(element.id)}">${face}</button>` +
+            `<nav class="site-button-menu" id="menu-${escapeHtml(element.id)}" aria-label="${escapeHtml(element.label)}: navigasjon" hidden>${options}</nav>`
+        } else content = linkContent(face, element.link)
         break
       }
       case 'header': content = headerMarkup(element, project, pageSlug, assetHref(element.logoAssetId)); break

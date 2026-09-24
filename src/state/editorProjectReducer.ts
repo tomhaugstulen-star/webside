@@ -15,6 +15,7 @@ import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
 import { reducePageProjectAction } from './reducePageProjectAction'
 import { resetElementMobileOverrides, setElementMobileVisibility } from './reduceResponsiveElementAction'
 import { setButtonAsset } from './setButtonAsset'
+import { setButtonDropdown } from './setButtonDropdown'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
 import { setElementViewportLayout } from './setElementViewportLayout'
@@ -191,7 +192,6 @@ function reduceEditorProjectState(
         action.label,
         action.updatedAt,
       )
-
     case 'set-button-asset':
       return setButtonAsset(
         state,
@@ -199,7 +199,8 @@ function reduceEditorProjectState(
         action.assetId,
         action.updatedAt,
       )
-
+    case 'set-button-dropdown':
+      return setButtonDropdown(state, action.elementId, action.dropdown, action.updatedAt)
     case 'set-active-page-background-fill':
     case 'set-section-background-fill':
     case 'set-section-frame-width':
