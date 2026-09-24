@@ -109,3 +109,22 @@
     justify-self: center;
   }
 }
+
+
+.paint-picker__new {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 16px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 10px;
+  background: var(--portal-control-surface);
+  color: var(--portal-text);
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.paint-picker__new:hover {
+  border-color: var(--portal-accent);
+  background: var(--portal-control-hover);
+}
