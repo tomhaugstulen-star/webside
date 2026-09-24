@@ -212,11 +212,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               }}>Hero 16:9 · 1920 × 1080</button>
             </fieldset>
 
-            <PaintChatGptPanel
-              canvasRef={canvasRef}
-              disabled={!paint.ready || importPending}
-            />
-
             <div className="paint-dialog__save">
               <h3>Fil</h3>
               <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
@@ -245,6 +240,11 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             </div>
           </div>
         </div>
+
+        <PaintChatGptPanel
+          canvasRef={canvasRef}
+          disabled={!paint.ready || importPending}
+        />
       </section>
     </div>
   )
