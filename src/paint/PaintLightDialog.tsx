@@ -3,6 +3,7 @@ import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
+import { PaintDesignControls } from './PaintDesignControls'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
@@ -23,6 +24,10 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [tool, setTool] = useState<PaintTool>('select')
   const [color, setColor] = useState('#17202c')
   const [size, setSize] = useState(8)
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff')
+  const [textValue, setTextValue] = useState('')
+  const [textColor, setTextColor] = useState('#17202c')
+  const [textSize, setTextSize] = useState(48)
   const [name, setName] = useState(file.name.replace(/\.[^.]+$/, '') + '-redigert')
   const [format, setFormat] = useState<SupportedImageMimeType>('image/png')
   const [newWidth, setNewWidth] = useState(dimensions.width)
@@ -34,7 +39,9 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [message, setMessage] = useState<string | null>(null)
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
-  const { canvasRef, overlayRef, ...paint } = usePaintCanvas(file, tool, color, size)
+  const { canvasRef, overlayRef, ...paint } = usePaintCanvas(
+    file, tool, color, size, textValue, textColor, textSize,
+  )
   const { overlayRef: importOverlayRef, imported: importPending, ...importActions } =
     usePaintImport(canvasRef, paint.width, paint.height, paint.commit)
   const importInputRef = useRef<HTMLInputElement>(null)
@@ -189,6 +196,20 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
             </div>
+            <PaintDesignControls
+              backgroundColor={backgroundColor}
+              textValue={textValue}
+              textColor={textColor}
+              textSize={textSize}
+              textActive={tool === 'text'}
+              disabled={!paint.ready || importPending}
+              onBackgroundColorChange={setBackgroundColor}
+              onFillBackground={() => paint.fillBackground(backgroundColor)}
+              onTextValueChange={setTextValue}
+              onTextColorChange={setTextColor}
+              onTextSizeChange={setTextSize}
+              onActivateText={() => setTool('text')}
+            />
             <fieldset className="paint-dialog__resize">
               <legend>Bildestørrelse</legend>
               <p className="paint-dialog__meta">{file.name}<br />{paint.width} × {paint.height} px</p>
