@@ -6,6 +6,7 @@ import { PaintAiDialog } from './PaintAiDialog'
 import { PaintDesignControls } from './PaintDesignControls'
 import type { PaintFill } from './paintFill'
 import { PaintLightToolbar } from './PaintLightToolbar'
+import { PaintResizeControls } from './PaintResizeControls'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
 type Props = {
@@ -214,21 +215,25 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               onTextSizeChange={setTextSize}
               onActivateText={() => setTool('text')}
             />
-            <fieldset className="paint-dialog__resize">
-              <legend>Bildestørrelse</legend>
-              <p className="paint-dialog__meta">{file.name}<br />{paint.width} × {paint.height} px</p>
-              <label>Bredde <input type="number" min="1" max="16384" value={newWidth || ''}
-                onChange={(event) => setDimension('width', Number(event.target.value))} /></label>
-              <label>Høyde <input type="number" min="1" max="16384" value={newHeight || ''}
-                onChange={(event) => setDimension('height', Number(event.target.value))} /></label>
-              <label><input type="checkbox" checked={lockRatio}
-                onChange={(event) => setLockRatio(event.target.checked)} /> Lås proporsjoner</label>
-              <button type="button" onClick={applyResize}
-                disabled={!paint.ready || importPending}>Endre størrelse</button>
-              <button type="button" disabled={importPending} onClick={() => {
-                setNewWidth(1920); setNewHeight(1080); setLockRatio(false)
-              }}>Hero 16:9 · 1920 × 1080</button>
-            </fieldset>
+            <PaintResizeControls
+              fileName={file.name}
+              width={paint.width}
+              height={paint.height}
+              newWidth={newWidth}
+              newHeight={newHeight}
+              lockRatio={lockRatio}
+              ready={paint.ready}
+              importPending={importPending}
+              onWidthChange={(value) => setDimension('width', value)}
+              onHeightChange={(value) => setDimension('height', value)}
+              onLockRatioChange={setLockRatio}
+              onApply={applyResize}
+              onHeroPreset={() => {
+                setNewWidth(1920)
+                setNewHeight(1080)
+                setLockRatio(false)
+              }}
+            />
             <div className="paint-dialog__save">
               <h3>Fil</h3>
               <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
