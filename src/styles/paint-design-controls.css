@@ -1,0 +1,29 @@
+.paint-dialog__stacked-label {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.paint-dialog textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 7px;
+  resize: vertical;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  font: inherit;
+}
+
+.paint-dialog__fill-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.paint-dialog__fill-preview {
+  height: 34px;
+  border: 1px solid var(--portal-border);
+  border-radius: 7px;
+}
