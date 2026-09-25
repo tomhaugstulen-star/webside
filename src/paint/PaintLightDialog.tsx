@@ -12,8 +12,7 @@ import { usePaintImport } from './usePaintImport'
 type Props = { file: File; dimensions: { width: number; height: number };
   onClose: () => void; onSave: (file: File) => Promise<void> }
 const tools: Array<{ id: PaintTool; label: string }> = [
-  { id: 'select', label: 'Marker / flytt' },
-  { id: 'brush', label: 'Pensel' },
+  { id: 'select', label: 'Marker / flytt' }, { id: 'brush', label: 'Pensel' },
   { id: 'eraser', label: 'Viskelær' },
   { id: 'line', label: 'Strek' },
   { id: 'rectangle', label: 'Rektangel' },
