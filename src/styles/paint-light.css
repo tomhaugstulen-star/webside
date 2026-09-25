@@ -226,3 +226,22 @@
   opacity: 0.82;
   overflow-wrap: anywhere;
 }
+
+
+.paint-dialog__stacked-label {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.paint-dialog textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 7px;
+  resize: vertical;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  font: inherit;
+}
