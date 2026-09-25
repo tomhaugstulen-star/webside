@@ -9,12 +9,8 @@ import { PaintLightToolbar } from './PaintLightToolbar'
 import { PaintResizeControls } from './PaintResizeControls'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
-type Props = {
-  file: File
-  dimensions: { width: number; height: number }
-  onClose: () => void
-  onSave: (file: File) => Promise<void>
-}
+type Props = { file: File; dimensions: { width: number; height: number };
+  onClose: () => void; onSave: (file: File) => Promise<void> }
 const tools: Array<{ id: PaintTool; label: string }> = [
   { id: 'select', label: 'Marker / flytt' },
   { id: 'brush', label: 'Pensel' },
