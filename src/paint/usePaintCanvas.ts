@@ -15,7 +15,15 @@ type Drag = {
   pixels: ImageData | null
 }
 
-export function usePaintCanvas(file: File, tool: PaintTool, color: string, size: number) {
+export function usePaintCanvas(
+  file: File,
+  tool: PaintTool,
+  color: string,
+  size: number,
+  textValue: string,
+  textColor: string,
+  textSize: number,
+) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const overlayRef = useRef<HTMLCanvasElement>(null)
   const historyRef = useRef<{ entries: Snapshot[]; index: number }>({ entries: [], index: -1 })
@@ -92,8 +100,23 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
   }
   const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!ready || event.button !== 0) return
-    event.currentTarget.setPointerCapture(event.pointerId)
     const start = pointFromEvent(event)
+    if (tool === 'text') {
+      const value = textValue.trim()
+      const ctx = context()
+      if (!value || !ctx) return
+      ctx.save()
+      ctx.fillStyle = textColor
+      ctx.font = `600 ${textSize}px Arial, sans-serif`
+      ctx.textBaseline = 'top'
+      value.split('\n').forEach((line, index) => {
+        ctx.fillText(line, start.x, start.y + index * Math.round(textSize * 1.2))
+      })
+      ctx.restore()
+      snapshot()
+      return
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
     const canvas = canvasRef.current!
     const moving = tool === 'select' && !!selection && containsPoint(selection, start)
     dragRef.current = {
@@ -206,6 +229,19 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     setCanvasSize({ width, height })
     snapshot()
   }
+  const fillBackground = (fillColor: string) => {
+    const canvas = canvasRef.current
+    const ctx = context()
+    if (!canvas || !ctx) return
+    ctx.save()
+    ctx.fillStyle = fillColor
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.restore()
+    setSelection(null)
+    clearOverlay()
+    snapshot()
+  }
+
   const restore = async (index: number) => {
     const entry = historyRef.current.entries[index]
     if (!entry) return
@@ -227,7 +263,7 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     canUndo: historyStatus.canUndo, canRedo: historyStatus.canRedo,
     undo: () => restore(historyRef.current.index - 1),
     redo: () => restore(historyRef.current.index + 1),
-    copy, cut, paste, canPaste, crop, resize, commit: snapshot,
+    copy, cut, paste, canPaste, crop, resize, fillBackground, commit: snapshot,
     clearSelection: () => { setSelection(null); showSelection(null) },
     onPointerDown, onPointerMove, onPointerUp,
   }
