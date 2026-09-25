@@ -201,39 +201,19 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
             </div>
-            <PaintDesignControls
-              fill={fill}
-              textValue={textValue}
-              textColor={textColor}
-              textSize={textSize}
-              textActive={tool === 'text'}
-              disabled={!paint.ready || importPending}
-              onFillChange={setFill}
+            <PaintDesignControls fill={fill} textValue={textValue}
+              textColor={textColor} textSize={textSize} textActive={tool === 'text'}
+              disabled={!paint.ready || importPending} onFillChange={setFill}
               onFillBackground={() => paint.fillBackground(fill)}
-              onTextValueChange={setTextValue}
-              onTextColorChange={setTextColor}
-              onTextSizeChange={setTextSize}
-              onActivateText={() => setTool('text')}
-            />
-            <PaintResizeControls
-              fileName={file.name}
-              width={paint.width}
-              height={paint.height}
-              newWidth={newWidth}
-              newHeight={newHeight}
-              lockRatio={lockRatio}
-              ready={paint.ready}
-              importPending={importPending}
+              onTextValueChange={setTextValue} onTextColorChange={setTextColor}
+              onTextSizeChange={setTextSize} onActivateText={() => setTool('text')} />
+            <PaintResizeControls fileName={file.name} width={paint.width}
+              height={paint.height} newWidth={newWidth} newHeight={newHeight}
+              lockRatio={lockRatio} ready={paint.ready} importPending={importPending}
               onWidthChange={(value) => setDimension('width', value)}
               onHeightChange={(value) => setDimension('height', value)}
-              onLockRatioChange={setLockRatio}
-              onApply={applyResize}
-              onHeroPreset={() => {
-                setNewWidth(1920)
-                setNewHeight(1080)
-                setLockRatio(false)
-              }}
-            />
+              onLockRatioChange={setLockRatio} onApply={applyResize}
+              onHeroPreset={() => { setNewWidth(1920); setNewHeight(1080); setLockRatio(false) }} />
             <div className="paint-dialog__save">
               <h3>Fil</h3>
               <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
