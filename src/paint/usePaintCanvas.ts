@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import { drawMovedSelection, drawShape, drawStroke, movedSelectionPosition } from './paintDrawing'
+import { drawMovedSelection, drawShape, drawStroke, drawText, movedSelectionPosition } from './paintDrawing'
 import {
   containsPoint, fitSelection, selectionBetween,
   type PaintTool, type Point, type Selection,
 } from './paintGeometry'
 import { createPaintFillStyle, type PaintFill } from './paintFill'
-
 type Snapshot = { data: string; width: number; height: number }
 type Drag = {
   start: Point
@@ -15,7 +14,6 @@ type Drag = {
   selection: Selection | null
   pixels: ImageData | null
 }
-
 export function usePaintCanvas(
   file: File,
   tool: PaintTool,
@@ -36,7 +34,6 @@ export function usePaintCanvas(
   const [historyStatus, setHistoryStatus] = useState({ canUndo: false, canRedo: false })
   const [canPaste, setCanPaste] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const context = () => canvasRef.current?.getContext('2d', { willReadFrequently: true }) ?? null
   const clearOverlay = () => {
     const overlay = overlayRef.current
@@ -71,7 +68,6 @@ export function usePaintCanvas(
       canRedo: false,
     })
   }
-
   useEffect(() => {
     let active = true
     historyRef.current = { entries: [], index: -1 }
@@ -91,7 +87,6 @@ export function usePaintCanvas(
     return () => { active = false }
     // A new file starts a fresh editing history.
   }, [file])
-
   const pointFromEvent = (event: PointerEvent<HTMLCanvasElement>): Point => {
     const bounds = event.currentTarget.getBoundingClientRect()
     return {
@@ -106,14 +101,7 @@ export function usePaintCanvas(
       const value = textValue.trim()
       const ctx = context()
       if (!value || !ctx) return
-      ctx.save()
-      ctx.fillStyle = textColor
-      ctx.font = `600 ${textSize}px Arial, sans-serif`
-      ctx.textBaseline = 'top'
-      value.split('\n').forEach((line, index) => {
-        ctx.fillText(line, start.x, start.y + index * Math.round(textSize * 1.2))
-      })
-      ctx.restore()
+      drawText(ctx, value, start, textColor, textSize)
       snapshot()
       return
     }
@@ -177,7 +165,6 @@ export function usePaintCanvas(
       snapshot()
     }
   }
-
   const copy = () => {
     if (!selection) return
     clipboardRef.current = context()?.getImageData(
@@ -242,7 +229,6 @@ export function usePaintCanvas(
     clearOverlay()
     snapshot()
   }
-
   const restore = async (index: number) => {
     const entry = historyRef.current.entries[index]
     if (!entry) return
