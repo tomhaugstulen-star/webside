@@ -4,6 +4,7 @@ import {
   containsPoint, fitSelection, selectionBetween,
   type PaintTool, type Point, type Selection,
 } from './paintGeometry'
+import { createPaintFillStyle, type PaintFill } from './paintFill'
 
 type Snapshot = { data: string; width: number; height: number }
 type Drag = {
@@ -229,12 +230,12 @@ export function usePaintCanvas(
     setCanvasSize({ width, height })
     snapshot()
   }
-  const fillBackground = (fillColor: string) => {
+  const fillBackground = (fill: PaintFill) => {
     const canvas = canvasRef.current
     const ctx = context()
     if (!canvas || !ctx) return
     ctx.save()
-    ctx.fillStyle = fillColor
+    ctx.fillStyle = createPaintFillStyle(ctx, canvas.width, canvas.height, fill)
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     ctx.restore()
     setSelection(null)
