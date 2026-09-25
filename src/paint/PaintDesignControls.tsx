@@ -1,6 +1,4 @@
-export type PaintFill =
-  | { type: 'solid'; color: string }
-  | { type: 'gradient'; colors: [string, string, string]; angle: number }
+import type { PaintFill } from './paintFill'
 
 type Props = {
   fill: PaintFill
