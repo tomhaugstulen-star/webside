@@ -6,22 +6,11 @@ import {
 } from './paintGeometry'
 import { createPaintFillStyle, type PaintFill } from './paintFill'
 type Snapshot = { data: string; width: number; height: number }
-type Drag = {
-  start: Point
-  last: Point
-  original: ImageData | null
-  moving: boolean
-  selection: Selection | null
-  pixels: ImageData | null
-}
+type Drag = { start: Point; last: Point; original: ImageData | null;
+  moving: boolean; selection: Selection | null; pixels: ImageData | null }
 export function usePaintCanvas(
-  file: File,
-  tool: PaintTool,
-  color: string,
-  size: number,
-  textValue: string,
-  textColor: string,
-  textSize: number,
+  file: File, tool: PaintTool, color: string, size: number,
+  textValue: string, textColor: string, textSize: number,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const overlayRef = useRef<HTMLCanvasElement>(null)
