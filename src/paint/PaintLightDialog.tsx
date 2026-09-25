@@ -4,6 +4,7 @@ import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
 import { PaintDesignControls } from './PaintDesignControls'
+import type { PaintFill } from './paintFill'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
@@ -24,7 +25,10 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [tool, setTool] = useState<PaintTool>('select')
   const [color, setColor] = useState('#17202c')
   const [size, setSize] = useState(8)
-  const [backgroundColor, setBackgroundColor] = useState('#ffffff')
+  const [fill, setFill] = useState<PaintFill>({
+    type: 'solid',
+    color: '#ffffff',
+  })
   const [textValue, setTextValue] = useState('')
   const [textColor, setTextColor] = useState('#17202c')
   const [textSize, setTextSize] = useState(48)
@@ -197,14 +201,14 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
             </div>
             <PaintDesignControls
-              backgroundColor={backgroundColor}
+              fill={fill}
               textValue={textValue}
               textColor={textColor}
               textSize={textSize}
               textActive={tool === 'text'}
               disabled={!paint.ready || importPending}
-              onBackgroundColorChange={setBackgroundColor}
-              onFillBackground={() => paint.fillBackground(backgroundColor)}
+              onFillChange={setFill}
+              onFillBackground={() => paint.fillBackground(fill)}
               onTextValueChange={setTextValue}
               onTextColorChange={setTextColor}
               onTextSizeChange={setTextSize}
