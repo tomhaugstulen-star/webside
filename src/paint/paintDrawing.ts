@@ -67,3 +67,21 @@ export function drawShape(
     ctx.strokeRect(area.x, area.y, area.width, area.height)
   }
 }
+
+
+export function drawText(
+  ctx: CanvasRenderingContext2D,
+  value: string,
+  position: Point,
+  color: string,
+  size: number,
+) {
+  ctx.save()
+  ctx.fillStyle = color
+  ctx.font = `600 ${size}px Arial, sans-serif`
+  ctx.textBaseline = 'top'
+  value.split('\n').forEach((line, index) => {
+    ctx.fillText(line, position.x, position.y + index * Math.round(size * 1.2))
+  })
+  ctx.restore()
+}
