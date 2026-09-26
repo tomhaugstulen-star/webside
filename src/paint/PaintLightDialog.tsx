@@ -9,8 +9,7 @@ import type { PaintDesignPanel } from './paintDesignPanel'
 import type { PaintFill } from './paintFill'
 import { PaintFileControls } from './PaintFileControls'
 import { PaintLightToolbar } from './PaintLightToolbar'
-import { PaintResizeControls } from './PaintResizeControls'
-import { usePaintCanvas } from './usePaintCanvas'
+import { PaintResizeControls } from './PaintResizeControls'; import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
 type Props = { file: File; dimensions: { width: number; height: number }; onClose: () => void; onSave: (file: File) => Promise<void> }
 const tools: Array<{ id: PaintTool; label: string }> = [
