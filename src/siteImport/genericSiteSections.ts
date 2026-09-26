@@ -12,6 +12,7 @@ import {
   type CapturedSiteLayouts,
 } from './genericSiteComputedLayout'
 import { importedBox } from './genericSiteLayout'
+import { responsiveImportedLayout } from './genericSiteResponsiveLayout'
 
 export function addSemanticSections(
   page: EditorPage,
@@ -56,24 +57,9 @@ export function addSemanticSections(
       displayName: container.id
         ? `Seksjon: ${container.id}`
         : `Seksjon: ${container.tagName.toLowerCase()}`,
-      position: {
-        desktop: { x: box.x, y: box.y },
-        mobile: capturedMobile
-          ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
-          : undefined,
-      },
-      size: {
-        desktop: {
-          width: Math.max(160, box.width),
-          height: Math.max(90, box.height),
-        },
-        mobile: capturedMobile
-          ? {
-              width: Math.max(160, capturedMobile.box.width),
-              height: Math.max(90, capturedMobile.box.height),
-            }
-          : undefined,
-      },
+      ...responsiveImportedLayout(
+        box, capturedMobile, { width: 160, height: 90 },
+      ),
       appearance: background
         ? { ...element.appearance, backgroundFill: background }
         : element.appearance,
