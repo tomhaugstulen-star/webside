@@ -16,6 +16,11 @@ import {
   externalElementLink,
   isButtonLike,
 } from './genericSiteInteractive'
+import {
+  captureSiteLayouts,
+  capturedLayoutFor,
+  type CapturedSiteLayout,
+} from './genericSiteComputedLayout'
 import { childBoxInContainer } from './genericSiteLayout'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
 import { addSemanticSections } from './genericSiteSections'
@@ -57,6 +62,7 @@ function makeTextElement(
   parentCss: Map<string, string>,
   siblingIndex: number,
   link: ReturnType<typeof externalElementLink>,
+  captured: CapturedSiteLayout | null,
 ) {
   const element = createEditorElement({
     id: createStableId(),
@@ -70,7 +76,8 @@ function makeTextElement(
     fontSize,
     fontWeight: tagName.startsWith('H') ? 'bold' as const : 'normal' as const,
   }
-  const box = childBoxInContainer(css, parentCss, siblingIndex, y, {
+  const measured = captured?.box
+  const box = measured ?? childBoxInContainer(css, parentCss, siblingIndex, y, {
     width: 760,
     height: Math.max(64, Math.round(fontSize * 2.2)),
   })
@@ -81,7 +88,12 @@ function makeTextElement(
     ...element,
     content,
     position: { desktop: { x: box.x, y: box.y } },
-    size: { desktop: { width: box.width, height: box.height } },
+    size: {
+      desktop: {
+        width: Math.max(120, box.width),
+        height: Math.max(48, box.height),
+      },
+    },
     appearance: background
       ? { ...element.appearance, backgroundFill: background }
       : element.appearance,
@@ -90,13 +102,13 @@ function makeTextElement(
   }
 }
 
-export function createPageFromHtml(
+export async function createPageFromHtml(
   htmlPath: string,
   html: string,
   assetsByPath: Map<string, AssetMapEntry>,
   filesByPath: Map<string, Uint8Array>,
   runtimeContent: RuntimeContent | null,
-): EditorPage | null {
+): Promise<EditorPage | null> {
   const slug = htmlPathToSlug(htmlPath)
   if (!slug) return null
   const document = new DOMParser().parseFromString(html, 'text/html')
@@ -110,13 +122,16 @@ export function createPageFromHtml(
     if (bytes) cssParts.push(new TextDecoder().decode(bytes))
   }
   const cssText = cssParts.join('\n')
+  const layouts = await captureSiteLayouts(document, htmlPath, cssText, assetsByPath)
   const bodyCss = collectCssForElement(document.body, cssText)
   const pageBackground = cssBackgroundFill(
     bodyCss.get('background') ?? bodyCss.get('background-color'),
   )
   if (pageBackground) page.appearance = { backgroundFill: pageBackground }
-  addSpecialImportedElements(page, document, cssText, htmlPath, assetsByPath)
-  addSemanticSections(page, document, cssText)
+  addSpecialImportedElements(
+    page, document, cssText, htmlPath, assetsByPath, layouts,
+  )
+  addSemanticSections(page, document, cssText, layouts)
   page.seo = {
     title: document.querySelector('title')?.textContent?.trim().slice(0, 120) || page.name,
     description: document.querySelector('meta[name="description"]')?.getAttribute('content')?.trim().slice(0, 300) || '',
@@ -127,11 +142,13 @@ export function createPageFromHtml(
   for (const node of candidates) {
     if (node.closest('nav') || isInsideSpecialImportedElement(node)) continue
     if (node.parentElement?.closest('h1,h2,h3,p,li,a,button')) continue
-    const css = collectCssForElement(node, cssText)
+    const captured = capturedLayoutFor(node, layouts)
+    const css = captured?.css ?? collectCssForElement(node, cssText)
     const parent = node.parentElement
-    const parentCss = parent
+    const parentCaptured = parent ? capturedLayoutFor(parent, layouts) : null
+    const parentCss = parentCaptured?.css ?? (parent
       ? collectCssForElement(parent, cssText)
-      : new Map<string, string>()
+      : new Map<string, string>())
     const siblings = parent
       ? [...parent.children].filter((child) => child.matches('h1,h2,h3,p,li,a,button,img'))
       : [node]
@@ -143,7 +160,17 @@ export function createPageFromHtml(
         node, css, parentCss, siblingIndex, y, page.elements,
       )
       if (button) {
-        page.elements.push(button)
+        const box = captured?.box
+        page.elements.push(box ? {
+          ...button,
+          position: { desktop: { x: box.x, y: box.y } },
+          size: {
+            desktop: {
+              width: Math.max(80, box.width),
+              height: Math.max(36, box.height),
+            },
+          },
+        } : button)
         if (cssPixel(css.get('top')) === null &&
           parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
           y += button.size.desktop.height + 20
@@ -169,15 +196,22 @@ export function createPageFromHtml(
       const naturalWidth = Math.min(760, asset.metadata.width)
       const naturalHeight = Math.max(80,
         Math.round(asset.metadata.height * naturalWidth / asset.metadata.width))
-      const box = childBoxInContainer(css, parentCss, siblingIndex, y, {
-        width: naturalWidth,
-        height: naturalHeight,
-      })
+      const box = captured?.box ?? childBoxInContainer(
+        css, parentCss, siblingIndex, y, {
+          width: naturalWidth,
+          height: naturalHeight,
+        },
+      )
       page.elements.push({
         ...element,
         altText: node.getAttribute('alt')?.slice(0, 300) || '',
         position: { desktop: { x: box.x, y: box.y } },
-        size: { desktop: { width: box.width, height: box.height } },
+        size: {
+          desktop: {
+            width: Math.max(48, box.width),
+            height: Math.max(48, box.height),
+          },
+        },
       })
       if (cssPixel(css.get('top')) === null &&
         parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
@@ -190,7 +224,7 @@ export function createPageFromHtml(
     if (!text) continue
     const element = makeTextElement(
       text.slice(0, 2000), node.tagName, y, page.elements,
-      css, parentCss, siblingIndex, externalElementLink(node),
+      css, parentCss, siblingIndex, externalElementLink(node), captured,
     )
     page.elements.push(element)
     if (cssPixel(css.get('top')) === null &&
