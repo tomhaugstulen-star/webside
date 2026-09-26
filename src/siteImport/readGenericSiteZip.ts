@@ -49,7 +49,7 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
     const filesByPath = new Map(entries.map((entry) => [entry.path, entry.bytes]))
     const runtimeContent = parseRuntimeContent(filesByPath.get('content.json'))
     for (const entry of htmlEntries) {
-      const page = createPageFromHtml(
+      const page = await createPageFromHtml(
         entry.path, decoder.decode(entry.bytes), assetsByPath, filesByPath,
         runtimeContent,
       )
