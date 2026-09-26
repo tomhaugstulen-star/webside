@@ -75,7 +75,7 @@
 
 .canvas-element--text {
   place-items: start;
-  padding: 14px;
+  padding: 4px 14px;
   border-style: dashed;
   text-align: left;
 }
