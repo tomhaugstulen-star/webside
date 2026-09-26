@@ -133,9 +133,6 @@ export async function captureSiteLayouts(
     )
 
 
-    const view = frame.contentWindow
-    if (!document || !view) return new Map()
-
     const layouts: CapturedSiteLayouts = new Map()
     for (const element of document.querySelectorAll(`[${LAYOUT_ATTRIBUTE}]`)) {
       const id = element.getAttribute(LAYOUT_ATTRIBUTE)
