@@ -1,6 +1,7 @@
 import { createEditorElement } from '../model/createEditorElement'
 import { createStableId } from '../model/createStableId'
 import type { EditorPage } from '../model/editorProject'
+import { createUniqueSectionAnchorId } from '../model/siteStructure'
 import { collectCssForElement, cssBackgroundFill, cssPixel } from './genericSiteCss'
 import { importedBox } from './genericSiteLayout'
 
@@ -33,8 +34,15 @@ export function addSemanticSections(
       width: 1240,
       height: explicitHeight ?? 320,
     })
+    const anchorId = createUniqueSectionAnchorId(
+      page.elements
+        .filter((candidate) => candidate.kind === 'section')
+        .map((candidate) => candidate.kind === 'section' ? candidate.anchorId : ''),
+      container.id || 'seksjon',
+    )
     page.elements.push({
       ...element,
+      anchorId,
       displayName: container.id
         ? `Seksjon: ${container.id}`
         : `Seksjon: ${container.tagName.toLowerCase()}`,
