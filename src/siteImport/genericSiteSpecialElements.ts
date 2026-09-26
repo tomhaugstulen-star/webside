@@ -14,6 +14,7 @@ import {
 } from './genericSiteComputedLayout'
 import { externalElementLink } from './genericSiteInteractive'
 import { importedBox } from './genericSiteLayout'
+import { responsiveImportedLayout } from './genericSiteResponsiveLayout'
 import { resolveSitePath } from './genericSitePaths'
 
 type SiteAsset = {
@@ -99,24 +100,10 @@ function importHeader(
   const fill = cssBackgroundFillFromMap(css)
   page.elements.push({
     ...element,
-    position: {
-      desktop: { x: box.x, y: box.y },
-      mobile: capturedMobile
-        ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
-        : undefined,
-    },
-    size: {
-      desktop: {
-        width: Math.max(240, box.width),
-        height: Math.max(70, Math.min(100, box.height)),
-      },
-      mobile: capturedMobile
-        ? {
-            width: Math.max(240, capturedMobile.box.width),
-            height: Math.max(70, capturedMobile.box.height),
-          }
-        : undefined,
-    },
+    ...responsiveImportedLayout(
+      { ...box, height: Math.min(100, box.height) },
+      capturedMobile, { width: 240, height: 70 },
+    ),
     appearance: {
       ...element.appearance,
       backgroundFill: fill ?? element.appearance.backgroundFill,
@@ -184,24 +171,9 @@ function importHero(
     subtitle,
     ctaLabel,
     ctaLink: ctaNode ? externalElementLink(ctaNode) : element.ctaLink,
-    position: {
-      desktop: { x: box.x, y: box.y },
-      mobile: capturedMobile
-        ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
-        : undefined,
-    },
-    size: {
-      desktop: {
-        width: Math.max(280, box.width),
-        height: Math.max(160, box.height),
-      },
-      mobile: capturedMobile
-        ? {
-            width: Math.max(280, capturedMobile.box.width),
-            height: Math.max(160, capturedMobile.box.height),
-          }
-        : undefined,
-    },
+    ...responsiveImportedLayout(
+      box, capturedMobile, { width: 280, height: 160 },
+    ),
     appearance: {
       ...element.appearance,
       backgroundFill: fill ?? element.appearance.backgroundFill,
