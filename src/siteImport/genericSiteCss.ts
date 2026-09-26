@@ -1,5 +1,10 @@
 import { normalizeEditorColor, type EditorColor } from '../model/editorColor'
 import {
+  createLinearGradientFill,
+  createSolidFill,
+  type EditorFill,
+} from '../model/editorFill'
+import {
   textFontFamilies,
   textFontSizes,
   type TextAlignment,
@@ -117,4 +122,31 @@ export function applyCssTextStyle(
     fontStyle: css.get('font-style')?.toLowerCase() === 'italic' ? 'italic' : base.fontStyle,
     textAlign,
   }
+}
+
+
+export function cssBackgroundFill(value: string | undefined): EditorFill | null {
+  if (!value) return null
+  const solid = cssColor(value)
+  if (solid) return createSolidFill(solid)
+
+  const match = value.trim().match(/^linear-gradient\((.+)\)$/i)
+  if (!match) return null
+  const parts = match[1].split(',').map((part) => part.trim()).filter(Boolean)
+  if (parts.length < 2 || parts.length > 4) return null
+
+  let angle = 180
+  if (/^-?\d+(?:\.\d+)?deg$/i.test(parts[0])) {
+    angle = ((Number(parts.shift()!.replace(/deg$/i, '')) % 360) + 360) % 360
+  }
+  const colors = parts.map((part) => {
+    const token = part.match(/^(#[0-9a-f]{3,6}|rgba?\([^)]*\))/i)?.[1]
+    return token ? cssColor(token) : null
+  })
+  if (colors.length < 2 || colors.length > 3 || colors.some((color) => !color)) return null
+
+  const [first, second, third] = colors as [EditorColor, EditorColor, EditorColor?]
+  return third
+    ? createLinearGradientFill(first, second, third, angle)
+    : { type: 'linear-gradient', angle, stops: [first, second] }
 }
