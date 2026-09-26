@@ -19,6 +19,10 @@ import {
 import { childBoxInContainer } from './genericSiteLayout'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
 import { addSemanticSections } from './genericSiteSections'
+import {
+  addSpecialImportedElements,
+  isInsideSpecialImportedElement,
+} from './genericSiteSpecialElements'
 
 export type AssetMapEntry = {
   assetId: ImageAssetId
@@ -105,6 +109,7 @@ export function createPageFromHtml(
     bodyCss.get('background') ?? bodyCss.get('background-color'),
   )
   if (pageBackground) page.appearance = { backgroundFill: pageBackground }
+  addSpecialImportedElements(page, document, cssText, htmlPath, assetsByPath)
   addSemanticSections(page, document, cssText)
   page.seo = {
     title: document.querySelector('title')?.textContent?.trim().slice(0, 120) || page.name,
@@ -114,7 +119,7 @@ export function createPageFromHtml(
   let y = 60
   const candidates = [...document.body.querySelectorAll('h1,h2,h3,p,li,a,button,img')]
   for (const node of candidates) {
-    if (node.closest('nav')) continue
+    if (node.closest('nav') || isInsideSpecialImportedElement(node)) continue
     if (node.parentElement?.closest('h1,h2,h3,p,li,a,button')) continue
     const css = collectCssForElement(node, cssText)
     const parent = node.parentElement
