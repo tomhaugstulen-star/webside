@@ -45,9 +45,19 @@ test('schema 15 projects migrate SEO and site settings without changing old page
     }) }
   delete (legacy as Record<string, unknown>).siteSettings
   const migrated = parseImportedEditorProject(legacy)
-  expect(migrated?.schemaVersion).toBe(16)
+  expect(migrated?.schemaVersion).toBe(17)
   expect(migrated?.siteSettings).toEqual({ language: 'nb', publicUrl: '' })
   expect(migrated?.pages[0].seo).toEqual({ title: 'Forside', description: '' })
+})
+
+
+test('schema 16 projects migrate unchanged to schema 17', () => {
+  const project = createBlankProject('Schema 16')
+  const legacy = { ...project, schemaVersion: 16 }
+  const migrated = parseImportedEditorProject(legacy)
+  expect(migrated?.schemaVersion).toBe(17)
+  expect(migrated?.pages).toEqual(project.pages)
+  expect(migrated?.siteSettings).toEqual(project.siteSettings)
 })
 
 test('site metadata changes atomically and unchanged values preserve state identity', () => {
