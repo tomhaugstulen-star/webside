@@ -3,7 +3,7 @@ import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
-import { PaintDesignControls } from './PaintDesignControls'
+import { PaintDesignDialog, type PaintDesignPanel } from './PaintDesignDialog'
 import type { PaintFill } from './paintFill'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { PaintResizeControls } from './PaintResizeControls'
@@ -36,6 +36,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [busy, setBusy] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [aiOpen, setAiOpen] = useState(false)
+  const [designPanel, setDesignPanel] = useState<PaintDesignPanel | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
@@ -63,6 +64,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       if (event.key === 'Escape' && !busy) {
         event.stopImmediatePropagation()
         if (aiOpen) setAiOpen(false)
+        else if (designPanel) setDesignPanel(null)
         else if (importPending) importActions.cancel()
         else if (fullscreen) setFullscreen(false)
         else onClose()
@@ -70,7 +72,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     }
     window.addEventListener('keydown', onEscape, true)
     return () => window.removeEventListener('keydown', onEscape, true)
-  }, [aiOpen, busy, fullscreen, importPending, importActions, onClose])
+  }, [aiOpen, busy, designPanel, fullscreen, importPending, importActions, onClose])
   const fileName = () => {
     const base = name.trim().replace(/\.(png|jpe?g|webp)$/i, '')
     if (!base) throw new Error('Skriv et filnavn.')
@@ -196,12 +198,13 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
             </div>
-            <PaintDesignControls fill={fill} textValue={textValue}
-              textColor={textColor} textSize={textSize} textActive={tool === 'text'}
-              disabled={!paint.ready || importPending} onFillChange={setFill}
-              onFillBackground={() => paint.fillBackground(fill)}
-              onTextValueChange={setTextValue} onTextColorChange={setTextColor}
-              onTextSizeChange={setTextSize} onActivateText={() => setTool('text')} />
+            <div className="paint-dialog__panel-group">
+              <h3>Design</h3>
+              <button type="button" disabled={!paint.ready || importPending}
+                onClick={() => setDesignPanel('colors')}>Farger…</button>
+              <button type="button" disabled={!paint.ready || importPending}
+                onClick={() => setDesignPanel('text')}>Tekst…</button>
+            </div>
             <PaintResizeControls fileName={file.name} width={paint.width}
               height={paint.height} newWidth={newWidth} newHeight={newHeight}
               lockRatio={lockRatio} ready={paint.ready} importPending={importPending}
@@ -235,6 +238,24 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             </div>
           </div>
         </div>
+        {designPanel && (
+          <PaintDesignDialog
+            panel={designPanel}
+            fill={fill}
+            textValue={textValue}
+            textColor={textColor}
+            textSize={textSize}
+            textActive={tool === 'text'}
+            disabled={!paint.ready || importPending}
+            onFillChange={setFill}
+            onFillBackground={() => paint.fillBackground(fill)}
+            onTextValueChange={setTextValue}
+            onTextColorChange={setTextColor}
+            onTextSizeChange={setTextSize}
+            onActivateText={() => setTool('text')}
+            onClose={() => setDesignPanel(null)}
+          />
+        )}
         {aiOpen && (
           <PaintAiDialog
             canvasRef={canvasRef}
