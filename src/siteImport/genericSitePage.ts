@@ -24,6 +24,7 @@ import {
 import { childBoxInContainer } from './genericSiteLayout'
 import { importedTextBoxHeight } from './genericSiteTextLayout'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
+import { collectPageCss } from './genericSiteStylesheets'
 import { addSemanticSections } from './genericSiteSections'
 import {
   addSpecialImportedElements,
@@ -113,14 +114,7 @@ export async function createPageFromHtml(
   const document = new DOMParser().parseFromString(html, 'text/html')
   applyRuntimeContent(document, runtimeContent)
   const page = createEditorPage(createStableId(), pageName(document, slug), slug)
-  const cssParts = [...document.querySelectorAll('style')]
-    .map((style) => style.textContent || '')
-  for (const link of document.querySelectorAll('link[rel~="stylesheet"]')) {
-    const path = resolveSitePath(htmlPath, link.getAttribute('href') || '')
-    const bytes = path ? filesByPath.get(path) : null
-    if (bytes) cssParts.push(new TextDecoder().decode(bytes))
-  }
-  const cssText = cssParts.join('\n')
+  const cssText = collectPageCss(document, htmlPath, filesByPath)
   const layouts = await captureSiteLayouts(document, htmlPath, cssText, assetsByPath)
   const bodyCss = collectCssForElement(document.body, cssText)
   const pageBackground = cssBackgroundFillFromMap(bodyCss)
