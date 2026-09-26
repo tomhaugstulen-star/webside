@@ -109,7 +109,7 @@ export function RightPropertiesPanel({
               <ElementLinkPropertiesSection element={element} />
             )}
 
-            <ElementNamePropertiesSection element={element} />
+            <ElementNamePropertiesSection key={element.id} element={element} />
 
             <MobilePropertiesSection element={element} />
 
