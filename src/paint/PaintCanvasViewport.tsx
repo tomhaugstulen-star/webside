@@ -1,4 +1,6 @@
 import type { PointerEventHandler, RefObject } from 'react'
+import type { Point } from './paintGeometry'
+import { PaintTextFrame } from './PaintTextFrame'
 
 type Props = {
   viewportRef: RefObject<HTMLDivElement | null>
@@ -7,7 +9,11 @@ type Props = {
   importOverlayRef: RefObject<HTMLCanvasElement | null>
   width: number
   height: number
+  canvasWidth: number
+  canvasHeight: number
   importPending: boolean
+  textFrame: { value: string; color: string; size: number; position: Point } | null
+  onTextFrameMove: (position: Point) => void
   onPointerDown: PointerEventHandler<HTMLCanvasElement>
   onPointerMove: PointerEventHandler<HTMLCanvasElement>
   onPointerUp: PointerEventHandler<HTMLCanvasElement>
@@ -18,7 +24,8 @@ type Props = {
 
 export function PaintCanvasViewport({
   viewportRef, canvasRef, overlayRef, importOverlayRef, width, height,
-  importPending, onPointerDown, onPointerMove, onPointerUp,
+  canvasWidth, canvasHeight, importPending, textFrame, onTextFrameMove,
+  onPointerDown, onPointerMove, onPointerUp,
   onImportPointerDown, onImportPointerMove, onImportPointerUp,
 }: Props) {
   return (
@@ -33,6 +40,13 @@ export function PaintCanvasViewport({
           style={{ pointerEvents: importPending ? 'auto' : 'none' }}
           onPointerDown={onImportPointerDown} onPointerMove={onImportPointerMove}
           onPointerUp={onImportPointerUp} onPointerCancel={onImportPointerUp} />
+        {textFrame && (
+          <PaintTextFrame value={textFrame.value} color={textFrame.color}
+            fontSize={textFrame.size} position={textFrame.position}
+            canvasWidth={canvasWidth} canvasHeight={canvasHeight}
+            displayWidth={width} displayHeight={height}
+            onMove={onTextFrameMove} />
+        )}
       </div>
     </div>
   )
