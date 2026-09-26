@@ -17,7 +17,8 @@ async function siteZip() {
     '<section class="hero" style="width:900px;height:320px;background:#223344">' +
     '<img src="assets/logo.png" alt="Hero"><h1>Stor overskrift</h1>' +
     '<p>Hero-tekst</p><a href="https://example.com">Les mer</a></section>' +
-    '<main><h1>Velkommen</h1><p>Redigerbar tekst fra ZIP.</p></main>' +
+    '<main><h1>Velkommen</h1><p>Redigerbar tekst fra ZIP.</p>' +
+    '<ul style="width:220px"><li>Vanskeligheter med å ta valg når teksten brytes over flere linjer</li></ul></main>' +
     '</body></html>',
   )
   const about = encoder.encode(
@@ -56,6 +57,13 @@ test('imports generic HTML ZIP as editable browser project', async ({ page }) =>
   await expect(page.locator('.hero-element__image')).toBeVisible()
   await expect(page.getByText('Stor overskrift', { exact: true })).toBeVisible()
   await expect(page.getByText('Velkommen', { exact: true })).toBeVisible()
+  const wrapped = page.locator('.canvas-element--text').filter({
+    hasText: 'Vanskeligheter med å ta valg',
+  })
+  await expect(wrapped).toBeVisible()
+  expect(await wrapped.evaluate((element) =>
+    element.scrollHeight <= element.clientHeight + 1,
+  )).toBe(true)
 
   await page.getByRole('button', { name: 'Innstillinger' }).click()
   await expect(page.getByText('Om oss', { exact: true })).toBeVisible()
