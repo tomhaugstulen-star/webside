@@ -8,7 +8,7 @@ import type { ImportedProjectFile } from '../projectFiles/projectFileFormat'
 import {
   applyCssTextStyle,
   collectCssForElement,
-  cssBackgroundFill,
+  cssBackgroundFillFromMap,
   cssPixel,
 } from './genericSiteCss'
 import {
@@ -82,9 +82,7 @@ function makeTextElement(
     width: 760,
     height: Math.max(64, Math.round(fontSize * 2.2)),
   })
-  const background = cssBackgroundFill(
-    css.get('background') ?? css.get('background-color'),
-  )
+  const background = cssBackgroundFillFromMap(css)
   return {
     ...element,
     content,
@@ -125,9 +123,7 @@ export async function createPageFromHtml(
   const cssText = cssParts.join('\n')
   const layouts = await captureSiteLayouts(document, htmlPath, cssText, assetsByPath)
   const bodyCss = collectCssForElement(document.body, cssText)
-  const pageBackground = cssBackgroundFill(
-    bodyCss.get('background') ?? bodyCss.get('background-color'),
-  )
+  const pageBackground = cssBackgroundFillFromMap(bodyCss)
   if (pageBackground) page.appearance = { backgroundFill: pageBackground }
   addSpecialImportedElements(
     page, document, cssText, htmlPath, assetsByPath, layouts,
