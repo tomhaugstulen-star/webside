@@ -86,14 +86,7 @@ export function usePaintCanvas(
   const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!ready || event.button !== 0) return
     const start = pointFromEvent(event)
-    if (tool === 'text') {
-      const value = textValue.trim()
-      const ctx = context()
-      if (!value || !ctx) return
-      drawText(ctx, value, start, textColor, textSize)
-      snapshot()
-      return
-    }
+    if (tool === 'text') return
     event.currentTarget.setPointerCapture(event.pointerId)
     const canvas = canvasRef.current!
     const moving = tool === 'select' && !!selection && containsPoint(selection, start)
@@ -206,6 +199,13 @@ export function usePaintCanvas(
     setCanvasSize({ width, height })
     snapshot()
   }
+  const addText = (position: Point) => {
+    const value = textValue.trim()
+    const ctx = context()
+    if (!value || !ctx) return
+    drawText(ctx, value, position, textColor, textSize)
+    snapshot()
+  }
   const fillBackground = (fill: PaintFill) => {
     const canvas = canvasRef.current
     const ctx = context()
@@ -239,7 +239,7 @@ export function usePaintCanvas(
     canUndo: historyStatus.canUndo, canRedo: historyStatus.canRedo,
     undo: () => restore(historyRef.current.index - 1),
     redo: () => restore(historyRef.current.index + 1),
-    copy, cut, paste, canPaste, crop, resize, fillBackground, commit: snapshot,
+    copy, cut, paste, canPaste, crop, resize, addText, fillBackground, commit: snapshot,
     clearSelection: () => { setSelection(null); showSelection(null) },
     onPointerDown, onPointerMove, onPointerUp,
   }
