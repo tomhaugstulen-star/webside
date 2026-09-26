@@ -95,3 +95,53 @@
     max-height: calc(100% - 86px);
   }
 }
+
+
+.paint-angle-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.paint-angle-wheel {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 50%;
+  background: var(--portal-control-surface);
+  cursor: grab;
+  touch-action: none;
+}
+
+.paint-angle-wheel:active {
+  cursor: grabbing;
+}
+
+.paint-angle-wheel::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--portal-accent);
+}
+
+.paint-angle-wheel__hand {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 2px;
+  height: 29px;
+  transform-origin: 50% 29px;
+  background: var(--portal-accent);
+}
+
+.paint-angle-control input {
+  width: 72px;
+  text-align: right;
+}
