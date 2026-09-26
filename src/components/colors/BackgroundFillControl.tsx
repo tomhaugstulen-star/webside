@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent } from 'react'
 import {
+  createNoFill,
   editorFillToCssBackground,
   isEditorGradientAngle,
   toLinearGradientFill,
@@ -73,6 +74,14 @@ export function BackgroundFillControl({
         <div className="background-fill-control__mode" role="group" aria-label={`${label} type`}>
           <button
             type="button"
+            aria-pressed={fill.type === 'none'}
+            disabled={disabled}
+            onClick={() => onChange(createNoFill())}
+          >
+            Gjennomsiktig
+          </button>
+          <button
+            type="button"
             aria-pressed={fill.type === 'solid'}
             disabled={disabled}
             onClick={() => onChange(toSolidFill(fill))}
@@ -91,12 +100,18 @@ export function BackgroundFillControl({
       </div>
 
       <div
-        className="background-fill-control__preview"
-        style={{ background: editorFillToCssBackground(fill) }}
+        className={`background-fill-control__preview${fill.type === 'none' ? ' background-fill-control__preview--transparent' : ''}`}
+        style={fill.type === 'none'
+          ? undefined
+          : { background: editorFillToCssBackground(fill) }}
         aria-label={`${label} forhåndsvisning`}
       />
 
-      {fill.type === 'solid' ? (
+      {fill.type === 'none' ? (
+        <p className="background-fill-control__transparent-note">
+          Ingen bakgrunnsfarge.
+        </p>
+      ) : fill.type === 'solid' ? (
         <ColorSwatchInput
           id={`${id}-solid`}
           label={`${label} farge`}
