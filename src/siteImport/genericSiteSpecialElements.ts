@@ -88,6 +88,7 @@ function importHeader(
   if (element.kind !== 'header') return
 
   const captured = capturedLayoutFor(header, layouts)
+  const capturedMobile = capturedLayoutFor(header, layouts, 'mobile')
   const css = captured?.css ?? collectCssForElement(header, cssText)
   const nameCaptured = nameNode ? capturedLayoutFor(nameNode, layouts) : null
   const nameCss = nameCaptured?.css ??
@@ -98,12 +99,23 @@ function importHeader(
   const fill = cssBackgroundFillFromMap(css)
   page.elements.push({
     ...element,
-    position: { desktop: { x: box.x, y: box.y } },
+    position: {
+      desktop: { x: box.x, y: box.y },
+      mobile: capturedMobile
+        ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
+        : undefined,
+    },
     size: {
       desktop: {
         width: Math.max(240, box.width),
         height: Math.max(70, Math.min(100, box.height)),
       },
+      mobile: capturedMobile
+        ? {
+            width: Math.max(240, capturedMobile.box.width),
+            height: Math.max(70, capturedMobile.box.height),
+          }
+        : undefined,
     },
     appearance: {
       ...element.appearance,
@@ -136,6 +148,7 @@ function importHero(
   if (!hero) return
   const rawCss = collectCssForElement(hero, cssText)
   const captured = capturedLayoutFor(hero, layouts)
+  const capturedMobile = capturedLayoutFor(hero, layouts, 'mobile')
   const css = captured?.css ?? rawCss
   const asset = assetForHero(hero, rawCss, htmlPath, assetsByPath)
   if (!asset) return
@@ -171,12 +184,23 @@ function importHero(
     subtitle,
     ctaLabel,
     ctaLink: ctaNode ? externalElementLink(ctaNode) : element.ctaLink,
-    position: { desktop: { x: box.x, y: box.y } },
+    position: {
+      desktop: { x: box.x, y: box.y },
+      mobile: capturedMobile
+        ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
+        : undefined,
+    },
     size: {
       desktop: {
         width: Math.max(280, box.width),
         height: Math.max(160, box.height),
       },
+      mobile: capturedMobile
+        ? {
+            width: Math.max(280, capturedMobile.box.width),
+            height: Math.max(160, capturedMobile.box.height),
+          }
+        : undefined,
     },
     appearance: {
       ...element.appearance,
