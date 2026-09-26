@@ -138,6 +138,10 @@ function hasValidCommonFields(
     isReference(element.id) &&
     element.kind === kind &&
     typeof element.locked === 'boolean' &&
+    (element.displayName === undefined ||
+      (typeof element.displayName === 'string' &&
+        element.displayName.length <= 60 &&
+        element.displayName.trim() === element.displayName)) &&
     hasValidLayouts(element, kind)
   )
 }
@@ -150,6 +154,7 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
       return (
         hasExactKeys(value, [
           'id', 'position', 'size', 'visibility', 'locked',
+          ...(value.displayName === undefined ? [] : ['displayName']),
           'kind', 'anchorId', 'appearance',
         ]) &&
         hasValidCommonFields(value, 'section') &&
@@ -159,7 +164,8 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
     case 'image':
       return (
         hasExactKeys(value, [
-          'id', 'position', 'size', 'visibility', 'locked', 'kind',
+          'id', 'position', 'size', 'visibility', 'locked',
+          ...(value.displayName === undefined ? [] : ['displayName']), 'kind',
           'assetId', 'assetMetadata', 'altText', 'mode', 'transform',
         ]) &&
         hasValidCommonFields(value, 'image') &&
@@ -173,7 +179,8 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
     case 'text':
       return (
         hasExactKeys(value, [
-          'id', 'position', 'size', 'visibility', 'locked', 'kind',
+          'id', 'position', 'size', 'visibility', 'locked',
+          ...(value.displayName === undefined ? [] : ['displayName']), 'kind',
           'content', 'appearance', 'textStyle', 'link',
         ]) &&
         hasValidCommonFields(value, 'text') &&
@@ -186,18 +193,23 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
       return (
         hasExactKeys(value, [
           'id', 'position', 'size', 'visibility', 'locked',
+          ...(value.displayName === undefined ? [] : ['displayName']),
           'kind', 'assetId', 'label', 'link',
+          ...(value.dropdown === undefined ? [] : ['dropdown']),
         ]) &&
         hasValidCommonFields(value, 'button') &&
         isKnownButtonAssetId(value.assetId) &&
         typeof value.label === 'string' &&
         normalizeButtonLabel(value.label) === value.label &&
-        isValidElementLink(value.link)
+        isValidElementLink(value.link) &&
+        (value.dropdown === undefined || typeof value.dropdown === 'boolean') &&
+        (value.dropdown !== true || value.link.type === 'none')
       )
     case 'header':
       return (
         hasExactKeys(value, [
-          'id', 'position', 'size', 'visibility', 'locked', 'kind',
+          'id', 'position', 'size', 'visibility', 'locked',
+          ...(value.displayName === undefined ? [] : ['displayName']), 'kind',
           'logoAssetId', 'logoAssetMetadata', 'siteName', 'subtitle', 'appearance',
         ]) &&
         hasValidCommonFields(value, 'header') &&
@@ -212,7 +224,8 @@ export function isValidEditorElement(value: unknown): value is EditorElement {
     case 'hero':
       return (
         hasExactKeys(value, [
-          'id', 'position', 'size', 'visibility', 'locked', 'kind',
+          'id', 'position', 'size', 'visibility', 'locked',
+          ...(value.displayName === undefined ? [] : ['displayName']), 'kind',
           'imageAssetId', 'imageAssetMetadata', 'title', 'subtitle',
           'ctaLabel', 'ctaLink', 'appearance',
         ]) &&

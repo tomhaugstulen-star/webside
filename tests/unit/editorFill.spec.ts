@@ -10,12 +10,18 @@ import {
   toSolidFill,
 } from '../../src/model/editorFill'
 
-test('validates exact solid and two-stop linear gradient fills', () => {
+test('validates solid fills and two- or three-stop linear gradients', () => {
   const white = createEditorColor('#FFFFFF')
   const black = createEditorColor('#000000')
+  const yellow = createEditorColor('#FFFF00')
 
   expect(isEditorFill(createSolidFill(white))).toBe(true)
-  expect(isEditorFill(createLinearGradientFill(white, black, 135))).toBe(true)
+  expect(isEditorFill(createLinearGradientFill(white, yellow, black, 135))).toBe(true)
+  expect(isEditorFill({
+    type: 'linear-gradient',
+    angle: 90,
+    stops: ['#FFFFFF', '#000000'],
+  })).toBe(true)
   expect(isEditorFill({ type: 'solid', color: '#ffffff' })).toBe(false)
   expect(isEditorFill({ type: 'solid', color: '#FFFFFF', extra: true })).toBe(false)
   expect(isEditorFill({
@@ -26,7 +32,7 @@ test('validates exact solid and two-stop linear gradient fills', () => {
   expect(isEditorFill({
     type: 'linear-gradient',
     angle: 90,
-    stops: ['#FFFFFF', '#000000', '#123456'],
+    stops: ['#FFFFFF', '#000000', '#123456', '#654321'],
   })).toBe(false)
 })
 
@@ -48,7 +54,7 @@ test('converts fills deterministically without losing the primary color', () => 
   expect(gradient).toEqual({
     type: 'linear-gradient',
     angle: 90,
-    stops: ['#123456', '#123456'],
+    stops: ['#123456', '#123456', '#123456'],
   })
   expect(toSolidFill(gradient)).toEqual({
     type: 'solid',
@@ -56,12 +62,30 @@ test('converts fills deterministically without losing the primary color', () => 
   })
 })
 
+test('upgrades legacy two-stop gradients when opened for editing', () => {
+  const legacy = {
+    type: 'linear-gradient' as const,
+    angle: 180,
+    stops: [
+      createEditorColor('#000000'),
+      createEditorColor('#008000'),
+    ] as [ReturnType<typeof createEditorColor>, ReturnType<typeof createEditorColor>],
+  }
+
+  expect(toLinearGradientFill(legacy)).toEqual({
+    type: 'linear-gradient',
+    angle: 180,
+    stops: ['#000000', '#008000', '#008000'],
+  })
+})
+
 test('renders typed fills to deterministic CSS values', () => {
   const white = createEditorColor('#FFFFFF')
+  const yellow = createEditorColor('#FFFF00')
   const black = createEditorColor('#000000')
 
   expect(editorFillToCssBackground(createSolidFill(white))).toBe('#FFFFFF')
   expect(
-    editorFillToCssBackground(createLinearGradientFill(white, black, 45)),
-  ).toBe('linear-gradient(45deg, #FFFFFF 0%, #000000 100%)')
+    editorFillToCssBackground(createLinearGradientFill(white, yellow, black, 45)),
+  ).toBe('linear-gradient(45deg, #FFFFFF 0%, #FFFF00 50%, #000000 100%)')
 })

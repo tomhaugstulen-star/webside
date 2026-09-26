@@ -14,6 +14,7 @@
 
 .background-fill-control__mode {
   display: inline-flex;
+  flex-wrap: wrap;
   border: 1px solid var(--portal-border-strong);
   border-radius: 8px;
   overflow: hidden;
@@ -91,4 +92,22 @@
 .background-fill-control input:focus-visible {
   outline: 3px solid var(--portal-focus-ring);
   outline-offset: 2px;
+}
+
+
+.background-fill-control__preview--transparent {
+  background-color: var(--portal-control-surface);
+  background-image:
+    linear-gradient(45deg, var(--portal-border) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--portal-border) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--portal-border) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--portal-border) 75%);
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+}
+
+.background-fill-control__transparent-note {
+  margin: 0;
+  color: var(--portal-text-muted);
+  font-size: 12px;
 }

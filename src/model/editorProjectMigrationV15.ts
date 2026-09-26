@@ -1,4 +1,5 @@
 import type { EditorProject } from './editorProject'
+import { migrateEditorProjectV16 } from './editorProjectMigrationV16'
 import { DEFAULT_SITE_SETTINGS } from './siteSettings'
 
 export type EditorProjectV15 = Omit<EditorProject, 'schemaVersion' | 'siteSettings' | 'pages'> & {
@@ -7,7 +8,7 @@ export type EditorProjectV15 = Omit<EditorProject, 'schemaVersion' | 'siteSettin
 }
 
 export function migrateEditorProjectV15(project: EditorProjectV15): EditorProject {
-  return {
+  return migrateEditorProjectV16({
     ...project,
     schemaVersion: 16,
     siteSettings: { ...DEFAULT_SITE_SETTINGS },
@@ -15,5 +16,5 @@ export function migrateEditorProjectV15(project: EditorProjectV15): EditorProjec
       ...page,
       seo: { title: page.name, description: '' },
     })),
-  }
+  })
 }

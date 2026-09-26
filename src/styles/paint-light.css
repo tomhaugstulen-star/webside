@@ -8,6 +8,7 @@
   background: rgba(18, 26, 35, 0.68);
 }
 .paint-dialog {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: min(1280px, 100%);

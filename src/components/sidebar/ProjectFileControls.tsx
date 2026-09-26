@@ -10,8 +10,9 @@ import {
 } from '../../projectFiles/projectFileFormat'
 import { readProjectFileResult } from '../../projectFiles/readProjectFile'
 import { useEditorProject } from '../../state/useEditorProject'
+import { readStaticSiteZip } from '../../siteImport/readStaticSiteZip'
 
-type BusyMode = 'export' | 'backup' | 'import' | null
+type BusyMode = 'export' | 'backup' | 'import' | 'site-import' | null
 
 export function ProjectFileControls() {
   const mountedRef = useRef(true)
@@ -21,6 +22,7 @@ export function ProjectFileControls() {
     return () => { mountedRef.current = false }
   }, [])
   const inputRef = useRef<HTMLInputElement>(null)
+  const siteInputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<BusyMode>(null)
   const [message, setMessage] = useState<string | null>(null)
   const { state, dispatch } = useEditorProject()
@@ -114,11 +116,44 @@ export function ProjectFileControls() {
     }
   }
 
+  const importSite = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0] ?? null
+    event.currentTarget.value = ''
+    if (!file || operationRef.current) return
+    operationRef.current = true
+    setBusy('site-import')
+    setMessage(null)
+
+    try {
+      const result = await readStaticSiteZip(file)
+      if (!mountedRef.current) return
+      if (!result.ok) {
+        setMessage(result.message)
+        return
+      }
+      if (!replaceImageAssets(result.value.assets)) {
+        setMessage('Bildene fra nettstedet kunne ikke lastes inn.')
+        return
+      }
+      dispatch({ type: 'replace-project', project: result.value.project })
+      setMessage(
+        `Importerte nettstedet «${result.value.project.name}».` +
+        (result.message ? ` ${result.message}` : ''),
+      )
+    } catch {
+      setMessage('Nettstedet kunne ikke importeres.')
+    } finally {
+      operationRef.current = false
+      if (mountedRef.current) setBusy(null)
+    }
+  }
+
   return (
     <section className="project-file-controls">
       <h3>Prosjektfil</h3>
       <p>
-        Lagre hele prosjektet med bilder, eller åpne en tidligere prosjektfil.
+        Lagre hele prosjektet, åpne en prosjektfil eller importer en nettsted-ZIP
+        som tidligere er eksportert fra editoren.
       </p>
       <div className="project-file-controls__actions">
         <button
@@ -134,6 +169,10 @@ export function ProjectFileControls() {
           onClick={() => inputRef.current?.click()}
         >
           {busy === 'import' ? 'Åpner…' : 'Åpne prosjekt'}
+        </button>
+        <button type="button" disabled={busy !== null}
+          onClick={() => siteInputRef.current?.click()}>
+          {busy === 'site-import' ? 'Importerer…' : 'Importer nettsted (ZIP)'}
         </button>
         <button
           className="project-file-controls__backup"
@@ -154,6 +193,10 @@ export function ProjectFileControls() {
         aria-hidden="true"
         onChange={(event) => void importProject(event)}
       />
+      <input ref={siteInputRef} className="project-file-controls__site-input"
+        type="file" accept=".zip,application/zip" disabled={busy !== null}
+        tabIndex={-1} aria-hidden="true"
+        onChange={(event) => void importSite(event)} />
       {message && <p role="status" className="project-file-controls__message">{message}</p>}
     </section>
   )

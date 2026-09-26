@@ -6,6 +6,7 @@ import {
 import { normalizeButtonLabel } from '../../model/buttonAsset'
 import type { ButtonEditorElement } from '../../model/editorProject'
 import { useButtonProperties } from '../../state/useButtonProperties'
+import { useEditorProject } from '../../state/useEditorProject'
 
 type ButtonPropertiesSectionProps = {
   element: ButtonEditorElement
@@ -14,7 +15,8 @@ type ButtonPropertiesSectionProps = {
 export function ButtonPropertiesSection({
   element,
 }: ButtonPropertiesSectionProps) {
-  const { updateButtonLabel, updateButtonAsset } = useButtonProperties()
+  const { updateButtonLabel, updateButtonAsset, updateButtonDropdown } = useButtonProperties()
+  const { state } = useEditorProject()
   const [labelDraft, setLabelDraft] = useState(element.label)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const [savedMessage, setSavedMessage] = useState<string | null>(null)
@@ -123,6 +125,22 @@ export function ButtonPropertiesSection({
           ))}
         </select>
       </label>
+
+      <label className="button-properties__field" htmlFor={`${idPrefix}-action`}>
+        <span>Handling</span>
+        <select id={`${idPrefix}-action`} value={element.dropdown ? 'menu' : 'link'}
+          disabled={disabled} onChange={(event) => updateButtonDropdown(element.id, event.target.value === 'menu')}>
+          <option value="link">Vanlig knapp / lenke</option>
+          <option value="menu">Åpne nedtrekksmeny</option>
+        </select>
+      </label>
+      {element.dropdown && (
+        <p className="button-properties__help">
+          Menyen viser {state.project.navigation.items.length} valg fra Navigasjon i venstrepanelet.
+          {state.project.navigation.items.length === 0 ? ' Legg til sidene eller seksjonene der først.' : ''}
+          {' '}Legg en menyknapp på hver side der du ønsker navigasjon.
+        </p>
+      )}
 
       {currentAsset ? (
         <p className="button-properties__help">

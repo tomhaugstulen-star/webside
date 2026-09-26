@@ -38,5 +38,6 @@ test('exports a standalone site with saved SEO and no editor state', async ({ pa
   expect(html).toMatch(/assets\/site-[a-f0-9]+\.css/)
   expect(files.get('sitemap.xml')).toContain('https://example.no/nettside/')
   expect([...files.keys()].some((name) => name.endsWith('.website-project'))).toBe(false)
+  expect(files.has('website-editor.json')).toBe(true)
   expect(files.has('assets/site.js')).toBe(false)
 })

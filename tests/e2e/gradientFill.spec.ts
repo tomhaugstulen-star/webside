@@ -28,6 +28,7 @@ async function setGradient(
   label: string,
   first: string,
   second: string,
+  third: string,
   angle: number,
 ) {
   await group.getByRole('button', { name: 'Gradient', exact: true }).click()
@@ -39,10 +40,16 @@ async function setGradient(
     name: `${label} farge 2 HEX-kode`,
     exact: true,
   })
+  const thirdInput = group.getByRole('textbox', {
+    name: `${label} farge 3 HEX-kode`,
+    exact: true,
+  })
   await firstInput.fill(first)
   await firstInput.press('Enter')
   await secondInput.fill(second)
   await secondInput.press('Enter')
+  await thirdInput.fill(third)
+  await thirdInput.press('Enter')
   const angleInput = group.getByRole('spinbutton', {
     name: `${label} vinkel`,
     exact: true,
@@ -51,7 +58,7 @@ async function setGradient(
   await angleInput.press('Enter')
 }
 
-test('renders gradients on page, section, text and header while preserving solid colors', async ({ page }) => {
+test('renders three-color gradients on page, section, text and header while preserving solid colors', async ({ page }) => {
   await page.goto('/')
   await createSectionAndText(page)
   await createHeader(page)
@@ -72,10 +79,10 @@ test('renders gradients on page, section, text and header while preserving solid
     (element) => getComputedStyle(element).color,
   )
 
-  await setGradient(pageGroup, 'Sidebakgrunn', '#112233', '#445566', 45)
-  await setGradient(sectionGroup, 'Bakgrunn', '#AA0000', '#00AA00', 90)
-  await setGradient(textGroup, 'Bakgrunn', '#0000AA', '#AAAA00', 135)
-  await setGradient(headerGroup, 'Bakgrunn', '#101010', '#F0F0F0', 180)
+  await setGradient(pageGroup, 'Sidebakgrunn', '#112233', '#DDBB22', '#445566', 45)
+  await setGradient(sectionGroup, 'Bakgrunn', '#AA0000', '#CCCC00', '#00AA00', 90)
+  await setGradient(textGroup, 'Bakgrunn', '#0000AA', '#AAAA00', '#00AAAA', 135)
+  await setGradient(headerGroup, 'Bakgrunn', '#101010', '#DDBB22', '#F0F0F0', 180)
 
   await expect(page.getByLabel('Nettside: Forside')).toHaveCSS(
     'background-image',
@@ -116,11 +123,11 @@ test('gradient angle rejects invalid drafts and Escape keeps the colors panel op
   await expect(page.getByRole('heading', { name: 'Farger', exact: true })).toBeVisible()
 })
 
-test('gradient survives project-file download and reopen', async ({ page }) => {
+test('three-color gradient survives project-file download and reopen', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Farger', exact: true }).click()
   const group = page.getByRole('region', { name: 'Bakgrunn', exact: true })
-  await setGradient(group, 'Sidebakgrunn', '#123456', '#ABCDEF', 123)
+  await setGradient(group, 'Sidebakgrunn', '#123456', '#FEDCBA', '#ABCDEF', 123)
   await expect(page.getByLabel('Nettside: Forside')).toHaveCSS(
     'background-image',
     /linear-gradient/,
@@ -153,5 +160,8 @@ test('gradient survives project-file download and reopen', async ({ page }) => {
   ).toHaveValue('#123456')
   await expect(
     restored.getByRole('textbox', { name: 'Sidebakgrunn farge 2 HEX-kode', exact: true }),
+  ).toHaveValue('#FEDCBA')
+  await expect(
+    restored.getByRole('textbox', { name: 'Sidebakgrunn farge 3 HEX-kode', exact: true }),
   ).toHaveValue('#ABCDEF')
 })

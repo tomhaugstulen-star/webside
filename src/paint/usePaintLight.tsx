@@ -34,6 +34,25 @@ export function usePaintLight(selected: EditorElement | null, elements: readonly
     setPaintFile(image.file)
     setPickerOpen(false)
   }
+
+  const createBlankProject = async () => {
+    const width = 1200
+    const height = 1200
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const context = canvas.getContext('2d')
+    if (!context) return
+    context.fillStyle = '#FFFFFF'
+    context.fillRect(0, 0, width, height)
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/png'),
+    )
+    if (!blob) return
+    setSourceDimensions({ width, height })
+    setPaintFile(new File([blob], 'nytt-bilde.png', { type: 'image/png' }))
+    setPickerOpen(false)
+  }
   const open = () => {
     if (resource) choose(resource)
     else setPickerOpen(true)
@@ -59,7 +78,12 @@ export function usePaintLight(selected: EditorElement | null, elements: readonly
     active: paintFile !== null || pickerOpen,
     open,
     dialog: pickerOpen ? (
-      <PaintImagePicker images={images} onChoose={choose} onClose={() => setPickerOpen(false)} />
+      <PaintImagePicker
+        images={images}
+        onChoose={choose}
+        onNew={() => void createBlankProject()}
+        onClose={() => setPickerOpen(false)}
+      />
     ) : paintFile ? (
       <PaintLightDialog file={paintFile} dimensions={sourceDimensions}
         onClose={() => setPaintFile(null)} onSave={save} />

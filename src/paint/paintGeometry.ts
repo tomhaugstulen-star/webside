@@ -1,4 +1,4 @@
-export type PaintTool = 'select' | 'brush' | 'eraser' | 'line' | 'rectangle'
+export type PaintTool = 'select' | 'brush' | 'eraser' | 'line' | 'rectangle' | 'text'
 export type Point = { x: number; y: number }
 export type Selection = { x: number; y: number; width: number; height: number }
 

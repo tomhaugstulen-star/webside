@@ -1,40 +1,41 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
-import { validDimensions, type PaintTool } from './paintGeometry'
+import { validDimensions, type PaintTool, type Point } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
+import { PaintCanvasViewport } from './PaintCanvasViewport'
+import { PaintDesignDialog } from './PaintDesignDialog'
+import type { PaintDesignPanel } from './paintDesignPanel'
+import type { PaintFill } from './paintFill'
+import { PaintFileControls } from './PaintFileControls'
 import { PaintLightToolbar } from './PaintLightToolbar'
-import { usePaintCanvas } from './usePaintCanvas'
+import { PaintResizeControls } from './PaintResizeControls'; import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
-type Props = {
-  file: File
-  dimensions: { width: number; height: number }
-  onClose: () => void
-  onSave: (file: File) => Promise<void>
-}
+type Props = { file: File; dimensions: { width: number; height: number }; onClose: () => void; onSave: (file: File) => Promise<void> }
 const tools: Array<{ id: PaintTool; label: string }> = [
-  { id: 'select', label: 'Marker / flytt' },
-  { id: 'brush', label: 'Pensel' },
-  { id: 'eraser', label: 'Viskelær' },
-  { id: 'line', label: 'Strek' },
+  { id: 'select', label: 'Marker / flytt' }, { id: 'brush', label: 'Pensel' },
+  { id: 'eraser', label: 'Viskelær' }, { id: 'line', label: 'Strek' },
   { id: 'rectangle', label: 'Rektangel' },
 ]
 export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [tool, setTool] = useState<PaintTool>('select')
-  const [color, setColor] = useState('#17202c')
-  const [size, setSize] = useState(8)
+  const [color, setColor] = useState('#17202c'), [size, setSize] = useState(8)
+  const [fill, setFill] = useState<PaintFill>({ type: 'solid', color: '#ffffff' })
+  const [textValue, setTextValue] = useState(''), [textColor, setTextColor] = useState('#17202c')
+  const [textSize, setTextSize] = useState(48)
+  const [textFramePosition, setTextFramePosition] = useState<Point>({ x: 80, y: 80 })
   const [name, setName] = useState(file.name.replace(/\.[^.]+$/, '') + '-redigert')
   const [format, setFormat] = useState<SupportedImageMimeType>('image/png')
   const [newWidth, setNewWidth] = useState(dimensions.width)
-  const [newHeight, setNewHeight] = useState(dimensions.height)
-  const [lockRatio, setLockRatio] = useState(true)
-  const [busy, setBusy] = useState(false)
-  const [fullscreen, setFullscreen] = useState(false)
-  const [aiOpen, setAiOpen] = useState(false)
+  const [newHeight, setNewHeight] = useState(dimensions.height), [lockRatio, setLockRatio] = useState(true)
+  const [busy, setBusy] = useState(false), [fullscreen, setFullscreen] = useState(false)
+  const [aiOpen, setAiOpen] = useState(false), [designPanel, setDesignPanel] = useState<PaintDesignPanel | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [canvasViewport, setCanvasViewport] = useState({ width: 0, height: 0 })
-  const { canvasRef, overlayRef, ...paint } = usePaintCanvas(file, tool, color, size)
+  const { canvasRef, overlayRef, ...paint } = usePaintCanvas(
+    file, tool, color, size, textValue, textColor, textSize,
+  )
   const { overlayRef: importOverlayRef, imported: importPending, ...importActions } =
     usePaintImport(canvasRef, paint.width, paint.height, paint.commit)
   const importInputRef = useRef<HTMLInputElement>(null)
@@ -56,6 +57,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       if (event.key === 'Escape' && !busy) {
         event.stopImmediatePropagation()
         if (aiOpen) setAiOpen(false)
+        else if (designPanel) setDesignPanel(null)
         else if (importPending) importActions.cancel()
         else if (fullscreen) setFullscreen(false)
         else onClose()
@@ -63,7 +65,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
     }
     window.addEventListener('keydown', onEscape, true)
     return () => window.removeEventListener('keydown', onEscape, true)
-  }, [aiOpen, busy, fullscreen, importPending, importActions, onClose])
+  }, [aiOpen, busy, designPanel, fullscreen, importPending, importActions, onClose])
   const fileName = () => {
     const base = name.trim().replace(/\.(png|jpe?g|webp)$/i, '')
     if (!base) throw new Error('Skriv et filnavn.')
@@ -109,12 +111,10 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       if (lockRatio && value > 0) setNewWidth(Math.round(value * ratio))
     }
   }
-  const fitScale = paint.width > 0 && paint.height > 0 && canvasViewport.width > 0 && canvasViewport.height > 0
-    ? Math.min(
-      1,
-      Math.max(1, canvasViewport.width - 24) / paint.width,
-      Math.max(1, canvasViewport.height - 24) / paint.height,
-    )
+  const fitScale = paint.width > 0 && paint.height > 0 &&
+    canvasViewport.width > 0 && canvasViewport.height > 0
+    ? Math.min(1, Math.max(1, canvasViewport.width - 24) / paint.width,
+      Math.max(1, canvasViewport.height - 24) / paint.height)
     : 1
   const displayWidth = Math.max(1, Math.round((paint.width || 1) * fitScale))
   const displayHeight = Math.max(1, Math.round((paint.height || 1) * fitScale))
@@ -123,9 +123,8 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       setMessage('Bruk hele piksler, maks 16 384 per side og 40 megapiksler.')
       return
     }
-    if (newWidth > paint.width || newHeight > paint.height) {
-      if (!window.confirm('Du oppskalerer bildet. Det kan bli mindre skarpt. Fortsette?')) return
-    }
+    if ((newWidth > paint.width || newHeight > paint.height) &&
+      !window.confirm('Du oppskalerer bildet. Det kan bli mindre skarpt. Fortsette?')) return
     paint.resize(newWidth, newHeight)
     setMessage(null)
   }
@@ -189,47 +188,53 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               <label>Størrelse <input type="number" min="1" max="100" value={size}
                 onChange={(event) => setSize(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} /></label>
             </div>
-            <fieldset className="paint-dialog__resize">
-              <legend>Bildestørrelse</legend>
-              <p className="paint-dialog__meta">{file.name}<br />{paint.width} × {paint.height} px</p>
-              <label>Bredde <input type="number" min="1" max="16384" value={newWidth || ''}
-                onChange={(event) => setDimension('width', Number(event.target.value))} /></label>
-              <label>Høyde <input type="number" min="1" max="16384" value={newHeight || ''}
-                onChange={(event) => setDimension('height', Number(event.target.value))} /></label>
-              <label><input type="checkbox" checked={lockRatio}
-                onChange={(event) => setLockRatio(event.target.checked)} /> Lås proporsjoner</label>
-              <button type="button" onClick={applyResize}
-                disabled={!paint.ready || importPending}>Endre størrelse</button>
-              <button type="button" disabled={importPending} onClick={() => {
-                setNewWidth(1920); setNewHeight(1080); setLockRatio(false)
-              }}>Hero 16:9 · 1920 × 1080</button>
-            </fieldset>
-            <div className="paint-dialog__save">
-              <h3>Fil</h3>
-              <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
-              <label>Format <select value={format} onChange={(event) =>
-                setFormat(event.target.value as SupportedImageMimeType)}>
-                <option value="image/png">PNG</option><option value="image/jpeg">JPEG</option>
-                <option value="image/webp">WebP</option>
-              </select></label>
+            <div className="paint-dialog__panel-group">
+              <h3>Design</h3>
+              <button type="button" disabled={!paint.ready || importPending}
+                onClick={() => setDesignPanel('colors')}>Farger…</button>
+              <button type="button" disabled={!paint.ready || importPending}
+                onClick={() => setDesignPanel('text')}>Tekst…</button>
             </div>
-            {(message || paint.error) &&
-              <p className="paint-dialog__message" role="status">{message || paint.error}</p>}
+            <PaintResizeControls fileName={file.name} width={paint.width}
+              height={paint.height} newWidth={newWidth} newHeight={newHeight}
+              lockRatio={lockRatio} ready={paint.ready} importPending={importPending}
+              onWidthChange={(value) => setDimension('width', value)}
+              onHeightChange={(value) => setDimension('height', value)}
+              onLockRatioChange={setLockRatio} onApply={applyResize}
+              onHeroPreset={() => { setNewWidth(1920); setNewHeight(1080); setLockRatio(false) }} />
+            <PaintFileControls name={name} format={format}
+              message={message} error={paint.error}
+              onNameChange={setName} onFormatChange={setFormat} />
           </aside>
-          <div ref={canvasViewportRef} className="paint-dialog__canvas-scroll">
-            <div className="paint-dialog__canvas-wrap"
-              style={{ width: displayWidth, height: displayHeight }}>
-              <canvas ref={canvasRef} aria-label="Bildearbeidsflate"
-                onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
-                onPointerUp={paint.onPointerUp} onPointerCancel={paint.onPointerUp} />
-              <canvas ref={overlayRef} aria-hidden="true" />
-              <canvas ref={importOverlayRef} className="paint-dialog__import-overlay"
-                aria-label="Flytt importert bilde" style={{ pointerEvents: importPending ? 'auto' : 'none' }}
-                onPointerDown={importActions.onPointerDown} onPointerMove={importActions.onPointerMove}
-                onPointerUp={importActions.onPointerUp} onPointerCancel={importActions.onPointerUp} />
-            </div>
-          </div>
+          <PaintCanvasViewport viewportRef={canvasViewportRef} canvasRef={canvasRef}
+            overlayRef={overlayRef} importOverlayRef={importOverlayRef}
+            width={displayWidth} height={displayHeight} canvasWidth={paint.width}
+            canvasHeight={paint.height} importPending={importPending}
+            textFrame={tool === 'text' && textValue.trim()
+              ? { value: textValue, color: textColor, size: textSize, position: textFramePosition }
+              : null}
+            onTextFrameMove={setTextFramePosition}
+            onTextFrameCommit={() => { paint.addText(textFramePosition); setTool('select') }}
+            onPointerDown={paint.onPointerDown}
+            onPointerMove={paint.onPointerMove} onPointerUp={paint.onPointerUp}
+            onImportPointerDown={importActions.onPointerDown}
+            onImportPointerMove={importActions.onPointerMove}
+            onImportPointerUp={importActions.onPointerUp} />
         </div>
+        {designPanel && (
+          <PaintDesignDialog panel={designPanel} fill={fill} textValue={textValue}
+            textColor={textColor} textSize={textSize} textActive={tool === 'text'}
+            disabled={!paint.ready || importPending} onFillChange={setFill}
+            onFillBackground={() => paint.fillBackground(fill)}
+            onTextValueChange={setTextValue} onTextColorChange={setTextColor}
+            onTextSizeChange={setTextSize}
+            onActivateText={() => {
+              setTextFramePosition({ x: Math.round(paint.width * 0.12),
+                y: Math.round(paint.height * 0.12) })
+              setTool('text')
+            }}
+            onClose={() => setDesignPanel(null)} />
+        )}
         {aiOpen && (
           <PaintAiDialog
             canvasRef={canvasRef}

@@ -29,6 +29,7 @@ export function setElementLink(
     !element ||
     existingLink === null ||
     element.locked ||
+    (element.kind === 'button' && element.dropdown) ||
     !isValidElementLink(link) ||
     elementLinksEqual(existingLink, link)
   ) {

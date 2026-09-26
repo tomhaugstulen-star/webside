@@ -15,8 +15,10 @@ import { reduceNavigationProjectAction } from './reduceNavigationProjectAction'
 import { reducePageProjectAction } from './reducePageProjectAction'
 import { resetElementMobileOverrides, setElementMobileVisibility } from './reduceResponsiveElementAction'
 import { setButtonAsset } from './setButtonAsset'
+import { setButtonDropdown } from './setButtonDropdown'
 import { setButtonLabel } from './setButtonLabel'
 import { setElementDesktopLayout } from './setElementDesktopLayout'
+import { setElementDisplayName } from './setElementDisplayName'
 import { setElementViewportLayout } from './setElementViewportLayout'
 import { setElementLink } from './setElementLink'
 import { setSectionAnchorId } from './setSectionAnchorId'
@@ -38,12 +40,9 @@ function selectedElementExists(state: EditorProjectState) {
     activePageContainsElement(state, state.selectedElementId)
   )
 }
-
 function ensureValidSelection(state: EditorProjectState): EditorProjectState {
-  if (selectedElementExists(state)) return state
-  return { ...state, selectedElementId: null }
+  return selectedElementExists(state) ? state : { ...state, selectedElementId: null }
 }
-
 function reduceEditorProjectState(
   state: EditorProjectState,
   action: EditorProjectAction,
@@ -63,7 +62,6 @@ function reduceEditorProjectState(
         selectedElementId: null,
       }
     }
-
     case 'set-active-page': {
       if (action.pageId === state.activePageId) return state
       const pageExists = state.project.pages.some(
@@ -76,7 +74,6 @@ function reduceEditorProjectState(
         selectedElementId: null,
       }
     }
-
     case 'set-selected-element':
       if (action.elementId === state.selectedElementId) return state
       if (
@@ -86,14 +83,12 @@ function reduceEditorProjectState(
         return state
       }
       return { ...state, selectedElementId: action.elementId }
-
     case 'add-page':
     case 'set-page-name':
     case 'set-page-slug':
     case 'move-page':
     case 'delete-page':
       return reducePageProjectAction(state, action)
-
     case 'add-navigation-item':
     case 'set-navigation-item-label':
     case 'set-navigation-item-target':
@@ -101,7 +96,6 @@ function reduceEditorProjectState(
     case 'move-navigation-item':
     case 'delete-navigation-item':
       return reduceNavigationProjectAction(state, action)
-
     case 'add-element-to-active-page':
       return addElementToActivePage(
         state,
@@ -109,22 +103,20 @@ function reduceEditorProjectState(
         action.request,
         action.updatedAt,
       )
-
     case 'insert-elements-to-active-page':
       return insertElementsToActivePage(
         state, action.elements, action.selectedElementId, action.updatedAt,
       )
-
     case 'delete-element-from-active-page':
       return deleteElementFromActivePage(
         state, action.elementId, action.updatedAt,
       )
-
+    case 'set-element-display-name':
+      return setElementDisplayName(state, action.elementId, action.displayName, action.updatedAt)
     case 'set-section-anchor-id':
       return setSectionAnchorId(
         state, action.elementId, action.anchorId, action.updatedAt,
       )
-
     case 'set-element-desktop-layout':
       return setElementDesktopLayout(
         state,
@@ -132,7 +124,6 @@ function reduceEditorProjectState(
         action.layout,
         action.updatedAt,
       )
-
     case 'set-element-viewport-layout':
       return setElementViewportLayout(
         state,
@@ -141,10 +132,8 @@ function reduceEditorProjectState(
         action.layout,
         action.updatedAt,
       )
-
     case 'toggle-element-lock':
       return toggleElementLock(state, action.elementId, action.updatedAt)
-
     case 'set-element-mobile-visibility':
       return setElementMobileVisibility(
         state,
@@ -152,14 +141,12 @@ function reduceEditorProjectState(
         action.visible,
         action.updatedAt,
       )
-
     case 'reset-element-mobile-overrides':
       return resetElementMobileOverrides(
         state,
         action.elementId,
         action.updatedAt,
       )
-
     case 'set-text-element-content':
       return setTextElementContent(
         state,
@@ -167,7 +154,6 @@ function reduceEditorProjectState(
         action.content,
         action.updatedAt,
       )
-
     case 'set-text-element-style':
       return setTextElementStyle(
         state,
@@ -175,7 +161,6 @@ function reduceEditorProjectState(
         action.patch,
         action.updatedAt,
       )
-
     case 'set-element-link':
       return setElementLink(
         state,
@@ -183,7 +168,6 @@ function reduceEditorProjectState(
         action.link,
         action.updatedAt,
       )
-
     case 'set-button-label':
       return setButtonLabel(
         state,
@@ -191,7 +175,6 @@ function reduceEditorProjectState(
         action.label,
         action.updatedAt,
       )
-
     case 'set-button-asset':
       return setButtonAsset(
         state,
@@ -199,7 +182,8 @@ function reduceEditorProjectState(
         action.assetId,
         action.updatedAt,
       )
-
+    case 'set-button-dropdown':
+      return setButtonDropdown(state, action.elementId, action.dropdown, action.updatedAt)
     case 'set-active-page-background-fill':
     case 'set-section-background-fill':
     case 'set-section-frame-width':
@@ -208,7 +192,6 @@ function reduceEditorProjectState(
     case 'set-text-frame-width':
     case 'set-text-frame-color':
       return reduceColorProjectAction(state, action)
-
     case 'set-header-content':
     case 'set-header-logo':
       return reduceHeaderProjectAction(state, action)
@@ -219,7 +202,6 @@ function reduceEditorProjectState(
     case 'set-header-frame-width':
     case 'set-header-frame-color':
       return reduceHeaderAppearanceAction(state, action)
-
     case 'set-hero-content':
     case 'set-hero-image':
     case 'set-hero-background-fill':
@@ -227,7 +209,6 @@ function reduceEditorProjectState(
     case 'set-hero-frame-width':
     case 'set-hero-frame-color':
       return reduceHeroProjectAction(state, action)
-
     case 'set-image-alt-text':
     case 'set-image-mode':
     case 'set-image-transform':
@@ -235,11 +216,9 @@ function reduceEditorProjectState(
     case 'set-image-viewport-frame':
       return reduceImageProjectAction(state, action)
   }
-
   const unhandledAction: never = action
   return unhandledAction
 }
-
 export function editorProjectReducer(
   state: EditorProjectState,
   action: EditorProjectAction,

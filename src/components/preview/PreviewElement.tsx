@@ -10,6 +10,7 @@ import { HeroElementContent } from '../canvas/HeroElementContent'
 import { ImageElementContent } from '../canvas/ImageElementContent'
 import { getElementAppearanceCssStyle } from '../canvas/getElementAppearanceCssStyle'
 import { getTextElementCssStyle } from '../canvas/getTextElementCssStyle'
+import { PreviewButtonDropdown } from './PreviewButtonDropdown'
 
 type PreviewElementProps = {
   element: EditorElement
@@ -76,6 +77,11 @@ export function PreviewElement({
       break
     }
     case 'button': {
+      if (element.dropdown) {
+        content = <PreviewButtonDropdown element={element} pages={pages}
+          navigation={navigation} onNavigate={onNavigate} />
+        break
+      }
       const link = externalLinkProps(element.link)
       const button = <ButtonElementContent element={element} />
       content = link ? <a className="preview-element__link" {...link}>{button}</a> : button
@@ -98,7 +104,7 @@ export function PreviewElement({
   return (
     <div
       id={element.kind === 'section' ? element.anchorId : undefined}
-      className={`canvas-element canvas-element--${element.kind} preview-element preview-element--${element.kind}`}
+      className={`canvas-element canvas-element--${element.kind} preview-element preview-element--${element.kind}${element.kind === 'button' && element.dropdown ? ' preview-element--dropdown' : ''}`}
       style={style}
       data-element-id={element.id}
     >

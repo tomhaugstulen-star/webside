@@ -1,0 +1,147 @@
+.paint-dialog__stacked-label {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.paint-dialog textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 7px;
+  resize: vertical;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  color: var(--portal-text);
+  background: var(--portal-control-surface);
+  font: inherit;
+}
+
+.paint-dialog__fill-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.paint-dialog__fill-preview {
+  height: 34px;
+  border: 1px solid var(--portal-border);
+  border-radius: 7px;
+}
+
+
+.paint-design-dialog {
+  position: absolute;
+  z-index: 8;
+  top: 76px;
+  left: 216px;
+  width: min(390px, calc(100% - 252px));
+  max-height: calc(100% - 96px);
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 14px;
+  background: var(--portal-control-surface);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
+}
+
+.paint-design-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.paint-design-dialog__header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.paint-design-dialog__header p {
+  margin: 4px 0 0;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.paint-design-dialog__header > button {
+  width: 34px;
+  min-width: 34px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.paint-design-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paint-design-dialog__body > button {
+  width: 100%;
+}
+
+.paint-design-dialog__body textarea {
+  min-height: 108px;
+}
+
+@media (max-width: 760px) {
+  .paint-design-dialog {
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: calc(100% - 86px);
+  }
+}
+
+
+.paint-angle-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.paint-angle-wheel {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 50%;
+  background: var(--portal-control-surface);
+  cursor: grab;
+  touch-action: none;
+}
+
+.paint-angle-wheel:active {
+  cursor: grabbing;
+}
+
+.paint-angle-wheel::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--portal-accent);
+}
+
+.paint-angle-wheel__hand {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 2px;
+  height: 29px;
+  transform-origin: 50% 29px;
+  background: var(--portal-accent);
+}
+
+.paint-angle-control input {
+  width: 72px;
+  text-align: right;
+}

@@ -8,7 +8,9 @@ import { normalizePublicUrl } from '../../src/model/siteSettings'
 import { createImageAssetId } from '../../src/model/imageAsset'
 import { pageFilePath, relativePageHref } from '../../src/export/sitePaths'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
+import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
 import { PUBLIC_DESKTOP_WIDTH } from '../../src/export/siteDimensions'
+import { createNoFill } from '../../src/model/editorFill'
 
 const decode = new TextDecoder()
 
@@ -44,9 +46,46 @@ test('schema 15 projects migrate SEO and site settings without changing old page
     }) }
   delete (legacy as Record<string, unknown>).siteSettings
   const migrated = parseImportedEditorProject(legacy)
-  expect(migrated?.schemaVersion).toBe(16)
+  expect(migrated?.schemaVersion).toBe(17)
   expect(migrated?.siteSettings).toEqual({ language: 'nb', publicUrl: '' })
   expect(migrated?.pages[0].seo).toEqual({ title: 'Forside', description: '' })
+})
+
+
+test('schema 16 projects migrate unchanged to schema 17', () => {
+  const project = createBlankProject('Schema 16')
+  const legacy = { ...project, schemaVersion: 16 }
+  const migrated = parseImportedEditorProject(legacy)
+  expect(migrated?.schemaVersion).toBe(17)
+  expect(migrated?.pages).toEqual(project.pages)
+  expect(migrated?.siteSettings).toEqual(project.siteSettings)
+})
+
+
+test('transparent fills validate and export as transparent background', () => {
+  const project = createBlankProject('Gjennomsiktig')
+  const text = createEditorElement({
+    id: 'transparent-text',
+    request: { kind: 'text' },
+    existingElements: [],
+  })
+  if (text.kind !== 'text') throw Error('Fixture')
+  project.pages[0].elements.push({
+    ...text,
+    content: 'Gjennomsiktig tekst',
+    appearance: {
+      ...text.appearance,
+      backgroundFill: createNoFill(),
+    },
+  })
+  expect(parseImportedEditorProject(project)).not.toBeNull()
+  const html = renderPublicElements(
+    project,
+    '/',
+    () => 'unused',
+    () => ({ href: 'unused', color: '#fff' }),
+  )
+  expect(html).toContain('background:transparent')
 })
 
 test('site metadata changes atomically and unchanged values preserve state identity', () => {
@@ -81,6 +120,36 @@ test('public markup escapes content and resolves menu and section links', () => 
   expect(html).toContain('Om &amp; oss')
   expect(html).toContain('&lt;script&gt;farlig&lt;/script&gt;')
   expect(html).not.toContain('<script>')
+})
+
+test('ordinary button opens navigation on every page without a Header', () => {
+  const project = createBlankProject('Test')
+  const home = project.pages[0]
+  const second = createEditorPage('page-2', 'Om oss', '/om-oss')
+  const section = createEditorElement({ id: 'section-1', request: { kind: 'section' }, existingElements: [] })
+  const button = createEditorElement({ id: 'button-1', request: { kind: 'button', assetId: DEFAULT_BUTTON_ASSET_ID }, existingElements: [] })
+  if (section.kind !== 'section' || button.kind !== 'button') throw Error('Fixture')
+  project.pages.push({ ...second, elements: [section, button] })
+  project.navigation.items.push(
+    { id: 'home', label: 'Forside', target: { type: 'page', pageId: home.id } },
+    { id: 'section', label: 'Les mer', target: { type: 'section', pageId: second.id, elementId: section.id } },
+  )
+  const state = { project, activePageId: second.id, selectedElementId: button.id }
+  const updated = editorProjectReducer(state, {
+    type: 'set-button-dropdown', elementId: button.id, dropdown: true, updatedAt: new Date().toISOString(),
+  })
+  expect(parseImportedEditorProject(updated.project)).not.toBeNull()
+  expect(editorProjectReducer(updated, {
+    type: 'set-element-link', elementId: button.id, link: {
+      type: 'external-url', url: 'https://example.no', openInNewTab: false,
+    }, updatedAt: new Date().toISOString(),
+  })).toBe(updated)
+  const html = renderPublicElements(updated.project, second.slug, () => 'unused',
+    () => ({ href: 'button.svg', color: '#fff' }))
+  expect(html).toContain('class="site-button-menu-toggle"')
+  expect(html).toContain('href=".././"')
+  expect(html).toContain(`href="#${section.anchorId}"`)
+  expect(html).not.toContain('site-header')
 })
 
 test('export keeps elements placed in the editor’s expanded desktop canvas', () => {

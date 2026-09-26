@@ -51,7 +51,8 @@
   cursor: default;
 }
 
-.project-file-controls__input {
+.project-file-controls__input,
+.project-file-controls__site-input {
   display: none;
 }
 

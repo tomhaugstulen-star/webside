@@ -16,6 +16,7 @@ import {
 } from './editorProjectMigration'
 import { migrateEditorProjectV14, type EditorProjectV14 } from './editorProjectMigrationV14'
 import { migrateEditorProjectV15, type EditorProjectV15 } from './editorProjectMigrationV15'
+import { migrateEditorProjectV16, type EditorProjectV16 } from './editorProjectMigrationV16'
 import { isValidPageSeo, isValidSiteSettings } from './siteSettings'
 import { isValidPageAppearance } from './pageAppearance'
 import {
@@ -114,6 +115,8 @@ export function parseImportedEditorProject(value: unknown): EditorProject | null
       migrated = migrateEditorProjectV14(value as unknown as EditorProjectV14)
     } else if (value.schemaVersion === 15) {
       migrated = migrateEditorProjectV15(value as unknown as EditorProjectV15)
+    } else if (value.schemaVersion === 16) {
+      migrated = migrateEditorProjectV16(value as unknown as EditorProjectV16)
     } else if (value.schemaVersion !== EDITOR_PROJECT_SCHEMA_VERSION) {
       return null
     }

@@ -35,6 +35,7 @@
 @import './styles/section-templates.css';
 @import './styles/paint-light.css';
 @import './styles/paint-light-workspace.css';
+@import './styles/paint-design-controls.css';
 @import './styles/paint-ai.css';
 
 #root {

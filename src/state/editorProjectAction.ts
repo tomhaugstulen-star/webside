@@ -122,6 +122,12 @@ export type EditorProjectAction =
       updatedAt: string
     }
   | {
+      type: 'set-element-display-name'
+      elementId: string
+      displayName: string
+      updatedAt: string
+    }
+  | {
       type: 'set-section-anchor-id'
       elementId: string
       anchorId: string
@@ -184,6 +190,12 @@ export type EditorProjectAction =
       type: 'set-button-asset'
       elementId: string
       assetId: ButtonAssetId
+      updatedAt: string
+    }
+  | {
+      type: 'set-button-dropdown'
+      elementId: string
+      dropdown: boolean
       updatedAt: string
     }
   | {

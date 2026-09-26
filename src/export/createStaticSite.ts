@@ -17,6 +17,12 @@ import { createZip, type ZipEntry } from './createZip'
 import { renderPublicElements } from './renderPublicElements'
 import { escapeHtml, pageFilePath, relativeRoot } from './sitePaths'
 import { PUBLIC_DESKTOP_WIDTH, PUBLIC_MOBILE_WIDTH } from './siteDimensions'
+import {
+  STATIC_SITE_MANIFEST_FORMAT,
+  STATIC_SITE_MANIFEST_PATH,
+  STATIC_SITE_MANIFEST_VERSION,
+  type StaticSiteManifest,
+} from '../siteImport/staticSiteManifest'
 
 const encoder = new TextEncoder()
 const buttonAssets = [
@@ -110,6 +116,20 @@ export async function createStaticSiteZip(project: EditorProject,
   }
   for (const page of project.pages) entries.push({
     path: pageFilePath(page.slug), bytes: encoder.encode(renderPage(project, page.slug, assetPaths, buttons, cssPath, scriptPath)),
+  })
+  const manifest: StaticSiteManifest = {
+    format: STATIC_SITE_MANIFEST_FORMAT,
+    formatVersion: STATIC_SITE_MANIFEST_VERSION,
+    project,
+    assets: references.map((reference) => ({
+      assetId: reference.assetId,
+      path: assetPaths.get(reference.assetId)!,
+      metadata: reference.metadata,
+    })),
+  }
+  entries.push({
+    path: STATIC_SITE_MANIFEST_PATH,
+    bytes: encoder.encode(JSON.stringify(manifest)),
   })
   entries.push({ path: cssPath, bytes: cssBytes })
   entries.push({ path: scriptPath, bytes: scriptBytes })

@@ -6,10 +6,11 @@ type ImageChoice = { id: ImageAssetId; resource: ImageAssetResource }
 type Props = {
   images: readonly ImageChoice[]
   onChoose: (resource: ImageAssetResource) => void
+  onNew: () => void
   onClose: () => void
 }
 
-export function PaintImagePicker({ images, onChoose, onClose }: Props) {
+export function PaintImagePicker({ images, onChoose, onNew, onClose }: Props) {
   return (
     <div className="paint-backdrop" onKeyDown={(event) => {
       if (event.key === 'Escape') {
@@ -19,9 +20,15 @@ export function PaintImagePicker({ images, onChoose, onClose }: Props) {
     }}>
       <section className="paint-dialog paint-picker" role="dialog" aria-modal="true" aria-label="Velg bilde">
         <div className="paint-dialog__header">
-          <h2>Velg bilde på siden</h2>
+          <div>
+            <h2>Rediger bilde</h2>
+            <p>Start med en tom arbeidsflate eller velg et bilde fra siden.</p>
+          </div>
           <button type="button" onClick={onClose} autoFocus>Lukk</button>
         </div>
+        <button type="button" className="paint-picker__new" onClick={onNew}>
+          Nytt prosjekt · 1200 × 1200
+        </button>
         {images.length ? (
           <div className="paint-picker__grid">
             {images.map(({ id, resource }) => (
@@ -31,7 +38,7 @@ export function PaintImagePicker({ images, onChoose, onClose }: Props) {
               </button>
             ))}
           </div>
-        ) : <p>Ingen bilder på denne siden. Legg til et bilde fra Elementer først.</p>}
+        ) : <p>Ingen bilder på denne siden. Du kan fortsatt starte et nytt prosjekt.</p>}
       </section>
     </div>
   )

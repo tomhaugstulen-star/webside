@@ -1,21 +1,19 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import { drawMovedSelection, drawShape, drawStroke, movedSelectionPosition } from './paintDrawing'
-import {
-  containsPoint, fitSelection, selectionBetween,
-  type PaintTool, type Point, type Selection,
-} from './paintGeometry'
-
+import { resizePaintCanvasBitmap } from './paintCanvasBitmap'
+import { paintPointFromEvent } from './paintPointer'
+import { drawMovedSelection, drawShape, drawStroke, drawText, movedSelectionPosition } from './paintDrawing'
+import { clearPaintOverlay, drawRectangleMeasurement, drawSelectionOverlay } from './paintOverlay'
+import { drawResizedSelection, resizedSelection, resizeHandleAtPoint, type ResizeHandle } from './paintSelectionResize'
+import { containsPoint, fitSelection, selectionBetween, type PaintTool, type Point, type Selection } from './paintGeometry'
+import { createPaintFillStyle, type PaintFill } from './paintFill'
 type Snapshot = { data: string; width: number; height: number }
-type Drag = {
-  start: Point
-  last: Point
-  original: ImageData | null
-  moving: boolean
-  selection: Selection | null
-  pixels: ImageData | null
-}
-
-export function usePaintCanvas(file: File, tool: PaintTool, color: string, size: number) {
+type Drag = { start: Point; last: Point; original: ImageData | null;
+  moving: boolean; resizing: ResizeHandle | null;
+  selection: Selection | null; pixels: ImageData | null }
+export function usePaintCanvas(
+  file: File, tool: PaintTool, color: string, size: number,
+  textValue: string, textColor: string, textSize: number,
+) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const overlayRef = useRef<HTMLCanvasElement>(null)
   const historyRef = useRef<{ entries: Snapshot[]; index: number }>({ entries: [], index: -1 })
@@ -27,26 +25,10 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
   const [historyStatus, setHistoryStatus] = useState({ canUndo: false, canRedo: false })
   const [canPaste, setCanPaste] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const context = () => canvasRef.current?.getContext('2d', { willReadFrequently: true }) ?? null
-  const clearOverlay = () => {
-    const overlay = overlayRef.current
-    overlay?.getContext('2d')?.clearRect(0, 0, overlay.width, overlay.height)
-  }
-  const showSelection = (area: Selection | null) => {
-    clearOverlay()
-    if (!area) return
-    const ctx = overlayRef.current?.getContext('2d')
-    if (!ctx) return
-    ctx.strokeStyle = '#ffffff'
-    ctx.lineWidth = 2
-    ctx.strokeRect(area.x + 0.5, area.y + 0.5, area.width, area.height)
-    ctx.strokeStyle = '#17202c'
-    ctx.lineWidth = 1
-    ctx.setLineDash([5, 5])
-    ctx.strokeRect(area.x + 0.5, area.y + 0.5, area.width, area.height)
-    ctx.setLineDash([])
-  }
+  const clearOverlay = () => clearPaintOverlay(overlayRef.current)
+  const showSelection = (area: Selection | null) =>
+    drawSelectionOverlay(overlayRef.current, area)
   const snapshot = () => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -62,7 +44,6 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
       canRedo: false,
     })
   }
-
   useEffect(() => {
     let active = true
     historyRef.current = { entries: [], index: -1 }
@@ -82,42 +63,51 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     return () => { active = false }
     // A new file starts a fresh editing history.
   }, [file])
-
-  const pointFromEvent = (event: PointerEvent<HTMLCanvasElement>): Point => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    return {
-      x: Math.round((event.clientX - bounds.left) * event.currentTarget.width / bounds.width),
-      y: Math.round((event.clientY - bounds.top) * event.currentTarget.height / bounds.height),
-    }
-  }
   const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!ready || event.button !== 0) return
+    const start = paintPointFromEvent(event)
+    if (tool === 'text') return
     event.currentTarget.setPointerCapture(event.pointerId)
-    const start = pointFromEvent(event)
     const canvas = canvasRef.current!
-    const moving = tool === 'select' && !!selection && containsPoint(selection, start)
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const handleRadius = Math.max(6, Math.round(12 * canvas.width / Math.max(1, bounds.width)))
+    const resizing = tool === 'select' && selection
+      ? resizeHandleAtPoint(selection, start, handleRadius)
+      : null
+    const moving = tool === 'select' && !!selection && !resizing &&
+      containsPoint(selection, start)
+    const manipulating = moving || !!resizing
     dragRef.current = {
-      start, last: start, moving, selection,
-      pixels: moving && selection ? context()?.getImageData(
+      start, last: start, moving, resizing, selection,
+      pixels: manipulating && selection ? context()?.getImageData(
         selection.x, selection.y, selection.width, selection.height,
       ) ?? null : null,
-      original: moving || tool === 'line' || tool === 'rectangle'
+      original: manipulating || tool === 'line' || tool === 'rectangle'
         ? context()?.getImageData(0, 0, canvas.width, canvas.height) ?? null
         : null,
     }
-    if (tool === 'brush' || tool === 'eraser') drawStroke(context()!, start, start, color, size, tool === 'eraser')
-    if (tool === 'select' && !moving) showSelection(null)
+    if (tool === 'brush' || tool === 'eraser') {
+      drawStroke(context()!, start, start, color, size, tool === 'eraser')
+    }
+    if (tool === 'select' && !moving && !resizing) showSelection(null)
+    if (tool !== 'select') clearOverlay()
   }
   const onPointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
     const drag = dragRef.current
     if (!drag) return
-    const current = pointFromEvent(event)
+    const current = paintPointFromEvent(event)
     const canvas = canvasRef.current!
     const ctx = context()!
     if (tool === 'brush' || tool === 'eraser') {
       drawStroke(ctx, drag.last, current, color, size, tool === 'eraser')
     } else if (tool === 'select') {
-      if (drag.moving && drag.selection && drag.original && drag.pixels) {
+      if (drag.resizing && drag.selection && drag.original && drag.pixels) {
+        const target = resizedSelection(
+          drag.selection, drag.resizing, current, canvas.width, canvas.height,
+        )
+        drawResizedSelection(ctx, drag.original, drag.pixels, drag.selection, target)
+        showSelection(target)
+      } else if (drag.moving && drag.selection && drag.original && drag.pixels) {
         const source = drag.selection
         const position = movedSelectionPosition(
           source, drag.start, current, canvas.width, canvas.height,
@@ -130,6 +120,12 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     } else if (drag.original) {
       ctx.putImageData(drag.original, 0, 0)
       drawShape(ctx, tool, drag.start, current, color, size)
+      if (tool === 'rectangle') {
+        drawRectangleMeasurement(
+          overlayRef.current,
+          fitSelection(selectionBetween(drag.start, current), canvas.width, canvas.height),
+        )
+      }
     }
     drag.last = current
   }
@@ -140,20 +136,24 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     dragRef.current = null
     if (tool === 'select') {
       const canvas = canvasRef.current!
-      const area = drag.moving && drag.selection
-        ? { ...drag.selection, ...movedSelectionPosition(
-          drag.selection, drag.start, drag.last, canvas.width, canvas.height,
-        ) }
-        : fitSelection(selectionBetween(drag.start, drag.last), canvas.width, canvas.height)
+      const area = drag.resizing && drag.selection
+        ? resizedSelection(
+            drag.selection, drag.resizing, drag.last, canvas.width, canvas.height,
+          )
+        : drag.moving && drag.selection
+          ? { ...drag.selection, ...movedSelectionPosition(
+              drag.selection, drag.start, drag.last, canvas.width, canvas.height,
+            ) }
+          : fitSelection(selectionBetween(drag.start, drag.last), canvas.width, canvas.height)
       const chosen = area.width > 1 && area.height > 1 ? area : null
       setSelection(chosen)
       showSelection(chosen)
-      if (drag.moving && chosen) snapshot()
+      if ((drag.moving || drag.resizing) && chosen) snapshot()
     } else {
+      clearOverlay()
       snapshot()
     }
   }
-
   const copy = () => {
     if (!selection) return
     clipboardRef.current = context()?.getImageData(
@@ -194,16 +194,28 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     snapshot()
   }
   const resize = (width: number, height: number) => {
-    const canvas = canvasRef.current!
-    const scratch = document.createElement('canvas')
-    scratch.width = width
-    scratch.height = height
-    scratch.getContext('2d')?.drawImage(canvas, 0, 0, width, height)
-    canvas.width = overlayRef.current!.width = width
-    canvas.height = overlayRef.current!.height = height
-    context()?.drawImage(scratch, 0, 0)
+    resizePaintCanvasBitmap(canvasRef.current!, overlayRef.current!, width, height)
     setSelection(null)
     setCanvasSize({ width, height })
+    snapshot()
+  }
+  const addText = (position: Point) => {
+    const value = textValue.trim()
+    const ctx = context()
+    if (!value || !ctx) return
+    drawText(ctx, value, position, textColor, textSize)
+    snapshot()
+  }
+  const fillBackground = (fill: PaintFill) => {
+    const canvas = canvasRef.current
+    const ctx = context()
+    if (!canvas || !ctx) return
+    ctx.save()
+    ctx.fillStyle = createPaintFillStyle(ctx, canvas.width, canvas.height, fill)
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.restore()
+    setSelection(null)
+    clearOverlay()
     snapshot()
   }
   const restore = async (index: number) => {
@@ -227,7 +239,7 @@ export function usePaintCanvas(file: File, tool: PaintTool, color: string, size:
     canUndo: historyStatus.canUndo, canRedo: historyStatus.canRedo,
     undo: () => restore(historyRef.current.index - 1),
     redo: () => restore(historyRef.current.index + 1),
-    copy, cut, paste, canPaste, crop, resize, commit: snapshot,
+    copy, cut, paste, canPaste, crop, resize, addText, fillBackground, commit: snapshot,
     clearSelection: () => { setSelection(null); showSelection(null) },
     onPointerDown, onPointerMove, onPointerUp,
   }

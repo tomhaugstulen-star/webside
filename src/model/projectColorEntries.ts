@@ -84,7 +84,7 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
 
       groups.push({
         id: element.id,
-        label: `Element ${sectionNumber}`,
+        label: element.displayName || `Element ${sectionNumber}`,
         locked: element.locked,
         entries,
       })
@@ -95,7 +95,7 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
       textNumber += 1
       groups.push({
         id: element.id,
-        label: `Tekst ${textNumber}`,
+        label: element.displayName || `Tekst ${textNumber}`,
         locked: element.locked,
         entries: [
           {
@@ -153,7 +153,7 @@ export function getProjectColorGroups(page: EditorPage): ProjectColorGroup[] {
 
       groups.push({
         id: element.id,
-        label: `Header ${headerNumber}`,
+        label: element.displayName || `Header ${headerNumber}`,
         locked: element.locked,
         entries,
       })

@@ -14,7 +14,7 @@ import type { PageSeo, SiteSettings } from './siteSettings'
 
 export type { ElementKind, ElementSize } from './elementDimensions'
 
-export const EDITOR_PROJECT_SCHEMA_VERSION = 16 as const
+export const EDITOR_PROJECT_SCHEMA_VERSION = 17 as const
 
 export type ResponsiveViewport = 'desktop' | 'mobile'
 
@@ -34,6 +34,7 @@ type BaseEditorElement = {
   size: ResponsiveValue<ElementSize>
   visibility: ResponsiveValue<boolean>
   locked: boolean
+  displayName?: string
 }
 
 export type SectionEditorElement = BaseEditorElement & {
@@ -64,6 +65,7 @@ export type ButtonEditorElement = BaseEditorElement & {
   assetId: ButtonAssetId
   label: string
   link: ElementLink
+  dropdown?: boolean
 }
 
 export type HeaderEditorElement = BaseEditorElement & {
