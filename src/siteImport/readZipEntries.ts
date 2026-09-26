@@ -49,6 +49,7 @@ export async function readZipEntries(file: File): Promise<ZipEntryData[]> {
   const centralOffset = u32(view, end + 16)
   const decoder = new TextDecoder()
   const entries: ZipEntryData[] = []
+  const seenPaths = new Set<string>()
   let cursor = centralOffset
   let totalUncompressed = 0
 
@@ -73,9 +74,18 @@ export async function readZipEntries(file: File): Promise<ZipEntryData[]> {
     }
     const path = decoder.decode(bytes.slice(cursor + 46, cursor + 46 + nameLength))
 
-    if (path.includes('..') || path.startsWith('/') || path.includes('\\')) {
+    const segments = path.split('/')
+    if (
+      segments.some((segment) => segment === '..') ||
+      path.startsWith('/') ||
+      path.includes('\\')
+    ) {
       throw new Error('ZIP-filen inneholder en ugyldig filsti.')
     }
+    if (seenPaths.has(path)) {
+      throw new Error('ZIP-filen inneholder dupliserte filstier.')
+    }
+    seenPaths.add(path)
 
     if (!path.endsWith('/')) {
       if (u32(view, localOffset) !== 0x04034b50) {
