@@ -15,6 +15,12 @@ import {
 } from './genericSiteCss'
 import { childBoxInContainer } from './genericSiteLayout'
 import { addSemanticSections } from './genericSiteSections'
+import {
+  createImportedButton,
+  externalElementLink,
+  isButtonLike,
+} from './genericSiteInteractive'
+import { importNavigation } from './genericSiteNavigation'
 import { readZipEntries } from './readZipEntries'
 
 type GenericReadResult =
@@ -57,6 +63,7 @@ function makeTextElement(
   css: Map<string, string>,
   parentCss: Map<string, string>,
   siblingIndex: number,
+  link: ReturnType<typeof externalElementLink>,
 ) {
   const element = createEditorElement({
     id: createStableId(),
@@ -86,6 +93,7 @@ function makeTextElement(
       ? { ...element.appearance, backgroundFill: background }
       : element.appearance,
     textStyle: applyCssTextStyle(baseStyle, css),
+    link,
   }
 }
 
@@ -120,9 +128,10 @@ function createPageFromHtml(
   }
 
   let y = 60
-  const candidates = [...document.body.querySelectorAll('h1,h2,h3,p,li,a,img')]
+  const candidates = [...document.body.querySelectorAll('h1,h2,h3,p,li,a,button,img')]
   for (const node of candidates) {
-    if (node.parentElement?.closest('h1,h2,h3,p,li,a')) continue
+    if (node.closest('nav')) continue
+    if (node.parentElement?.closest('h1,h2,h3,p,li,a,button')) continue
 
     const css = collectCssForElement(node, cssText)
     const parent = node.parentElement
@@ -134,6 +143,20 @@ function createPageFromHtml(
       : [node]
     parentCss.set('--import-child-count', String(siblings.length))
     const siblingIndex = Math.max(0, siblings.indexOf(node))
+    if (isButtonLike(node, css)) {
+      const button = createImportedButton(
+        node, css, parentCss, siblingIndex, y, page.elements,
+      )
+      if (button) {
+        page.elements.push(button)
+        if (cssPixel(css.get('top')) === null &&
+          parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
+          y += button.size.desktop.height + 20
+        }
+      }
+      continue
+    }
+
     if (node instanceof HTMLImageElement) {
       const path = resolveSitePath(htmlPath, node.getAttribute('src') || '')
       const asset = path ? assetsByPath.get(path) : null
@@ -172,7 +195,7 @@ function createPageFromHtml(
     if (!text) continue
     const element = makeTextElement(
       text.slice(0, 2000), node.tagName, y, page.elements,
-      css, parentCss, siblingIndex,
+      css, parentCss, siblingIndex, externalElementLink(node),
     )
     page.elements.push(element)
     if (cssPixel(css.get('top')) === null &&
@@ -221,6 +244,12 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
     if (!project.pages.length) {
       return { ok: false, message: 'Ingen støttede HTML-sider kunne importeres.' }
     }
+
+    const htmlPages = htmlEntries.map((entry) => ({
+      path: entry.path,
+      document: new DOMParser().parseFromString(decoder.decode(entry.bytes), 'text/html'),
+    }))
+    importNavigation(project, htmlPages)
 
     return {
       ok: true,
