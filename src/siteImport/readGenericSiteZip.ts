@@ -4,6 +4,7 @@ import { createImageAssetId } from '../model/imageAsset'
 import type { ImportedProjectFile } from '../projectFiles/projectFileFormat'
 import { importNavigation } from './genericSiteNavigation'
 import { createPageFromHtml, type AssetMapEntry } from './genericSitePage'
+import { parseRuntimeContent } from './genericSiteRuntimeContent'
 import { readZipEntries } from './readZipEntries'
 
 type GenericReadResult =
@@ -46,9 +47,11 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
     project.pages = []
     const decoder = new TextDecoder()
     const filesByPath = new Map(entries.map((entry) => [entry.path, entry.bytes]))
+    const runtimeContent = parseRuntimeContent(filesByPath.get('content.json'))
     for (const entry of htmlEntries) {
       const page = createPageFromHtml(
         entry.path, decoder.decode(entry.bytes), assetsByPath, filesByPath,
+        runtimeContent,
       )
       if (page) project.pages.push(page)
     }
@@ -66,7 +69,9 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
       ok: true,
       value: { project, assets },
       warnings: [
-        'Enkel CSS er tolket. Avansert layout, script og komplekse selektorer kan kreve manuell justering.',
+        runtimeContent
+          ? 'Admininnhold fra content.json er brukt før import.'
+          : 'Enkel CSS er tolket. Avansert layout, script og komplekse selektorer kan kreve manuell justering.',
       ],
     }
   } catch (error) {
