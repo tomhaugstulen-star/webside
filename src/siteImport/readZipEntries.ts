@@ -3,6 +3,11 @@ type ZipEntryData = {
   bytes: Uint8Array<ArrayBuffer>
 }
 
+const MAX_ZIP_BYTES = 150 * 1024 * 1024
+const MAX_ENTRY_COUNT = 5_000
+const MAX_ENTRY_BYTES = 50 * 1024 * 1024
+const MAX_TOTAL_BYTES = 250 * 1024 * 1024
+
 const u16 = (view: DataView, at: number) => view.getUint16(at, true)
 const u32 = (view: DataView, at: number) => view.getUint32(at, true)
 
@@ -29,16 +34,23 @@ function findEndOfCentralDirectory(bytes: Uint8Array) {
 }
 
 export async function readZipEntries(file: File): Promise<ZipEntryData[]> {
+  if (file.size > MAX_ZIP_BYTES) {
+    throw new Error('ZIP-filen er for stor til å importeres trygt.')
+  }
   const bytes = new Uint8Array(await file.arrayBuffer())
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   const end = findEndOfCentralDirectory(bytes)
   if (end < 0) throw new Error('ZIP-filen er ugyldig.')
 
   const count = u16(view, end + 10)
+  if (count > MAX_ENTRY_COUNT) {
+    throw new Error('ZIP-filen inneholder for mange filer.')
+  }
   const centralOffset = u32(view, end + 16)
   const decoder = new TextDecoder()
   const entries: ZipEntryData[] = []
   let cursor = centralOffset
+  let totalUncompressed = 0
 
   for (let index = 0; index < count; index += 1) {
     if (u32(view, cursor) !== 0x02014b50) {
@@ -52,6 +64,13 @@ export async function readZipEntries(file: File): Promise<ZipEntryData[]> {
     const extraLength = u16(view, cursor + 30)
     const commentLength = u16(view, cursor + 32)
     const localOffset = u32(view, cursor + 42)
+    if (uncompressedSize > MAX_ENTRY_BYTES) {
+      throw new Error('ZIP-filen inneholder en fil som er for stor.')
+    }
+    totalUncompressed += uncompressedSize
+    if (totalUncompressed > MAX_TOTAL_BYTES) {
+      throw new Error('ZIP-filen blir for stor når den pakkes ut.')
+    }
     const path = decoder.decode(bytes.slice(cursor + 46, cursor + 46 + nameLength))
 
     if (path.includes('..') || path.startsWith('/') || path.includes('\\')) {
