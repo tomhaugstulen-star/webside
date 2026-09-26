@@ -11,11 +11,12 @@ type Props = {
   displayWidth: number
   displayHeight: number
   onMove: (position: Point) => void
+  onCommit: () => void
 }
 
 export function PaintTextFrame({
   value, color, fontSize, position, canvasWidth, canvasHeight,
-  displayWidth, displayHeight, onMove,
+  displayWidth, displayHeight, onMove, onCommit,
 }: Props) {
   const dragRef = useRef<{ x: number; y: number; start: Point } | null>(null)
   const left = canvasWidth ? position.x / canvasWidth * displayWidth : 0
@@ -34,9 +35,16 @@ export function PaintTextFrame({
   }
 
   return (
-    <div className="paint-text-frame"
+    <div className="paint-text-frame" tabIndex={0} autoFocus
+      aria-label="Tekstramme. Trykk Enter for å feste teksten."
       style={{ left, top, color, fontSize: Math.max(8, fontSize * scale) }}
+      onKeyDown={(event) => {
+        if (event.key !== 'Enter' || event.shiftKey) return
+        event.preventDefault()
+        onCommit()
+      }}
       onPointerDown={(event) => {
+        event.currentTarget.focus()
         event.currentTarget.setPointerCapture(event.pointerId)
         dragRef.current = { x: event.clientX, y: event.clientY, start: position }
       }}
