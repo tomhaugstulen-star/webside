@@ -2,21 +2,9 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { resizePaintCanvasBitmap } from './paintCanvasBitmap'
 import { paintPointFromEvent } from './paintPointer'
 import { drawMovedSelection, drawShape, drawStroke, drawText, movedSelectionPosition } from './paintDrawing'
-import {
-  clearPaintOverlay,
-  drawRectangleMeasurement,
-  drawSelectionOverlay,
-} from './paintOverlay'
-import {
-  drawResizedSelection,
-  resizedSelection,
-  resizeHandleAtPoint,
-  type ResizeHandle,
-} from './paintSelectionResize'
-import {
-  containsPoint, fitSelection, selectionBetween,
-  type PaintTool, type Point, type Selection,
-} from './paintGeometry'
+import { clearPaintOverlay, drawRectangleMeasurement, drawSelectionOverlay } from './paintOverlay'
+import { drawResizedSelection, resizedSelection, resizeHandleAtPoint, type ResizeHandle } from './paintSelectionResize'
+import { containsPoint, fitSelection, selectionBetween, type PaintTool, type Point, type Selection } from './paintGeometry'
 import { createPaintFillStyle, type PaintFill } from './paintFill'
 type Snapshot = { data: string; width: number; height: number }
 type Drag = { start: Point; last: Point; original: ImageData | null;
