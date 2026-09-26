@@ -4,14 +4,13 @@ import { createEditorElement } from '../model/createEditorElement'
 import { createStableId } from '../model/createStableId'
 import type { EditorElement, EditorPage } from '../model/editorProject'
 import { createImageAssetId, type ImageAssetId } from '../model/imageAsset'
-import { createSolidFill } from '../model/editorFill'
 import { DEFAULT_TEXT_ELEMENT_STYLE, type TextFontSize } from '../model/textElementStyle'
 import type { ImportedProjectFile } from '../projectFiles/projectFileFormat'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
 import {
   applyCssTextStyle,
   collectCssForElement,
-  cssColor,
+  cssBackgroundFill,
   cssPixel,
 } from './genericSiteCss'
 import { readZipEntries } from './readZipEntries'
@@ -71,14 +70,16 @@ function makeTextElement(
   const height = cssPixel(css.get('height')) ?? Math.max(64, Math.round(fontSize * 2.2))
   const x = cssPixel(css.get('left')) ?? 80
   const top = cssPixel(css.get('top'))
-  const background = cssColor(css.get('background-color'))
+  const background = cssBackgroundFill(
+    css.get('background') ?? css.get('background-color'),
+  )
   return {
     ...element,
     content,
     position: { desktop: { x: Math.max(0, x), y: Math.max(0, top ?? y) } },
     size: { desktop: { width: Math.max(40, width), height: Math.max(32, height) } },
     appearance: background
-      ? { ...element.appearance, backgroundFill: createSolidFill(background) }
+      ? { ...element.appearance, backgroundFill: background }
       : element.appearance,
     textStyle: applyCssTextStyle(baseStyle, css),
   }
@@ -103,10 +104,10 @@ function createPageFromHtml(
   }
   const cssText = cssParts.join('\n')
   const bodyCss = collectCssForElement(document.body, cssText)
-  const pageBackground = cssColor(
-    bodyCss.get('background-color') ?? bodyCss.get('background'),
+  const pageBackground = cssBackgroundFill(
+    bodyCss.get('background') ?? bodyCss.get('background-color'),
   )
-  if (pageBackground) page.appearance = { backgroundFill: createSolidFill(pageBackground) }
+  if (pageBackground) page.appearance = { backgroundFill: pageBackground }
   page.seo = {
     title: document.querySelector('title')?.textContent?.trim().slice(0, 120) || page.name,
     description: document.querySelector('meta[name="description"]')?.getAttribute('content')?.trim().slice(0, 300) || '',
