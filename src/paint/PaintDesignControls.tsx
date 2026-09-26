@@ -1,3 +1,4 @@
+import { PaintAngleWheel } from './PaintAngleWheel'
 import type { PaintDesignPanel } from './PaintDesignDialog'
 import type { PaintFill } from './paintFill'
 
@@ -15,12 +16,13 @@ type Props = {
   onTextColorChange: (color: string) => void
   onTextSizeChange: (size: number) => void
   onActivateText: () => void
+  onCommitText: () => void
 }
 
 export function PaintDesignControls({
   panel, fill, textValue, textColor, textSize, textActive, disabled,
   onFillChange, onFillBackground, onTextValueChange, onTextColorChange,
-  onTextSizeChange, onActivateText,
+  onTextSizeChange, onActivateText, onCommitText,
 }: Props) {
   const gradient = fill.type === 'gradient' ? fill : null
   const preview = gradient
@@ -59,12 +61,9 @@ export function PaintDesignControls({
                   }} />
               </label>
             ))}
-            <label>Vinkel
-              <input type="number" min="0" max="360" step="1" value={fill.angle}
-                disabled={disabled} onChange={(event) => onFillChange({
-                  ...fill,
-                  angle: Math.max(0, Math.min(360, Number(event.target.value) || 0)),
-                })} />
+            <label className="paint-dialog__stacked-label">Vinkel
+              <PaintAngleWheel angle={fill.angle} disabled={disabled}
+                onChange={(angle) => onFillChange({ ...fill, angle })} />
             </label>
           </>
         )}
@@ -89,7 +88,11 @@ export function PaintDesignControls({
         )} /></label>
       <button type="button" aria-pressed={textActive}
         disabled={disabled || !textValue.trim()} onClick={onActivateText}>
-        {textActive ? 'Klikk på canvas for å plassere' : 'Plasser tekst'}
+        {textActive ? 'Tekstramme aktiv' : 'Vis tekstramme'}
+      </button>
+      <button type="button" disabled={disabled || !textActive || !textValue.trim()}
+        onClick={onCommitText}>
+        Fest tekst på canvas
       </button>
     </div>
   )
