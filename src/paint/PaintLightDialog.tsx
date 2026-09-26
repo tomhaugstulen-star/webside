@@ -15,18 +15,14 @@ type Props = { file: File; dimensions: { width: number; height: number };
   onClose: () => void; onSave: (file: File) => Promise<void> }
 const tools: Array<{ id: PaintTool; label: string }> = [
   { id: 'select', label: 'Marker / flytt' }, { id: 'brush', label: 'Pensel' },
-  { id: 'eraser', label: 'Viskelær' },
-  { id: 'line', label: 'Strek' },
+  { id: 'eraser', label: 'Viskelær' }, { id: 'line', label: 'Strek' },
   { id: 'rectangle', label: 'Rektangel' },
 ]
 export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [tool, setTool] = useState<PaintTool>('select')
   const [color, setColor] = useState('#17202c')
   const [size, setSize] = useState(8)
-  const [fill, setFill] = useState<PaintFill>({
-    type: 'solid',
-    color: '#ffffff',
-  })
+  const [fill, setFill] = useState<PaintFill>({ type: 'solid', color: '#ffffff' })
   const [textValue, setTextValue] = useState('')
   const [textColor, setTextColor] = useState('#17202c')
   const [textSize, setTextSize] = useState(48)
@@ -121,12 +117,10 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       if (lockRatio && value > 0) setNewWidth(Math.round(value * ratio))
     }
   }
-  const fitScale = paint.width > 0 && paint.height > 0 && canvasViewport.width > 0 && canvasViewport.height > 0
-    ? Math.min(
-      1,
-      Math.max(1, canvasViewport.width - 24) / paint.width,
-      Math.max(1, canvasViewport.height - 24) / paint.height,
-    )
+  const fitScale = paint.width > 0 && paint.height > 0 &&
+    canvasViewport.width > 0 && canvasViewport.height > 0
+    ? Math.min(1, Math.max(1, canvasViewport.width - 24) / paint.width,
+      Math.max(1, canvasViewport.height - 24) / paint.height)
     : 1
   const displayWidth = Math.max(1, Math.round((paint.width || 1) * fitScale))
   const displayHeight = Math.max(1, Math.round((paint.height || 1) * fitScale))
@@ -135,9 +129,8 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
       setMessage('Bruk hele piksler, maks 16 384 per side og 40 megapiksler.')
       return
     }
-    if (newWidth > paint.width || newHeight > paint.height) {
-      if (!window.confirm('Du oppskalerer bildet. Det kan bli mindre skarpt. Fortsette?')) return
-    }
+    if ((newWidth > paint.width || newHeight > paint.height) &&
+      !window.confirm('Du oppskalerer bildet. Det kan bli mindre skarpt. Fortsette?')) return
     paint.resize(newWidth, newHeight)
     setMessage(null)
   }
