@@ -14,6 +14,7 @@ type Props = {
   importPending: boolean
   textFrame: { value: string; color: string; size: number; position: Point } | null
   onTextFrameMove: (position: Point) => void
+  onTextFrameCommit: () => void
   onPointerDown: PointerEventHandler<HTMLCanvasElement>
   onPointerMove: PointerEventHandler<HTMLCanvasElement>
   onPointerUp: PointerEventHandler<HTMLCanvasElement>
@@ -25,6 +26,7 @@ type Props = {
 export function PaintCanvasViewport({
   viewportRef, canvasRef, overlayRef, importOverlayRef, width, height,
   canvasWidth, canvasHeight, importPending, textFrame, onTextFrameMove,
+  onTextFrameCommit,
   onPointerDown, onPointerMove, onPointerUp,
   onImportPointerDown, onImportPointerMove, onImportPointerUp,
 }: Props) {
@@ -45,7 +47,7 @@ export function PaintCanvasViewport({
             fontSize={textFrame.size} position={textFrame.position}
             canvasWidth={canvasWidth} canvasHeight={canvasHeight}
             displayWidth={width} displayHeight={height}
-            onMove={onTextFrameMove} />
+            onMove={onTextFrameMove} onCommit={onTextFrameCommit} />
         )}
       </div>
     </div>
