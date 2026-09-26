@@ -136,7 +136,10 @@ export function ProjectFileControls() {
         return
       }
       dispatch({ type: 'replace-project', project: result.value.project })
-      setMessage(`Importerte nettstedet «${result.value.project.name}».`)
+      setMessage(
+        `Importerte nettstedet «${result.value.project.name}».` +
+        (result.message ? ` ${result.message}` : ''),
+      )
     } catch {
       setMessage('Nettstedet kunne ikke importeres.')
     } finally {
