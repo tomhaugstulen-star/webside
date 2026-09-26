@@ -71,8 +71,20 @@ function sanitizeClone(
     image.setAttribute('src', url)
   }
 
+  const localizedCss = cssText.replace(
+    /url\(\s*["']?([^"')]+)["']?\s*\)/gi,
+    (match, reference: string) => {
+      if (/^data:/i.test(reference)) return match
+      const path = reference.startsWith('/') ? reference.slice(1) : null
+      const asset = path ? assetsByPath.get(path) : null
+      if (!asset) return 'url("data:,")'
+      const url = URL.createObjectURL(asset.file)
+      urls.push(url)
+      return `url("${url}")`
+    },
+  )
   const style = clone.createElement('style')
-  style.textContent = cssText
+  style.textContent = localizedCss
   clone.head.append(style)
   return { clone, urls }
 }
