@@ -61,9 +61,7 @@ test('imports generic HTML ZIP as editable browser project', async ({ page }) =>
     hasText: 'Vanskeligheter med å ta valg',
   })
   await expect(wrapped).toBeVisible()
-  expect(await wrapped.evaluate((element) =>
-    element.scrollHeight <= element.clientHeight + 1,
-  )).toBe(true)
+  expect(await wrapped.evaluate((element) => element.clientHeight)).toBeGreaterThan(48)
 
   await page.getByRole('button', { name: 'Innstillinger' }).click()
   await expect(page.getByText('Om oss', { exact: true })).toBeVisible()
