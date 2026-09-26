@@ -8,6 +8,10 @@ import {
   collectCssForElement,
   cssBackgroundFill,
 } from './genericSiteCss'
+import {
+  capturedLayoutFor,
+  type CapturedSiteLayouts,
+} from './genericSiteComputedLayout'
 import { externalElementLink } from './genericSiteInteractive'
 import { importedBox } from './genericSiteLayout'
 import { resolveSitePath } from './genericSitePaths'
@@ -37,6 +41,7 @@ function assetForHero(
   css: Map<string, string>,
   htmlPath: string,
   assetsByPath: ReadonlyMap<string, SiteAsset>,
+  layouts: CapturedSiteLayouts,
 ) {
   const image = container.querySelector('img[src]')
   if (image) {
@@ -82,10 +87,14 @@ function importHeader(
   })
   if (element.kind !== 'header') return
 
-  const css = collectCssForElement(header, cssText)
-  const nameCss = nameNode ? collectCssForElement(nameNode, cssText) : css
+  const captured = capturedLayoutFor(header, layouts)
+  const css = captured?.css ?? collectCssForElement(header, cssText)
+  const nameCaptured = nameNode ? capturedLayoutFor(nameNode, layouts) : null
+  const nameCss = nameCaptured?.css ??
+    (nameNode ? collectCssForElement(nameNode, cssText) : css)
   const style = applyCssTextStyle(DEFAULT_TEXT_ELEMENT_STYLE, nameCss)
-  const box = importedBox(css, { x: 0, y: 0, width: 960, height: 88 })
+  const box = captured?.box ??
+    importedBox(css, { x: 0, y: 0, width: 960, height: 88 })
   const fill = cssBackgroundFill(css.get('background') ?? css.get('background-color'))
   page.elements.push({
     ...element,
@@ -121,11 +130,14 @@ function importHero(
   cssText: string,
   htmlPath: string,
   assetsByPath: ReadonlyMap<string, SiteAsset>,
+  layouts: CapturedSiteLayouts,
 ) {
   const hero = heroCandidate(document)
   if (!hero) return
-  const css = collectCssForElement(hero, cssText)
-  const asset = assetForHero(hero, css, htmlPath, assetsByPath)
+  const rawCss = collectCssForElement(hero, cssText)
+  const captured = capturedLayoutFor(hero, layouts)
+  const css = captured?.css ?? rawCss
+  const asset = assetForHero(hero, rawCss, htmlPath, assetsByPath)
   if (!asset) return
 
   const titleNode = hero.querySelector('h1,h2')
@@ -145,10 +157,13 @@ function importHero(
   const title = titleNode?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 180) || 'Overskrift'
   const subtitle = subtitleNode?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 300) || ''
   const ctaLabel = ctaNode?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 120) || ''
-  const titleCss = titleNode ? collectCssForElement(titleNode, cssText) : css
+  const titleCaptured = titleNode ? capturedLayoutFor(titleNode, layouts) : null
+  const titleCss = titleCaptured?.css ??
+    (titleNode ? collectCssForElement(titleNode, cssText) : css)
   const style = applyCssTextStyle(DEFAULT_TEXT_ELEMENT_STYLE, titleCss)
-  const fill = cssBackgroundFill(css.get('background') ?? css.get('background-color'))
-  const box = importedBox(css, { x: 80, y: 140, width: 1160, height: 420 })
+  const fill = cssBackgroundFill(css.get('background-color') ?? css.get('background'))
+  const box = captured?.box ??
+    importedBox(css, { x: 80, y: 140, width: 1160, height: 420 })
 
   page.elements.push({
     ...element,
@@ -178,9 +193,10 @@ export function addSpecialImportedElements(
   cssText: string,
   htmlPath: string,
   assetsByPath: ReadonlyMap<string, SiteAsset>,
+  layouts: CapturedSiteLayouts,
 ) {
-  importHeader(page, document, cssText, htmlPath, assetsByPath)
-  importHero(page, document, cssText, htmlPath, assetsByPath)
+  importHeader(page, document, cssText, htmlPath, assetsByPath, layouts)
+  importHero(page, document, cssText, htmlPath, assetsByPath, layouts)
 }
 
 export function isInsideSpecialImportedElement(node: Element) {
