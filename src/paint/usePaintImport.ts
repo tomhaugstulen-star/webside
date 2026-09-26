@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState, type PointerEvent, type RefObject } from 'react'
 import { prepareImageFile } from '../assets/images/prepareImageFile'
 import { containsPoint, type Selection } from './paintGeometry'
+import {
+  resizedSelection,
+  resizeHandleAtPoint,
+  type ResizeHandle,
+} from './paintSelectionResize'
 
 type Imported = { bitmap: ImageBitmap; area: Selection }
 
@@ -10,7 +15,12 @@ export function usePaintImport(
 ) {
   const overlayRef = useRef<HTMLCanvasElement>(null)
   const importedRef = useRef<Imported | null>(null)
-  const dragRef = useRef<{ x: number; y: number; area: Selection } | null>(null)
+  const dragRef = useRef<{
+    x: number
+    y: number
+    area: Selection
+    handle: ResizeHandle | null
+  } | null>(null)
   const [imported, setImported] = useState(false)
 
   const render = () => {
@@ -26,6 +36,17 @@ export function usePaintImport(
     ctx.strokeStyle = '#f97316'
     ctx.lineWidth = Math.max(2, width / 500)
     ctx.strokeRect(x, y, w, h)
+    const handle = Math.max(10, Math.round(Math.min(width, height) / 90))
+    const half = handle / 2
+    for (const [hx, hy] of [
+      [x, y], [x + w, y], [x, y + h], [x + w, y + h],
+    ]) {
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(hx - half, hy - half, handle, handle)
+      ctx.strokeStyle = '#f97316'
+      ctx.lineWidth = 2
+      ctx.strokeRect(hx - half, hy - half, handle, handle)
+    }
   }
   useEffect(render, [width, height, imported])
   useEffect(() => () => { importedRef.current?.bitmap.close() }, [])
@@ -70,8 +91,11 @@ export function usePaintImport(
     const item = importedRef.current
     if (!item || event.button !== 0) return
     const { x, y } = point(event)
-    if (!containsPoint(item.area, { x, y })) return
-    dragRef.current = { x, y, area: { ...item.area } }
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const radius = Math.max(6, Math.round(12 * width / Math.max(1, bounds.width)))
+    const handle = resizeHandleAtPoint(item.area, { x, y }, radius)
+    if (!handle && !containsPoint(item.area, { x, y })) return
+    dragRef.current = { x, y, area: { ...item.area }, handle }
     event.currentTarget.setPointerCapture(event.pointerId)
   }
   const onPointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
@@ -79,11 +103,19 @@ export function usePaintImport(
     const drag = dragRef.current
     if (!item || !drag) return
     const current = point(event)
-    item.area = {
-      ...drag.area,
-      x: Math.max(0, Math.min(width - drag.area.width, drag.area.x + current.x - drag.x)),
-      y: Math.max(0, Math.min(height - drag.area.height, drag.area.y + current.y - drag.y)),
-    }
+    item.area = drag.handle
+      ? resizedSelection(drag.area, drag.handle, current, width, height)
+      : {
+          ...drag.area,
+          x: Math.max(0, Math.min(
+            width - drag.area.width,
+            drag.area.x + current.x - drag.x,
+          )),
+          y: Math.max(0, Math.min(
+            height - drag.area.height,
+            drag.area.y + current.y - drag.y,
+          )),
+        }
     render()
   }
   const onPointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
