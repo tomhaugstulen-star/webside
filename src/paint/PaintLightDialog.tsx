@@ -215,10 +215,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               ? { value: textValue, color: textColor, size: textSize, position: textFramePosition }
               : null}
             onTextFrameMove={setTextFramePosition}
-            onTextFrameCommit={() => {
-              paint.addText(textFramePosition)
-              setTool('select')
-            }}
+            onTextFrameCommit={() => { paint.addText(textFramePosition); setTool('select') }}
             onPointerDown={paint.onPointerDown}
             onPointerMove={paint.onPointerMove} onPointerUp={paint.onPointerUp}
             onImportPointerDown={importActions.onPointerDown}
