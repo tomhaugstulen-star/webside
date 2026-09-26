@@ -40,7 +40,7 @@ async function siteZip() {
 test('imports generic HTML ZIP as editable browser project', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Prosjekt', exact: true }).click()
-  const input = page.locator('input[accept*=".zip"]')
+  const input = page.locator('.project-file-controls__site-input')
   await input.setInputFiles({
     name: 'ekstern-side.zip',
     mimeType: 'application/zip',
