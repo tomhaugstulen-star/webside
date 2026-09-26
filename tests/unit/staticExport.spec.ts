@@ -182,3 +182,38 @@ test('generic HTML ZIP imports editable text content', async () => {
     .map((element) => element.kind === 'text' ? element.content : '')
   expect(texts).toEqual(['Velkommen', 'Dette er redigerbar tekst.'])
 })
+
+
+test('generic HTML import maps simple local CSS into editor styling and layout', async () => {
+  const html = new TextEncoder().encode(
+    '<!doctype html><html><head><title>CSS-import</title>' +
+    '<link rel="stylesheet" href="assets/site.css"></head><body>' +
+    '<h1 class="hero-title">Overskrift</h1></body></html>',
+  )
+  const css = new TextEncoder().encode(
+    'body{background-color:#112233}' +
+    '.hero-title{position:absolute;left:120px;top:140px;width:500px;height:90px;' +
+    'font-size:36px;font-weight:bold;color:#AABBCC;text-align:center;background-color:#FFFFFF}',
+  )
+  const zip = createZip([
+    { path: 'index.html', bytes: html },
+    { path: 'assets/site.css', bytes: css },
+  ])
+  const result = await readStaticSiteZip(
+    new File([zip], 'css-import.zip', { type: 'application/zip' }),
+  )
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+  const page = result.value.project.pages[0]
+  expect(page.appearance.backgroundFill).toEqual({ type: 'solid', color: '#112233' })
+  const text = page.elements.find((element) => element.kind === 'text')
+  expect(text?.kind).toBe('text')
+  if (!text || text.kind !== 'text') return
+  expect(text.position.desktop).toEqual({ x: 120, y: 140 })
+  expect(text.size.desktop).toEqual({ width: 500, height: 90 })
+  expect(text.textStyle.fontSize).toBe(36)
+  expect(text.textStyle.fontWeight).toBe('bold')
+  expect(text.textStyle.color).toBe('#AABBCC')
+  expect(text.textStyle.textAlign).toBe('center')
+  expect(text.appearance.backgroundFill).toEqual({ type: 'solid', color: '#FFFFFF' })
+})
