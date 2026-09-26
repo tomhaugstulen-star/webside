@@ -23,6 +23,7 @@ import {
 } from './genericSiteComputedLayout'
 import { childBoxInContainer } from './genericSiteLayout'
 import { importedTextBoxHeight } from './genericSiteTextLayout'
+import { responsiveImportedLayout } from './genericSiteResponsiveLayout'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
 import { collectPageCss } from './genericSiteStylesheets'
 import { addSemanticSections } from './genericSiteSections'
@@ -88,24 +89,9 @@ function makeTextElement(
   return {
     ...element,
     content,
-    position: {
-      desktop: { x: box.x, y: box.y },
-      mobile: capturedMobile
-        ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
-        : undefined,
-    },
-    size: {
-      desktop: {
-        width: Math.max(120, box.width),
-        height: importedTextBoxHeight(box.height),
-      },
-      mobile: capturedMobile
-        ? {
-            width: Math.max(120, capturedMobile.box.width),
-            height: importedTextBoxHeight(capturedMobile.box.height),
-          }
-        : undefined,
-    },
+    ...responsiveImportedLayout(
+      box, capturedMobile, { width: 120, height: 48 }, importedTextBoxHeight,
+    ),
     appearance: background
       ? { ...element.appearance, backgroundFill: background }
       : element.appearance,
@@ -167,24 +153,9 @@ export async function createPageFromHtml(
         const box = captured?.box
         page.elements.push(box ? {
           ...button,
-          position: {
-            desktop: { x: box.x, y: box.y },
-            mobile: capturedMobile
-              ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
-              : undefined,
-          },
-          size: {
-            desktop: {
-              width: Math.max(80, box.width),
-              height: Math.max(36, box.height),
-            },
-            mobile: capturedMobile
-              ? {
-                  width: Math.max(80, capturedMobile.box.width),
-                  height: Math.max(36, capturedMobile.box.height),
-                }
-              : undefined,
-          },
+          ...responsiveImportedLayout(
+            box, capturedMobile, { width: 80, height: 36 },
+          ),
         } : button)
         if (cssPixel(css.get('top')) === null &&
           parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
@@ -220,24 +191,9 @@ export async function createPageFromHtml(
       page.elements.push({
         ...element,
         altText: node.getAttribute('alt')?.slice(0, 300) || '',
-        position: {
-          desktop: { x: box.x, y: box.y },
-          mobile: capturedMobile
-            ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
-            : undefined,
-        },
-        size: {
-          desktop: {
-            width: Math.max(48, box.width),
-            height: Math.max(48, box.height),
-          },
-          mobile: capturedMobile
-            ? {
-                width: Math.max(48, capturedMobile.box.width),
-                height: Math.max(48, capturedMobile.box.height),
-              }
-            : undefined,
-        },
+        ...responsiveImportedLayout(
+          box, capturedMobile, { width: 48, height: 48 },
+        ),
       })
       if (cssPixel(css.get('top')) === null &&
         parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
