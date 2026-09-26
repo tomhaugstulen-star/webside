@@ -14,6 +14,9 @@ async function siteZip() {
     '</head><body>' +
     '<header class="site-header"><img src="assets/logo.png" alt="Logo">' +
     '<strong>Min side</strong><nav><a href="about/">Om oss</a></nav></header>' +
+    '<section class="hero" style="width:900px;height:320px;background:#223344">' +
+    '<img src="assets/logo.png" alt="Hero"><h1>Stor overskrift</h1>' +
+    '<p>Hero-tekst</p><a href="https://example.com">Les mer</a></section>' +
     '<main><h1>Velkommen</h1><p>Redigerbar tekst fra ZIP.</p></main>' +
     '</body></html>',
   )
@@ -44,6 +47,8 @@ test('imports generic HTML ZIP as editable browser project', async ({ page }) =>
   )
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
   await expect(page.locator('.header-element__logo')).toBeVisible()
+  await expect(page.locator('.hero-element__image')).toBeVisible()
+  await expect(page.getByText('Stor overskrift', { exact: true })).toBeVisible()
   await expect(page.getByText('Velkommen', { exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Innstillinger' }).click()
