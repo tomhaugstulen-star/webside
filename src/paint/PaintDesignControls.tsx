@@ -1,5 +1,5 @@
 import { PaintAngleWheel } from './PaintAngleWheel'
-import type { PaintDesignPanel } from './PaintDesignDialog'
+import type { PaintDesignPanel } from './paintDesignPanel'
 import type { PaintFill } from './paintFill'
 
 type Props = {
