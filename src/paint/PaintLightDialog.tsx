@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
-import { validDimensions, type PaintTool } from './paintGeometry'
+import { validDimensions, type PaintTool, type Point } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
 import { PaintCanvasViewport } from './PaintCanvasViewport'
 import { PaintDesignDialog, type PaintDesignPanel } from './PaintDesignDialog'
@@ -30,6 +30,7 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [textValue, setTextValue] = useState('')
   const [textColor, setTextColor] = useState('#17202c')
   const [textSize, setTextSize] = useState(48)
+  const [textFramePosition, setTextFramePosition] = useState<Point>({ x: 80, y: 80 })
   const [name, setName] = useState(file.name.replace(/\.[^.]+$/, '') + '-redigert')
   const [format, setFormat] = useState<SupportedImageMimeType>('image/png')
   const [newWidth, setNewWidth] = useState(dimensions.width)
@@ -220,7 +221,14 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
           </aside>
           <PaintCanvasViewport viewportRef={canvasViewportRef} canvasRef={canvasRef}
             overlayRef={overlayRef} importOverlayRef={importOverlayRef}
-            width={displayWidth} height={displayHeight} importPending={importPending}
+            width={displayWidth} height={displayHeight}
+            canvasWidth={paint.width} canvasHeight={paint.height}
+            importPending={importPending}
+            textFrame={tool === 'text' && textValue.trim() ? {
+              value: textValue, color: textColor, size: textSize,
+              position: textFramePosition,
+            } : null}
+            onTextFrameMove={setTextFramePosition}
             onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
             onPointerUp={paint.onPointerUp} onImportPointerDown={importActions.onPointerDown}
             onImportPointerMove={importActions.onPointerMove}
@@ -232,7 +240,18 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             disabled={!paint.ready || importPending} onFillChange={setFill}
             onFillBackground={() => paint.fillBackground(fill)}
             onTextValueChange={setTextValue} onTextColorChange={setTextColor}
-            onTextSizeChange={setTextSize} onActivateText={() => setTool('text')}
+            onTextSizeChange={setTextSize}
+            onActivateText={() => {
+              setTextFramePosition({
+                x: Math.max(0, Math.round(paint.width * 0.12)),
+                y: Math.max(0, Math.round(paint.height * 0.12)),
+              })
+              setTool('text')
+            }}
+            onCommitText={() => {
+              paint.addText(textFramePosition)
+              setTool('select')
+            }}
             onClose={() => setDesignPanel(null)} />
         )}
         {aiOpen && (
