@@ -4,7 +4,10 @@ import { createImageAssetId } from '../model/imageAsset'
 import type { ImportedProjectFile } from '../projectFiles/projectFileFormat'
 import { importNavigation } from './genericSiteNavigation'
 import { createPageFromHtml, type AssetMapEntry } from './genericSitePage'
-import { parseRuntimeContent } from './genericSiteRuntimeContent'
+import {
+  applyRuntimeContent,
+  parseRuntimeContent,
+} from './genericSiteRuntimeContent'
 import { readZipEntries } from './readZipEntries'
 
 type GenericReadResult =
@@ -59,10 +62,14 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
       return { ok: false, message: 'Ingen støttede HTML-sider kunne importeres.' }
     }
 
-    const htmlPages = htmlEntries.map((entry) => ({
-      path: entry.path,
-      document: new DOMParser().parseFromString(decoder.decode(entry.bytes), 'text/html'),
-    }))
+    const htmlPages = htmlEntries.map((entry) => {
+      const document = new DOMParser().parseFromString(
+        decoder.decode(entry.bytes),
+        'text/html',
+      )
+      applyRuntimeContent(document, runtimeContent)
+      return { path: entry.path, document }
+    })
     importNavigation(project, htmlPages)
 
     return {
