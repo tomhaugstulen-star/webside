@@ -16,13 +16,12 @@ type Props = {
   onTextColorChange: (color: string) => void
   onTextSizeChange: (size: number) => void
   onActivateText: () => void
-  onCommitText: () => void
 }
 
 export function PaintDesignControls({
   panel, fill, textValue, textColor, textSize, textActive, disabled,
   onFillChange, onFillBackground, onTextValueChange, onTextColorChange,
-  onTextSizeChange, onActivateText, onCommitText,
+  onTextSizeChange, onActivateText,
 }: Props) {
   const gradient = fill.type === 'gradient' ? fill : null
   const solidColor = fill.type === 'solid' ? fill.color : gradient?.colors[0] ?? '#ffffff'
@@ -90,10 +89,6 @@ export function PaintDesignControls({
       <button type="button" aria-pressed={textActive}
         disabled={disabled || !textValue.trim()} onClick={onActivateText}>
         {textActive ? 'Tekstramme aktiv' : 'Vis tekstramme'}
-      </button>
-      <button type="button" disabled={disabled || !textActive || !textValue.trim()}
-        onClick={onCommitText}>
-        Fest tekst på canvas
       </button>
     </div>
   )
