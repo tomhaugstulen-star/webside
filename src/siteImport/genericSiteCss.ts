@@ -1,6 +1,7 @@
 import { normalizeEditorColor, type EditorColor } from '../model/editorColor'
 import {
   createLinearGradientFill,
+  createNoFill,
   createSolidFill,
   type EditorFill,
 } from '../model/editorFill'
@@ -215,10 +216,27 @@ export function cssBackgroundFill(value: string | undefined): EditorFill | null 
 }
 
 
+function isTransparentCssValue(value: string | undefined) {
+  if (!value) return false
+  const normalized = value.trim().toLowerCase()
+  if (normalized === 'transparent') return true
+  return /^rgba?\([^)]*,\s*0(?:\.0+)?\s*\)$/i.test(normalized) ||
+    /^rgb\([^)]*\/\s*0(?:\.0+)?%?\s*\)$/i.test(normalized)
+}
+
 export function cssBackgroundFillFromMap(
   css: ReadonlyMap<string, string>,
 ): EditorFill | null {
-  return cssBackgroundFill(css.get('background-image')) ??
-    cssBackgroundFill(css.get('background-color')) ??
-    cssBackgroundFill(css.get('background'))
+  const image = css.get('background-image')
+  const imageFill = image && image !== 'none' ? cssBackgroundFill(image) : null
+  if (imageFill) return imageFill
+
+  const color = css.get('background-color')
+  if (isTransparentCssValue(color)) return createNoFill()
+  const colorFill = cssBackgroundFill(color)
+  if (colorFill) return colorFill
+
+  const background = css.get('background')
+  if (isTransparentCssValue(background)) return createNoFill()
+  return cssBackgroundFill(background)
 }
