@@ -3,6 +3,7 @@ import type { SupportedImageMimeType } from '../model/imageAsset'
 import { canvasToFile, saveCanvasWithPicker } from './paintCanvasFiles'
 import { validDimensions, type PaintTool } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
+import { PaintCanvasViewport } from './PaintCanvasViewport'
 import { PaintDesignDialog, type PaintDesignPanel } from './PaintDesignDialog'
 import type { PaintFill } from './paintFill'
 import { PaintFileControls } from './PaintFileControls'
@@ -217,19 +218,21 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               message={message} error={paint.error}
               onNameChange={setName} onFormatChange={setFormat} />
           </aside>
-          <div ref={canvasViewportRef} className="paint-dialog__canvas-scroll">
-            <div className="paint-dialog__canvas-wrap"
-              style={{ width: displayWidth, height: displayHeight }}>
-              <canvas ref={canvasRef} aria-label="Bildearbeidsflate"
-                onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
-                onPointerUp={paint.onPointerUp} onPointerCancel={paint.onPointerUp} />
-              <canvas ref={overlayRef} aria-hidden="true" />
-              <canvas ref={importOverlayRef} className="paint-dialog__import-overlay"
-                aria-label="Flytt importert bilde" style={{ pointerEvents: importPending ? 'auto' : 'none' }}
-                onPointerDown={importActions.onPointerDown} onPointerMove={importActions.onPointerMove}
-                onPointerUp={importActions.onPointerUp} onPointerCancel={importActions.onPointerUp} />
-            </div>
-          </div>
+          <PaintCanvasViewport
+            viewportRef={canvasViewportRef}
+            canvasRef={canvasRef}
+            overlayRef={overlayRef}
+            importOverlayRef={importOverlayRef}
+            width={displayWidth}
+            height={displayHeight}
+            importPending={importPending}
+            onPointerDown={paint.onPointerDown}
+            onPointerMove={paint.onPointerMove}
+            onPointerUp={paint.onPointerUp}
+            onImportPointerDown={importActions.onPointerDown}
+            onImportPointerMove={importActions.onPointerMove}
+            onImportPointerUp={importActions.onPointerUp}
+          />
         </div>
         {designPanel && (
           <PaintDesignDialog
