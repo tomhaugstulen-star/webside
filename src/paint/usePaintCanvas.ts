@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { resizePaintCanvasBitmap } from './paintCanvasBitmap'
+import { paintPointFromEvent } from './paintPointer'
 import { drawMovedSelection, drawShape, drawStroke, drawText, movedSelectionPosition } from './paintDrawing'
 import {
   clearPaintOverlay,
@@ -73,16 +75,9 @@ export function usePaintCanvas(
     return () => { active = false }
     // A new file starts a fresh editing history.
   }, [file])
-  const pointFromEvent = (event: PointerEvent<HTMLCanvasElement>): Point => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    return {
-      x: Math.round((event.clientX - bounds.left) * event.currentTarget.width / bounds.width),
-      y: Math.round((event.clientY - bounds.top) * event.currentTarget.height / bounds.height),
-    }
-  }
   const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!ready || event.button !== 0) return
-    const start = pointFromEvent(event)
+    const start = paintPointFromEvent(event)
     if (tool === 'text') return
     event.currentTarget.setPointerCapture(event.pointerId)
     const canvas = canvasRef.current!
@@ -112,7 +107,7 @@ export function usePaintCanvas(
   const onPointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
     const drag = dragRef.current
     if (!drag) return
-    const current = pointFromEvent(event)
+    const current = paintPointFromEvent(event)
     const canvas = canvasRef.current!
     const ctx = context()!
     if (tool === 'brush' || tool === 'eraser') {
@@ -211,14 +206,7 @@ export function usePaintCanvas(
     snapshot()
   }
   const resize = (width: number, height: number) => {
-    const canvas = canvasRef.current!
-    const scratch = document.createElement('canvas')
-    scratch.width = width
-    scratch.height = height
-    scratch.getContext('2d')?.drawImage(canvas, 0, 0, width, height)
-    canvas.width = overlayRef.current!.width = width
-    canvas.height = overlayRef.current!.height = height
-    context()?.drawImage(scratch, 0, 0)
+    resizePaintCanvasBitmap(canvasRef.current!, overlayRef.current!, width, height)
     setSelection(null)
     setCanvasSize({ width, height })
     snapshot()
