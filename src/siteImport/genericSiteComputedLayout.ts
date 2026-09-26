@@ -16,6 +16,8 @@ type SiteAsset = { file: File }
 const capturedProperties = [
   'background',
   'background-color',
+  'background-image',
+  'border-radius',
   'color',
   'display',
   'font-family',
@@ -108,11 +110,29 @@ export async function captureSiteLayouts(
     })
     frame.srcdoc = '<!doctype html>' + clone.documentElement.outerHTML
     await loaded
+
+    const document = frame.contentDocument
+    const view = frame.contentWindow
+    if (!document || !view) return new Map()
+
+    await Promise.all([...document.images].map(async (image) => {
+      try {
+        if (!image.complete) {
+          await new Promise<void>((resolve) => {
+            image.addEventListener('load', () => resolve(), { once: true })
+            image.addEventListener('error', () => resolve(), { once: true })
+          })
+        }
+        await image.decode().catch(() => undefined)
+      } catch {
+        // Broken or unsupported images should not abort the whole import.
+      }
+    }))
     await new Promise<void>((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
     )
 
-    const document = frame.contentDocument
+
     const view = frame.contentWindow
     if (!document || !view) return new Map()
 
