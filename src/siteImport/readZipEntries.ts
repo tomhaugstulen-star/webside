@@ -1,12 +1,12 @@
 type ZipEntryData = {
   path: string
-  bytes: Uint8Array
+  bytes: Uint8Array<ArrayBuffer>
 }
 
 const u16 = (view: DataView, at: number) => view.getUint16(at, true)
 const u32 = (view: DataView, at: number) => view.getUint32(at, true)
 
-async function inflateRaw(bytes: Uint8Array) {
+async function inflateRaw(bytes: Uint8Array<ArrayBuffer>) {
   if (typeof DecompressionStream === 'undefined') {
     throw new Error('Denne nettleseren støtter ikke komprimert ZIP.')
   }
