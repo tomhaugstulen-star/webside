@@ -3,19 +3,25 @@ import { createStableId } from '../model/createStableId'
 import type { EditorPage } from '../model/editorProject'
 import { createUniqueSectionAnchorId } from '../model/siteStructure'
 import { collectCssForElement, cssBackgroundFill, cssPixel } from './genericSiteCss'
+import {
+  capturedLayoutFor,
+  type CapturedSiteLayouts,
+} from './genericSiteComputedLayout'
 import { importedBox } from './genericSiteLayout'
 
 export function addSemanticSections(
   page: EditorPage,
   document: Document,
   cssText: string,
+  layouts: CapturedSiteLayouts,
 ) {
   let fallbackY = 20
   for (const container of document.body.querySelectorAll(
     ':scope > section, :scope > article, :scope > main, :scope > header, :scope > footer',
   )) {
     if (container.hasAttribute('data-webside-import-special')) continue
-    const css = collectCssForElement(container, cssText)
+    const captured = capturedLayoutFor(container, layouts)
+    const css = captured?.css ?? collectCssForElement(container, cssText)
     const background = cssBackgroundFill(
       css.get('background') ?? css.get('background-color'),
     )
@@ -29,7 +35,7 @@ export function addSemanticSections(
     })
     if (element.kind !== 'section') continue
 
-    const box = importedBox(css, {
+    const box = captured?.box ?? importedBox(css, {
       x: 40,
       y: fallbackY,
       width: 1240,
@@ -48,7 +54,12 @@ export function addSemanticSections(
         ? `Seksjon: ${container.id}`
         : `Seksjon: ${container.tagName.toLowerCase()}`,
       position: { desktop: { x: box.x, y: box.y } },
-      size: { desktop: { width: box.width, height: box.height } },
+      size: {
+        desktop: {
+          width: Math.max(160, box.width),
+          height: Math.max(90, box.height),
+        },
+      },
       appearance: background
         ? { ...element.appearance, backgroundFill: background }
         : element.appearance,
