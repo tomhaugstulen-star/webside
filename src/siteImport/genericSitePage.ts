@@ -23,6 +23,10 @@ import {
   addSpecialImportedElements,
   isInsideSpecialImportedElement,
 } from './genericSiteSpecialElements'
+import {
+  applyRuntimeContent,
+  type RuntimeContent,
+} from './genericSiteRuntimeContent'
 
 export type AssetMapEntry = {
   assetId: ImageAssetId
@@ -91,10 +95,12 @@ export function createPageFromHtml(
   html: string,
   assetsByPath: Map<string, AssetMapEntry>,
   filesByPath: Map<string, Uint8Array>,
+  runtimeContent: RuntimeContent | null,
 ): EditorPage | null {
   const slug = htmlPathToSlug(htmlPath)
   if (!slug) return null
   const document = new DOMParser().parseFromString(html, 'text/html')
+  applyRuntimeContent(document, runtimeContent)
   const page = createEditorPage(createStableId(), pageName(document, slug), slug)
   const cssParts = [...document.querySelectorAll('style')]
     .map((style) => style.textContent || '')
