@@ -221,16 +221,14 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
           </aside>
           <PaintCanvasViewport viewportRef={canvasViewportRef} canvasRef={canvasRef}
             overlayRef={overlayRef} importOverlayRef={importOverlayRef}
-            width={displayWidth} height={displayHeight}
-            canvasWidth={paint.width} canvasHeight={paint.height}
-            importPending={importPending}
-            textFrame={tool === 'text' && textValue.trim() ? {
-              value: textValue, color: textColor, size: textSize,
-              position: textFramePosition,
-            } : null}
-            onTextFrameMove={setTextFramePosition}
-            onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
-            onPointerUp={paint.onPointerUp} onImportPointerDown={importActions.onPointerDown}
+            width={displayWidth} height={displayHeight} canvasWidth={paint.width}
+            canvasHeight={paint.height} importPending={importPending}
+            textFrame={tool === 'text' && textValue.trim()
+              ? { value: textValue, color: textColor, size: textSize, position: textFramePosition }
+              : null}
+            onTextFrameMove={setTextFramePosition} onPointerDown={paint.onPointerDown}
+            onPointerMove={paint.onPointerMove} onPointerUp={paint.onPointerUp}
+            onImportPointerDown={importActions.onPointerDown}
             onImportPointerMove={importActions.onPointerMove}
             onImportPointerUp={importActions.onPointerUp} />
         </div>
@@ -242,16 +240,11 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             onTextValueChange={setTextValue} onTextColorChange={setTextColor}
             onTextSizeChange={setTextSize}
             onActivateText={() => {
-              setTextFramePosition({
-                x: Math.max(0, Math.round(paint.width * 0.12)),
-                y: Math.max(0, Math.round(paint.height * 0.12)),
-              })
+              setTextFramePosition({ x: Math.round(paint.width * 0.12),
+                y: Math.round(paint.height * 0.12) })
               setTool('text')
             }}
-            onCommitText={() => {
-              paint.addText(textFramePosition)
-              setTool('select')
-            }}
+            onCommitText={() => { paint.addText(textFramePosition); setTool('select') }}
             onClose={() => setDesignPanel(null)} />
         )}
         {aiOpen && (
