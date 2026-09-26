@@ -22,6 +22,7 @@ import {
   type CapturedSiteLayout,
 } from './genericSiteComputedLayout'
 import { childBoxInContainer } from './genericSiteLayout'
+import { importedTextBoxHeight } from './genericSiteTextLayout'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
 import { addSemanticSections } from './genericSiteSections'
 import {
@@ -91,7 +92,7 @@ function makeTextElement(
     size: {
       desktop: {
         width: Math.max(120, box.width),
-        height: Math.max(48, box.height),
+        height: importedTextBoxHeight(box.height),
       },
     },
     appearance: background
