@@ -217,3 +217,23 @@ test('generic HTML import maps simple local CSS into editor styling and layout',
   expect(text.textStyle.textAlign).toBe('center')
   expect(text.appearance.backgroundFill).toEqual({ type: 'solid', color: '#FFFFFF' })
 })
+
+
+test('generic HTML import maps a simple CSS gradient background', async () => {
+  const html = new TextEncoder().encode(
+    '<!doctype html><html><head><style>' +
+    'body{background:linear-gradient(135deg,#111111,#777777,#EEEEEE)}' +
+    '</style></head><body><p>Gradient</p></body></html>',
+  )
+  const zip = createZip([{ path: 'index.html', bytes: html }])
+  const result = await readStaticSiteZip(
+    new File([zip], 'gradient.zip', { type: 'application/zip' }),
+  )
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+  expect(result.value.project.pages[0].appearance.backgroundFill).toEqual({
+    type: 'linear-gradient',
+    angle: 135,
+    stops: ['#111111', '#777777', '#EEEEEE'],
+  })
+})
