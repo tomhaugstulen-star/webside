@@ -218,39 +218,22 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               message={message} error={paint.error}
               onNameChange={setName} onFormatChange={setFormat} />
           </aside>
-          <PaintCanvasViewport
-            viewportRef={canvasViewportRef}
-            canvasRef={canvasRef}
-            overlayRef={overlayRef}
-            importOverlayRef={importOverlayRef}
-            width={displayWidth}
-            height={displayHeight}
-            importPending={importPending}
-            onPointerDown={paint.onPointerDown}
-            onPointerMove={paint.onPointerMove}
-            onPointerUp={paint.onPointerUp}
-            onImportPointerDown={importActions.onPointerDown}
+          <PaintCanvasViewport viewportRef={canvasViewportRef} canvasRef={canvasRef}
+            overlayRef={overlayRef} importOverlayRef={importOverlayRef}
+            width={displayWidth} height={displayHeight} importPending={importPending}
+            onPointerDown={paint.onPointerDown} onPointerMove={paint.onPointerMove}
+            onPointerUp={paint.onPointerUp} onImportPointerDown={importActions.onPointerDown}
             onImportPointerMove={importActions.onPointerMove}
-            onImportPointerUp={importActions.onPointerUp}
-          />
+            onImportPointerUp={importActions.onPointerUp} />
         </div>
         {designPanel && (
-          <PaintDesignDialog
-            panel={designPanel}
-            fill={fill}
-            textValue={textValue}
-            textColor={textColor}
-            textSize={textSize}
-            textActive={tool === 'text'}
-            disabled={!paint.ready || importPending}
-            onFillChange={setFill}
+          <PaintDesignDialog panel={designPanel} fill={fill} textValue={textValue}
+            textColor={textColor} textSize={textSize} textActive={tool === 'text'}
+            disabled={!paint.ready || importPending} onFillChange={setFill}
             onFillBackground={() => paint.fillBackground(fill)}
-            onTextValueChange={setTextValue}
-            onTextColorChange={setTextColor}
-            onTextSizeChange={setTextSize}
-            onActivateText={() => setTool('text')}
-            onClose={() => setDesignPanel(null)}
-          />
+            onTextValueChange={setTextValue} onTextColorChange={setTextColor}
+            onTextSizeChange={setTextSize} onActivateText={() => setTool('text')}
+            onClose={() => setDesignPanel(null)} />
         )}
         {aiOpen && (
           <PaintAiDialog
