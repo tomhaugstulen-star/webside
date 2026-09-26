@@ -11,8 +11,7 @@ import { PaintLightToolbar } from './PaintLightToolbar'
 import { PaintResizeControls } from './PaintResizeControls'
 import { usePaintCanvas } from './usePaintCanvas'
 import { usePaintImport } from './usePaintImport'
-type Props = { file: File; dimensions: { width: number; height: number };
-  onClose: () => void; onSave: (file: File) => Promise<void> }
+type Props = { file: File; dimensions: { width: number; height: number }; onClose: () => void; onSave: (file: File) => Promise<void> }
 const tools: Array<{ id: PaintTool; label: string }> = [
   { id: 'select', label: 'Marker / flytt' }, { id: 'brush', label: 'Pensel' },
   { id: 'eraser', label: 'Viskelær' }, { id: 'line', label: 'Strek' },
@@ -20,11 +19,9 @@ const tools: Array<{ id: PaintTool; label: string }> = [
 ]
 export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
   const [tool, setTool] = useState<PaintTool>('select')
-  const [color, setColor] = useState('#17202c')
-  const [size, setSize] = useState(8)
+  const [color, setColor] = useState('#17202c'), [size, setSize] = useState(8)
   const [fill, setFill] = useState<PaintFill>({ type: 'solid', color: '#ffffff' })
-  const [textValue, setTextValue] = useState('')
-  const [textColor, setTextColor] = useState('#17202c')
+  const [textValue, setTextValue] = useState(''), [textColor, setTextColor] = useState('#17202c')
   const [textSize, setTextSize] = useState(48)
   const [textFramePosition, setTextFramePosition] = useState<Point>({ x: 80, y: 80 })
   const [name, setName] = useState(file.name.replace(/\.[^.]+$/, '') + '-redigert')
