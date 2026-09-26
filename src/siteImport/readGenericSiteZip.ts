@@ -4,9 +4,16 @@ import { createEditorElement } from '../model/createEditorElement'
 import { createStableId } from '../model/createStableId'
 import type { EditorElement, EditorPage } from '../model/editorProject'
 import { createImageAssetId, type ImageAssetId } from '../model/imageAsset'
+import { createSolidFill } from '../model/editorFill'
 import { DEFAULT_TEXT_ELEMENT_STYLE, type TextFontSize } from '../model/textElementStyle'
 import type { ImportedProjectFile } from '../projectFiles/projectFileFormat'
 import { htmlPathToSlug, resolveSitePath } from './genericSitePaths'
+import {
+  applyCssTextStyle,
+  collectCssForElement,
+  cssColor,
+  cssPixel,
+} from './genericSiteCss'
 import { readZipEntries } from './readZipEntries'
 
 type GenericReadResult =
@@ -46,6 +53,7 @@ function makeTextElement(
   tagName: string,
   y: number,
   existing: EditorElement[],
+  css: Map<string, string>,
 ) {
   const element = createEditorElement({
     id: createStableId(),
@@ -54,16 +62,25 @@ function makeTextElement(
   })
   if (element.kind !== 'text') throw new Error('Kunne ikke opprette tekst.')
   const fontSize = headingSize(tagName)
+  const baseStyle = {
+    ...DEFAULT_TEXT_ELEMENT_STYLE,
+    fontSize,
+    fontWeight: tagName.startsWith('H') ? 'bold' as const : 'normal' as const,
+  }
+  const width = cssPixel(css.get('width')) ?? 760
+  const height = cssPixel(css.get('height')) ?? Math.max(64, Math.round(fontSize * 2.2))
+  const x = cssPixel(css.get('left')) ?? 80
+  const top = cssPixel(css.get('top'))
+  const background = cssColor(css.get('background-color'))
   return {
     ...element,
     content,
-    position: { desktop: { x: 80, y } },
-    size: { desktop: { width: 760, height: Math.max(64, Math.round(fontSize * 2.2)) } },
-    textStyle: {
-      ...DEFAULT_TEXT_ELEMENT_STYLE,
-      fontSize,
-      fontWeight: tagName.startsWith('H') ? 'bold' as const : 'normal' as const,
-    },
+    position: { desktop: { x: Math.max(0, x), y: Math.max(0, top ?? y) } },
+    size: { desktop: { width: Math.max(40, width), height: Math.max(32, height) } },
+    appearance: background
+      ? { ...element.appearance, backgroundFill: createSolidFill(background) }
+      : element.appearance,
+    textStyle: applyCssTextStyle(baseStyle, css),
   }
 }
 
@@ -71,11 +88,25 @@ function createPageFromHtml(
   htmlPath: string,
   html: string,
   assetsByPath: Map<string, AssetMapEntry>,
+  filesByPath: Map<string, Uint8Array>,
 ): EditorPage | null {
   const slug = htmlPathToSlug(htmlPath)
   if (!slug) return null
   const document = new DOMParser().parseFromString(html, 'text/html')
   const page = createEditorPage(createStableId(), pageName(document, slug), slug)
+  const cssParts = [...document.querySelectorAll('style')]
+    .map((style) => style.textContent || '')
+  for (const link of document.querySelectorAll('link[rel~="stylesheet"]')) {
+    const path = resolveSitePath(htmlPath, link.getAttribute('href') || '')
+    const bytes = path ? filesByPath.get(path) : null
+    if (bytes) cssParts.push(new TextDecoder().decode(bytes))
+  }
+  const cssText = cssParts.join('\n')
+  const bodyCss = collectCssForElement(document.body, cssText)
+  const pageBackground = cssColor(
+    bodyCss.get('background-color') ?? bodyCss.get('background'),
+  )
+  if (pageBackground) page.appearance = { backgroundFill: createSolidFill(pageBackground) }
   page.seo = {
     title: document.querySelector('title')?.textContent?.trim().slice(0, 120) || page.name,
     description: document.querySelector('meta[name="description"]')?.getAttribute('content')?.trim().slice(0, 300) || '',
@@ -86,6 +117,7 @@ function createPageFromHtml(
   for (const node of candidates) {
     if (node.parentElement?.closest('h1,h2,h3,p,li,a')) continue
 
+    const css = collectCssForElement(node, cssText)
     if (node instanceof HTMLImageElement) {
       const path = resolveSitePath(htmlPath, node.getAttribute('src') || '')
       const asset = path ? assetsByPath.get(path) : null
@@ -100,22 +132,31 @@ function createPageFromHtml(
         existingElements: page.elements,
       })
       if (element.kind !== 'image') continue
-      const width = Math.min(760, asset.metadata.width)
-      const height = Math.max(80, Math.round(asset.metadata.height * width / asset.metadata.width))
+      const naturalWidth = Math.min(760, asset.metadata.width)
+      const width = Math.max(40, cssPixel(css.get('width')) ?? naturalWidth)
+      const height = Math.max(40, cssPixel(css.get('height')) ??
+        Math.round(asset.metadata.height * width / asset.metadata.width))
+      const x = Math.max(0, cssPixel(css.get('left')) ?? 80)
+      const top = cssPixel(css.get('top'))
       page.elements.push({
         ...element,
         altText: node.getAttribute('alt')?.slice(0, 300) || '',
-        position: { desktop: { x: 80, y } },
+        position: { desktop: { x, y: Math.max(0, top ?? y) } },
         size: { desktop: { width, height } },
       })
-      y += height + 28
+      if (top === null) y += height + 28
       continue
     }
 
     const text = node.textContent?.replace(/\s+/g, ' ').trim()
     if (!text) continue
-    page.elements.push(makeTextElement(text.slice(0, 2000), node.tagName, y, page.elements))
-    y += node.tagName.startsWith('H') ? 96 : 76
+    const element = makeTextElement(
+      text.slice(0, 2000), node.tagName, y, page.elements, css,
+    )
+    page.elements.push(element)
+    if (cssPixel(css.get('top')) === null) {
+      y += element.size.desktop.height + 20
+    }
   }
 
   return page
@@ -148,8 +189,11 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
     )
     project.pages = []
     const decoder = new TextDecoder()
+    const filesByPath = new Map(entries.map((entry) => [entry.path, entry.bytes]))
     for (const entry of htmlEntries) {
-      const page = createPageFromHtml(entry.path, decoder.decode(entry.bytes), assetsByPath)
+      const page = createPageFromHtml(
+        entry.path, decoder.decode(entry.bytes), assetsByPath, filesByPath,
+      )
       if (page) project.pages.push(page)
     }
     if (!project.pages.length) {
@@ -160,7 +204,7 @@ export async function readGenericSiteZip(file: File): Promise<GenericReadResult>
       ok: true,
       value: { project, assets },
       warnings: [
-        'Original CSS og avansert layout er ikke bevart i denne første importversjonen.',
+        'Enkel CSS er tolket. Avansert layout, script og komplekse selektorer kan kreve manuell justering.',
       ],
     }
   } catch (error) {
