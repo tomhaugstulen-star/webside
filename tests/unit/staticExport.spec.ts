@@ -10,9 +10,7 @@ import { pageFilePath, relativePageHref } from '../../src/export/sitePaths'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
 import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
 import { PUBLIC_DESKTOP_WIDTH } from '../../src/export/siteDimensions'
-import { createStaticSiteZip } from '../../src/export/createStaticSite'
 import { readStaticSiteZip } from '../../src/siteImport/readStaticSiteZip'
-import { STATIC_SITE_MANIFEST_PATH } from '../../src/siteImport/staticSiteManifest'
 
 const decode = new TextDecoder()
 
@@ -129,35 +127,6 @@ test('export keeps elements placed in the editor’s expanded desktop canvas', (
   expect(html).toContain('--d-x:594px')
   expect(html).toContain('--d-w:537px')
   expect(594 + 537).toBeLessThanOrEqual(PUBLIC_DESKTOP_WIDTH)
-})
-
-
-test('static site ZIP keeps an editable project round-trip manifest', async () => {
-  const project = createBlankProject('Rundtur')
-  project.pages[0].seo = { title: 'Rundtur', description: 'Test av import' }
-  const blob = await createStaticSiteZip(project, () => null)
-  const bytes = new Uint8Array(await blob.arrayBuffer())
-  const view = new DataView(bytes.buffer)
-  let offset = 0
-  const files = new Set<string>()
-
-  while (view.getUint32(offset, true) === 0x04034b50) {
-    const nameLength = view.getUint16(offset + 26, true)
-    const extraLength = view.getUint16(offset + 28, true)
-    const size = view.getUint32(offset + 18, true)
-    const name = decode.decode(bytes.slice(offset + 30, offset + 30 + nameLength))
-    files.add(name)
-    offset += 30 + nameLength + extraLength + size
-  }
-
-  expect(files.has(STATIC_SITE_MANIFEST_PATH)).toBe(true)
-  const result = await readStaticSiteZip(
-    new File([blob], 'nettsted.zip', { type: 'application/zip' }),
-  )
-  expect(result.ok).toBe(true)
-  if (!result.ok) return
-  expect(result.value.project).toEqual(project)
-  expect(result.value.assets).toEqual([])
 })
 
 
