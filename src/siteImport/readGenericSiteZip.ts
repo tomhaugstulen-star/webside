@@ -13,6 +13,7 @@ import {
   cssBackgroundFill,
   cssPixel,
 } from './genericSiteCss'
+import { childBoxInContainer } from './genericSiteLayout'
 import { readZipEntries } from './readZipEntries'
 
 type GenericReadResult =
@@ -53,6 +54,8 @@ function makeTextElement(
   y: number,
   existing: EditorElement[],
   css: Map<string, string>,
+  parentCss: Map<string, string>,
+  siblingIndex: number,
 ) {
   const element = createEditorElement({
     id: createStableId(),
@@ -66,18 +69,18 @@ function makeTextElement(
     fontSize,
     fontWeight: tagName.startsWith('H') ? 'bold' as const : 'normal' as const,
   }
-  const width = cssPixel(css.get('width')) ?? 760
-  const height = cssPixel(css.get('height')) ?? Math.max(64, Math.round(fontSize * 2.2))
-  const x = cssPixel(css.get('left')) ?? 80
-  const top = cssPixel(css.get('top'))
+  const box = childBoxInContainer(css, parentCss, siblingIndex, y, {
+    width: 760,
+    height: Math.max(64, Math.round(fontSize * 2.2)),
+  })
   const background = cssBackgroundFill(
     css.get('background') ?? css.get('background-color'),
   )
   return {
     ...element,
     content,
-    position: { desktop: { x: Math.max(0, x), y: Math.max(0, top ?? y) } },
-    size: { desktop: { width: Math.max(40, width), height: Math.max(32, height) } },
+    position: { desktop: { x: box.x, y: box.y } },
+    size: { desktop: { width: box.width, height: box.height } },
     appearance: background
       ? { ...element.appearance, backgroundFill: background }
       : element.appearance,
@@ -119,6 +122,15 @@ function createPageFromHtml(
     if (node.parentElement?.closest('h1,h2,h3,p,li,a')) continue
 
     const css = collectCssForElement(node, cssText)
+    const parent = node.parentElement
+    const parentCss = parent
+      ? collectCssForElement(parent, cssText)
+      : new Map<string, string>()
+    const siblings = parent
+      ? [...parent.children].filter((child) => child.matches('h1,h2,h3,p,li,a,img'))
+      : [node]
+    parentCss.set('--import-child-count', String(siblings.length))
+    const siblingIndex = Math.max(0, siblings.indexOf(node))
     if (node instanceof HTMLImageElement) {
       const path = resolveSitePath(htmlPath, node.getAttribute('src') || '')
       const asset = path ? assetsByPath.get(path) : null
@@ -134,28 +146,34 @@ function createPageFromHtml(
       })
       if (element.kind !== 'image') continue
       const naturalWidth = Math.min(760, asset.metadata.width)
-      const width = Math.max(40, cssPixel(css.get('width')) ?? naturalWidth)
-      const height = Math.max(40, cssPixel(css.get('height')) ??
-        Math.round(asset.metadata.height * width / asset.metadata.width))
-      const x = Math.max(0, cssPixel(css.get('left')) ?? 80)
-      const top = cssPixel(css.get('top'))
+      const naturalHeight = Math.max(80,
+        Math.round(asset.metadata.height * naturalWidth / asset.metadata.width))
+      const box = childBoxInContainer(css, parentCss, siblingIndex, y, {
+        width: naturalWidth,
+        height: naturalHeight,
+      })
       page.elements.push({
         ...element,
         altText: node.getAttribute('alt')?.slice(0, 300) || '',
-        position: { desktop: { x, y: Math.max(0, top ?? y) } },
-        size: { desktop: { width, height } },
+        position: { desktop: { x: box.x, y: box.y } },
+        size: { desktop: { width: box.width, height: box.height } },
       })
-      if (top === null) y += height + 28
+      if (cssPixel(css.get('top')) === null &&
+        parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
+        y += box.height + 28
+      }
       continue
     }
 
     const text = node.textContent?.replace(/\s+/g, ' ').trim()
     if (!text) continue
     const element = makeTextElement(
-      text.slice(0, 2000), node.tagName, y, page.elements, css,
+      text.slice(0, 2000), node.tagName, y, page.elements,
+      css, parentCss, siblingIndex,
     )
     page.elements.push(element)
-    if (cssPixel(css.get('top')) === null) {
+    if (cssPixel(css.get('top')) === null &&
+      parentCss.get('display') !== 'flex' && parentCss.get('display') !== 'grid') {
       y += element.size.desktop.height + 20
     }
   }
