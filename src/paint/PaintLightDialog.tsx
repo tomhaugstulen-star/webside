@@ -214,7 +214,12 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
             textFrame={tool === 'text' && textValue.trim()
               ? { value: textValue, color: textColor, size: textSize, position: textFramePosition }
               : null}
-            onTextFrameMove={setTextFramePosition} onPointerDown={paint.onPointerDown}
+            onTextFrameMove={setTextFramePosition}
+            onTextFrameCommit={() => {
+              paint.addText(textFramePosition)
+              setTool('select')
+            }}
+            onPointerDown={paint.onPointerDown}
             onPointerMove={paint.onPointerMove} onPointerUp={paint.onPointerUp}
             onImportPointerDown={importActions.onPointerDown}
             onImportPointerMove={importActions.onPointerMove}
@@ -232,7 +237,6 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
                 y: Math.round(paint.height * 0.12) })
               setTool('text')
             }}
-            onCommitText={() => { paint.addText(textFramePosition); setTool('select') }}
             onClose={() => setDesignPanel(null)} />
         )}
         {aiOpen && (
