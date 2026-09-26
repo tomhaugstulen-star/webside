@@ -5,6 +5,7 @@ import { validDimensions, type PaintTool } from './paintGeometry'
 import { PaintAiDialog } from './PaintAiDialog'
 import { PaintDesignDialog, type PaintDesignPanel } from './PaintDesignDialog'
 import type { PaintFill } from './paintFill'
+import { PaintFileControls } from './PaintFileControls'
 import { PaintLightToolbar } from './PaintLightToolbar'
 import { PaintResizeControls } from './PaintResizeControls'
 import { usePaintCanvas } from './usePaintCanvas'
@@ -212,17 +213,9 @@ export function PaintLightDialog({ file, dimensions, onClose, onSave }: Props) {
               onHeightChange={(value) => setDimension('height', value)}
               onLockRatioChange={setLockRatio} onApply={applyResize}
               onHeroPreset={() => { setNewWidth(1920); setNewHeight(1080); setLockRatio(false) }} />
-            <div className="paint-dialog__save">
-              <h3>Fil</h3>
-              <label>Filnavn <input value={name} onChange={(event) => setName(event.target.value)} /></label>
-              <label>Format <select value={format} onChange={(event) =>
-                setFormat(event.target.value as SupportedImageMimeType)}>
-                <option value="image/png">PNG</option><option value="image/jpeg">JPEG</option>
-                <option value="image/webp">WebP</option>
-              </select></label>
-            </div>
-            {(message || paint.error) &&
-              <p className="paint-dialog__message" role="status">{message || paint.error}</p>}
+            <PaintFileControls name={name} format={format}
+              message={message} error={paint.error}
+              onNameChange={setName} onFormatChange={setFormat} />
           </aside>
           <div ref={canvasViewportRef} className="paint-dialog__canvas-scroll">
             <div className="paint-dialog__canvas-wrap"
