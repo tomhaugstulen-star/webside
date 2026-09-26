@@ -10,6 +10,7 @@ import { pageFilePath, relativePageHref } from '../../src/export/sitePaths'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
 import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
 import { PUBLIC_DESKTOP_WIDTH } from '../../src/export/siteDimensions'
+import { createNoFill } from '../../src/model/editorFill'
 
 const decode = new TextDecoder()
 
@@ -58,6 +59,33 @@ test('schema 16 projects migrate unchanged to schema 17', () => {
   expect(migrated?.schemaVersion).toBe(17)
   expect(migrated?.pages).toEqual(project.pages)
   expect(migrated?.siteSettings).toEqual(project.siteSettings)
+})
+
+
+test('transparent fills validate and export as transparent background', () => {
+  const project = createBlankProject('Gjennomsiktig')
+  const text = createEditorElement({
+    id: 'transparent-text',
+    request: { kind: 'text' },
+    existingElements: [],
+  })
+  if (text.kind !== 'text') throw Error('Fixture')
+  project.pages[0].elements.push({
+    ...text,
+    content: 'Gjennomsiktig tekst',
+    appearance: {
+      ...text.appearance,
+      backgroundFill: createNoFill(),
+    },
+  })
+  expect(parseImportedEditorProject(project)).not.toBeNull()
+  const html = renderPublicElements(
+    project,
+    '/',
+    () => 'unused',
+    () => ({ href: 'unused', color: '#fff' }),
+  )
+  expect(html).toContain('background:transparent')
 })
 
 test('site metadata changes atomically and unchanged values preserve state identity', () => {
