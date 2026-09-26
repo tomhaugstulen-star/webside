@@ -1,4 +1,7 @@
-import { PUBLIC_DESKTOP_WIDTH } from '../export/siteDimensions'
+import {
+  PUBLIC_DESKTOP_WIDTH,
+  PUBLIC_MOBILE_WIDTH,
+} from '../export/siteDimensions'
 import type { ImportedBox } from './genericSiteLayout'
 import { resolveSitePath } from './genericSitePaths'
 
@@ -9,7 +12,10 @@ export type CapturedSiteLayout = {
   css: Map<string, string>
 }
 
-export type CapturedSiteLayouts = Map<string, CapturedSiteLayout>
+export type CapturedSiteLayouts = {
+  desktop: Map<string, CapturedSiteLayout>
+  mobile: Map<string, CapturedSiteLayout>
+}
 
 type SiteAsset = { file: File }
 
@@ -31,9 +37,10 @@ const capturedProperties = [
 export function capturedLayoutFor(
   element: Element,
   layouts: CapturedSiteLayouts,
+  viewport: 'desktop' | 'mobile' = 'desktop',
 ) {
   const id = element.getAttribute(LAYOUT_ATTRIBUTE)
-  return id ? layouts.get(id) ?? null : null
+  return id ? layouts[viewport].get(id) ?? null : null
 }
 
 function assignLayoutIds(document: Document) {
@@ -94,13 +101,13 @@ function numeric(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0
 }
 
-export async function captureSiteLayouts(
+async function captureSiteLayoutsAtWidth(
   source: Document,
   htmlPath: string,
   cssText: string,
   assetsByPath: ReadonlyMap<string, SiteAsset>,
-): Promise<CapturedSiteLayouts> {
-  assignLayoutIds(source)
+  width: number,
+) {
   const { clone, urls } = sanitizeClone(source, htmlPath, cssText, assetsByPath)
   const frame = globalThis.document.createElement('iframe')
   frame.setAttribute('sandbox', 'allow-same-origin')
@@ -109,7 +116,7 @@ export async function captureSiteLayouts(
     position: 'fixed',
     left: '-20000px',
     top: '0',
-    width: `${PUBLIC_DESKTOP_WIDTH}px`,
+    width: `${width}px`,
     height: '30000px',
     border: '0',
     visibility: 'hidden',
@@ -126,7 +133,7 @@ export async function captureSiteLayouts(
 
     const document = frame.contentDocument
     const view = frame.contentWindow
-    if (!document || !view) return new Map()
+    if (!document || !view) return new Map<string, CapturedSiteLayout>()
 
     await Promise.all([...document.images].map(async (image) => {
       try {
@@ -146,7 +153,7 @@ export async function captureSiteLayouts(
     )
 
 
-    const layouts: CapturedSiteLayouts = new Map()
+    const layouts = new Map<string, CapturedSiteLayout>()
     for (const element of document.querySelectorAll(`[${LAYOUT_ATTRIBUTE}]`)) {
       const id = element.getAttribute(LAYOUT_ATTRIBUTE)
       if (!id) continue
@@ -171,4 +178,21 @@ export async function captureSiteLayouts(
     frame.remove()
     urls.forEach((url) => URL.revokeObjectURL(url))
   }
+}
+
+
+export async function captureSiteLayouts(
+  source: Document,
+  htmlPath: string,
+  cssText: string,
+  assetsByPath: ReadonlyMap<string, SiteAsset>,
+): Promise<CapturedSiteLayouts> {
+  assignLayoutIds(source)
+  const desktop = await captureSiteLayoutsAtWidth(
+    source, htmlPath, cssText, assetsByPath, PUBLIC_DESKTOP_WIDTH,
+  )
+  const mobile = await captureSiteLayoutsAtWidth(
+    source, htmlPath, cssText, assetsByPath, PUBLIC_MOBILE_WIDTH,
+  )
+  return { desktop, mobile }
 }
