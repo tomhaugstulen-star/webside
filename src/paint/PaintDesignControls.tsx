@@ -25,9 +25,10 @@ export function PaintDesignControls({
   onTextSizeChange, onActivateText, onCommitText,
 }: Props) {
   const gradient = fill.type === 'gradient' ? fill : null
+  const solidColor = fill.type === 'solid' ? fill.color : gradient?.colors[0] ?? '#ffffff'
   const preview = gradient
     ? `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]} 0%, ${gradient.colors[1]} 50%, ${gradient.colors[2]} 100%)`
-    : fill.color
+    : solidColor
 
   if (panel === 'colors') {
     return (
@@ -36,11 +37,11 @@ export function PaintDesignControls({
           <button type="button" aria-pressed={fill.type === 'solid'} disabled={disabled}
             onClick={() => onFillChange({
               type: 'solid',
-              color: gradient?.colors[0] ?? fill.color,
+              color: solidColor,
             })}>Helfarge</button>
           <button type="button" aria-pressed={fill.type === 'gradient'} disabled={disabled}
             onClick={() => onFillChange(fill.type === 'gradient' ? fill : {
-              type: 'gradient', colors: [fill.color, fill.color, fill.color], angle: 180,
+              type: 'gradient', colors: [solidColor, solidColor, solidColor], angle: 180,
             })}>Gradient</button>
         </div>
         <div className="paint-dialog__fill-preview" style={{ background: preview }} />
