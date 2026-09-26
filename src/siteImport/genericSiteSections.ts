@@ -14,6 +14,7 @@ export function addSemanticSections(
   for (const container of document.body.querySelectorAll(
     ':scope > section, :scope > article, :scope > main, :scope > header, :scope > footer',
   )) {
+    if (container.hasAttribute('data-webside-import-special')) continue
     const css = collectCssForElement(container, cssText)
     const background = cssBackgroundFill(
       css.get('background') ?? css.get('background-color'),
