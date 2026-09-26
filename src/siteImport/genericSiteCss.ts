@@ -7,10 +7,12 @@ import {
 import {
   textFontFamilies,
   textFontSizes,
+  textLineHeights,
   type TextAlignment,
   type TextElementStyle,
   type TextFontFamily,
   type TextFontSize,
+  type TextLineHeight,
 } from '../model/textElementStyle'
 
 type CssMap = Map<string, string>
@@ -93,6 +95,30 @@ function closestFontSize(value: number): TextFontSize {
   )
 }
 
+function closestLineHeight(value: number): TextLineHeight {
+  return textLineHeights.reduce((best, candidate) =>
+    Math.abs(candidate - value) < Math.abs(best - value) ? candidate : best,
+  )
+}
+
+function cssLineHeight(
+  value: string | undefined,
+  fontSizePx: number | null,
+  fallback: TextLineHeight,
+) {
+  if (!value) return fallback
+  const normalized = value.trim().toLowerCase()
+  if (normalized === 'normal') return closestLineHeight(1.2)
+  const px = cssPixel(normalized)
+  if (px && fontSizePx && fontSizePx > 0) return closestLineHeight(px / fontSizePx)
+  const percent = normalized.match(/^(\d+(?:\.\d+)?)%$/)
+  if (percent) return closestLineHeight(Number(percent[1]) / 100)
+  const numeric = Number(normalized)
+  return Number.isFinite(numeric) && numeric > 0
+    ? closestLineHeight(numeric)
+    : fallback
+}
+
 function fontFamily(value: string | undefined): TextFontFamily | null {
   if (!value) return null
   const normalized = value.toLowerCase().replace(/["']/g, '')
@@ -112,6 +138,7 @@ export function applyCssTextStyle(
   const weightValue = css.get('font-weight')?.toLowerCase()
   const numericWeight = weightValue ? Number(weightValue) : NaN
   const alignment = css.get('text-align')?.toLowerCase()
+  const lineHeight = cssLineHeight(css.get('line-height'), sizePx, base.lineHeight)
   const textAlign: TextAlignment = alignment === 'center' || alignment === 'right'
     ? alignment
     : alignment === 'left' ? 'left' : base.textAlign
@@ -123,6 +150,7 @@ export function applyCssTextStyle(
     fontFamily: family ?? base.fontFamily,
     fontWeight: weightValue === 'bold' || numericWeight >= 600 ? 'bold' : base.fontWeight,
     fontStyle: css.get('font-style')?.toLowerCase() === 'italic' ? 'italic' : base.fontStyle,
+    lineHeight,
     textAlign,
   }
 }
@@ -152,4 +180,13 @@ export function cssBackgroundFill(value: string | undefined): EditorFill | null 
   return third
     ? createLinearGradientFill(first, second, third, angle)
     : { type: 'linear-gradient', angle, stops: [first, second] }
+}
+
+
+export function cssBackgroundFillFromMap(
+  css: ReadonlyMap<string, string>,
+): EditorFill | null {
+  return cssBackgroundFill(css.get('background-image')) ??
+    cssBackgroundFill(css.get('background-color')) ??
+    cssBackgroundFill(css.get('background'))
 }
