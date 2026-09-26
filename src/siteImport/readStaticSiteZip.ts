@@ -16,10 +16,11 @@ import {
   STATIC_SITE_MANIFEST_VERSION,
   type StaticSiteManifestAsset,
 } from './staticSiteManifest'
+import { readGenericSiteZip } from './readGenericSiteZip'
 import { readZipEntries } from './readZipEntries'
 
 type ReadResult =
-  | { ok: true; value: ImportedProjectFile }
+  | { ok: true; value: ImportedProjectFile; message?: string }
   | { ok: false; message: string }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -50,9 +51,12 @@ export async function readStaticSiteZip(file: File): Promise<ReadResult> {
     const byPath = new Map(entries.map((entry) => [entry.path, entry.bytes]))
     const manifestBytes = byPath.get(STATIC_SITE_MANIFEST_PATH)
     if (!manifestBytes) {
+      const generic = await readGenericSiteZip(file)
+      if (!generic.ok) return generic
       return {
-        ok: false,
-        message: 'Nettstedet mangler editorinformasjon og kan ikke åpnes som redigerbart prosjekt.',
+        ok: true,
+        value: generic.value,
+        message: generic.warnings.join(' '),
       }
     }
 
