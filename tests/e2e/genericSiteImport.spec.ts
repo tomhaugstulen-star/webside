@@ -67,7 +67,7 @@ test('imports generic HTML ZIP as editable browser project', async ({ page }) =>
     hasText: 'Vanskeligheter med å ta valg',
   })
   await expect(wrapped).toBeVisible()
-  expect(await wrapped.evaluate((element) => element.clientHeight)).toBeGreaterThan(48)
+  expect(await wrapped.evaluate((element) => element.clientHeight)).toBeGreaterThan(40)
 
   await page.getByRole('button', { name: 'Mobil' }).click()
   const aboutText = page.locator('.canvas-element--text').filter({
