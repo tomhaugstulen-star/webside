@@ -142,7 +142,7 @@ test('generic HTML ZIP imports editable text content', async () => {
   )
   expect(result.ok).toBe(true)
   if (!result.ok) return
-  expect(result.message).toContain('Original CSS')
+  expect(result.message).toContain('Enkel CSS')
   expect(result.value.project.pages).toHaveLength(1)
   expect(result.value.project.pages[0].slug).toBe('/')
   expect(result.value.project.pages[0].seo.description).toBe('Importtest')
@@ -247,5 +247,82 @@ test('generic HTML import reconstructs semantic section backgrounds', async () =
   expect(section.size.desktop).toEqual({ width: 900, height: 300 })
   expect(section.appearance.backgroundFill).toEqual({
     type: 'solid', color: '#224466',
+  })
+})
+
+
+test('generic HTML import preserves external text links and CTA buttons', async () => {
+  const html = new TextEncoder().encode(
+    '<!doctype html><html><body>' +
+    '<a href="https://example.com" target="_blank">Ekstern lenke</a>' +
+    '<a class="cta" href="https://openai.com" style="background:#222;width:220px;height:52px">Bestill nå</a>' +
+    '</body></html>',
+  )
+  const result = await readStaticSiteZip(new File([
+    createZip([{ path: 'index.html', bytes: html }]),
+  ], 'links.zip', { type: 'application/zip' }))
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+
+  const page = result.value.project.pages[0]
+  const text = page.elements.find((element) =>
+    element.kind === 'text' && element.content === 'Ekstern lenke')
+  expect(text?.kind).toBe('text')
+  if (text?.kind === 'text') {
+    expect(text.link).toEqual({
+      type: 'external-url',
+      url: 'https://example.com',
+      openInNewTab: true,
+    })
+  }
+
+  const button = page.elements.find((element) =>
+    element.kind === 'button' && element.label === 'Bestill nå')
+  expect(button?.kind).toBe('button')
+  if (button?.kind === 'button') {
+    expect(button.link).toEqual({
+      type: 'external-url',
+      url: 'https://openai.com',
+      openInNewTab: false,
+    })
+    expect(button.size.desktop).toEqual({ width: 220, height: 52 })
+  }
+})
+
+test('generic HTML import creates internal navigation to pages and sections', async () => {
+  const home = new TextEncoder().encode(
+    '<!doctype html><html><body>' +
+    '<nav><a href="about/">Om oss</a><a href="#kontakt">Kontakt</a></nav>' +
+    '<section id="kontakt" style="height:240px;background:#EEEEEE"><h2>Kontakt</h2></section>' +
+    '</body></html>',
+  )
+  const about = new TextEncoder().encode(
+    '<!doctype html><html><head><title>Om oss</title></head><body><p>Om oss</p></body></html>',
+  )
+  const result = await readStaticSiteZip(new File([
+    createZip([
+      { path: 'index.html', bytes: home },
+      { path: 'about/index.html', bytes: about },
+    ]),
+  ], 'navigation.zip', { type: 'application/zip' }))
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+
+  const project = result.value.project
+  const homePage = project.pages.find((page) => page.slug === '/')
+  const aboutPage = project.pages.find((page) => page.slug === '/about')
+  const section = homePage?.elements.find((element) =>
+    element.kind === 'section' && element.anchorId === 'kontakt')
+  expect(aboutPage).toBeTruthy()
+  expect(section?.kind).toBe('section')
+
+  const aboutItem = project.navigation.items.find((item) => item.label === 'Om oss')
+  expect(aboutItem?.target).toEqual({ type: 'page', pageId: aboutPage?.id })
+
+  const contactItem = project.navigation.items.find((item) => item.label === 'Kontakt')
+  expect(contactItem?.target).toEqual({
+    type: 'section',
+    pageId: homePage?.id,
+    elementId: section?.id,
   })
 })
