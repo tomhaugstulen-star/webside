@@ -159,3 +159,26 @@ test('static site ZIP keeps an editable project round-trip manifest', async () =
   expect(result.value.project).toEqual(project)
   expect(result.value.assets).toEqual([])
 })
+
+
+test('generic HTML ZIP imports editable text content', async () => {
+  const html = new TextEncoder().encode(
+    '<!doctype html><html><head><title>Ekstern side</title>' +
+    '<meta name="description" content="Importtest"></head><body>' +
+    '<h1>Velkommen</h1><p>Dette er redigerbar tekst.</p></body></html>',
+  )
+  const zip = createZip([{ path: 'index.html', bytes: html }])
+  const result = await readStaticSiteZip(
+    new File([zip], 'ekstern-side.zip', { type: 'application/zip' }),
+  )
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+  expect(result.message).toContain('Original CSS')
+  expect(result.value.project.pages).toHaveLength(1)
+  expect(result.value.project.pages[0].slug).toBe('/')
+  expect(result.value.project.pages[0].seo.description).toBe('Importtest')
+  const texts = result.value.project.pages[0].elements
+    .filter((element) => element.kind === 'text')
+    .map((element) => element.kind === 'text' ? element.content : '')
+  expect(texts).toEqual(['Velkommen', 'Dette er redigerbar tekst.'])
+})
