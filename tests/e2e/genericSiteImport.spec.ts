@@ -10,7 +10,11 @@ async function siteZip() {
   const encoder = new TextEncoder()
   const home = encoder.encode(
     '<!doctype html><html><head><title>Importert side</title>' +
-    '<style>.site-header{width:900px;height:88px;background:#FFFFFF}</style>' +
+    '<style>.site-header{width:900px;height:88px;background:#FFFFFF}' +
+    '.about-grid{display:grid;grid-template-columns:200px 1fr;gap:24px;width:600px}' +
+    '.about-grid img{width:200px;height:120px}.about-grid p{margin:0}' +
+    '@media(max-width:600px){.about-grid{grid-template-columns:1fr;width:390px}' +
+    '.about-grid img{width:200px;height:120px}.about-grid p{margin-top:12px}}</style>' +
     '</head><body>' +
     '<header class="site-header"><img src="assets/logo.png" alt="Logo" data-image-key="image.logo">' +
     '<strong data-content="hero.name">Standardnavn</strong><nav><a href="about/">Om oss</a></nav></header>' +
@@ -18,7 +22,9 @@ async function siteZip() {
     '<img src="assets/logo.png" alt="Hero"><h1>Stor overskrift</h1>' +
     '<p>Hero-tekst</p><a href="https://example.com">Les mer</a></section>' +
     '<main><h1>Velkommen</h1><p>Redigerbar tekst fra ZIP.</p>' +
-    '<ul style="width:220px"><li>Vanskeligheter med å ta valg når teksten brytes over flere linjer</li></ul></main>' +
+    '<ul style="width:220px"><li>Vanskeligheter med å ta valg når teksten brytes over flere linjer</li></ul>' +
+    '<div class="about-grid"><img src="assets/logo.png" alt="Person">' +
+    '<p>Tekst ved siden av bildet på desktop, under bildet på mobil.</p></div></main>' +
     '</body></html>',
   )
   const about = encoder.encode(
@@ -62,6 +68,21 @@ test('imports generic HTML ZIP as editable browser project', async ({ page }) =>
   })
   await expect(wrapped).toBeVisible()
   expect(await wrapped.evaluate((element) => element.clientHeight)).toBeGreaterThan(48)
+
+  await page.getByRole('button', { name: 'Mobil' }).click()
+  const aboutText = page.locator('.canvas-element--text').filter({
+    hasText: 'Tekst ved siden av bildet på desktop',
+  })
+  const personImage = page.locator('.canvas-element--image').filter({
+    has: page.locator('img[alt="Person"]'),
+  })
+  await expect(aboutText).toBeVisible()
+  await expect(personImage).toBeVisible()
+  const imageBox = await personImage.boundingBox()
+  const textBox = await aboutText.boundingBox()
+  expect(imageBox).not.toBeNull()
+  expect(textBox).not.toBeNull()
+  expect(textBox!.y).toBeGreaterThanOrEqual(imageBox!.y + imageBox!.height)
 
   await page.getByRole('button', { name: 'Innstillinger' }).click()
   await expect(page.getByText('Om oss', { exact: true })).toBeVisible()
