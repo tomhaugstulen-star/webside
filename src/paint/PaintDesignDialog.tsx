@@ -1,7 +1,6 @@
 import { PaintDesignControls } from './PaintDesignControls'
+import type { PaintDesignPanel } from './paintDesignPanel'
 import type { PaintFill } from './paintFill'
-
-export type PaintDesignPanel = 'colors' | 'text'
 
 type Props = {
   panel: PaintDesignPanel
