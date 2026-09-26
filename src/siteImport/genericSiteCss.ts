@@ -156,6 +156,36 @@ export function applyCssTextStyle(
 }
 
 
+function splitCssArguments(value: string) {
+  const parts: string[] = []
+  let depth = 0
+  let start = 0
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index]
+    if (char === '(') depth += 1
+    else if (char === ')') depth = Math.max(0, depth - 1)
+    else if (char === ',' && depth === 0) {
+      parts.push(value.slice(start, index).trim())
+      start = index + 1
+    }
+  }
+  parts.push(value.slice(start).trim())
+  return parts.filter(Boolean)
+}
+
+function gradientAngle(value: string) {
+  if (/^-?\d+(?:\.\d+)?deg$/i.test(value)) {
+    return ((Number(value.replace(/deg$/i, '')) % 360) + 360) % 360
+  }
+  const directions: Record<string, number> = {
+    'to top': 0,
+    'to right': 90,
+    'to bottom': 180,
+    'to left': 270,
+  }
+  return directions[value.toLowerCase()] ?? null
+}
+
 export function cssBackgroundFill(value: string | undefined): EditorFill | null {
   if (!value) return null
   const solid = cssColor(value)
@@ -163,12 +193,14 @@ export function cssBackgroundFill(value: string | undefined): EditorFill | null 
 
   const match = value.trim().match(/^linear-gradient\((.+)\)$/i)
   if (!match) return null
-  const parts = match[1].split(',').map((part) => part.trim()).filter(Boolean)
+  const parts = splitCssArguments(match[1])
   if (parts.length < 2 || parts.length > 4) return null
 
   let angle = 180
-  if (/^-?\d+(?:\.\d+)?deg$/i.test(parts[0])) {
-    angle = ((Number(parts.shift()!.replace(/deg$/i, '')) % 360) + 360) % 360
+  const parsedAngle = gradientAngle(parts[0])
+  if (parsedAngle !== null) {
+    angle = parsedAngle
+    parts.shift()
   }
   const colors = parts.map((part) => {
     const token = part.match(/^(#[0-9a-f]{3,6}|rgba?\([^)]*\))/i)?.[1]
