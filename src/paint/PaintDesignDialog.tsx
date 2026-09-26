@@ -17,13 +17,14 @@ type Props = {
   onTextColorChange: (color: string) => void
   onTextSizeChange: (size: number) => void
   onActivateText: () => void
+  onCommitText: () => void
   onClose: () => void
 }
 
 export function PaintDesignDialog({
   panel, fill, textValue, textColor, textSize, textActive, disabled,
   onFillChange, onFillBackground, onTextValueChange, onTextColorChange,
-  onTextSizeChange, onActivateText, onClose,
+  onTextSizeChange, onActivateText, onCommitText, onClose,
 }: Props) {
   return (
     <section className="paint-design-dialog" role="dialog"
@@ -51,6 +52,7 @@ export function PaintDesignDialog({
         onTextColorChange={onTextColorChange}
         onTextSizeChange={onTextSizeChange}
         onActivateText={onActivateText}
+        onCommitText={onCommitText}
       />
     </section>
   )
