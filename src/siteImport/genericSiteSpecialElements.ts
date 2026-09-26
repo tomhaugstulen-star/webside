@@ -6,7 +6,7 @@ import { DEFAULT_TEXT_ELEMENT_STYLE } from '../model/textElementStyle'
 import {
   applyCssTextStyle,
   collectCssForElement,
-  cssBackgroundFill,
+  cssBackgroundFillFromMap,
 } from './genericSiteCss'
 import {
   capturedLayoutFor,
@@ -95,7 +95,7 @@ function importHeader(
   const style = applyCssTextStyle(DEFAULT_TEXT_ELEMENT_STYLE, nameCss)
   const box = captured?.box ??
     importedBox(css, { x: 0, y: 0, width: 960, height: 88 })
-  const fill = cssBackgroundFill(css.get('background') ?? css.get('background-color'))
+  const fill = cssBackgroundFillFromMap(css)
   page.elements.push({
     ...element,
     position: { desktop: { x: box.x, y: box.y } },
@@ -161,7 +161,7 @@ function importHero(
   const titleCss = titleCaptured?.css ??
     (titleNode ? collectCssForElement(titleNode, cssText) : css)
   const style = applyCssTextStyle(DEFAULT_TEXT_ELEMENT_STYLE, titleCss)
-  const fill = cssBackgroundFill(css.get('background-color') ?? css.get('background'))
+  const fill = cssBackgroundFillFromMap(css)
   const box = captured?.box ??
     importedBox(css, { x: 80, y: 140, width: 1160, height: 420 })
 
