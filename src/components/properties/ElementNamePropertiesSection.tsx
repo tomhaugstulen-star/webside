@@ -1,4 +1,4 @@
-import { useEffect, useState, type KeyboardEvent } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import type { EditorElement } from '../../model/editorProject'
 import { useEditorProject } from '../../state/useEditorProject'
 
@@ -12,11 +12,6 @@ export function ElementNamePropertiesSection({
   const { dispatch } = useEditorProject()
   const [draft, setDraft] = useState(element.displayName ?? '')
   const [saved, setSaved] = useState(false)
-
-  useEffect(() => {
-    setDraft(element.displayName ?? '')
-    setSaved(false)
-  }, [element.id, element.displayName])
 
   const save = () => {
     dispatch({
