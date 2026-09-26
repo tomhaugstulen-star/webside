@@ -193,7 +193,7 @@ export function ProjectFileControls() {
         aria-hidden="true"
         onChange={(event) => void importProject(event)}
       />
-      <input ref={siteInputRef} className="project-file-controls__input"
+      <input ref={siteInputRef} className="project-file-controls__site-input"
         type="file" accept=".zip,application/zip" disabled={busy !== null}
         tabIndex={-1} aria-hidden="true"
         onChange={(event) => void importSite(event)} />
