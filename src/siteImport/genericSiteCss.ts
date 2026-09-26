@@ -65,8 +65,11 @@ export function cssPixel(value: string | undefined) {
 }
 
 function rgbToHex(value: string) {
-  const match = value.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
+  const match = value.match(
+    /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/i,
+  )
   if (!match) return null
+  if (match[4] !== undefined && Number(match[4]) <= 0) return null
   const channels = match.slice(1, 4).map((part) =>
     Math.max(0, Math.min(255, Number(part))).toString(16).padStart(2, '0'),
   )
