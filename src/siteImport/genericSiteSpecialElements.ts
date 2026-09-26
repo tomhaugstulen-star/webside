@@ -41,7 +41,6 @@ function assetForHero(
   css: Map<string, string>,
   htmlPath: string,
   assetsByPath: ReadonlyMap<string, SiteAsset>,
-  layouts: CapturedSiteLayouts,
 ) {
   const image = container.querySelector('img[src]')
   if (image) {
@@ -58,6 +57,7 @@ function importHeader(
   cssText: string,
   htmlPath: string,
   assetsByPath: ReadonlyMap<string, SiteAsset>,
+  layouts: CapturedSiteLayouts,
 ) {
   const header = document.querySelector('header')
   const logo = header?.querySelector('img[src]')
