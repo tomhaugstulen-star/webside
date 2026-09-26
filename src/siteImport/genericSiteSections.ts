@@ -2,7 +2,11 @@ import { createEditorElement } from '../model/createEditorElement'
 import { createStableId } from '../model/createStableId'
 import type { EditorPage } from '../model/editorProject'
 import { createUniqueSectionAnchorId } from '../model/siteStructure'
-import { collectCssForElement, cssBackgroundFill, cssPixel } from './genericSiteCss'
+import {
+  collectCssForElement,
+  cssBackgroundFillFromMap,
+  cssPixel,
+} from './genericSiteCss'
 import {
   capturedLayoutFor,
   type CapturedSiteLayouts,
