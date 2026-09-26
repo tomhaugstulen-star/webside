@@ -84,7 +84,8 @@ function sanitizeClone(
     },
   )
   const style = clone.createElement('style')
-  style.textContent = localizedCss
+  style.textContent = localizedCss +
+    '\n*,*::before,*::after{animation:none!important;transition:none!important;}'
   clone.head.append(style)
   return { clone, urls }
 }
