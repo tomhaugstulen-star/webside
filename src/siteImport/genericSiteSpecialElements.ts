@@ -57,6 +57,11 @@ function importHeader(
   const header = document.querySelector('header')
   const logo = header?.querySelector('img[src]')
   if (!header || !logo) return
+  const headerHints = `${header.id} ${header.className}`.toLowerCase()
+  const hasNavigation = Boolean(header.querySelector('nav'))
+  const looksLikeSiteHeader = hasNavigation ||
+    /\b(?:site-header|navbar|nav-bar|masthead|topbar|top-bar|brand-header)\b/.test(headerHints)
+  if (!looksLikeSiteHeader) return
   const asset = assetForPath(htmlPath, logo.getAttribute('src') ?? '', assetsByPath)
   if (!asset) return
 
