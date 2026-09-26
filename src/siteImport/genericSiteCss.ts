@@ -29,8 +29,8 @@ function parseDeclarations(source: string) {
   return result
 }
 
-function safeSelector(selector: string) {
-  return /^(?:[a-z][\w-]*|\.[\w-]+|#[\w-]+|[a-z][\w-]*\.[\w-]+)$/i.test(selector)
+function usableSelector(selector: string) {
+  return selector.length > 0 && selector.length <= 500 && !selector.startsWith('@')
 }
 
 export function collectCssForElement(element: Element, cssText: string) {
@@ -42,7 +42,7 @@ export function collectCssForElement(element: Element, cssText: string) {
   while ((match = rulePattern.exec(cleaned))) {
     for (const rawSelector of match[1].split(',')) {
       const selector = rawSelector.trim()
-      if (!safeSelector(selector)) continue
+      if (!usableSelector(selector)) continue
       try {
         if (!element.matches(selector)) continue
       } catch {
