@@ -6,7 +6,10 @@ import {
   type SupportedImageMimeType,
 } from '../model/imageAsset'
 import type { ImportedProjectFile } from '../projectFiles/projectFileFormat'
-import { imageAssetMetadataEqual } from '../projectFiles/projectAssetReferences'
+import {
+  getProjectAssetReferences,
+  imageAssetMetadataEqual,
+} from '../projectFiles/projectAssetReferences'
 import {
   STATIC_SITE_MANIFEST_FORMAT,
   STATIC_SITE_MANIFEST_PATH,
@@ -78,6 +81,11 @@ export async function readStaticSiteZip(file: File): Promise<ReadResult> {
       return { ok: false, message: 'Bildelisten i nettstedet er ugyldig.' }
     }
 
+    const references = getProjectAssetReferences(project)
+    if (!references || references.length !== parsed.assets.length) {
+      return { ok: false, message: 'Nettstedets bildeliste stemmer ikke med prosjektet.' }
+    }
+
     const ids = new Set<string>()
     const paths = new Set<string>()
     const assets: ImportedProjectFile['assets'] = []
@@ -88,6 +96,11 @@ export async function readStaticSiteZip(file: File): Promise<ReadResult> {
       }
       ids.add(asset.assetId)
       paths.add(asset.path)
+
+      const reference = references.find((item) => item.assetId === asset.assetId)
+      if (!reference || !imageAssetMetadataEqual(reference.metadata, asset.metadata)) {
+        return { ok: false, message: 'Nettstedets bildedata stemmer ikke med prosjektet.' }
+      }
 
       const bytes = byPath.get(asset.path)
       if (!bytes) {
