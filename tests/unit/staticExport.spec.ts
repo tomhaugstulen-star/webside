@@ -237,3 +237,46 @@ test('generic HTML import maps a simple CSS gradient background', async () => {
     stops: ['#111111', '#777777', '#EEEEEE'],
   })
 })
+
+
+test('generic HTML import maps simple flex layout', async () => {
+  const html = new TextEncoder().encode(
+    '<!doctype html><html><head><style>' +
+    '.row{display:flex;width:600px;padding:10px;gap:20px}' +
+    '</style></head><body><div class="row"><p>En</p><p>To</p></div></body></html>',
+  )
+  const result = await readStaticSiteZip(new File([
+    createZip([{ path: 'index.html', bytes: html }]),
+  ], 'flex.zip', { type: 'application/zip' }))
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+  const texts = result.value.project.pages[0].elements
+    .filter((element) => element.kind === 'text')
+  expect(texts).toHaveLength(2)
+  expect(texts[0].position.desktop.x).toBe(90)
+  expect(texts[0].size.desktop.width).toBe(280)
+  expect(texts[1].position.desktop.x).toBe(390)
+})
+
+test('generic HTML import reconstructs semantic section backgrounds', async () => {
+  const html = new TextEncoder().encode(
+    '<!doctype html><html><head><style>' +
+    '#intro{position:absolute;left:30px;top:40px;width:900px;height:300px;' +
+    'background-color:#224466}' +
+    '</style></head><body><section id="intro"><h2>Intro</h2></section></body></html>',
+  )
+  const result = await readStaticSiteZip(new File([
+    createZip([{ path: 'index.html', bytes: html }]),
+  ], 'section.zip', { type: 'application/zip' }))
+  expect(result.ok).toBe(true)
+  if (!result.ok) return
+  const section = result.value.project.pages[0].elements
+    .find((element) => element.kind === 'section')
+  expect(section?.kind).toBe('section')
+  if (!section || section.kind !== 'section') return
+  expect(section.position.desktop).toEqual({ x: 30, y: 40 })
+  expect(section.size.desktop).toEqual({ width: 900, height: 300 })
+  expect(section.appearance.backgroundFill).toEqual({
+    type: 'solid', color: '#224466',
+  })
+})
