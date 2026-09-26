@@ -65,6 +65,7 @@ function makeTextElement(
   siblingIndex: number,
   link: ReturnType<typeof externalElementLink>,
   captured: CapturedSiteLayout | null,
+  capturedMobile: CapturedSiteLayout | null,
 ) {
   const element = createEditorElement({
     id: createStableId(),
@@ -87,12 +88,23 @@ function makeTextElement(
   return {
     ...element,
     content,
-    position: { desktop: { x: box.x, y: box.y } },
+    position: {
+      desktop: { x: box.x, y: box.y },
+      mobile: capturedMobile
+        ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
+        : undefined,
+    },
     size: {
       desktop: {
         width: Math.max(120, box.width),
         height: importedTextBoxHeight(box.height),
       },
+      mobile: capturedMobile
+        ? {
+            width: Math.max(120, capturedMobile.box.width),
+            height: importedTextBoxHeight(capturedMobile.box.height),
+          }
+        : undefined,
     },
     appearance: background
       ? { ...element.appearance, backgroundFill: background }
@@ -134,6 +146,7 @@ export async function createPageFromHtml(
     if (node.closest('nav') || isInsideSpecialImportedElement(node)) continue
     if (node.parentElement?.closest('h1,h2,h3,p,li,a,button')) continue
     const captured = capturedLayoutFor(node, layouts)
+    const capturedMobile = capturedLayoutFor(node, layouts, 'mobile')
     const css = captured?.css ?? collectCssForElement(node, cssText)
     const parent = node.parentElement
     const parentCaptured = parent ? capturedLayoutFor(parent, layouts) : null
@@ -154,12 +167,23 @@ export async function createPageFromHtml(
         const box = captured?.box
         page.elements.push(box ? {
           ...button,
-          position: { desktop: { x: box.x, y: box.y } },
+          position: {
+            desktop: { x: box.x, y: box.y },
+            mobile: capturedMobile
+              ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
+              : undefined,
+          },
           size: {
             desktop: {
               width: Math.max(80, box.width),
               height: Math.max(36, box.height),
             },
+            mobile: capturedMobile
+              ? {
+                  width: Math.max(80, capturedMobile.box.width),
+                  height: Math.max(36, capturedMobile.box.height),
+                }
+              : undefined,
           },
         } : button)
         if (cssPixel(css.get('top')) === null &&
@@ -196,12 +220,23 @@ export async function createPageFromHtml(
       page.elements.push({
         ...element,
         altText: node.getAttribute('alt')?.slice(0, 300) || '',
-        position: { desktop: { x: box.x, y: box.y } },
+        position: {
+          desktop: { x: box.x, y: box.y },
+          mobile: capturedMobile
+            ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
+            : undefined,
+        },
         size: {
           desktop: {
             width: Math.max(48, box.width),
             height: Math.max(48, box.height),
           },
+          mobile: capturedMobile
+            ? {
+                width: Math.max(48, capturedMobile.box.width),
+                height: Math.max(48, capturedMobile.box.height),
+              }
+            : undefined,
         },
       })
       if (cssPixel(css.get('top')) === null &&
@@ -215,7 +250,8 @@ export async function createPageFromHtml(
     if (!text) continue
     const element = makeTextElement(
       text.slice(0, 2000), node.tagName, y, page.elements,
-      css, parentCss, siblingIndex, externalElementLink(node), captured,
+      css, parentCss, siblingIndex, externalElementLink(node),
+      captured, capturedMobile,
     )
     page.elements.push(element)
     if (cssPixel(css.get('top')) === null &&
