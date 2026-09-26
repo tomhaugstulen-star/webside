@@ -149,7 +149,8 @@ export function ProjectFileControls() {
     <section className="project-file-controls">
       <h3>Prosjektfil</h3>
       <p>
-        Lagre hele prosjektet med bilder, eller åpne en tidligere prosjektfil.
+        Lagre hele prosjektet, åpne en prosjektfil eller importer en nettsted-ZIP
+        som tidligere er eksportert fra editoren.
       </p>
       <div className="project-file-controls__actions">
         <button
