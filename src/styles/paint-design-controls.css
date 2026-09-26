@@ -27,3 +27,71 @@
   border: 1px solid var(--portal-border);
   border-radius: 7px;
 }
+
+
+.paint-design-dialog {
+  position: absolute;
+  z-index: 8;
+  top: 76px;
+  left: 216px;
+  width: min(390px, calc(100% - 252px));
+  max-height: calc(100% - 96px);
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 14px;
+  background: var(--portal-control-surface);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
+}
+
+.paint-design-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.paint-design-dialog__header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.paint-design-dialog__header p {
+  margin: 4px 0 0;
+  color: var(--portal-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.paint-design-dialog__header > button {
+  width: 34px;
+  min-width: 34px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.paint-design-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paint-design-dialog__body > button {
+  width: 100%;
+}
+
+.paint-design-dialog__body textarea {
+  min-height: 108px;
+}
+
+@media (max-width: 760px) {
+  .paint-design-dialog {
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: calc(100% - 86px);
+  }
+}
