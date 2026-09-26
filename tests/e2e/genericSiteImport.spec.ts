@@ -12,8 +12,8 @@ async function siteZip() {
     '<!doctype html><html><head><title>Importert side</title>' +
     '<style>.site-header{width:900px;height:88px;background:#FFFFFF}</style>' +
     '</head><body>' +
-    '<header class="site-header"><img src="assets/logo.png" alt="Logo">' +
-    '<strong>Min side</strong><nav><a href="about/">Om oss</a></nav></header>' +
+    '<header class="site-header"><img src="assets/logo.png" alt="Logo" data-image-key="image.logo">' +
+    '<strong data-content="hero.name">Standardnavn</strong><nav><a href="about/">Om oss</a></nav></header>' +
     '<section class="hero" style="width:900px;height:320px;background:#223344">' +
     '<img src="assets/logo.png" alt="Hero"><h1>Stor overskrift</h1>' +
     '<p>Hero-tekst</p><a href="https://example.com">Les mer</a></section>' +
@@ -24,8 +24,13 @@ async function siteZip() {
     '<!doctype html><html><head><title>Om oss</title></head>' +
     '<body><h1>Om oss</h1></body></html>',
   )
+  const content = encoder.encode(JSON.stringify({
+    'hero.name': 'Navn fra admin',
+    'image.logo': 'assets/logo.png',
+  }))
   const blob = createZip([
     { path: 'index.html', bytes: home },
+    { path: 'content.json', bytes: content },
     { path: 'about/index.html', bytes: about },
     { path: 'assets/logo.png', bytes: new Uint8Array(onePixelPng) },
   ])
@@ -47,6 +52,7 @@ test('imports generic HTML ZIP as editable browser project', async ({ page }) =>
   )
   await expect(page.getByText('2 sider', { exact: true })).toBeVisible()
   await expect(page.locator('.header-element__logo')).toBeVisible()
+  await expect(page.getByText('Navn fra admin', { exact: true })).toBeVisible()
   await expect(page.locator('.hero-element__image')).toBeVisible()
   await expect(page.getByText('Stor overskrift', { exact: true })).toBeVisible()
   await expect(page.getByText('Velkommen', { exact: true })).toBeVisible()
