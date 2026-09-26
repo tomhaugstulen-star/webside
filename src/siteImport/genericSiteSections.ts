@@ -22,9 +22,7 @@ export function addSemanticSections(
     if (container.hasAttribute('data-webside-import-special')) continue
     const captured = capturedLayoutFor(container, layouts)
     const css = captured?.css ?? collectCssForElement(container, cssText)
-    const background = cssBackgroundFill(
-      css.get('background') ?? css.get('background-color'),
-    )
+    const background = cssBackgroundFillFromMap(css)
     const explicitHeight = cssPixel(css.get('height'))
     if (!background && explicitHeight === null) continue
 
