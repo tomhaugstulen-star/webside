@@ -10,7 +10,6 @@ import { pageFilePath, relativePageHref } from '../../src/export/sitePaths'
 import { editorProjectReducer } from '../../src/state/editorProjectReducer'
 import { DEFAULT_BUTTON_ASSET_ID } from '../../src/model/buttonAsset'
 import { PUBLIC_DESKTOP_WIDTH } from '../../src/export/siteDimensions'
-import { readStaticSiteZip } from '../../src/siteImport/readStaticSiteZip'
 
 const decode = new TextDecoder()
 
