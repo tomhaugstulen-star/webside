@@ -25,6 +25,7 @@ export function addSemanticSections(
   )) {
     if (container.hasAttribute('data-webside-import-special')) continue
     const captured = capturedLayoutFor(container, layouts)
+    const capturedMobile = capturedLayoutFor(container, layouts, 'mobile')
     const css = captured?.css ?? collectCssForElement(container, cssText)
     const background = cssBackgroundFillFromMap(css)
     const explicitHeight = cssPixel(css.get('height'))
@@ -55,12 +56,23 @@ export function addSemanticSections(
       displayName: container.id
         ? `Seksjon: ${container.id}`
         : `Seksjon: ${container.tagName.toLowerCase()}`,
-      position: { desktop: { x: box.x, y: box.y } },
+      position: {
+        desktop: { x: box.x, y: box.y },
+        mobile: capturedMobile
+          ? { x: capturedMobile.box.x, y: capturedMobile.box.y }
+          : undefined,
+      },
       size: {
         desktop: {
           width: Math.max(160, box.width),
           height: Math.max(90, box.height),
         },
+        mobile: capturedMobile
+          ? {
+              width: Math.max(160, capturedMobile.box.width),
+              height: Math.max(90, capturedMobile.box.height),
+            }
+          : undefined,
       },
       appearance: background
         ? { ...element.appearance, backgroundFill: background }
